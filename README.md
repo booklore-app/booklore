@@ -4,6 +4,11 @@ BookLore is a self-hosted web app for organizing and managing your personal book
 
 ![BookLore Screenshot](assets/booklore-screenshot.jpg)
 
+> ⚠️ **Warning:**  
+> This project is in early development by a sole developer. Expect bugs, missing features, and frequent changes.  
+> **Data Loss Risk:** Non-backwards compatible database changes may result in loss of metadata, such as book titles, authors, and reading progress. Your actual book files (PDFs and ePubs) are unlikely to be affected, but it's always a good idea to keep a backup of both your database and your book files.  
+> **Limited Support:** As this is a one-person project, support may be slow, and features could be experimental or incomplete. Contributions and feedback are welcome!
+
 ## Key Features
 - **Modern, Responsive UI** – A sleek, highly reactive, and fluent interface for a seamless reading experience.
 - **Organized Book Management** – Categorize books using Libraries and Shelves for better organization.
@@ -91,3 +96,10 @@ Once the containers are up, access BookLore in your browser at:
 ```ini
 http://localhost:6060
 ```
+
+## Tech Stack
+
+- **Backend:** Spring Boot (Java)
+- **Frontend:** Angular (TypeScript)
+- **Database:** MariaDB
+- **Containerization:** Docker & Docker Compose  
