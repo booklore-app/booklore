@@ -11,6 +11,7 @@
         <th style="width: 100px;">Can Upload</th>
         <th style="width: 100px;">Can Download</th>
         <th style="width: 100px;">Can Edit Metadata</th>
+        <th style="width: 100px;">Can Email Books</th>
         <th style="width: 100px;">Edit</th>
         <th style="width: 100px;">Change Password</th>
         <th style="width: 100px;">Delete</th>
@@ -53,6 +54,10 @@
         <td class="text-center">
           <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEditMetadata" *ngIf="user.isEditing"></p-checkbox>
           <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEditMetadata" disabled *ngIf="!user.isEditing"></p-checkbox>
+        </td>
+        <td class="text-center">
+          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook" *ngIf="user.isEditing"></p-checkbox>
+          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook" disabled *ngIf="!user.isEditing"></p-checkbox>
         </td>
         <td class="text-center">
           <ng-container *ngIf="user.username !== 'admin'">

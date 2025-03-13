@@ -46,6 +46,7 @@ public class UserService {
         user.getPermissions().setPermissionUpload(updateRequest.getPermissions().isCanUpload());
         user.getPermissions().setPermissionDownload(updateRequest.getPermissions().isCanDownload());
         user.getPermissions().setPermissionEditMetadata(updateRequest.getPermissions().isCanEditMetadata());
+        user.getPermissions().setPermissionEmailBook(updateRequest.getPermissions().isCanEmailBook());
 
         List<Long> libraryIds = updateRequest.getAssignedLibraries();
         if (libraryIds != null) {

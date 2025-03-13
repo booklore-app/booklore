@@ -23,5 +23,6 @@ public class BookLoreUser {
         private boolean canDownload;
         private boolean canEditMetadata;
         private boolean canManipulateLibrary;
+        private boolean canEmailBook;
     }
 }

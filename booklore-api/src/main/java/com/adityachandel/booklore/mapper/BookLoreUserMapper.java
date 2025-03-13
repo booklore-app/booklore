@@ -23,6 +23,7 @@ public interface BookLoreUserMapper {
         dto.setCanDownload(permissions.isPermissionDownload());
         dto.setCanManipulateLibrary(permissions.isPermissionManipulateLibrary());
         dto.setCanEditMetadata(permissions.isPermissionEditMetadata());
+        dto.setCanEmailBook(permissions.isPermissionEmailBook());
         return dto;
     }
 }

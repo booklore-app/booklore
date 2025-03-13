@@ -28,7 +28,7 @@
   <div class="book-info">
     <div class="book-title-container">
       <h4 class="book-title">{{ book.metadata?.title }}</h4>
-      <p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
+      <p-tieredmenu #menu [model]="items" [popup]="true" appendTo="body"></p-tieredmenu>
       <p-button
         size="small"
         [text]="true"

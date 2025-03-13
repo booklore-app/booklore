@@ -83,6 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         permissions.setCanUpload(userEntity.getPermissions().isPermissionUpload());
         permissions.setCanDownload(userEntity.getPermissions().isPermissionDownload());
         permissions.setCanEditMetadata(userEntity.getPermissions().isPermissionEditMetadata());
+        permissions.setCanEmailBook(userEntity.getPermissions().isPermissionEmailBook());
         permissions.setCanManipulateLibrary(userEntity.getPermissions().isPermissionManipulateLibrary());
 
         BookLoreUser bookLoreUser = new BookLoreUser();

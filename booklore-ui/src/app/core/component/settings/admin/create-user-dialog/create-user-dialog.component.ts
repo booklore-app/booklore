@@ -47,7 +47,8 @@ export class CreateUserDialogComponent implements OnInit {
       selectedLibraries: [[], Validators.required],
       permissionUpload: [false],
       permissionDownload: [false],
-      permissionEditMetadata: [false]
+      permissionEditMetadata: [false],
+      permissionEmailBook: [false]
     });
   }
 

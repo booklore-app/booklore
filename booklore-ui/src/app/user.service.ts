@@ -17,6 +17,7 @@ export interface User {
     admin: boolean;
     canUpload: boolean;
     canDownload: boolean;
+    canEmailBook: boolean;
     canEditMetadata: boolean;
     canManipulateLibrary: boolean;
   };

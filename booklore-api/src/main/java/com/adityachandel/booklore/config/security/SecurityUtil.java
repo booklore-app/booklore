@@ -52,6 +52,14 @@ public class SecurityUtil {
         return false;
     }
 
+    public boolean canEmailBook() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof BookLoreUser user) {
+            return user.getPermissions().isCanEmailBook();
+        }
+        return false;
+    }
+
     public boolean canViewUserProfile(Long userId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof BookLoreUser user) {

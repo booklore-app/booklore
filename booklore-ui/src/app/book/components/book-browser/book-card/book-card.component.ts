@@ -2,7 +2,7 @@ import {Component, inject, Input, OnInit} from '@angular/core';
 import {Book} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
-import {MenuItem} from 'primeng/api';
+import {MenuItem, MessageService} from 'primeng/api';
 import {DialogService} from 'primeng/dynamicdialog';
 import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.component';
 import {BookService} from '../../../service/book.service';
@@ -16,12 +16,15 @@ import {UrlHelperService} from '../../../../utilities/service/url-helper.service
 import {NgClass, NgIf} from '@angular/common';
 import {UserService} from '../../../../user.service';
 import {filter} from 'rxjs';
+import {EmailService} from '../../../../settings/email/email.service';
+import {TieredMenu, TieredMenuModule} from 'primeng/tieredmenu';
+import {BookSenderComponent} from '../../book-sender/book-sender.component';
 
 @Component({
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf, NgClass],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf, NgClass, TieredMenu],
   standalone: true
 })
 export class BookCardComponent implements OnInit {
@@ -37,8 +40,11 @@ export class BookCardComponent implements OnInit {
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
   private metadataDialogService = inject(MetadataDialogService);
-  protected urlHelper = inject(UrlHelperService);
   private userService = inject(UserService);
+  private emailService = inject(EmailService);
+  private messageService = inject(MessageService);
+
+  protected urlHelper = inject(UrlHelperService);
 
   private userPermissions: any;
 
@@ -71,21 +77,16 @@ export class BookCardComponent implements OnInit {
   private initMenu() {
     this.items = [
       {
-        label: 'Options',
-        items: [
-          {
-            label: 'Assign Shelves',
-            icon: 'pi pi-folder',
-            command: () => this.openShelfDialog()
-          },
-          {
-            label: 'View Details',
-            icon: 'pi pi-info-circle',
-            command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'view'),
-          },
-          ...this.getPermissionBasedMenuItems(),
-        ],
+        label: 'Assign Shelves',
+        icon: 'pi pi-folder',
+        command: () => this.openShelfDialog()
       },
+      {
+        label: 'View Details',
+        icon: 'pi pi-info-circle',
+        command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'view'),
+      },
+      ...this.getPermissionBasedMenuItems(),
     ];
   }
 
@@ -139,6 +140,56 @@ export class BookCardComponent implements OnInit {
       });
     }
 
+    if (this.hasEmailBookPermission()) {
+      items.push(
+        {
+          label: 'Send Book',
+          icon: 'pi pi-envelope',
+          items: [{
+            label: 'Quick Send',
+            icon: 'pi pi-envelope',
+            command: () => {
+              this.emailService.emailBookQuick(this.book.id).subscribe({
+                next: () => {
+                  this.messageService.add({
+                    severity: 'info',
+                    summary: 'Success',
+                    detail: 'The book sending has been scheduled.',
+                  });
+                },
+                error: (err) => {
+                  const errorMessage = err?.error?.message || 'An error occurred while sending the book.';
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: errorMessage,
+                  });
+                },
+              });
+            }
+          },
+            {
+              label: 'Custom Send',
+              icon: 'pi pi-envelope',
+              command: () => {
+                this.dialogService.open(BookSenderComponent, {
+                  header: 'Send Book to Email',
+                  modal: true,
+                  closable: true,
+                  style: {
+                    position: 'absolute',
+                    top: '15%',
+                  },
+                  data: {
+                    book: this.book,
+                  }
+                });
+              }
+            }
+          ]
+        });
+    }
+
     return items;
   }
 
@@ -169,5 +220,9 @@ export class BookCardComponent implements OnInit {
 
   private hasDownloadPermission(): boolean {
     return this.userPermissions?.canDownload ?? false;
+  }
+
+  private hasEmailBookPermission(): boolean {
+    return this.userPermissions?.canEmailBook ?? false;
   }
 }

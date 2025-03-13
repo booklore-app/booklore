@@ -49,6 +49,7 @@ public class UserCreatorService {
         permissions.setPermissionUpload(request.isPermissionUpload());
         permissions.setPermissionDownload(request.isPermissionDownload());
         permissions.setPermissionEditMetadata(request.isPermissionEditMetadata());
+        permissions.setPermissionEmailBook(request.isPermissionEmailBook());
         user.setPermissions(permissions);
 
         user.setBookPreferences(buildDefaultBookPreferences());
@@ -81,6 +82,7 @@ public class UserCreatorService {
         permissions.setPermissionDownload(true);
         permissions.setPermissionManipulateLibrary(true);
         permissions.setPermissionEditMetadata(true);
+        permissions.setPermissionEmailBook(true);
         permissions.setPermissionAdmin(true);
 
         user.setPermissions(permissions);

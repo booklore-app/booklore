@@ -8,6 +8,7 @@ import {SettingsComponent} from './core/component/settings/settings.component';
 import {PdfViewerComponent} from './book/components/pdf-viewer/pdf-viewer.component';
 import {EpubViewerComponent} from './book/components/epub-viewer/component/epub-viewer.component';
 import {ChangePasswordComponent} from './core/component/change-password/change-password.component';
+import {EmailComponent} from './settings/email/email.component';
 
 export const routes: Routes = [
   {

@@ -1,0 +1,55 @@
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-xl flex items-center gap-2">
+    Recipient Emails
+    <i class="pi pi-info-circle text-sky-600"
+       pTooltip="Manage the list of recipients who will receive books via email. The 'Default' recipient will be used for 'Quick Book Send,' located in the Book Card menu."
+       tooltipPosition="right"
+       style="cursor: pointer;"></i>
+  </h2>
+  <p-button outlined="true" label="Add New Recipient" (onClick)="openAddRecipientDialog()"></p-button>
+</div>
+
+<p-table [value]="recipientEmails">
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 5%;">Default</th>
+      <th style="width: 40%;">Email Address</th>
+      <th style="width: 40%;">Name</th>
+      <th style="width: 15%;">Edit</th>
+      <th style="width: 5%;">Delete</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-recipient>
+    <tr>
+      <td class="text-center">
+        <p-radioButton
+          name="defaultRecipient"
+          [value]="recipient.id"
+          [(ngModel)]="defaultRecipientId"
+          (onClick)="setDefaultRecipient(recipient)">
+        </p-radioButton>
+      </td>
+
+      <td>
+        <input *ngIf="recipient.isEditing" type="email" [(ngModel)]="recipient.email" class="p-inputtext w-full"/>
+        <span *ngIf="!recipient.isEditing">{{ recipient.email }}</span>
+      </td>
+
+      <td>
+        <input *ngIf="recipient.isEditing" type="text" [(ngModel)]="recipient.name" class="p-inputtext w-full"/>
+        <span *ngIf="!recipient.isEditing">{{ recipient.name }}</span>
+      </td>
+
+      <td class="text-center">
+        <p-button *ngIf="!recipient.isEditing" icon="pi pi-pencil" outlined="true" severity="info" (onClick)="toggleEditRecipient(recipient)"></p-button>
+        <p-button *ngIf="recipient.isEditing" icon="pi pi-check" outlined="true" severity="success" (onClick)="saveRecipient(recipient)"></p-button>
+        <p-button *ngIf="recipient.isEditing" icon="pi pi-times" outlined="true" severity="danger" (onClick)="toggleEditRecipient(recipient)"></p-button>
+      </td>
+
+      <td class="text-center">
+        <p-button icon="pi pi-trash" outlined="true" severity="danger" (onClick)="deleteRecipient(recipient)"></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
