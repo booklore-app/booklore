@@ -85,3 +85,13 @@ jobs:
           gh release create ${{ env.new_tag }} \
             --title "Release ${{ env.new_tag }}" \
             --notes "Automated release for ${{ env.new_tag }}"
+
+      - name: Delete Feature/Bug Branches (Only for Master and Develop)
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
+        run: |
+          git fetch --prune
+          for branch in $(git branch -r | grep 'origin/feature/' || grep 'origin/bug/'); do
+            branch_name=${branch#origin/}
+            echo "Deleting branch: $branch_name"
+            git push origin --delete "$branch_name"
+          done
