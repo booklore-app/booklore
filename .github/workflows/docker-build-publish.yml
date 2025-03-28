@@ -2,6 +2,9 @@ name: Build, Tag, Push, and Release to GitHub Container Registry
 
 on:
   push:
+    branches:
+      - master
+      - develop
 
 jobs:
   build-and-push:
@@ -10,6 +13,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      pull-requests: write
 
     steps:
       - name: Checkout Repository
@@ -34,13 +38,36 @@ jobs:
           echo "latest_tag=$latest_tag" >> $GITHUB_ENV
           echo "Latest master tag: $latest_tag"
 
+      - name: Determine Version Bump (Only for Master)
+        if: github.ref == 'refs/heads/master'
+        id: determine_bump
+        run: |
+          labels=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name' || echo "")
+          if echo "$labels" | grep -q 'breaking-change'; then
+            bump="major"
+          elif echo "$labels" | grep -q 'feature\|enhancement'; then
+            bump="minor"
+          else
+            bump="patch"
+          fi
+          echo "bump=$bump" >> $GITHUB_ENV
+          echo "Version bump type: $bump"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Auto-Increment Version (Only for Master)
         if: github.ref == 'refs/heads/master'
         id: bump_version
         run: |
-          old_version=${{ env.latest_tag }}
+          old_version="${{ env.latest_tag }}"
           IFS='.' read -r -a parts <<< "${old_version//[!0-9.]/}"
-          new_version="${parts[0]}.${parts[1]}.$((parts[2] + 1))"
+          if [ "${{ env.bump }}" = "major" ]; then
+            new_version="$((parts[0] + 1)).0.0"
+          elif [ "${{ env.bump }}" = "minor" ]; then
+            new_version="${parts[0]}.$((parts[1] + 1)).0"
+          else
+            new_version="${parts[0]}.${parts[1]}.$((parts[2] + 1))"
+          fi
           new_tag="v${new_version}"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
           echo "New version: $new_tag"
@@ -85,14 +112,21 @@ jobs:
             --tag ghcr.io/${{ github.actor }}/booklore-app:latest \
             --push .
 
-      - name: Create GitHub Release (Only for Master)
+      - name: Update Release Draft (Only for Master)
+        if: github.ref == 'refs/heads/master'
+        uses: release-drafter/release-drafter@v6
+        with:
+          tag: ${{ env.new_tag }}
+          name: "Release ${{ env.new_tag }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Draft Release (Only for Master)
         if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ env.new_tag }} \
-            --title "Release ${{ env.new_tag }}" \
-            --notes "Automated release for ${{ env.new_tag }}"
+          gh release edit ${{ env.new_tag }} --draft=false
 
       - name: Delete Feature/Bug Branches (Only for Master and Develop)
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
