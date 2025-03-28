@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
-import {Observable} from 'rxjs';
+import {first, Observable} from 'rxjs';
 import {BookService} from '../../../book/service/book.service';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
@@ -45,7 +45,7 @@ export class MetadataViewerComponent implements OnInit {
       {
         label: 'Custom Send',
         command: () => {
-          this.metadata$.subscribe((metadata) => {
+          this.metadata$.pipe(first()).subscribe((metadata) => {
             if (metadata) {
               this.dialogService.open(BookSenderComponent, {
                 header: 'Send Book to Email',
