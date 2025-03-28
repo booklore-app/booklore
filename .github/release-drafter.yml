@@ -29,10 +29,3 @@ change-template: '- $TITLE (#$NUMBER) by @$AUTHOR'
 template: |
   ## 🌟 Changes in this release:
   $CHANGES
-
-  ## 📣 Contributors:
-  $CONTRIBUTORS 🙌
-
-  ## 🚢 Docker Image:
-  You can pull the Docker image from GitHub Container Registry:
-  - [ghcr.io/${{ github.actor }}/booklore-app:${{ env.image_tag }}](https://ghcr.io/${{ github.actor }}/booklore-app:${{ env.image_tag }})
