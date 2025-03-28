@@ -1,6 +1,7 @@
 <div #epubContainer class="epub-viewer-container">
   <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
   <div *ngIf="!isLoading">
+
     <p-button class="menu-toggle-button" (click)="toggleDrawer()" icon="pi pi-bars" severity="secondary"></p-button>
     <p-drawer [(visible)]="isDrawerVisible" [modal]="false" [position]="'left'" header="Chapters">
       <ul class="chapter-list">
@@ -9,6 +10,10 @@
         </li>
       </ul>
     </p-drawer>
+
+    <div class="epub-header">
+      <h3>Chapter 1: Introduction | Page 3 of 120</h3>
+    </div>
 
     <p-button class="settings-toggle-button" (click)="toggleSettingsDrawer()" icon="pi pi-cog" severity="secondary"></p-button>
     <p-drawer [(visible)]="isSettingsDrawerVisible" [modal]="false" [position]="'right'" header="Settings">

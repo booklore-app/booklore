@@ -1,5 +1,6 @@
 .epub-viewer-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -27,6 +28,16 @@
 
 .settings-toggle-button {
   right: 10px;
+}
+
+.epub-header {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 500;
+  text-align: center;
+  color: #333;
 }
 
 .epub-controls-left,

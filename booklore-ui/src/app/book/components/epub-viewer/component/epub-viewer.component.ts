@@ -1,5 +1,5 @@
 import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import ePub from 'epubjs';
+import ePub, {EpubCFI} from 'epubjs';
 import {Drawer} from 'primeng/drawer';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
@@ -21,6 +21,32 @@ const FALLBACK_EPUB_SETTINGS = {
   maxFontSize: 300,
   minFontSize: 50,
 };
+
+function flatten(chapters: any) {
+  return [].concat.apply([], chapters.map((chapter: any) => [].concat.apply([chapter], flatten(chapter.subitems))));
+}
+
+export function getCfiFromHref(book: any, href: string): string {
+  const [_, id] = href.split('#');
+  const section = book.spine.get(href);
+  const el = (id ? section.document.getElementById(id) : section.document.body) as Element;
+  return section.cfiFromElement(el);
+}
+
+export function getChapter(book: any, location: any) {
+  const locationHref = location.start.href;
+
+  let match = flatten(book.navigation.toc)
+    .filter((chapter: any) => {
+      return book.canonical(chapter.href).includes(book.canonical(locationHref));
+    })
+    .reduce((result: any | null, chapter: any) => {
+      const locationAfterChapter = EpubCFI.prototype.compare(location.start.cfi, getCfiFromHref(book, chapter.href)) > 0;
+      return locationAfterChapter ? chapter : result;
+    }, null);
+
+  return match;
+}
 
 @Component({
   selector: 'app-epub-viewer',
@@ -236,10 +262,13 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   private trackProgress(): void {
     if (this.rendition) {
       this.rendition.on('relocated', (location: any) => {
+        const currentChapter = getChapter(this.book, location);
+        console.log(currentChapter?.label || 'Unknown Chapter');
         this.bookService.saveEpubProgress(this.epub.id, location.start.cfi).subscribe();
       });
     }
   }
+
 
   ngOnDestroy(): void {
     if (this.rendition) {
