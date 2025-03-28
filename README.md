@@ -35,76 +35,59 @@ You can quickly set up and run BookLore using Docker.
 
 Ensure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
-### 2️⃣ Create a `.env` file
+### 2️⃣ Create docker-compose.yml
 
-Create a `.env` file to store environment variables.
-
-```ini
-# Docker image version (Replace with latest version found at https://github.com/adityachandelgit/BookLore/releases)
-BOOKLORE_IMAGE_TAG=v0.0.19
-
-# User and timezone settings
-PUID=1000
-PGID=1000
-TZ=Etc/UTC
-
-# Database credentials (Replace with a secure password)
-MYSQL_ROOT_PASSWORD=your_secure_password
-
-# Paths for Docker volumes (Update these paths as per your system)
-BOOKLORE_DATA_PATH=/path/to/booklore/data       # Example: /home/user/booklore/data
-BOOKLORE_BOOKS_PATH=/path/to/booklore/books     # Example: /home/user/booklore/books
-MARIADB_CONFIG_PATH=/path/to/mariadb/config     # Example: /home/user/booklore/mariadb/config
-
-```
-
-### 3️⃣ Create docker-compose.yml
-
-Create a `docker-compose.yml` file in your project directory:
+Create a `docker-compose.yml` file with content:
 
 ```yaml
 services:
   booklore:
-    image: ghcr.io/adityachandelgit/booklore-app:${BOOKLORE_IMAGE_TAG}
+    image: ghcr.io/adityachandelgit/booklore-app:latest
     container_name: booklore
-    env_file:
-      - .env
+    environment:
+      - PUID=1000 # User ID to ensure correct file permissions
+      - PGID=1000 # Group ID to ensure correct file permissions
+      - TZ=Etc/UTC # Set the timezone for logs and system operations
     depends_on:
       mariadb:
         condition: service_healthy
     ports:
       - "6060:6060"
     volumes:
-      - ${BOOKLORE_DATA_PATH}:/app/data
-      - ${BOOKLORE_BOOKS_PATH}:/books
+      - /your/local/path/to/booklore/data:/app/data # Replace the left side before colon with your system path, keep the right side unchanged
+      - /your/local/path/to/booklore/books:/books # Replace the left side before colon with your book storage path, keep the right side unchanged
+    restart: unless-stopped
 
   mariadb:
     image: lscr.io/linuxserver/mariadb:11.4.5
     container_name: mariadb
-    env_file:
-      - .env
+    environment:
+      - PUID=1000 # Ensure correct file ownership for database files
+      - PGID=1000 # Ensure correct file ownership for database files
+      - TZ=Etc/UTC # Set the timezone for logs and database operations
+      - MYSQL_ROOT_PASSWORD=your_secure_password # Replace with a strong password for the database
     volumes:
-      - ${MARIADB_CONFIG_PATH}:/config
+      - /your/local/path/to/mariadb/config:/config # Replace the left side before colon with your system path, keep the right side unchanged
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
-      interval: 10s
+      interval: 5s 
       timeout: 5s
-      retries: 5
+      retries: 10
 ```
 Note: You can find the latest BookLore image tag `BOOKLORE_IMAGE_TAG` (e.g. v.0.x.x) from the Releases section:
 📦 [Latest Image Tag – GitHub Releases](https://github.com/adityachandelgit/BookLore/releases)
 
 
-### 4️⃣ Start the Containers
+### 3️⃣ Start the Containers
 
 Run the following command to start the services:
 
 ```ini
-docker-compose up -d
+docker compose up -d
 ```
 
-### 5️⃣ Access BookLore
+### 4️⃣ Access BookLore
 
 Once the containers are up, access BookLore in your browser at:
 
@@ -112,7 +95,7 @@ Once the containers are up, access BookLore in your browser at:
 http://localhost:6060
 ```
 
-### 6️⃣ First-Time Login
+### 5️⃣ First-Time Login
 
 After starting the containers, you can log into BookLore with the default admin credentials:
 
