@@ -2,16 +2,17 @@ import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angu
 import ePub from 'epubjs';
 import {Drawer} from 'primeng/drawer';
 import {Button} from 'primeng/button';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
 import {ActivatedRoute} from '@angular/router';
 import {Book, BookSetting} from '../../../model/book.model';
 import {BookService} from '../../../service/book.service';
-import {filter, forkJoin, take} from 'rxjs';
-import {AppSettingsService} from '../../../../core/service/app-settings.service';
+import {forkJoin} from 'rxjs';
 import {Select} from 'primeng/select';
 import {UserService} from '../../../../user.service';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {MessageService} from 'primeng/api';
 
 const FALLBACK_EPUB_SETTINGS = {
   fontSize: 150,
@@ -25,12 +26,13 @@ const FALLBACK_EPUB_SETTINGS = {
   selector: 'app-epub-viewer',
   templateUrl: './epub-viewer.component.html',
   styleUrls: ['./epub-viewer.component.scss'],
-  imports: [Drawer, Button, NgForOf, FormsModule, Divider, Select],
+  imports: [Drawer, Button, NgForOf, FormsModule, Divider, Select, ProgressSpinner, NgIf],
   standalone: true
 })
 export class EpubViewerComponent implements OnInit, OnDestroy {
-  @ViewChild('epubContainer', {static: true}) epubContainer!: ElementRef;
+  @ViewChild('epubContainer', {static: false}) epubContainer!: ElementRef;
 
+  isLoading = true;
   chapters: { label: string; href: string }[] = [];
   isDrawerVisible = false;
   isSettingsDrawerVisible = false;
@@ -61,11 +63,13 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private userService = inject(UserService);
   private bookService = inject(BookService);
+  private messageService = inject(MessageService);
 
   epub!: Book;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
+      this.isLoading = true;
       const bookId = +params.get('bookId')!;
 
       const myself$ = this.userService.getMyself();
@@ -73,62 +77,69 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
       const epubData$ = this.bookService.getFileContent(bookId);
       const bookSetting$ = this.bookService.getBookSetting(bookId);
 
-      forkJoin([myself$, epub$, epubData$, bookSetting$]).subscribe((results) => {
-        const myself = results[0];
-        const epub = results[1];
-        const epubData = results[2];
-        const individualSetting = results[3]?.epubSettings;
+      forkJoin([myself$, epub$, epubData$, bookSetting$]).subscribe({
+        next: (results) => {
+          const myself = results[0];
+          const epub = results[1];
+          const epubData = results[2];
+          const individualSetting = results[3]?.epubSettings;
 
-        this.epub = epub;
-        const fileReader = new FileReader();
+          this.epub = epub;
+          const fileReader = new FileReader();
 
-        fileReader.onload = () => {
-          this.book = ePub(fileReader.result as ArrayBuffer);
+          fileReader.onload = () => {
+            this.book = ePub(fileReader.result as ArrayBuffer);
 
-          this.book.loaded.navigation.then((nav: any) => {
-            this.chapters = nav.toc.map((chapter: any) => ({
-              label: chapter.label,
-              href: chapter.href,
-            }));
-          });
+            this.book.loaded.navigation.then((nav: any) => {
+              this.chapters = nav.toc.map((chapter: any) => ({
+                label: chapter.label,
+                href: chapter.href,
+              }));
+            });
 
-          this.rendition = this.book.renderTo(this.epubContainer.nativeElement, {
-            flow: 'paginated',
-            width: '100%',
-            height: '100%',
-            allowScriptedContent: true,
-          });
+            this.rendition = this.book.renderTo(this.epubContainer.nativeElement, {
+              flow: 'paginated',
+              width: '100%',
+              height: '100%',
+              allowScriptedContent: true,
+            });
 
-          if (this.epub?.epubProgress) {
-            this.rendition.display(this.epub.epubProgress);
-          } else {
-            this.rendition.display();
-          }
+            if (this.epub?.epubProgress) {
+              this.rendition.display(this.epub.epubProgress);
+            } else {
+              this.rendition.display();
+            }
 
-          this.themesMap.forEach((theme, name) => {
-            this.rendition.themes.register(name, theme);
-          });
+            this.themesMap.forEach((theme, name) => {
+              this.rendition.themes.register(name, theme);
+            });
 
-          let globalOrIndividual = myself.bookPreferences.perBookSetting.epub;
-          if (globalOrIndividual === 'Global') {
-            this.selectedTheme = myself.bookPreferences.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
-            this.selectedFontType = myself.bookPreferences.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
-            this.fontSize = myself.bookPreferences.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
-          } else {
-            this.selectedTheme = individualSetting?.theme || myself.bookPreferences.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
-            this.selectedFontType = individualSetting?.font || myself.bookPreferences.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
-            this.fontSize = individualSetting?.fontSize || myself.bookPreferences.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
-          }
+            let globalOrIndividual = myself.bookPreferences.perBookSetting.epub;
+            if (globalOrIndividual === 'Global') {
+              this.selectedTheme = myself.bookPreferences.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
+              this.selectedFontType = myself.bookPreferences.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
+              this.fontSize = myself.bookPreferences.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+            } else {
+              this.selectedTheme = individualSetting?.theme || myself.bookPreferences.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
+              this.selectedFontType = individualSetting?.font || myself.bookPreferences.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
+              this.fontSize = individualSetting?.fontSize || myself.bookPreferences.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+            }
 
-          this.rendition.themes.select(this.selectedTheme);
-          this.rendition.themes.fontSize(`${this.fontSize}%`);
-          this.rendition.themes.font(this.selectedFontType);
+            this.rendition.themes.select(this.selectedTheme);
+            this.rendition.themes.fontSize(`${this.fontSize}%`);
+            this.rendition.themes.font(this.selectedFontType);
 
-          this.setupKeyListener();
-          this.trackProgress();
-        };
+            this.setupKeyListener();
+            this.trackProgress();
+            this.isLoading = false;
+          };
 
-        fileReader.readAsArrayBuffer(epubData);
+          fileReader.readAsArrayBuffer(epubData);
+        },
+        error: () => {
+          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to load the book'});
+          this.isLoading = false;
+        }
       });
     });
   }

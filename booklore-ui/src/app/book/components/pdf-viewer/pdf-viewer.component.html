@@ -1,4 +1,9 @@
+<div *ngIf="isLoading" class="flex justify-center items-center h-screen relative">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
 <ngx-extended-pdf-viewer
+  *ngIf="!isLoading"
   [src]="bookData"
   [handTool]="handTool"
   [height]="'auto'"
