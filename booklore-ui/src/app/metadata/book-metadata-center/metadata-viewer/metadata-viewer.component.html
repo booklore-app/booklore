@@ -8,40 +8,44 @@
            loading="lazy"
            width="250"/>
 
-      <div class="pl-6 flex flex-col w-full space-y-4">
-        <div class="flex flex-row items-center justify-between">
-          <div>
-            <p *ngIf="metadata.seriesName" class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }} </p>
-            <p class="text-2xl font-bold">{{ metadata.title }}</p>
-            <p class="text-xl">{{ getAuthorNames(metadata?.authors || []) }}</p>
-          </div>
-          <div class="flex gap-4 pr-4">
-            <p-button [rounded]="true" [raised]="true" severity="info" (onClick)="readBook(metadata.bookId)" icon="pi pi-eye"></p-button>
-            <div *ngIf="userService.userData$ | async as userData">
-              <p-button *ngIf="userData.permissions.canDownload" [rounded]="true" [raised]="true" severity="info" icon="pi pi-download" (onClick)="download(metadata.bookId)"></p-button>
+      <div class="flex flex-col justify-between">
+        <div class="pl-6 flex flex-col w-full space-y-4">
+          <div class="flex flex-row items-center justify-between">
+            <div>
+              <p *ngIf="metadata.seriesName" class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }} </p>
+              <p class="text-2xl font-bold">{{ metadata.title }}</p>
+              <p class="text-xl">{{ getAuthorNames(metadata?.authors || []) }}</p>
             </div>
           </div>
+
+          <div class="flex items-center gap-4 pb-4">
+            <p-rating [(ngModel)]="metadata.rating" readonly stars="5"></p-rating>
+            <p class="font-semibold">({{ metadata.reviewCount || 0 }} Reviews)</p>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <p><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
+            <p><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
+            <p><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
+            <p><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
+            <p><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
+            <p><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 pt-2">
+            <p-tag *ngFor="let category of metadata.categories" [value]="category"></p-tag>
+          </div>
+
         </div>
 
-        <div class="flex items-center gap-4 pb-4">
-          <p-rating [(ngModel)]="metadata.rating" readonly stars="5"></p-rating>
-          <p class="font-semibold">({{ metadata.reviewCount || 0 }} Reviews)</p>
+        <div *ngIf="userService.userData$ | async as userData" class="pl-6 flex flex-row w-full gap-4">
+          <p-button label="Read" icon="pi pi-book" severity="info" (onClick)="read(metadata.bookId)"></p-button>
+          <p-button label="Assign Shelf" icon="pi pi-folder" severity="info" outlined (onClick)="assignShelf(metadata.bookId)"></p-button>
+          <p-button *ngIf="userData.permissions.canDownload" label="Download" icon="pi pi-download" severity="info" outlined (onClick)="download(metadata.bookId)"></p-button>
+          <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined severity="info"/>
         </div>
-
-        <div class="grid grid-cols-3 gap-2">
-          <p><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
-          <p><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
-          <p><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
-          <p><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
-          <p><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
-          <p><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
-        </div>
-
-        <div class="flex flex-wrap gap-2 pt-2">
-          <p-tag *ngFor="let category of metadata.categories" [value]="category"></p-tag>
-        </div>
-
       </div>
+
     </div>
   </div>
 

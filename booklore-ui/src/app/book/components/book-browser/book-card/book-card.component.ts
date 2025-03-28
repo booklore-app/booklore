@@ -77,7 +77,7 @@ export class BookCardComponent implements OnInit {
   private initMenu() {
     this.items = [
       {
-        label: 'Assign Shelves',
+        label: 'Assign Shelf',
         icon: 'pi pi-folder',
         command: () => this.openShelfDialog()
       },

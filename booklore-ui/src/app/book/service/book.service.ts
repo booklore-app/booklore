@@ -50,6 +50,11 @@ export class BookService {
     ).subscribe();
   }
 
+  getBookByIdFromState(bookId: number): Book | undefined {
+    const currentState = this.bookStateSubject.value;
+    return currentState.books?.find(book => book.id === bookId);
+  }
+
   updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
     const requestPayload = {
       bookIds: Array.from(bookIds),
