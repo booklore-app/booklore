@@ -35,8 +35,7 @@ export function getCfiFromHref(book: any, href: string): string {
 
 export function getChapter(book: any, location: any) {
   const locationHref = location.start.href;
-
-  let match = flatten(book.navigation.toc)
+  return flatten(book.navigation.toc)
     .filter((chapter: any) => {
       return book.canonical(chapter.href).includes(book.canonical(locationHref));
     })
@@ -44,8 +43,6 @@ export function getChapter(book: any, location: any) {
       const locationAfterChapter = EpubCFI.prototype.compare(location.start.cfi, getCfiFromHref(book, chapter.href)) > 0;
       return locationAfterChapter ? chapter : result;
     }, null);
-
-  return match;
 }
 
 @Component({
@@ -60,6 +57,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
 
   isLoading = true;
   chapters: { label: string; href: string }[] = [];
+  currentChapter = '';
   isDrawerVisible = false;
   isSettingsDrawerVisible = false;
   private book: any;
@@ -263,7 +261,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     if (this.rendition) {
       this.rendition.on('relocated', (location: any) => {
         const currentChapter = getChapter(this.book, location);
-        console.log(currentChapter?.label || 'Unknown Chapter');
+        this.currentChapter = currentChapter?.label;
         this.bookService.saveEpubProgress(this.epub.id, location.start.cfi).subscribe();
       });
     }

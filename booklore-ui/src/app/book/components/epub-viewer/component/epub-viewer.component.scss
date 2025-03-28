@@ -1,10 +1,15 @@
-.epub-viewer-container {
+.epub-header {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.epub-viewer-container {
+  overflow: hidden;
   height: 100vh;
-  position: relative;
 }
 
 #epubContainer {
@@ -16,7 +21,6 @@
 
 .menu-toggle-button,
 .settings-toggle-button {
-  position: absolute;
   top: 10px;
   z-index: 1000;
   margin: 0;
@@ -28,16 +32,6 @@
 
 .settings-toggle-button {
   right: 10px;
-}
-
-.epub-header {
-  position: absolute;
-  top: 2%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 500;
-  text-align: center;
-  color: #333;
 }
 
 .epub-controls-left,
