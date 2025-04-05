@@ -45,34 +45,34 @@ services:
     image: ghcr.io/adityachandelgit/booklore-app:latest
     container_name: booklore
     environment:
-      - PUID=1000 # User ID to ensure correct file permissions
-      - PGID=1000 # Group ID to ensure correct file permissions
-      - TZ=Etc/UTC # Set the timezone for logs and system operations
-      - MYSQL_ROOT_PASSWORD=your_secure_password # Replace with a strong password for the database (must be same as in mariadb container)
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password; must match the one in the mariadb service
     depends_on:
       mariadb:
         condition: service_healthy
     ports:
       - "6060:6060"
     volumes:
-      - /your/local/path/to/booklore/data:/app/data # Replace the left side before colon with your system path, keep the right side unchanged
-      - /your/local/path/to/booklore/books:/books # Replace the left side before colon with your book storage path, keep the right side unchanged
+      - /your/local/path/to/booklore/data:/app/data
+      - /your/local/path/to/booklore/books:/books
     restart: unless-stopped
 
   mariadb:
     image: lscr.io/linuxserver/mariadb:11.4.5
     container_name: mariadb
     environment:
-      - PUID=1000 # Ensure correct file ownership for database files
-      - PGID=1000 # Ensure correct file ownership for database files
-      - TZ=Etc/UTC # Set the timezone for logs and database operations
-      - MYSQL_ROOT_PASSWORD=your_secure_password # Replace with a strong password for the database (must be same as in mariadb booklore)
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password; must match the one in the booklore service
     volumes:
-      - /your/local/path/to/mariadb/config:/config # Replace the left side before colon with your system path, keep the right side unchanged
+      - /your/local/path/to/mariadb/config:/config
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
-      interval: 5s 
+      interval: 5s
       timeout: 5s
       retries: 10
 ```
