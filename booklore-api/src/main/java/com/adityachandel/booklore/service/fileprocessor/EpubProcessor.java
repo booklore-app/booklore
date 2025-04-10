@@ -137,6 +137,21 @@ public class EpubProcessor implements FileProcessor {
                         });
             }
 
+            String seriesName = epubMetadata.getMetaAttribute("calibre:series");
+            if (seriesName != null && !seriesName.isEmpty()) {
+                bookMetadata.setSeriesName(seriesName);
+            }
+
+            String seriesIndex = epubMetadata.getMetaAttribute("calibre:series_index");
+            if (seriesIndex != null && !seriesIndex.isEmpty()) {
+                try {
+                    double indexValue = Double.parseDouble(seriesIndex);
+                    bookMetadata.setSeriesNumber((int) indexValue);
+                } catch (NumberFormatException e) {
+                    log.warn("Unable to parse series number: {}", seriesIndex);
+                }
+            }
+
             bookCreatorService.addAuthorsToBook(getAuthors(book), bookEntity);
             bookCreatorService.addCategoriesToBook(epubMetadata.getSubjects(), bookEntity);
         }
