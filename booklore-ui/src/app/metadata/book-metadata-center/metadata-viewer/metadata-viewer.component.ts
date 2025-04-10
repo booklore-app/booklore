@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {first, Observable} from 'rxjs';
@@ -7,7 +7,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {BookMetadata} from '../../../book/model/book.model';
+import {Book, BookMetadata} from '../../../book/model/book.model';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {UserService} from '../../../user.service';
@@ -27,6 +27,8 @@ import {ShelfAssignerComponent} from '../../../book/components/shelf-assigner/sh
 })
 export class MetadataViewerComponent implements OnInit {
 
+  @Input() book: Book | undefined;
+
   private dialogService = inject(DialogService);
   private emailService = inject(EmailService);
   private messageService = inject(MessageService);
@@ -38,7 +40,6 @@ export class MetadataViewerComponent implements OnInit {
 
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   items: MenuItem[] | undefined;
-
 
   ngOnInit(): void {
     this.items = [

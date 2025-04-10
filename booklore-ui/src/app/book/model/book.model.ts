@@ -12,6 +12,7 @@ export interface Book {
   addedOn?: string;
   epubProgress?: string;
   pdfProgress?: number;
+  filePath?: string;
 }
 
 export interface BookMetadata {

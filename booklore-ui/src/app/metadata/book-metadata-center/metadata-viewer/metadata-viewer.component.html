@@ -23,7 +23,7 @@
             <p class="font-semibold">({{ metadata.reviewCount || 0 }} Reviews)</p>
           </div>
 
-          <div class="grid grid-cols-3 gap-x-48 gap-y-2">
+          <div class="grid grid-cols-3 gap-x-40 gap-y-3">
             <p><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
             <p><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
             <p><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
@@ -31,6 +31,8 @@
             <p><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
             <p><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
           </div>
+
+          <p><span class="font-bold">File Path:</span> {{ book?.filePath }}</p>
 
           <div class="flex flex-wrap gap-2 pt-2">
             <p-tag *ngFor="let category of metadata.categories" [value]="category"></p-tag>

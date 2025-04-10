@@ -8,6 +8,7 @@ import {MetadataViewerComponent} from './metadata-viewer/metadata-viewer.compone
 import {UserService} from '../../user.service';
 import {Subscription} from 'rxjs';
 import {NgIf} from '@angular/common';
+import {Book} from '../../book/model/book.model';
 
 @Component({
   selector: 'app-book-metadata-center',
@@ -26,13 +27,14 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
   tab = 'view';
   canEditMetadata: boolean = false;
   private userSubscription: Subscription = Subscription.EMPTY;
+  book: Book | undefined;
 
   ngOnInit(): void {
-    const book = this.dynamicDialogConfig.data.book;
+    this.book = this.dynamicDialogConfig.data.book;
     this.tab = this.dynamicDialogConfig.data.tab;
 
-    if (book?.metadata) {
-      this.metadataCenterService.emit(book.metadata);
+    if (this.book?.metadata) {
+      this.metadataCenterService.emit(this.book.metadata);
     }
 
     this.userSubscription = this.userService.userData$.subscribe(userData => {

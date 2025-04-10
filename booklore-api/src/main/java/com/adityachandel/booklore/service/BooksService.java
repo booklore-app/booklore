@@ -121,6 +121,7 @@ public class BooksService {
         book.setLastReadTime(userProgress.getLastReadTime());
         book.setPdfProgress(userProgress.getPdfProgress());
         book.setEpubProgress(userProgress.getEpubProgress());
+        book.setFilePath(bookEntity.getLibraryPath().getPath() + "/" + bookEntity.getFileSubPath() + "/" + bookEntity.getFileName());
         if (!withDescription) {
             book.getMetadata().setDescription(null);
         }

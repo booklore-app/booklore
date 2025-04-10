@@ -6,7 +6,7 @@
   </p-tablist>
   <p-tabpanels style="height: 100%; overflow: hidden; padding-bottom: 0">
     <p-tabpanel value="view" style="height: 100%; overflow: hidden;">
-      <app-metadata-viewer></app-metadata-viewer>
+      <app-metadata-viewer [book]="book"></app-metadata-viewer>
     </p-tabpanel>
     <p-tabpanel *ngIf="canEditMetadata" value="edit" style="height: 100%; overflow: hidden;">
       <app-metadata-editor></app-metadata-editor>
