@@ -128,12 +128,16 @@ jobs:
         run: |
           gh release edit ${{ env.new_tag }} --draft=false
 
-      - name: Delete Feature/Bug Branches (Only for Master and Develop)
+      - name: Delete Merged Branches (Only for Master and Develop)
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
         run: |
           git fetch --prune
-          for branch in $(git branch -r | grep 'origin/feature/' || grep 'origin/bug/'); do
-            branch_name=${branch#origin/}
-            echo "Deleting branch: $branch_name"
-            git push origin --delete "$branch_name"
+          merged_branches=$(git branch -r --merged origin/master origin/develop | sed 's/ *origin\///')
+          for branch in $merged_branches; do
+            if [[ "$branch" != "master" && "$branch" != "develop" ]]; then
+              echo "Deleting merged branch: $branch"
+              git push origin --delete "$branch"
+            else
+              echo "Skipping protected branch: $branch"
+            fi
           done
