@@ -7,87 +7,83 @@ import com.adityachandel.booklore.repository.AppSettingsRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AppSettingService {
 
     private final AppSettingsRepository appSettingsRepository;
     private final ObjectMapper objectMapper;
 
+    public static final String QUICK_BOOK_MATCH = "quick_book_match";
+    public static final String COVER_IMAGE_RESOLUTION = "cover_image_resolution";
+
+    private volatile AppSettings appSettings;
+    private final ReentrantLock lock = new ReentrantLock();
+
     public AppSettings getAppSettings() {
-        List<AppSettingEntity> settings = appSettingsRepository.findAll();
-        Map<String, Map<String, Object>> settingsMap = settings.stream()
-                .collect(Collectors.groupingBy(AppSettingEntity::getCategory,
-                        Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal)));
-
-        AppSettings.AppSettingsBuilder appSettingsBuilder = AppSettings.builder();
-
-        if (settingsMap.containsKey("epub")) {
-            Map<String, Object> epubSettings = settingsMap.get("epub");
-            appSettingsBuilder.epub(AppSettings.EpubSettings.builder()
-                    .theme((String) epubSettings.get("theme"))
-                    .fontSize((String) epubSettings.get("fontSize"))
-                    .font((String) epubSettings.get("font"))
-                    .build());
-        }
-
-        if (settingsMap.containsKey("pdf")) {
-            Map<String, Object> pdfSettings = settingsMap.get("pdf");
-            appSettingsBuilder.pdf(AppSettings.PdfSettings.builder()
-                    .spread((String) pdfSettings.get("spread"))
-                    .zoom((String) pdfSettings.get("zoom"))
-                    .build());
-        }
-
-        if (settingsMap.containsKey("reader_setting")) {
-            Map<String, Object> readerSetting = settingsMap.get("reader_setting");
-            appSettingsBuilder.readerSettings(AppSettings.ReaderSettings.builder()
-                    .pdfScope(AppSettings.SettingScope.valueOf((String) readerSetting.get("pdf")))
-                    .epubScope(AppSettings.SettingScope.valueOf((String) readerSetting.get("epub")))
-                    .build());
-        }
-
-        if (settingsMap.containsKey("quick_book_match")) {
-            Map<String, Object> quickBookMatch = settingsMap.get("quick_book_match");
-            String quickBookMatchValue = (String) quickBookMatch.get("all_books");
-            if (quickBookMatchValue != null) {
-                try {
-                    MetadataRefreshOptions metadataRefreshOptions = objectMapper.readValue(quickBookMatchValue, MetadataRefreshOptions.class);
-                    appSettingsBuilder.metadataRefreshOptions(metadataRefreshOptions);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException("Failed to parse quick_book_match settings", e);
+        if (appSettings == null) {
+            lock.lock();
+            try {
+                if (appSettings == null) {
+                    appSettings = buildAppSettings();
                 }
+            } finally {
+                lock.unlock();
             }
         }
-
-        return appSettingsBuilder.build();
+        return appSettings;
     }
 
     @Transactional
-    public void updateSetting(String category, String name, Object val) {
-        AppSettingEntity setting = appSettingsRepository.findByCategoryAndName(category, name);
-        if (setting != null) {
-            if (category.equals("quick_book_match")) {
-                try {
-                    String jsonString = objectMapper.writeValueAsString(val);
-                    setting.setVal(jsonString);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Failed to serialize value: " + e.getMessage(), e);
-                }
-            } else {
-                setting.setVal(val.toString());
-            }
-            appSettingsRepository.save(setting);
-        } else {
-            throw new IllegalArgumentException("Setting not found for category: " + category + " and key: " + name);
+    public void updateSetting(String name, Object val) {
+        AppSettingEntity setting = appSettingsRepository.findByName(name);
+        if (setting == null) {
+            throw new IllegalArgumentException("Setting not found for name: " + name);
         }
+
+        setting.setVal(val.toString());
+        appSettingsRepository.save(setting);
+        refreshCache();
+    }
+
+    private void refreshCache() {
+        lock.lock();
+        try {
+            this.appSettings = buildAppSettings();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private AppSettings buildAppSettings() {
+        List<AppSettingEntity> settings = appSettingsRepository.findAll();
+        Map<String, String> settingsMap = settings.stream().collect(Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal));
+
+        AppSettings.AppSettingsBuilder builder = AppSettings.builder();
+
+        if (settingsMap.containsKey(QUICK_BOOK_MATCH)) {
+            try {
+                MetadataRefreshOptions options = objectMapper.readValue(settingsMap.get(QUICK_BOOK_MATCH), MetadataRefreshOptions.class);
+                builder.metadataRefreshOptions(options);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to parse setting 'quick_book_match'", e);
+            }
+        }
+
+        if (settingsMap.containsKey(COVER_IMAGE_RESOLUTION)) {
+            builder.coverSettings(AppSettings.CoverSettings.builder()
+                    .resolution(settingsMap.get(COVER_IMAGE_RESOLUTION))
+                    .build());
+        }
+
+        return builder.build();
     }
 }

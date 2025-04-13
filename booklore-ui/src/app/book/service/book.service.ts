@@ -193,6 +193,14 @@ export class BookService {
     return this.http.post<void>(`${this.url}/progress`, {bookId: bookId, epubProgress: progress});
   }
 
+  regenerateCovers(): Observable<void> {
+    return this.http.post<void>(`${this.url}/regenerate-covers`, {});
+  }
+
+  regenerateCover(bookId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${bookId}/regenerate-cover`, {});
+  }
+
 
   /*------------------ All the metadata related calls go here ------------------*/
 

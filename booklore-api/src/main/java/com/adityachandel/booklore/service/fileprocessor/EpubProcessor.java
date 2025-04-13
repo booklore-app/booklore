@@ -6,6 +6,7 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
+import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookCreatorService;
 import com.adityachandel.booklore.util.FileUtils;
@@ -25,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -42,6 +44,7 @@ public class EpubProcessor implements FileProcessor {
     private final BookCreatorService bookCreatorService;
     private final BookMapper bookMapper;
     private final FileProcessingUtils fileProcessingUtils;
+    private final BookMetadataRepository bookMetadataRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
@@ -61,30 +64,28 @@ public class EpubProcessor implements FileProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected Book processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.EPUB);
-        try {
-            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(new FileInputStream(FileUtils.getBookFullPath(bookEntity)));
-
-            setBookMetadata(epub, bookEntity);
-            processCover(epub, bookEntity);
-
-            bookCreatorService.saveConnections(bookEntity);
-            bookRepository.save(bookEntity);
-            bookRepository.flush();
-
-        } catch (Exception e) {
-            log.error("Error while processing file {}, error: {}", libraryFile.getFileName(), e.getMessage());
+        setBookMetadata(bookEntity);
+        if (generateCover(bookEntity)) {
+            fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
+        bookCreatorService.saveConnections(bookEntity);
+        bookRepository.save(bookEntity);
+        bookRepository.flush();
         return bookMapper.toBook(bookEntity);
     }
 
-    private void processCover(io.documentnode.epub4j.domain.Book epub, BookEntity bookEntity) throws IOException {
-        Resource coverImage = epub.getCoverImage();
-        if (coverImage != null) {
-            boolean success = saveCoverImage(coverImage, bookEntity.getId());
-            if (success) {
-                fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
-            }
+    public boolean generateCover(BookEntity bookEntity) {
+        try {
+            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(new FileInputStream(FileUtils.getBookFullPath(bookEntity)));
+            Resource coverImage = epub.getCoverImage();
+            boolean saved = saveCoverImage(coverImage, bookEntity.getId());
+            bookEntity.getMetadata().setCoverUpdatedOn(Instant.now());
+            bookMetadataRepository.save(bookEntity.getMetadata());
+            return saved;
+        } catch (Exception e) {
+            log.error("Error generating cover for epub file {}, error: {}", bookEntity.getFileName(), e.getMessage());
         }
+        return false;
     }
 
     private static Set<String> getAuthors(io.documentnode.epub4j.domain.Book book) {
@@ -93,67 +94,71 @@ public class EpubProcessor implements FileProcessor {
                 .collect(Collectors.toSet());
     }
 
-    private void setBookMetadata(io.documentnode.epub4j.domain.Book book, BookEntity bookEntity) {
-        BookMetadataEntity bookMetadata = bookEntity.getMetadata();
-        Metadata epubMetadata = book.getMetadata();
+    private void setBookMetadata(BookEntity bookEntity) {
+        try {
+            io.documentnode.epub4j.domain.Book book = new EpubReader().readEpub(new FileInputStream(FileUtils.getBookFullPath(bookEntity)));
+            BookMetadataEntity bookMetadata = bookEntity.getMetadata();
+            Metadata epubMetadata = book.getMetadata();
+            if (epubMetadata != null) {
+                bookMetadata.setTitle(epubMetadata.getFirstTitle());
 
-        if (epubMetadata != null) {
-            bookMetadata.setTitle(epubMetadata.getFirstTitle());
-
-            if (epubMetadata.getDescriptions() != null && !epubMetadata.getDescriptions().isEmpty()) {
-                bookMetadata.setDescription(epubMetadata.getDescriptions().getFirst());
-            }
-
-            if (epubMetadata.getPublishers() != null && !epubMetadata.getPublishers().isEmpty()) {
-                bookMetadata.setPublisher(epubMetadata.getPublishers().getFirst());
-            }
-
-            List<String> identifiers = epubMetadata.getIdentifiers().stream()
-                    .map(Identifier::getValue)
-                    .toList();
-            if (!identifiers.isEmpty()) {
-                String isbn13 = identifiers.stream().filter(id -> id.length() == 13).findFirst().orElse(null);
-                String isbn10 = identifiers.stream().filter(id -> id.length() == 10).findFirst().orElse(null);
-                bookMetadata.setIsbn13(isbn13);
-                bookMetadata.setIsbn10(isbn10);
-            }
-
-            bookMetadata.setLanguage(epubMetadata.getLanguage() == null || epubMetadata.getLanguage().equalsIgnoreCase("UND") ? "en" : epubMetadata.getLanguage());
-
-            if (epubMetadata.getDates() != null && !epubMetadata.getDates().isEmpty()) {
-                epubMetadata.getDates().stream()
-                        .findFirst()
-                        .ifPresent(publishedDate -> {
-                            String dateString = publishedDate.getValue();
-                            if (isValidLocalDate(dateString)) {
-                                LocalDate parsedDate = LocalDate.parse(dateString);
-                                bookMetadata.setPublishedDate(parsedDate);
-                            } else if (isValidOffsetDateTime(dateString)) {
-                                OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateString);
-                                bookMetadata.setPublishedDate(offsetDateTime.toLocalDate());
-                            } else {
-                                log.error("Unable to parse date: {}", dateString);
-                            }
-                        });
-            }
-
-            String seriesName = epubMetadata.getMetaAttribute("calibre:series");
-            if (seriesName != null && !seriesName.isEmpty()) {
-                bookMetadata.setSeriesName(seriesName);
-            }
-
-            String seriesIndex = epubMetadata.getMetaAttribute("calibre:series_index");
-            if (seriesIndex != null && !seriesIndex.isEmpty()) {
-                try {
-                    double indexValue = Double.parseDouble(seriesIndex);
-                    bookMetadata.setSeriesNumber((int) indexValue);
-                } catch (NumberFormatException e) {
-                    log.warn("Unable to parse series number: {}", seriesIndex);
+                if (epubMetadata.getDescriptions() != null && !epubMetadata.getDescriptions().isEmpty()) {
+                    bookMetadata.setDescription(epubMetadata.getDescriptions().getFirst());
                 }
-            }
 
-            bookCreatorService.addAuthorsToBook(getAuthors(book), bookEntity);
-            bookCreatorService.addCategoriesToBook(epubMetadata.getSubjects(), bookEntity);
+                if (epubMetadata.getPublishers() != null && !epubMetadata.getPublishers().isEmpty()) {
+                    bookMetadata.setPublisher(epubMetadata.getPublishers().getFirst());
+                }
+
+                List<String> identifiers = epubMetadata.getIdentifiers().stream()
+                        .map(Identifier::getValue)
+                        .toList();
+                if (!identifiers.isEmpty()) {
+                    String isbn13 = identifiers.stream().filter(id -> id.length() == 13).findFirst().orElse(null);
+                    String isbn10 = identifiers.stream().filter(id -> id.length() == 10).findFirst().orElse(null);
+                    bookMetadata.setIsbn13(isbn13);
+                    bookMetadata.setIsbn10(isbn10);
+                }
+
+                bookMetadata.setLanguage(epubMetadata.getLanguage() == null || epubMetadata.getLanguage().equalsIgnoreCase("UND") ? "en" : epubMetadata.getLanguage());
+
+                if (epubMetadata.getDates() != null && !epubMetadata.getDates().isEmpty()) {
+                    epubMetadata.getDates().stream()
+                            .findFirst()
+                            .ifPresent(publishedDate -> {
+                                String dateString = publishedDate.getValue();
+                                if (isValidLocalDate(dateString)) {
+                                    LocalDate parsedDate = LocalDate.parse(dateString);
+                                    bookMetadata.setPublishedDate(parsedDate);
+                                } else if (isValidOffsetDateTime(dateString)) {
+                                    OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateString);
+                                    bookMetadata.setPublishedDate(offsetDateTime.toLocalDate());
+                                } else {
+                                    log.error("Unable to parse date: {}", dateString);
+                                }
+                            });
+                }
+
+                String seriesName = epubMetadata.getMetaAttribute("calibre:series");
+                if (seriesName != null && !seriesName.isEmpty()) {
+                    bookMetadata.setSeriesName(seriesName);
+                }
+
+                String seriesIndex = epubMetadata.getMetaAttribute("calibre:series_index");
+                if (seriesIndex != null && !seriesIndex.isEmpty()) {
+                    try {
+                        double indexValue = Double.parseDouble(seriesIndex);
+                        bookMetadata.setSeriesNumber((int) indexValue);
+                    } catch (NumberFormatException e) {
+                        log.warn("Unable to parse series number: {}", seriesIndex);
+                    }
+                }
+
+                bookCreatorService.addAuthorsToBook(getAuthors(book), bookEntity);
+                bookCreatorService.addCategoriesToBook(epubMetadata.getSubjects(), bookEntity);
+            }
+        } catch (Exception e) {
+            log.error("Error loading epub file {}, error: {}", bookEntity.getFileName(), e.getMessage());
         }
     }
 

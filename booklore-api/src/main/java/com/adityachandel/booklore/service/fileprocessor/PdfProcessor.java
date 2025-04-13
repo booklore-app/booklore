@@ -5,6 +5,7 @@ import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
+import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookCreatorService;
 import com.adityachandel.booklore.util.FileUtils;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -36,6 +38,7 @@ public class PdfProcessor implements FileProcessor {
     private final BookCreatorService bookCreatorService;
     private final BookMapper bookMapper;
     private final FileProcessingUtils fileProcessingUtils;
+    private final BookMetadataRepository bookMetadataRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
@@ -55,38 +58,43 @@ public class PdfProcessor implements FileProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected Book processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.PDF);
-        try (PDDocument pdf = Loader.loadPDF(new File(FileUtils.getBookFullPath(bookEntity)))) {
-
-            setMetadata(pdf, bookEntity);
-            processCover(pdf, bookEntity);
-
-            bookCreatorService.saveConnections(bookEntity);
-            bookEntity = bookRepository.save(bookEntity);
-            bookRepository.flush();
-        } catch (Exception e) {
-            log.error("Error while processing file {}, error: {}", libraryFile.getFileName(), e.getMessage());
+        if (generateCover(bookEntity)) {
+            fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
+        setMetadata(bookEntity);
+        bookCreatorService.saveConnections(bookEntity);
+        bookEntity = bookRepository.save(bookEntity);
+        bookRepository.flush();
         return bookMapper.toBook(bookEntity);
     }
 
-    private void processCover(PDDocument document, BookEntity bookEntity) throws IOException {
-        boolean success = generateCoverImageAndSave(bookEntity.getId(), document);
-        if (success) {
-            fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
+    public boolean generateCover(BookEntity bookEntity) {
+        try (PDDocument pdf = Loader.loadPDF(new File(FileUtils.getBookFullPath(bookEntity)))) {
+            boolean saved = generateCoverImageAndSave(bookEntity.getId(), pdf);
+            bookEntity.getMetadata().setCoverUpdatedOn(Instant.now());
+            bookMetadataRepository.save(bookEntity.getMetadata());
+            return saved;
+        } catch (Exception e) {
+            log.error("Error generating cover for pdf file {}, error: {}", bookEntity.getFileName(), e.getMessage());
         }
+        return false;
     }
 
-    private void setMetadata(PDDocument document, BookEntity bookEntity) {
-        if (document.getDocumentInformation() == null) {
-            log.warn("No document information found");
-        } else {
-            if (document.getDocumentInformation().getTitle() != null) {
-                bookEntity.getMetadata().setTitle(document.getDocumentInformation().getTitle());
+    private void setMetadata(BookEntity bookEntity) {
+        try (PDDocument pdf = Loader.loadPDF(new File(FileUtils.getBookFullPath(bookEntity)))) {
+            if (pdf.getDocumentInformation() == null) {
+                log.warn("No document information found");
+            } else {
+                if (pdf.getDocumentInformation().getTitle() != null) {
+                    bookEntity.getMetadata().setTitle(pdf.getDocumentInformation().getTitle());
+                }
+                if (pdf.getDocumentInformation().getAuthor() != null) {
+                    Set<String> authors = getAuthors(pdf);
+                    bookCreatorService.addAuthorsToBook(authors, bookEntity);
+                }
             }
-            if (document.getDocumentInformation().getAuthor() != null) {
-                Set<String> authors = getAuthors(document);
-                bookCreatorService.addAuthorsToBook(authors, bookEntity);
-            }
+        } catch (Exception e) {
+            log.error("Error loading pdf file {}, error: {}", bookEntity.getFileName(), e.getMessage());
         }
     }
 

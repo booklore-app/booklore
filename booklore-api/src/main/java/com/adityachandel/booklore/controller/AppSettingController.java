@@ -6,6 +6,8 @@ import com.adityachandel.booklore.service.AppSettingService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/settings")
@@ -19,7 +21,9 @@ public class AppSettingController {
     }
 
     @PutMapping
-    public void updateSetting(@RequestBody SettingRequest settingRequest) {
-        appSettingService.updateSetting(settingRequest.getCategory(), settingRequest.getName(), settingRequest.getValue());
+    public void updateSettings(@RequestBody List<SettingRequest> settingRequests) {
+        for (SettingRequest settingRequest : settingRequests) {
+            appSettingService.updateSetting(settingRequest.getName(), settingRequest.getValue());
+        }
     }
 }

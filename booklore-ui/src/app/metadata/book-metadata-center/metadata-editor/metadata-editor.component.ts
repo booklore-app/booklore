@@ -14,6 +14,7 @@ import {FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupl
 import {HttpResponse} from '@angular/common/http';
 import {BookService} from '../../../book/service/book.service';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -31,7 +32,8 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     ReactiveFormsModule,
     FileUpload,
     ProgressSpinner,
-    NgClass
+    NgClass,
+    Tooltip
   ]
 })
 export class MetadataEditorComponent implements OnInit {
@@ -277,6 +279,25 @@ export class MetadataEditorComponent implements OnInit {
     this.isUploading = false;
     this.messageService.add({
       severity: 'error', summary: 'Upload Error', detail: 'An error occurred while uploading the cover', life: 3000
+    });
+  }
+
+  regenerateCover(bookId: number) {
+    this.bookService.regenerateCover(bookId).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Book cover regenerated successfully. Refresh page to see the new cover.'
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to start cover regeneration'
+        });
+      }
     });
   }
 }

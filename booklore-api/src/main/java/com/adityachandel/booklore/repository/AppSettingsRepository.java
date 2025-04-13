@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AppSettingsRepository extends JpaRepository<AppSettingEntity, Long> {
-    AppSettingEntity findByCategoryAndName(String category, String name);;
+    AppSettingEntity findByName(String name);
 }

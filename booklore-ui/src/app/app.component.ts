@@ -7,7 +7,6 @@ import {parseLogNotification} from './shared/websocket/model/log-notification.mo
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {Toast} from 'primeng/toast';
 import {RouterOutlet} from '@angular/router';
-import {AppSettingsService} from './core/service/app-settings.service';
 
 @Component({
   selector: 'app-root',

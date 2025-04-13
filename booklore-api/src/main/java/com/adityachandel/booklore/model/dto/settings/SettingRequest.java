@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SettingRequest {
-    private String category;
     private String name;
     private Object value;
 }

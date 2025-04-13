@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {AppSettings} from '../model/app-settings.model';
 import {API_CONFIG} from '../../config/api-config';
+import {catchError, map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -29,19 +30,11 @@ export class AppSettingsService {
     });
   }
 
-  saveAppSetting(category: string, key: string, newValue: any): void {
-    const payload = {
-      category,
-      name: key,
-      value: newValue
-    };
-    this.http.put(this.apiUrl, payload).subscribe({
-      next: () => {
-        console.log('Settings saved successfully');
-      },
-      error: (error) => {
-        console.error('Error saving setting:', error);
-      }
-    });
+  saveSettings(settings: { key: string, newValue: any }[]): Observable<void> {
+    const payload = settings.map(setting => ({
+      name: setting.key,
+      value: setting.newValue
+    }));
+    return this.http.put<void>(this.apiUrl, payload);
   }
 }

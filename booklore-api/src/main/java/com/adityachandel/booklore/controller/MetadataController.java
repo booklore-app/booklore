@@ -65,4 +65,16 @@ public class MetadataController {
         boolean isLocked = request.getIsLocked();
         return ResponseEntity.ok(bookMetadataService.updateFieldLockState(bookId, field, isLocked));
     }
+
+    @PostMapping("/regenerate-covers")
+    @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
+    public void regenerateCovers() {
+        bookMetadataService.regenerateCovers();
+    }
+
+    @PostMapping("/{bookId}/regenerate-cover")
+    @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
+    public void regenerateCovers(@PathVariable Long bookId) {
+        bookMetadataService.regenerateCover(bookId);
+    }
 }

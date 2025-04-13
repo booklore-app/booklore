@@ -23,6 +23,8 @@
 
         <div class="flex items-center gap-6">
           <p-fileupload
+            pTooltip="Upload cover"
+            tooltipPosition="top"
             [disabled]="metadata['coverLocked']"
             name="file"
             [url]="getUploadCoverUrl()"
@@ -34,10 +36,20 @@
             (onUpload)="onUpload($event)"
             (onError)="onUploadError($event)"
             [auto]="true"
-            (onBeforeUpload)="onBeforeSend()"></p-fileupload>
+            (onBeforeUpload)="onBeforeSend()">
+          </p-fileupload>
+
+          <p-button
+            icon="pi pi-refresh"
+            (onClick)="regenerateCover(metadata.bookId)"
+            pTooltip="Regenerate cover"
+            tooltipPosition="top"
+            [disabled]="metadata['coverLocked']">
+          </p-button>
 
           <p-button *ngIf="!metadata['coverLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('thumbnailUrl')" severity="success"></p-button>
           <p-button *ngIf="metadata['coverLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('thumbnailUrl')" severity="warn"></p-button>
+
         </div>
       </div>
 

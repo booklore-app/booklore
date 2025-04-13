@@ -1,11 +1,9 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {NgxExtendedPdfViewerModule, PdfLoadedEvent, ScrollModeType} from 'ngx-extended-pdf-viewer';
+import {NgxExtendedPdfViewerModule} from 'ngx-extended-pdf-viewer';
 import {BookService} from '../../service/book.service';
-import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {filter, forkJoin, Subscription, take} from 'rxjs';
-import {BookSetting, PdfViewerSetting} from '../../model/book.model';
-import {PdfSettings} from '../../../core/model/app-settings.model';
+import {forkJoin, Subscription} from 'rxjs';
+import {BookSetting} from '../../model/book.model';
 import {UserService} from '../../../user.service';
 import {NgIf} from '@angular/common';
 import {ProgressSpinner} from 'primeng/progressspinner';

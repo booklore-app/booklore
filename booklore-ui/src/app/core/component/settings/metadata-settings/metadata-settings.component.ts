@@ -5,6 +5,7 @@ import {AppSettingsService} from '../../../service/app-settings.service';
 import {Observable} from 'rxjs';
 import {AppSettings} from '../../../model/app-settings.model';
 import {Tooltip} from 'primeng/tooltip';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-metadata-settings',
@@ -20,6 +21,8 @@ export class MetadataSettingsComponent implements OnInit {
   currentMetadataOptions!: MetadataRefreshOptions;
 
   private appSettingsService = inject(AppSettingsService);
+  private messageService = inject(MessageService);
+
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
   ngOnInit(): void {
@@ -31,6 +34,17 @@ export class MetadataSettingsComponent implements OnInit {
   }
 
   onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions) {
-    this.appSettingsService.saveAppSetting('quick_book_match', 'all_books', metadataRefreshOptions)
+    const settingsToSave = [
+      {key: 'quick_book_match', newValue: metadataRefreshOptions}
+    ];
+
+    this.appSettingsService.saveSettings(settingsToSave).subscribe({
+      next: () => {
+        this.messageService.add({severity: 'success', summary: 'Settings Saved', detail: 'The settings were successfully saved!'});
+      },
+      error: () => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'There was an error saving the settings.'});
+      }
+    });
   }
 }

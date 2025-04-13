@@ -3,6 +3,7 @@ package com.adityachandel.booklore.service.fileprocessor;
 import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.service.AppSettingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 public class FileProcessingUtils {
 
     private final AppProperties appProperties;
+    private final AppSettingService appSettingService;
 
     public void setBookCoverPath(long bookId, BookMetadataEntity bookMetadataEntity) {
         bookMetadataEntity.setThumbnail(appProperties.getPathConfig() + "/thumbs/" + bookId + "/f.jpg");
@@ -34,7 +36,13 @@ public class FileProcessingUtils {
 
     public boolean saveCoverImage(BufferedImage coverImage, long bookId) throws IOException {
         File coverDirectory = new File(appProperties.getPathConfig() + "/thumbs");
-        BufferedImage resizedImage = resizeImage(coverImage, 250, 350);
+
+        String resolution = appSettingService.getAppSettings().getCoverSettings().getResolution();
+        String[] split = resolution.split("x");
+        int x = Integer.parseInt(split[0]);
+        int y = Integer.parseInt(split[1]);
+
+        BufferedImage resizedImage = resizeImage(coverImage, x, y);
         File bookDirectory = new File(coverDirectory, String.valueOf(bookId));
         if (!bookDirectory.exists()) {
             if (!bookDirectory.mkdirs()) {

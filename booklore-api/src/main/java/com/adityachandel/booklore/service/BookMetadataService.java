@@ -17,6 +17,8 @@ import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
+import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
+import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
@@ -48,6 +50,8 @@ public class BookMetadataService {
     private final AppSettingService appSettingService;
     private final BookMetadataRepository bookMetadataRepository;
     private final FileService fileService;
+    private final PdfProcessor pdfProcessor;
+    private final EpubProcessor epubProcessor;
     private final Map<MetadataProvider, BookParser> parserMap;
 
     public List<BookMetadata> getProspectiveMetadataListForBookId(long bookId, FetchMetadataRequest request) {
@@ -394,5 +398,47 @@ public class BookMetadataService {
         metadata.setCoverUpdatedOn(Instant.now());
         bookMetadataRepository.save(metadata);
         return bookMetadataMapper.toBookMetadata(metadata, true);
+    }
+
+    public void regenerateCover(long bookId) {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        if (bookEntity.getMetadata().getCoverLocked() != null && bookEntity.getMetadata().getCoverLocked()) {
+            throw ApiError.METADATA_LOCKED.createException();
+        } else {
+            regenerateCoverForBook(bookEntity, "");
+        }
+    }
+
+    public void regenerateCovers() {
+        Thread.startVirtualThread(() -> {
+            List<BookEntity> books = bookRepository.findAll().stream()
+                    .filter(book -> book.getMetadata().getCoverLocked() == null || !book.getMetadata().getCoverLocked())
+                    .toList();
+            int total = books.size();
+            notificationService.sendMessage(Topic.LOG, createLogNotification("Started regenerating covers for " + total + " books"));
+            int[] current = {1};
+            for (BookEntity book : books) {
+                try {
+                    String progress = "(" + current[0] + "/" + total + ") ";
+                    regenerateCoverForBook(book, progress);
+                } catch (Exception e) {
+                    log.error("Failed to regenerate cover for book ID {}: {}", book.getId(), e.getMessage());
+                }
+                current[0]++;
+            }
+            notificationService.sendMessage(Topic.LOG, createLogNotification("Finished regenerating covers"));
+        });
+    }
+
+    private void regenerateCoverForBook(BookEntity book, String progress) {
+        String title = book.getMetadata().getTitle();
+        String message = progress + "Regenerating cover for: " + title;
+        notificationService.sendMessage(Topic.LOG, createLogNotification(message));
+        switch (book.getBookType()) {
+            case PDF -> pdfProcessor.generateCover(book);
+            case EPUB -> epubProcessor.generateCover(book);
+            default -> throw ApiError.UNSUPPORTED_BOOK_TYPE.createException(book.getBookType());
+        }
+        log.info("{} Successfully regenerated cover for book ID {} ({})", progress, book.getId(), title);
     }
 }

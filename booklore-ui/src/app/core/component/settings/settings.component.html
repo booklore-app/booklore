@@ -11,6 +11,9 @@
       <ng-container *ngIf="userData.permissions.admin">
         <p-tab value="3">Email</p-tab>
       </ng-container>
+      <ng-container *ngIf="userData.permissions.admin">
+        <p-tab value="4">Global Preferences</p-tab>
+      </ng-container>
     </p-tablist>
 
     <p-tabpanels>
@@ -30,6 +33,11 @@
       <ng-container *ngIf="userData.permissions.admin">
         <p-tabpanel value="3">
           <app-email></app-email>
+        </p-tabpanel>
+      </ng-container>
+      <ng-container *ngIf="userData.permissions.admin">
+        <p-tabpanel value="4">
+          <app-global-preferences></app-global-preferences>
         </p-tabpanel>
       </ng-container>
     </p-tabpanels>
