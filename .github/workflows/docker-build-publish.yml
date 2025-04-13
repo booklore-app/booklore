@@ -127,17 +127,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release edit ${{ env.new_tag }} --draft=false
-
-      - name: Delete Merged Branches (Only for Master and Develop)
-        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
-        run: |
-          git fetch --prune
-          merged_branches=$(git branch -r --merged origin/master origin/develop | sed 's/ *origin\///')
-          for branch in $merged_branches; do
-            if [[ "$branch" != "master" && "$branch" != "develop" ]]; then
-              echo "Deleting merged branch: $branch"
-              git push origin --delete "$branch"
-            else
-              echo "Skipping protected branch: $branch"
-            fi
-          done
