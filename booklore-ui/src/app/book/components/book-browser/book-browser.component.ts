@@ -144,8 +144,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           return;
         }
         if (this.isLibrary(entity)) {
+          this.entity = entity;
           this.entityOptions = this.libraryShelfMenuService.initializeLibraryMenuItems(entity);
         } else {
+          this.entity = entity;
           this.entityOptions = this.libraryShelfMenuService.initializeShelfMenuItems(entity);
         }
       });
