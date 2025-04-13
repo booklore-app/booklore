@@ -138,10 +138,16 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         map(({entityType}) => entityType)
       );
 
-      this.entity$.subscribe(entity => {
-        this.entity = entity;
-        this.entityOptions = this.libraryShelfMenuService.initializeLibraryMenuItems(entity);
-        this.setSelectedSortFromEntity(entity);
+      this.entity$?.subscribe((entity) => {
+        if (!entity) {
+          this.entityOptions = [];
+          return;
+        }
+        if (this.isLibrary(entity)) {
+          this.entityOptions = this.libraryShelfMenuService.initializeLibraryMenuItems(entity);
+        } else {
+          this.entityOptions = this.libraryShelfMenuService.initializeShelfMenuItems(entity);
+        }
       });
     }
 
@@ -151,6 +157,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.deselectAllBooks();
       this.clearFilter();
     });
+  }
+
+  private isLibrary(entity: Library | Shelf): entity is Library {
+    return (entity as Library).paths !== undefined;
   }
 
   toggleTableGrid() {
@@ -183,7 +193,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     if (entityType == EntityType.LIBRARY) {
       return this.fetchLibrary(entityId);
     } else if (EntityType.SHELF) {
-      this.libraryShelfMenuService.initializeLibraryMenuItems(this.entity);
       return this.fetchShelf(entityId);
     }
     return of(null);
