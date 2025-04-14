@@ -12,6 +12,10 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
 import {BookMetadata} from '../../../book/model/book.model';
 import {BookService} from '../../../book/service/book.service';
+import {Observable} from 'rxjs';
+import {AppSettings} from '../../../core/model/app-settings.model';
+import {AppSettingsService} from '../../../core/service/app-settings.service';
+import {filter, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -32,6 +36,9 @@ export class MetadataSearcherComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   private metadataCenterService = inject(BookMetadataCenterService);
   private bookService = inject(BookService);
+  private appSettingsService = inject(AppSettingsService);
+
+  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
   constructor() {
     this.form = this.formBuilder.group({
@@ -52,7 +59,17 @@ export class MetadataSearcherComponent implements OnInit {
         }));
       }
     }));
-    this.onSubmit();
+
+    this.appSettings$
+      .pipe(
+        filter(settings => settings != null),
+        take(1)
+      )
+      .subscribe(settings => {
+        if (settings.autoBookSearch) {
+          this.onSubmit();
+        }
+      });
   }
 
   get isSearchEnabled(): boolean {

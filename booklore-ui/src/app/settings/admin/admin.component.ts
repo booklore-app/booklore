@@ -5,12 +5,12 @@ import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {CreateUserDialogComponent} from './create-user-dialog/create-user-dialog.component';
 import {TableModule} from 'primeng/table';
 import {NgIf, NgStyle} from '@angular/common';
-import {User, UserService} from '../../../../user.service';
+import {User, UserService} from '../../user.service';
 import {MessageService} from 'primeng/api';
 import {Checkbox} from 'primeng/checkbox';
 import {MultiSelect} from 'primeng/multiselect';
-import {Library} from '../../../../book/model/library.model';
-import {LibraryService} from '../../../../book/service/library.service';
+import {Library} from '../../book/model/library.model';
+import {LibraryService} from '../../book/service/library.service';
 import {Dialog} from 'primeng/dialog';
 import {Password} from 'primeng/password';
 

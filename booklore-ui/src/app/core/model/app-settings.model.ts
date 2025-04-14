@@ -5,6 +5,7 @@ export interface CoverSettings {
 }
 
 export interface AppSettings {
+  autoBookSearch: boolean;
   metadataRefreshOptions: MetadataRefreshOptions;
   coverSettings?: CoverSettings
 }

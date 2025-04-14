@@ -35,6 +35,15 @@ export class AppSettingsService {
       name: setting.key,
       value: setting.newValue
     }));
-    return this.http.put<void>(this.apiUrl, payload);
+
+    return this.http.put<void>(this.apiUrl, payload).pipe(
+      map(() => {
+        this.loadAppSettings();
+      }),
+      catchError(err => {
+        console.error('Error saving settings:', err);
+        return of();
+      })
+    );
   }
 }
