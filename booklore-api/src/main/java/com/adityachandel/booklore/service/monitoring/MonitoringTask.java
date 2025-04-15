@@ -39,7 +39,7 @@ public class MonitoringTask {
                     Path directory = (Path) key.watchable();
                     Path fullPath = directory.resolve(fileName);
 
-                    if (isPdfOrEpub(fileName)) {
+                    if (isPdfOrEpub(fileName) && (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_DELETE)) {
                         log.info("Event kind: {}; File affected: {}; Full path: {}; Watched folder: {}", kind, fileName, fullPath, directory);
                         eventPublisher.publishEvent(new FileChangeEvent(this, fullPath, kind, directory));
                     }
