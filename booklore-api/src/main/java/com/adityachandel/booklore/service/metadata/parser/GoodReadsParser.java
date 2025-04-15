@@ -354,6 +354,9 @@ public class GoodReadsParser implements BookParser {
         if (searchTerm != null) {
             BookUtils.cleanAndTruncateSearchTerm(searchTerm);
         }
+        if(request.getAuthor() != null && !request.getAuthor().isEmpty()) {
+            searchTerm += " " + BookUtils.cleanAndTruncateSearchTerm(request.getAuthor());
+        }
         return searchTerm;
     }
 
