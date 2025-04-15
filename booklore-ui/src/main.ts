@@ -11,8 +11,8 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import Aura from '@primeng/themes/aura';
 import { routes } from './app/app.routes';
-import {AuthInterceptorService} from './app/auth-interceptor.service';
-import {AuthService} from './app/core/service/auth.service';
+import { AuthInterceptorService } from './app/auth-interceptor.service';
+import { AuthService } from './app/core/service/auth.service';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -33,7 +33,10 @@ bootstrapApplication(AppComponent, {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: Aura
+        preset: Aura,
+        options: {
+          darkModeSelector: '.p-dark'
+        }
       }
     })
   ]
