@@ -23,6 +23,7 @@ public class AppSettingService {
     private final ObjectMapper objectMapper;
 
     public static final String QUICK_BOOK_MATCH = "quick_book_match";
+    public static final String AUTO_BOOK_SEARCH = "auto_book_search";
     public static final String COVER_IMAGE_RESOLUTION = "cover_image_resolution";
 
     private volatile AppSettings appSettings;
@@ -85,6 +86,9 @@ public class AppSettingService {
             builder.coverSettings(AppSettings.CoverSettings.builder()
                     .resolution(settingsMap.get(COVER_IMAGE_RESOLUTION))
                     .build());
+        }
+        if(settingsMap.containsKey(AUTO_BOOK_SEARCH)) {
+            builder.autoBookSearch(Boolean.parseBoolean(settingsMap.get(AUTO_BOOK_SEARCH)));
         }
 
         return builder.build();

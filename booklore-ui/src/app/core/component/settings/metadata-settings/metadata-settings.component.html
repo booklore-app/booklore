@@ -1,9 +1,0 @@
-<p class="text-xl pb-4 pt-4">
-  Quick Book Match Preferences
-  <i class="pi pi-info-circle text-sky-600"
-     pTooltip="Choose how metadata fields (title, description, authors, categories, cover) are retrieved by setting priority providers. You can apply the same provider settings to all fields or customize them individually. Enable ‘Refresh Covers’ to update book covers, and ‘Merge Categories’ to consolidate categories/genres from all sources while preserving the existing categories/genres in the book."
-     tooltipPosition="right"
-     style="cursor: pointer;">
-  </i>
-</p>
-<app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)" [currentMetadataOptions]="currentMetadataOptions"></app-metadata-advanced-fetch-options>

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class AppSettings {
     private CoverSettings coverSettings;
     private MetadataRefreshOptions metadataRefreshOptions;
+    private boolean autoBookSearch;
 
     @Data
     @Builder

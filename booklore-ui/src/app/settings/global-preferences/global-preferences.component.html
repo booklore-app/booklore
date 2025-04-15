@@ -1,0 +1,62 @@
+<div class="w-full h-[calc(100vh-12.1rem)] overflow-y-auto border rounded-lg p-4 enclosing-container">
+
+  <p class="text-xl pb-4 pt-6">Book Cover Image</p>
+  <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+    <p class="text-lg py-1">Resolution:
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Specifies the resolution of the generated cover image. Higher resolutions result in sharper images but may increase file size. This setting will apply to future books, or else use 'Regenerate' button."
+         tooltipPosition="right"
+         style="cursor: pointer;">
+      </i>
+    </p>
+    <div class="flex gap-4 justify-start">
+      <p-select
+        [options]="resolutionOptions"
+        [(ngModel)]="selectedResolution"
+        (ngModelChange)="onResolutionChange()"
+        placeholder="Select Resolution">
+      </p-select>
+    </div>
+
+    <p class="text-lg py-1">Regenerate Covers?
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="This option will regenerate the covers for all EPUB and PDF books (except locked ones) using the selected resolution."
+         tooltipPosition="right"
+         style="cursor: pointer;">
+      </i>
+    </p>
+    <p-button label="Regenerate" icon="pi pi-refresh" (onClick)="regenerateCovers()"></p-button>
+  </div>
+
+  <p-divider></p-divider>
+
+  <p class="text-xl pb-4 pt-8">Auto Book Search
+    <i class="pi pi-info-circle text-sky-600"
+       pTooltip="If enabled, Booklore will automatically perform a metadata match/search when the book information tab is opened."
+       tooltipPosition="right"
+       style="cursor: pointer;">
+    </i>
+  </p>
+  <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+    <p class="text-lg py-1">Enable:</p>
+    <div class="flex gap-4 justify-start">
+      <p-toggleswitch
+        [(ngModel)]="autoMetadataChecked"
+        (onChange)="onAutoMetaChange($event)"
+      />
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <p class="text-xl pb-4 pt-8">
+    Quick Book Match Preferences
+    <i class="pi pi-info-circle text-sky-600"
+       pTooltip="Choose how metadata fields (title, description, authors, categories, cover) are retrieved by setting priority providers. You can apply the same provider settings to all fields or customize them individually. Enable ‘Refresh Covers’ to update book covers, and ‘Merge Categories’ to consolidate categories/genres from all sources while preserving the existing categories/genres in the book."
+       tooltipPosition="right"
+       style="cursor: pointer;">
+    </i>
+  </p>
+  <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)" [currentMetadataOptions]="currentMetadataOptions"></app-metadata-advanced-fetch-options>
+
+</div>
