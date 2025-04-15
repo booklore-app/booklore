@@ -1,26 +1,44 @@
-<ul class="layout-menu">
-  <ng-container *ngIf="homeMenu$ | async as homeMenu">
-    <ng-container *ngFor="let item of homeMenu; let i = index;">
-      <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
-      <li *ngIf="item.separator" class="menu-separator"></li>
-    </ng-container>
-  </ng-container>
-</ul>
+<div class="flex flex-col h-full">
+  <div>
+    <ul class="layout-menu">
+      <ng-container *ngIf="homeMenu$ | async as homeMenu">
+        <ng-container *ngFor="let item of homeMenu; let i = index;">
+          <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
+          <li *ngIf="item.separator" class="menu-separator"></li>
+        </ng-container>
+      </ng-container>
+    </ul>
 
-<ul class="layout-menu">
-  <ng-container *ngIf="libraryMenu$ | async as libraryMenu">
-    <ng-container *ngFor="let item of libraryMenu; let i = index;">
-      <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
-      <li *ngIf="item.separator" class="menu-separator"></li>
-    </ng-container>
-  </ng-container>
-</ul>
+    <ul class="layout-menu">
+      <ng-container *ngIf="libraryMenu$ | async as libraryMenu">
+        <ng-container *ngFor="let item of libraryMenu; let i = index;">
+          <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
+          <li *ngIf="item.separator" class="menu-separator"></li>
+        </ng-container>
+      </ng-container>
+    </ul>
 
-<ul class="layout-menu">
-  <ng-container *ngIf="shelfMenu$ | async as shelfMenu">
-    <ng-container *ngFor="let item of shelfMenu; let i = index;">
-      <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
-      <li *ngIf="item.separator" class="menu-separator"></li>
-    </ng-container>
-  </ng-container>
-</ul>
+    <ul class="layout-menu">
+      <ng-container *ngIf="shelfMenu$ | async as shelfMenu">
+        <ng-container *ngFor="let item of shelfMenu; let i = index;">
+          <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
+          <li *ngIf="item.separator" class="menu-separator"></li>
+        </ng-container>
+      </ng-container>
+    </ul>
+  </div>
+
+  <p style="margin-top: auto;" class="p-4 text-center w-full">
+    <a
+      [href]="getVersionUrl(version)"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-gray-300 hover:underline hover:text-gray-500">
+      Version: {{ version }}
+    </a>
+  </p>
+</div>
+
+
+
+

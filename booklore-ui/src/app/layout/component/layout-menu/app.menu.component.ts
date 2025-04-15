@@ -8,6 +8,7 @@ import {map} from 'rxjs/operators';
 import {ShelfService} from '../../../book/service/shelf.service';
 import {BookService} from '../../../book/service/book.service';
 import {LibraryShelfMenuService} from '../../../book/service/library-shelf-menu.service';
+import {version} from '../../../../environments/version';
 
 @Component({
   selector: 'app-menu',
@@ -23,6 +24,8 @@ export class AppMenuComponent implements OnInit {
   private shelfService = inject(ShelfService);
   private bookService = inject(BookService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
+
+  protected readonly version = version;
 
 
   ngOnInit(): void {
@@ -84,6 +87,14 @@ export class AppMenuComponent implements OnInit {
         ];
       })
     );
+  }
+
+  getVersionUrl(version: string): string {
+    if (version.startsWith('v')) {
+      return `https://github.com/adityachandelgit/BookLore/releases/tag/${version}`;
+    } else {
+      return `https://github.com/adityachandelgit/BookLore/commit/${version}`;
+    }
   }
 
 }
