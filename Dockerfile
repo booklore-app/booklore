@@ -4,7 +4,7 @@ FROM node:22-alpine AS angular-build
 WORKDIR /angular-app
 
 COPY ./booklore-ui/package.json ./booklore-ui/package-lock.json ./
-RUN npm install
+RUN npm install --force
 COPY ./booklore-ui /angular-app/
 
 RUN npm run build --configuration=production
