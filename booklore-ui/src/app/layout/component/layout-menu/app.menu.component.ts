@@ -8,7 +8,7 @@ import {map} from 'rxjs/operators';
 import {ShelfService} from '../../../book/service/shelf.service';
 import {BookService} from '../../../book/service/book.service';
 import {LibraryShelfMenuService} from '../../../book/service/library-shelf-menu.service';
-import {version} from '../../../../environments/version';
+import {AppVersion, VersionService} from '../../../core/service/version.service';
 
 @Component({
   selector: 'app-menu',
@@ -20,15 +20,20 @@ export class AppMenuComponent implements OnInit {
   shelfMenu$: Observable<any> | undefined;
   homeMenu$: Observable<any> | undefined;
 
+  versionInfo: AppVersion | null = null;
+
   private libraryService = inject(LibraryService);
   private shelfService = inject(ShelfService);
   private bookService = inject(BookService);
+  private versionService = inject(VersionService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
 
-  protected readonly version = version;
-
-
   ngOnInit(): void {
+
+    this.versionService.getVersion().subscribe((data) => {
+      this.versionInfo = data;
+    });
+
     this.libraryMenu$ = this.libraryService.libraryState$.pipe(
       map((state) => [
         {
@@ -89,12 +94,12 @@ export class AppMenuComponent implements OnInit {
     );
   }
 
-  getVersionUrl(version: string): string {
+  getVersionUrl(version: string | undefined): string {
+    if (!version) return '#';
     if (version.startsWith('v')) {
       return `https://github.com/adityachandelgit/BookLore/releases/tag/${version}`;
     } else {
       return `https://github.com/adityachandelgit/BookLore/commit/${version}`;
     }
   }
-
 }

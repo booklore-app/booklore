@@ -7,9 +7,6 @@ COPY ./booklore-ui/package.json ./booklore-ui/package-lock.json ./
 RUN npm install --force
 COPY ./booklore-ui /angular-app/
 
-ARG UI_VERSION=development
-RUN echo "export const version = '${UI_VERSION}';" > /angular-app/src/environments/version.ts
-
 RUN npm run build --configuration=production
 
 # Stage 2: Build the Spring Boot app with Gradle
@@ -21,10 +18,16 @@ COPY ./booklore-api/gradlew ./booklore-api/gradle/ /springboot-app/
 COPY ./booklore-api/build.gradle ./booklore-api/settings.gradle /springboot-app/
 COPY ./booklore-api/gradle /springboot-app/gradle
 COPY ./booklore-api/src /springboot-app/src
+COPY ./booklore-api/src/main/resources/application.yaml /springboot-app/src/main/resources/application.yaml
+
+# Inject version into application.yaml using yq
+ARG APP_VERSION
+RUN apk add --no-cache yq && \
+    yq eval '.app.version = strenv(APP_VERSION)' -i /springboot-app/src/main/resources/application.yaml
 
 RUN ./gradlew clean build
 
-# Stage 3: Final image combining everything
+# Stage 3: Final image
 FROM eclipse-temurin:21.0.5_11-jre-alpine
 
 RUN apk update && apk add nginx
