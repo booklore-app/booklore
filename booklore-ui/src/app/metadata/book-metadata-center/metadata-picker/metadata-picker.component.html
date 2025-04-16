@@ -20,11 +20,18 @@
         <img [src]="metadataForm.get('thumbnailUrl')?.value" alt="Book Thumbnail" class="thumbnail"/>
         <input type="hidden" id="thumbnailUrl" formControlName="thumbnailUrl" class="input"/>
         <p-button
-          [icon]="isValueSaved('thumbnailUrl') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('thumbnailUrl') ? 'pi pi-check' : (hoveredFields['thumbnailUrl'] && isValueCopied('thumbnailUrl') ? 'pi pi-times' : 'pi pi-arrow-left')"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueSaved('thumbnailUrl'), 'yellow-outlined-button': isValueCopied('thumbnailUrl')}"
+          [ngClass]="
+          {
+            'green-outlined-button': isValueSaved('thumbnailUrl'),
+            'yellow-outlined-button': isValueCopied('thumbnailUrl') && !hoveredFields['thumbnailUrl'],
+            'red-outlined-button': isValueCopied('thumbnailUrl') && hoveredFields['thumbnailUrl']
+          }"
           class="arrow-button"
-          (click)="copyFetchedToCurrent('thumbnailUrl')"/>
+          (click)="hoveredFields['thumbnailUrl'] && isValueCopied('thumbnailUrl') ? resetField('thumbnailUrl') : copyFetchedToCurrent('thumbnailUrl')"
+          (mouseenter)="onMouseEnter('thumbnailUrl')"
+          (mouseleave)="onMouseLeave('thumbnailUrl')"/>
         <input type="hidden" [value]="fetchedMetadata.thumbnailUrl" class="input" readonly/>
         <img [src]="fetchedMetadata.thumbnailUrl ?? null" alt="Fetched Thumbnail" class="thumbnail"/>
       </div>
@@ -37,11 +44,18 @@
         <p-button *ngIf="metadata[field.lockedKey]" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="warn"></p-button>
         <input pInputText id="{{field.controlName}}" formControlName="{{field.controlName}}" class="input"/>
         <p-button
-          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueSaved(field.controlName), 'yellow-outlined-button': isValueCopied(field.controlName)}"
+          [ngClass]="
+          {
+            'green-outlined-button': isValueSaved(field.controlName),
+            'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
+            'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
+          }"
           class="arrow-button"
-          (click)="copyFetchedToCurrent(field.controlName)"/>
+          (click)="hoveredFields[field.controlName] && isValueCopied(field.controlName) ? resetField(field.controlName) : copyFetchedToCurrent(field.controlName)"
+          (mouseenter)="onMouseEnter(field.controlName)"
+          (mouseleave)="onMouseLeave(field.controlName)"/>
         <input pInputText [value]="fetchedMetadata[field.fetchedKey] ?? null" class="input" readonly/>
       </div>
     </div>
@@ -53,11 +67,18 @@
         <p-button *ngIf="metadata[field.lockedKey]" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="warn"></p-button>
         <textarea rows="6" pTextarea id="{{field.controlName}}" formControlName="{{field.controlName}}" class="input"></textarea>
         <p-button
-          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueSaved(field.controlName), 'yellow-outlined-button': isValueCopied(field.controlName)}"
+          [ngClass]="
+          {
+            'green-outlined-button': isValueSaved(field.controlName),
+            'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
+            'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
+          }"
           class="arrow-button"
-          (click)="copyFetchedToCurrent(field.controlName)"/>
+          (click)="hoveredFields[field.controlName] && isValueCopied(field.controlName) ? resetField(field.controlName) : copyFetchedToCurrent(field.controlName)"
+          (mouseenter)="onMouseEnter(field.controlName)"
+          (mouseleave)="onMouseLeave(field.controlName)"/>
         <textarea rows="6" pInputText [value]="fetchedMetadata[field.fetchedKey] ?? null" class="input" readonly></textarea>
       </div>
     </div>
@@ -69,11 +90,18 @@
         <p-button *ngIf="metadata[field.lockedKey]" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="warn"></p-button>
         <input pInputText id="{{field.controlName}}" formControlName="{{field.controlName}}" class="input"/>
         <p-button
-          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueSaved(field.controlName), 'yellow-outlined-button': isValueCopied(field.controlName)}"
+          [ngClass]="
+          {
+            'green-outlined-button': isValueSaved(field.controlName),
+            'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
+            'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
+          }"
           class="arrow-button"
-          (click)="copyFetchedToCurrent(field.controlName)"/>
+          (click)="hoveredFields[field.controlName] && isValueCopied(field.controlName) ? resetField(field.controlName) : copyFetchedToCurrent(field.controlName)"
+          (mouseenter)="onMouseEnter(field.controlName)"
+          (mouseleave)="onMouseLeave(field.controlName)"/>
         <input pInputText [value]="fetchedMetadata[field.fetchedKey] ?? null" class="input" readonly/>
       </div>
     </div>

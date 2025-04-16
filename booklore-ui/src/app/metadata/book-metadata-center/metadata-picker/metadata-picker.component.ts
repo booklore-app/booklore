@@ -35,7 +35,6 @@ import {Textarea} from 'primeng/textarea';
 })
 export class MetadataPickerComponent implements OnInit {
 
-
   metadataFieldsTop = [
     {label: 'Title', controlName: 'title', lockedKey: 'titleLocked', fetchedKey: 'title'},
     {label: 'Authors', controlName: 'authors', lockedKey: 'authorsLocked', fetchedKey: 'authors'},
@@ -67,6 +66,7 @@ export class MetadataPickerComponent implements OnInit {
   currentBookId!: number;
   copiedFields: Record<string, boolean> = {};
   savedFields: Record<string, boolean> = {};
+  originalMetadata!: BookMetadata;
 
   private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
@@ -118,6 +118,8 @@ export class MetadataPickerComponent implements OnInit {
   ngOnInit(): void {
     this.bookMetadata$.subscribe((metadata) => {
       if (metadata) {
+        this.originalMetadata = metadata;
+        this.originalMetadata.thumbnailUrl = this.urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn);
         this.currentBookId = metadata.bookId;
         this.metadataForm.patchValue({
           title: metadata.title || '',
@@ -373,5 +375,23 @@ export class MetadataPickerComponent implements OnInit {
 
   closeDialog() {
     this.metadataCenterService.closeDialog(true);
+  }
+
+  hoveredFields: { [key: string]: boolean } = {};
+
+  onMouseEnter(controlName: string): void {
+    if (this.isValueCopied(controlName) && !this.isValueSaved(controlName)) {
+      this.hoveredFields[controlName] = true;
+    }
+  }
+
+  onMouseLeave(controlName: string): void {
+    this.hoveredFields[controlName] = false;
+  }
+
+  resetField(field: string) {
+    this.metadataForm.get(field)?.setValue(this.originalMetadata[field]);
+    this.copiedFields[field] = false;
+    this.hoveredFields[field] = false;
   }
 }
