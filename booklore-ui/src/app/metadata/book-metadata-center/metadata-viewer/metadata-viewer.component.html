@@ -1,6 +1,6 @@
-<div class="container pt-2 flex flex-col h-full">
-  <div class="book-metadata-container flex-shrink-0" *ngIf="metadata$ | async as metadata">
-    <div class="flex flex-row w-full">
+<div class="pt-2 flex flex-col h-full">
+  <div *ngIf="metadata$ | async as metadata">
+    <div class="flex flex-row">
 
       <img [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
            class="book-cover placeholder"
@@ -9,7 +9,7 @@
            width="250"/>
 
       <div class="flex flex-col justify-between">
-        <div class="pl-6 flex flex-col w-full space-y-4">
+        <div class="pl-6 flex flex-col w-full">
           <div class="flex flex-row items-center justify-between">
             <div>
               <p *ngIf="metadata.seriesName" class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }} </p>
@@ -18,29 +18,29 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-4 pb-4">
+          <div class="flex items-center gap-4 pt-2">
             <p-rating [(ngModel)]="metadata.rating" readonly stars="5"></p-rating>
             <p class="font-semibold">({{ metadata.reviewCount || 0 }} Reviews)</p>
           </div>
 
-          <div class="grid grid-cols-3 gap-x-40 gap-y-3">
-            <p><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
-            <p><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
-            <p><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
-            <p><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
-            <p><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
-            <p><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
+          <div class="flex gap-2 pt-4 overflow-x-auto whitespace-nowrap">
+            <p-tag *ngFor="let category of metadata.categories" [value]="category" class="shrink-0"></p-tag>
           </div>
 
-          <p><span class="font-bold">File Path:</span> {{ book?.filePath }}</p>
-
-          <div class="flex flex-wrap gap-2 pt-2">
-            <p-tag *ngFor="let category of metadata.categories" [value]="category"></p-tag>
+          <div class="grid gap-x-20 gap-y-2 pt-6" style="grid-template-columns: repeat(3, max-content);">
+            <p class="whitespace-nowrap"><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
+            <p class="whitespace-nowrap"><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
+            <p class="whitespace-nowrap"><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
+            <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
+            <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
+            <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
           </div>
+
+          <p class="pt-2"><span class="font-bold">File Path:</span> {{ book?.filePath }}</p>
 
         </div>
 
-        <div *ngIf="userService.userData$ | async as userData" class="pl-6 flex flex-row w-full gap-4">
+        <div *ngIf="userService.userData$ | async as userData" class="pl-6 pt-4 flex flex-row w-full gap-4">
           <p-button label="Read" icon="pi pi-book" severity="info" (onClick)="read(metadata.bookId)"></p-button>
           <p-button label="Assign Shelf" icon="pi pi-folder" severity="info" outlined (onClick)="assignShelf(metadata.bookId)"></p-button>
           <p-button *ngIf="userData.permissions.canDownload" label="Download" icon="pi pi-download" severity="info" outlined (onClick)="download(metadata.bookId)"></p-button>
