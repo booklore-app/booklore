@@ -23,7 +23,7 @@
             <p class="font-semibold">({{ metadata.reviewCount || 0 }} Reviews)</p>
           </div>
 
-          <div class="flex gap-2 pt-4 overflow-x-auto whitespace-nowrap">
+          <div class="flex gap-2 pt-4 overflow-x-auto scrollbar-hide">
             <p-tag *ngFor="let category of metadata.categories" [value]="category" class="shrink-0"></p-tag>
           </div>
 

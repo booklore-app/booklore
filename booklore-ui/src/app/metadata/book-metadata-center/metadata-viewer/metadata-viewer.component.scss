@@ -14,3 +14,12 @@
 ::ng-deep .ql-container {
   font-size: 14px !important;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none; /* for IE 10+ */
+}
