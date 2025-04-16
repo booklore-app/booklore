@@ -89,11 +89,18 @@
       <p class="ml-3 text-lg">Current Metadata</p>
       <p-button
         severity="info"
-        icon='pi pi-angle-double-left'
-        [ngStyle]="{'padding-left': '2rem', 'padding-right': '2rem'}"
+        icon='pi pi-angle-left'
+        [ngStyle]="{'padding-left': '2rem', 'padding-right': '0.5rem'}"
         [outlined]="true"
-        pTooltip="Select all missing field" tooltipPosition="top"
+        pTooltip="Move all missing field" tooltipPosition="bottom"
         (onClick)="copyMissing()"></p-button>
+      <p-button
+        severity="info"
+        icon='pi pi-angle-double-left'
+        [ngStyle]="{'padding-left': '0.5rem', 'padding-right': '2rem'}"
+        [outlined]="true"
+        pTooltip="Move all field" tooltipPosition="bottom"
+        (onClick)="copyAll()"></p-button>
       <p class="text-lg">Fetched Metadata</p>
     </div>
   </div>
