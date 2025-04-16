@@ -277,6 +277,33 @@ export class MetadataPickerComponent implements OnInit {
     });
   }
 
+  copyAll() {
+    Object.keys(this.fetchedMetadata).forEach((field) => {
+      const isLocked = this.metadataForm.get(`${field}Locked`)?.value;
+      if (!isLocked && this.fetchedMetadata[field] && field !== 'thumbnailUrl') {
+        this.copyFetchedToCurrent(field);
+      }
+    });
+  }
+
+  copyFetchedToCurrent(field: string): void {
+    const isLocked = this.metadataForm.get(`${field}Locked`)?.value;
+    if (isLocked) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Action Blocked',
+        detail: `${field} is locked and cannot be updated.`
+      });
+      return;
+    }
+    const value = this.fetchedMetadata[field];
+    if (value) {
+      this.metadataForm.get(field)?.setValue(value);
+      this.copiedFields[field] = true;
+      this.highlightCopiedInput(field);
+    }
+  }
+
   private getNumberOrCopied(field: string): number | null {
     const formValue = this.metadataForm.get(field)?.value;
     if (formValue === '' || formValue === null || isNaN(formValue)) {
@@ -313,24 +340,6 @@ export class MetadataPickerComponent implements OnInit {
       return fieldValue.split(',').map(item => item.trim());
     }
     return Array.isArray(fieldValue) ? fieldValue : [];
-  }
-
-  copyFetchedToCurrent(field: string): void {
-    const isLocked = this.metadataForm.get(`${field}Locked`)?.value;
-    if (isLocked) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Action Blocked',
-        detail: `${field} is locked and cannot be updated.`
-      });
-      return;
-    }
-    const value = this.fetchedMetadata[field];
-    if (value) {
-      this.metadataForm.get(field)?.setValue(value);
-      this.copiedFields[field] = true;
-      this.highlightCopiedInput(field);
-    }
   }
 
   lockAll(): void {
