@@ -12,6 +12,9 @@ import java.util.Optional;
 @Repository
 public interface EmailRecipientRepository extends JpaRepository<EmailRecipientEntity, Long> {
 
+
+    Optional<EmailRecipientEntity> findById(long id);
+
     @Modifying
     @Transactional
     @Query("UPDATE EmailRecipientEntity e SET e.defaultRecipient = false WHERE e.defaultRecipient = true")

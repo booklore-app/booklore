@@ -44,9 +44,9 @@ public class EmailService {
     public void emailBook(SendBookByEmailRequest request) {
         EmailProviderEntity emailProvider = emailProviderRepository.findById(request.getProviderId()).orElseThrow(() -> ApiError.EMAIL_PROVIDER_NOT_FOUND.createException(request.getProviderId()));
         BookEntity book = bookRepository.findById(request.getBookId()).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(request.getBookId()));
-        EmailRecipientEntity defaultEmailRecipient = emailRecipientRepository.findDefaultEmailRecipient().orElseThrow(ApiError.DEFAULT_EMAIL_RECIPIENT_NOT_FOUND::createException);
+        EmailRecipientEntity emailRecipient = emailRecipientRepository.findById(request.getRecipientId()).orElseThrow(() -> ApiError.EMAIL_RECIPIENT_NOT_FOUND.createException(request.getRecipientId()));
 
-        sendEmailInVirtualThread(emailProvider, defaultEmailRecipient.getEmail(), book);
+        sendEmailInVirtualThread(emailProvider, emailRecipient.getEmail(), book);
     }
 
     private void sendEmailInVirtualThread(EmailProviderEntity emailProvider, String recipientEmail, BookEntity book) {
