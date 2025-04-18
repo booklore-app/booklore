@@ -180,7 +180,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   onSave(): void {
-    const updatedBookMetadata = this.buildMetadata();
+    const updatedBookMetadata = this.buildMetadata(undefined);
     this.bookService.updateBookMetadata(this.currentBookId, updatedBookMetadata, false).subscribe({
       next: (bookMetadata) => {
         Object.keys(this.copiedFields).forEach((field) => {
@@ -197,7 +197,7 @@ export class MetadataPickerComponent implements OnInit {
     });
   }
 
-  private buildMetadata() {
+  private buildMetadata(shouldLockAllFields: boolean | undefined) {
     const updatedBookMetadata: BookMetadata = {
       bookId: this.currentBookId,
       title: this.metadataForm.get('title')?.value || this.copiedFields['title'] ? this.getValueOrCopied('title') : '',
@@ -235,6 +235,8 @@ export class MetadataPickerComponent implements OnInit {
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,
       coverLocked: this.metadataForm.get('thumbnailUrlLocked')?.value,
+
+      ...(shouldLockAllFields !== undefined && {allFieldsLocked: shouldLockAllFields}),
     };
     return updatedBookMetadata;
   }
@@ -247,13 +249,27 @@ export class MetadataPickerComponent implements OnInit {
     return this.copiedFields['thumbnailUrl'] ? this.getValueOrCopied('thumbnailUrl') : null;
   }
 
-  private updateMetadata(): void {
-    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(), false).subscribe({
+  private updateMetadata(shouldLockAllFields: boolean | undefined): void {
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(shouldLockAllFields), false).subscribe({
       next: (response) => {
         this.metadataCenterService.emit(response);
+
+        if (shouldLockAllFields !== undefined) {
+          this.messageService.add({
+            severity: 'success',
+            summary: shouldLockAllFields ? 'Metadata Locked' : 'Metadata Unlocked',
+            detail: shouldLockAllFields
+              ? 'All fields have been successfully locked.'
+              : 'All fields have been successfully unlocked.',
+          });
+        }
       },
       error: () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update lock state'});
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update lock state',
+        });
       }
     });
   }
@@ -267,7 +283,7 @@ export class MetadataPickerComponent implements OnInit {
     } else {
       this.metadataForm.get(field)?.enable();
     }
-    this.updateMetadata();
+    this.updateMetadata(undefined);
   }
 
   copyMissing(): void {
@@ -352,7 +368,7 @@ export class MetadataPickerComponent implements OnInit {
         this.metadataForm.get(fieldName)?.disable();
       }
     });
-    this.updateMetadata();
+    this.updateMetadata(true);
   }
 
   unlockAll(): void {
@@ -363,7 +379,7 @@ export class MetadataPickerComponent implements OnInit {
         this.metadataForm.get(fieldName)?.enable();
       }
     });
-    this.updateMetadata();
+    this.updateMetadata(false);
   }
 
   highlightCopiedInput(field: string): void {

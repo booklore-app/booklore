@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, inject, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {MenuItem, MessageService, PrimeTemplate} from 'primeng/api';
+import {ConfirmationService, MenuItem, MessageService, PrimeTemplate} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
-import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -31,6 +31,7 @@ import {BookFilterComponent} from './book-filter/book-filter.component';
 import {Tooltip} from 'primeng/tooltip';
 import {Fluid} from 'primeng/fluid';
 import {UserService} from '../../../user.service';
+import {LockUnlockMetadataDialogComponent} from './lock-unlock-metadata-dialog/lock-unlock-metadata-dialog.component';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -92,6 +93,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private dialogService = inject(DialogService);
   private sortService = inject(SortService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
+  private confirmationService = inject(ConfirmationService);
 
   protected resetFilterSubject = new Subject<void>();
 
@@ -481,6 +483,20 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.bookFilterComponent.filterSelected.subscribe((item) => {
       this.selectedFilter.next(item);
+    });
+  }
+
+  lockUnlockMetadata() {
+    this.dynamicDialogRef = this.dialogService.open(LockUnlockMetadataDialogComponent, {
+      header: 'Toggle Metadata Lock',
+      modal: true,
+      closable: true,
+      data: {
+        bookIds: Array.from(this.selectedBooks)
+      }
+    });
+    this.dynamicDialogRef.onClose.subscribe(() => {
+        this.deselectAllBooks();
     });
   }
 }

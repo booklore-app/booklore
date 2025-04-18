@@ -26,8 +26,17 @@
   </div>
 
   <div class="book-info">
-    <div class="book-title-container">
-      <h4 class="book-title">{{ book.metadata?.title }}</h4>
+    <div class="book-title-container flex items-center">
+      <p class="m-0 pl-2">
+        <i
+          class="pi"
+          [ngClass]="book.metadata?.allFieldsLocked ? 'pi-lock text-red-400' : 'pi-lock-open text-green-400'"
+          [title]="book.metadata?.allFieldsLocked ? 'Locked' : 'Unlocked'"
+          style="font-size: 0.75rem;">
+        </i>
+      </p>
+      <h4 class="book-title m-0 pl-2">{{ book.metadata?.title }}</h4>
+
       <p-tieredmenu #menu [model]="items" [popup]="true" appendTo="body"></p-tieredmenu>
       <p-button
         size="small"

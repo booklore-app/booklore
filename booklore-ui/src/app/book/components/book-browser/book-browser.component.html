@@ -106,8 +106,7 @@
         </div>
 
         <div class="book-card-container" *ngIf="bookState?.books as books">
-          <app-book-table *ngIf="gridOrTable === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
-                          [sortOption]="selectedSort"></app-book-table>
+          <app-book-table *ngIf="gridOrTable === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)" [sortOption]="selectedSort"></app-book-table>
 
           <virtual-scroller *ngIf="gridOrTable === 'grid'" class="virtual-scroller" #scroll [items]="books">
             <div class="grid grid-cols-12 gap-4" #container>
@@ -126,27 +125,50 @@
         <div class="book-browser-footer bg-[var(--card-background)] bg-opacity-10" *ngIf="selectedBooks.size > 0" [@slideInOut]>
           <div class="flex justify-between gap-8">
             <ng-container *ngIf="entityType$ | async as entityType">
-              <p-button *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"
-                        label="Assign Shelf"
-                        severity="info"
-                        (onClick)="openShelfAssigner()">
+              <p-button
+                *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"
+                icon="pi pi-bookmark-fill"
+                outlined="true"
+                severity="info"
+                (onClick)="openShelfAssigner()"
+                pTooltip="Assign to shelf"
+                tooltipPosition="top">
               </p-button>
-              <p-button *ngIf="entityType === EntityType.SHELF"
-                        label="Unshelf"
-                        severity="info"
-                        (click)="unshelfBooks()">
+              <p-button
+                *ngIf="entityType === EntityType.SHELF"
+                icon="pi pi-bookmark"
+                outlined="true"
+                severity="info"
+                (click)="unshelfBooks()"
+                pTooltip="Remove from shelf"
+                tooltipPosition="top">
               </p-button>
               <div *ngIf="userService.userData$ | async as userData">
-                <p-button *ngIf="userData.permissions.canEditMetadata"
-                          label="Refresh Metadata"
-                          severity="info"
-                          (click)="updateMetadata()">
+                <p-button
+                  *ngIf="userData.permissions.canEditMetadata"
+                  icon="pi pi-database"
+                  outlined="true"
+                  severity="info"
+                  (click)="updateMetadata()"
+                  pTooltip="Update metadata"
+                  tooltipPosition="top">
                 </p-button>
               </div>
               <p-button
-                label="Deselect All"
+                outlined="true"
+                icon="pi pi-lock"
+                severity="info"
+                (click)="lockUnlockMetadata()"
+                pTooltip="Lock/Unlock metadata"
+                tooltipPosition="top">
+              </p-button>
+              <p-button
+                outlined="true"
+                icon="pi pi-times"
                 severity="warn"
-                (click)="deselectAllBooks()">
+                (click)="deselectAllBooks()"
+                pTooltip="Deselect all books"
+                tooltipPosition="top">
               </p-button>
             </ng-container>
           </div>

@@ -150,4 +150,27 @@ public class BookMetadataEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
     private List<BookAwardEntity> awards;
+
+
+    public void applyLockToAllFields(boolean lock) {
+        this.allFieldsLocked = lock;
+        this.titleLocked = lock;
+        this.subtitleLocked = lock;
+        this.publisherLocked = lock;
+        this.publishedDateLocked = lock;
+        this.descriptionLocked = lock;
+        this.isbn13Locked = lock;
+        this.isbn10Locked = lock;
+        this.pageCountLocked = lock;
+        this.thumbnailLocked = lock;
+        this.languageLocked = lock;
+        this.ratingLocked = lock;
+        this.reviewCountLocked = lock;
+        this.coverLocked = lock;
+        this.seriesNameLocked = lock;
+        this.seriesNumberLocked = lock;
+        this.seriesTotalLocked = lock;
+        this.authorsLocked = lock;
+        this.categoriesLocked = lock;
+    }
 }

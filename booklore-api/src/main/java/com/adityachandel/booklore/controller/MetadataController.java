@@ -4,6 +4,7 @@ import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.FieldLockRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.request.ToggleAllLockRequest;
 import com.adityachandel.booklore.quartz.JobSchedulerService;
 import com.adityachandel.booklore.service.BookMetadataService;
 import com.adityachandel.booklore.service.BookMetadataUpdater;
@@ -57,13 +58,19 @@ public class MetadataController {
         return ResponseEntity.ok(updatedMetadata);
     }
 
-    @PutMapping("/{bookId}/metadata/lock")
+    @PutMapping("/{bookId}/metadata/toggle-field-lock")
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
     public ResponseEntity<BookMetadata> updateFieldLockState(@RequestBody FieldLockRequest request) {
         long bookId = request.getBookId();
         String field = request.getField();
         boolean isLocked = request.getIsLocked();
         return ResponseEntity.ok(bookMetadataService.updateFieldLockState(bookId, field, isLocked));
+    }
+
+    @PutMapping("/metadata/toggle-all-lock")
+    @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
+    public ResponseEntity<List<BookMetadata>> toggleAllMetadata(@RequestBody ToggleAllLockRequest request) {
+        return ResponseEntity.ok(bookMetadataService.toggleAllLock(request));
     }
 
     @PostMapping("/regenerate-covers")

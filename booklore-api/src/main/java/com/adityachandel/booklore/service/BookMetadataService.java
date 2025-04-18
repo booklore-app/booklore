@@ -7,10 +7,12 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.request.ToggleAllLockRequest;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.model.enums.Lock;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
@@ -440,5 +442,16 @@ public class BookMetadataService {
             default -> throw ApiError.UNSUPPORTED_BOOK_TYPE.createException(book.getBookType());
         }
         log.info("{} Successfully regenerated cover for book ID {} ({})", progress, book.getId(), title);
+    }
+
+    @Transactional
+    public List<BookMetadata> toggleAllLock(ToggleAllLockRequest request) {
+        boolean lock = request.getLock() == Lock.LOCK;
+        List<BookEntity> books = bookRepository.findAllByIdIn(request.getBookIds())
+                .stream()
+                .peek(book -> book.getMetadata().applyLockToAllFields(lock))
+                .toList();
+        bookRepository.saveAll(books);
+        return books.stream().map(b ->bookMetadataMapper.toBookMetadata(b.getMetadata(), false)).collect(Collectors.toList());
     }
 }

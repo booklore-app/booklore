@@ -16,6 +16,7 @@
       <th>
         <p-tableHeaderCheckbox/>
       </th>
+      <th pResizableColumn></th>
       <th class="max-w-14 min-w-14"></th>
       <th pResizableColumn>Title</th>
       <th pResizableColumn>Authors</th>
@@ -33,6 +34,17 @@
     <tr *ngIf="book.metadata as metadata" style="height:46px">
       <td class="max-w-16">
         <p-tableCheckbox [value]="book"></p-tableCheckbox>
+      </td>
+      <td class="text-center">
+        <p-button
+          [icon]="metadata.allFieldsLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
+          [severity]="metadata.allFieldsLocked ? 'danger' : 'success'"
+          [text]="true"
+          [title]="metadata.allFieldsLocked ? 'Locked' : 'Unlocked'"
+          size="small"
+          [style]="{ width: '1.5rem', height: '1.5rem', padding: '0', fontSize: '0.75rem' }"
+          (click)="toggleMetadataLock(metadata)">
+        </p-button>
       </td>
       <td (click)="openMetadataCenter(book.id)">
         <img [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)" alt="Book Cover" class="size-7"/>

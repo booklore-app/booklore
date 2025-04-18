@@ -1,6 +1,6 @@
 import {Component, inject, Input, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {first, Observable} from 'rxjs';
 import {BookService} from '../../../book/service/book.service';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
@@ -17,13 +17,14 @@ import {BookSenderComponent} from '../../../book/components/book-sender/book-sen
 import {DialogService} from 'primeng/dynamicdialog';
 import {EmailService} from '../../../settings/email/email.service';
 import {ShelfAssignerComponent} from '../../../book/components/shelf-assigner/shelf-assigner.component';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton]
+  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip]
 })
 export class MetadataViewerComponent implements OnInit {
 
@@ -119,4 +120,24 @@ export class MetadataViewerComponent implements OnInit {
       },
     });
   }
+
+  /*toggleMetadataLock(metadata: BookMetadata): void {
+    const lockAction = metadata.allFieldsLocked ? 'UNLOCK' : 'LOCK';
+    this.bookService.toggleAllLock(new Set([metadata.bookId]), lockAction).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: `Metadata ${lockAction === 'LOCK' ? 'Locked' : 'Unlocked'}`,
+          detail: `Book metadata has been ${lockAction === 'LOCK' ? 'locked' : 'unlocked'} successfully.`,
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: `Failed to ${lockAction === 'LOCK' ? 'Lock' : 'Unlock'}`,
+          detail: `An error occurred while ${lockAction === 'LOCK' ? 'locking' : 'unlocking'} the metadata.`,
+        });
+      }
+    });
+  }*/
 }

@@ -210,10 +210,31 @@ export class BookService {
 
   updateBookMetadata(bookId: number, bookMetadata: BookMetadata, mergeCategories: boolean): Observable<BookMetadata> {
     const params = new HttpParams().set('mergeCategories', mergeCategories.toString());
-    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata, { params }).pipe(
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata, {params}).pipe(
       map(updatedMetadata => {
         this.handleBookMetadataUpdate(bookId, updatedMetadata);
         return updatedMetadata;
+      })
+    );
+  }
+
+  toggleAllLock(bookIds: Set<number>, lock: string): Observable<void> {
+    const requestBody = {
+      bookIds: Array.from(bookIds),
+      lock: lock
+    };
+    return this.http.put<BookMetadata[]>(`${this.url}/metadata/toggle-all-lock`, requestBody).pipe(
+      tap((updatedMetadataList) => {
+        const currentState = this.bookStateSubject.value;
+        const updatedBooks = (currentState.books || []).map(book => {
+          const updatedMetadata = updatedMetadataList.find(meta => meta.bookId === book.id);
+          return updatedMetadata ? {...book, metadata: updatedMetadata} : book;
+        });
+        this.bookStateSubject.next({...currentState, books: updatedBooks});
+      }),
+      map(() => void 0),
+      catchError((error) => {
+        throw error;
       })
     );
   }

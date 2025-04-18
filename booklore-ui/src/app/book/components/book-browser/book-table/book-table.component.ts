@@ -3,10 +3,13 @@ import {TableModule} from 'primeng/table';
 import {NgIf} from '@angular/common';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
-import {Book} from '../../../model/book.model';
+import {Book, BookMetadata} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
+import {Button} from 'primeng/button';
+import {BookService} from '../../../service/book.service';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-book-table',
@@ -16,7 +19,8 @@ import {UrlHelperService} from '../../../../utilities/service/url-helper.service
     TableModule,
     NgIf,
     Rating,
-    FormsModule
+    FormsModule,
+    Button
   ],
   styleUrl: './book-table.component.scss'
 })
@@ -30,6 +34,8 @@ export class BookTableComponent implements OnChanges {
 
   protected urlHelper = inject(UrlHelperService);
   private metadataDialogService = inject(MetadataDialogService);
+  private bookService = inject(BookService);
+  private messageService = inject(MessageService);
 
   // Hack to set virtual-scroller height
   ngOnChanges() {
@@ -89,5 +95,25 @@ export class BookTableComponent implements OnChanges {
 
   getGenres(genres: string[]) {
     return genres?.join(', ') || '';
+  }
+
+  toggleMetadataLock(metadata: BookMetadata): void {
+    const lockAction = metadata.allFieldsLocked ? 'UNLOCK' : 'LOCK';
+    this.bookService.toggleAllLock(new Set([metadata.bookId]), lockAction).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: `Metadata ${lockAction === 'LOCK' ? 'Locked' : 'Unlocked'}`,
+          detail: `Book metadata has been ${lockAction === 'LOCK' ? 'locked' : 'unlocked'} successfully.`,
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: `Failed to ${lockAction === 'LOCK' ? 'Lock' : 'Unlock'}`,
+          detail: `An error occurred while ${lockAction === 'LOCK' ? 'locking' : 'unlocking'} the metadata.`,
+        });
+      }
+    });
   }
 }

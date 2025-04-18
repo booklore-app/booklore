@@ -13,7 +13,17 @@
           <div class="flex flex-row items-center justify-between">
             <div>
               <p *ngIf="metadata.seriesName" class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }} </p>
-              <p class="text-2xl font-bold">{{ metadata.title }}</p>
+              <div class="flex items-center gap-2">
+                <p class="text-2xl font-bold m-0">{{ metadata.title }}</p>
+                <i
+                  class="pi"
+                  [ngClass]="metadata.allFieldsLocked ? 'pi-lock text-red-500' : 'pi-lock-open text-green-500'"
+                  [title]="metadata.allFieldsLocked ? 'Metadata is locked' : 'Metadata is unlocked'"
+                  style="font-size: 1.25rem;"
+                  pTooltip="{{ metadata.allFieldsLocked ? 'This book metadata is locked.' : 'This book metadata is unlocked.' }}"
+                  tooltipPosition="top">
+                </i>
+              </div>
               <p class="text-xl">{{ getAuthorNames(metadata?.authors || []) }}</p>
             </div>
           </div>
@@ -45,6 +55,13 @@
           <p-button label="Assign Shelf" icon="pi pi-folder" severity="info" outlined (onClick)="assignShelf(metadata.bookId)"></p-button>
           <p-button *ngIf="userData.permissions.canDownload" label="Download" icon="pi pi-download" severity="info" outlined (onClick)="download(metadata.bookId)"></p-button>
           <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined severity="info"/>
+          <!--<p-button
+            outlined
+            [label]="metadata.allFieldsLocked ? 'Unlock Metadata' : 'Lock Metadata'"
+            [icon]="metadata.allFieldsLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
+            [severity]="metadata.allFieldsLocked ? 'danger' : 'success'"
+            (onClick)="toggleMetadataLock(metadata)">
+          </p-button>-->
         </div>
       </div>
 

@@ -151,7 +151,7 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   onSave(): void {
-    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(), false).subscribe({
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(undefined), false).subscribe({
       next: (response) => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.metadataCenterService.emit(response);
@@ -171,7 +171,7 @@ export class MetadataEditorComponent implements OnInit {
     } else {
       this.metadataForm.get(field)?.enable();
     }
-    this.updateMetadata();
+    this.updateMetadata(undefined);
   }
 
   lockAll(): void {
@@ -182,7 +182,7 @@ export class MetadataEditorComponent implements OnInit {
         this.metadataForm.get(fieldName)?.disable();
       }
     });
-    this.updateMetadata();
+    this.updateMetadata(true);
   }
 
   unlockAll(): void {
@@ -193,10 +193,10 @@ export class MetadataEditorComponent implements OnInit {
         this.metadataForm.get(fieldName)?.enable();
       }
     });
-    this.updateMetadata();
+    this.updateMetadata(false);
   }
 
-  private buildMetadata() {
+  private buildMetadata(shouldLockAllFields: boolean | undefined) {
     const updatedBookMetadata: BookMetadata = {
       bookId: this.currentBookId,
       title: this.metadataForm.get('title')?.value,
@@ -233,17 +233,33 @@ export class MetadataEditorComponent implements OnInit {
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,
       coverLocked: this.metadataForm.get('thumbnailUrlLocked')?.value,
+
+      ...(shouldLockAllFields !== undefined && {allFieldsLocked: shouldLockAllFields}),
     };
     return updatedBookMetadata;
   }
 
-  private updateMetadata(): void {
-    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(), false).subscribe({
+  private updateMetadata(shouldLockAllFields: boolean | undefined): void {
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(shouldLockAllFields), false).subscribe({
       next: (response) => {
         this.metadataCenterService.emit(response);
+
+        if (shouldLockAllFields !== undefined) {
+          this.messageService.add({
+            severity: 'success',
+            summary: shouldLockAllFields ? 'Metadata Locked' : 'Metadata Unlocked',
+            detail: shouldLockAllFields
+              ? 'All fields have been successfully locked.'
+              : 'All fields have been successfully unlocked.',
+          });
+        }
       },
       error: () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update lock state'});
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update lock state',
+        });
       }
     });
   }

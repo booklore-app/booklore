@@ -1,0 +1,7 @@
+<div class="flex flex-col items-center text-center space-y-6">
+  <p class="pt-6 px-4">Lock or unlock all metadata for all the selected books</p>
+  <div class="flex gap-4 justify-center">
+    <p-button icon="pi pi-lock" label="Lock" outlined="true" severity="danger" (onClick)="toggleLock('LOCK')"></p-button>
+    <p-button icon="pi pi-lock-open" label="Unlock" outlined="true" severity="success" (onClick)="toggleLock('UNLOCK')"></p-button>
+  </div>
+</div>
