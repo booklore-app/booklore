@@ -113,3 +113,8 @@ Password: admin123
 - **Frontend:** Angular (TypeScript)
 - **Database:** MariaDB
 - **Containerization:** Docker & Docker Compose  
+
+## License
+
+* [GNU GPL v3](http://www.gnu.org/licenses/gpl.html)
+* Copyright 2024-2025
