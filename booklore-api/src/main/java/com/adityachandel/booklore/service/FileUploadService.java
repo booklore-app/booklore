@@ -55,14 +55,14 @@ public class FileUploadService {
         }
 
         try {
-            file.transferTo(storageFile);
+            file.transferTo(storagePath); // storagePath here is required for windows, otherwise it will be resoled relative to Tomcat FS
             log.info("File uploaded successfully: {}", storageFile.getAbsolutePath());
             Book book = processFile(file, libraryEntity, libraryPathEntity, storageFile);
             notificationService.sendMessage(Topic.BOOK_ADD, book);
             log.info("Book processed successfully: {}", book.getMetadata().getTitle());
             return book;
         } catch (IOException e) {
-            log.error("Error saving file: {}", e.getMessage());
+            log.error("Error saving file", e);
             throw ApiError.FILE_READ_ERROR.createException(e.getMessage());
         }
     }

@@ -1,9 +1,8 @@
 package com.adityachandel.booklore.service.fileprocessor;
 
-import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
-import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.AppSettingService;
+import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,24 +25,22 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileProcessingUtils {
 
-    private final AppProperties appProperties;
+    private final FileService fileService;
     private final AppSettingService appSettingService;
 
     public void setBookCoverPath(long bookId, BookMetadataEntity bookMetadataEntity) {
-        bookMetadataEntity.setThumbnail(appProperties.getPathConfig() + "/thumbs/" + bookId + "/f.jpg");
+        bookMetadataEntity.setThumbnail(fileService.getThumbnailPath(bookId) + "/f.jpg");
         bookMetadataEntity.setCoverUpdatedOn(Instant.now());
     }
 
     public boolean saveCoverImage(BufferedImage coverImage, long bookId) throws IOException {
-        File coverDirectory = new File(appProperties.getPathConfig() + "/thumbs");
-
         String resolution = appSettingService.getAppSettings().getCoverSettings().getResolution();
         String[] split = resolution.split("x");
         int x = Integer.parseInt(split[0]);
         int y = Integer.parseInt(split[1]);
 
         BufferedImage resizedImage = resizeImage(coverImage, x, y);
-        File bookDirectory = new File(coverDirectory, String.valueOf(bookId));
+        File bookDirectory = new File(fileService.getThumbnailPath(bookId));
         if (!bookDirectory.exists()) {
             if (!bookDirectory.mkdirs()) {
                 throw new IOException("Failed to create directory: " + bookDirectory.getAbsolutePath());
@@ -65,7 +62,7 @@ public class FileProcessingUtils {
 
     public void deleteBookCovers(Set<Long> bookIds) {
         for (Long bookId : bookIds) {
-            String bookCoverFolder = appProperties.getPathConfig() + "/thumbs/" + bookId;
+            String bookCoverFolder = fileService.getThumbnailPath(bookId);
             Path folderPath = Paths.get(bookCoverFolder);
             try {
                 if (Files.exists(folderPath) && Files.isDirectory(folderPath)) {
