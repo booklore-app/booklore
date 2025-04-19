@@ -54,8 +54,10 @@ export class MetadataPickerComponent implements OnInit {
     {label: 'Book #', controlName: 'seriesNumber', lockedKey: 'seriesNumberLocked', fetchedKey: 'seriesNumber'},
     {label: 'Total Books', controlName: 'seriesTotal', lockedKey: 'seriesTotalLocked', fetchedKey: 'seriesTotal'},
     {label: 'ISBN-13', controlName: 'isbn13', lockedKey: 'isbn13Locked', fetchedKey: 'isbn13'},
-    {label: 'Rating', controlName: 'rating', lockedKey: 'ratingLocked', fetchedKey: 'rating'},
-    {label: 'Reviews', controlName: 'reviewCount', lockedKey: 'reviewCountLocked', fetchedKey: 'reviewCount'},
+    {label: 'Amazon Reviews', controlName: 'amazonReviewCount', lockedKey: 'amazonReviewCountLocked', fetchedKey: 'amazonReviewCount'},
+    {label: 'Amazon Rating', controlName: 'amazonRating', lockedKey: 'amazonRatingLocked', fetchedKey: 'amazonRating'},
+    {label: 'Goodreads Reviews', controlName: 'goodreadsReviewCount', lockedKey: 'goodreadsReviewCountLocked', fetchedKey: 'goodreadsReviewCount'},
+    {label: 'Goodreads Rating', controlName: 'goodreadsRating', lockedKey: 'goodreadsRatingLocked', fetchedKey: 'goodreadsRating'},
     {label: 'Pages', controlName: 'pageCount', lockedKey: 'pageCountLocked', fetchedKey: 'pageCount'}
   ];
 
@@ -88,8 +90,10 @@ export class MetadataPickerComponent implements OnInit {
       description: new FormControl(''),
       pageCount: new FormControl(''),
       language: new FormControl(''),
-      rating: new FormControl(''),
-      reviewCount: new FormControl(''),
+      amazonRating: new FormControl(''),
+      amazonReviewCount: new FormControl(''),
+      goodreadsRating: new FormControl(''),
+      goodreadsReviewCount: new FormControl(''),
       seriesName: new FormControl(''),
       seriesNumber: new FormControl(''),
       seriesTotal: new FormControl(''),
@@ -106,8 +110,10 @@ export class MetadataPickerComponent implements OnInit {
       descriptionLocked: new FormControl(false),
       pageCountLocked: new FormControl(false),
       languageLocked: new FormControl(false),
-      ratingLocked: new FormControl(false),
-      reviewCountLocked: new FormControl(false),
+      amazonRatingLocked: new FormControl(false),
+      amazonReviewCountLocked: new FormControl(false),
+      goodreadsRatingLocked: new FormControl(false),
+      goodreadsReviewCountLocked: new FormControl(false),
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
@@ -122,22 +128,24 @@ export class MetadataPickerComponent implements OnInit {
         this.originalMetadata.thumbnailUrl = this.urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn);
         this.currentBookId = metadata.bookId;
         this.metadataForm.patchValue({
-          title: metadata.title || '',
-          subtitle: metadata.subtitle || '',
+          title: metadata.title || null,
+          subtitle: metadata.subtitle || null,
           authors: (metadata.authors || []).sort().join(', '),
           categories: (metadata.categories || []).sort().join(', '),
-          publisher: metadata.publisher || '',
-          publishedDate: metadata.publishedDate || '',
-          isbn10: metadata.isbn10 || '',
-          isbn13: metadata.isbn13 || '',
-          description: metadata.description || '',
-          pageCount: metadata.pageCount || '',
-          language: metadata.language || '',
-          rating: metadata.rating || '',
-          reviewCount: metadata.reviewCount || '',
-          seriesName: metadata.seriesName || '',
-          seriesNumber: metadata.seriesNumber || '',
-          seriesTotal: metadata.seriesTotal || '',
+          publisher: metadata.publisher || null,
+          publishedDate: metadata.publishedDate || null,
+          isbn10: metadata.isbn10 || null,
+          isbn13: metadata.isbn13 || null,
+          description: metadata.description || null,
+          pageCount: metadata.pageCount || null,
+          language: metadata.language || null,
+          amazonRating: metadata.amazonRating || null,
+          amazonReviewCount: metadata.amazonReviewCount || null,
+          goodreadsRating: metadata.goodreadsRating || null,
+          goodreadsReviewCount: metadata.goodreadsReviewCount || null,
+          seriesName: metadata.seriesName || null,
+          seriesNumber: metadata.seriesNumber || null,
+          seriesTotal: metadata.seriesTotal || null,
           thumbnailUrl: this.urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn),
 
           titleLocked: metadata.titleLocked || false,
@@ -151,8 +159,10 @@ export class MetadataPickerComponent implements OnInit {
           descriptionLocked: metadata.descriptionLocked || false,
           pageCountLocked: metadata.pageCountLocked || false,
           languageLocked: metadata.languageLocked || false,
-          ratingLocked: metadata.ratingLocked || false,
-          reviewCountLocked: metadata.reviewCountLocked || false,
+          amazonRatingLocked: metadata.amazonRatingLocked || false,
+          amazonReviewCountLocked: metadata.amazonReviewCountLocked || false,
+          goodreadsRatingLocked: metadata.goodreadsRatingLocked || false,
+          goodreadsReviewCountLocked: metadata.goodreadsReviewCountLocked || false,
           seriesNameLocked: metadata.seriesNameLocked || false,
           seriesNumberLocked: metadata.seriesNumberLocked || false,
           seriesTotalLocked: metadata.seriesTotalLocked || false,
@@ -168,8 +178,10 @@ export class MetadataPickerComponent implements OnInit {
         if (metadata.languageLocked) this.metadataForm.get('language')?.disable();
         if (metadata.isbn10Locked) this.metadataForm.get('isbn10')?.disable();
         if (metadata.isbn13Locked) this.metadataForm.get('isbn13')?.disable();
-        if (metadata.reviewCountLocked) this.metadataForm.get('reviewCount')?.disable();
-        if (metadata.ratingLocked) this.metadataForm.get('rating')?.disable();
+        if (metadata.amazonReviewCountLocked) this.metadataForm.get('amazonReviewCount')?.disable();
+        if (metadata.amazonRatingLocked) this.metadataForm.get('amazonRating')?.disable();
+        if (metadata.goodreadsReviewCountLocked) this.metadataForm.get('goodreadsReviewCount')?.disable();
+        if (metadata.goodreadsRatingLocked) this.metadataForm.get('goodreadsRating')?.disable();
         if (metadata.pageCountLocked) this.metadataForm.get('pageCount')?.disable();
         if (metadata.descriptionLocked) this.metadataForm.get('description')?.disable();
         if (metadata.seriesNameLocked) this.metadataForm.get('seriesName')?.disable();
@@ -211,8 +223,10 @@ export class MetadataPickerComponent implements OnInit {
       description: this.metadataForm.get('description')?.value || this.copiedFields['description'] ? this.getValueOrCopied('description') : '',
       pageCount: this.metadataForm.get('pageCount')?.value || this.copiedFields['pageCount'] ? this.getPageCountOrCopied() : null,
       language: this.metadataForm.get('language')?.value || this.copiedFields['language'] ? this.getValueOrCopied('language') : '',
-      rating: this.metadataForm.get('rating')?.value || this.copiedFields['rating'] ? this.getNumberOrCopied('rating') : null,
-      reviewCount: this.metadataForm.get('reviewCount')?.value || this.copiedFields['reviewCount'] ? this.getNumberOrCopied('reviewCount') : null,
+      amazonRating: this.metadataForm.get('amazonRating')?.value || this.copiedFields['amazonRating'] ? this.getNumberOrCopied('amazonRating') : null,
+      amazonReviewCount: this.metadataForm.get('amazonReviewCount')?.value || this.copiedFields['amazonReviewCount'] ? this.getNumberOrCopied('amazonReviewCount') : null,
+      goodreadsRating: this.metadataForm.get('goodreadsRating')?.value || this.copiedFields['goodreadsRating'] ? this.getNumberOrCopied('goodreadsRating') : null,
+      goodreadsReviewCount: this.metadataForm.get('goodreadsReviewCount')?.value || this.copiedFields['goodreadsReviewCount'] ? this.getNumberOrCopied('goodreadsReviewCount') : null,
       seriesName: this.metadataForm.get('seriesName')?.value || this.copiedFields['seriesName'] ? this.getValueOrCopied('seriesName') : '',
       seriesNumber: this.metadataForm.get('seriesNumber')?.value || this.copiedFields['seriesNumber'] ? this.getNumberOrCopied('seriesNumber') : null,
       seriesTotal: this.metadataForm.get('seriesTotal')?.value || this.copiedFields['seriesTotal'] ? this.getNumberOrCopied('seriesTotal') : null,
@@ -229,8 +243,10 @@ export class MetadataPickerComponent implements OnInit {
       descriptionLocked: this.metadataForm.get('descriptionLocked')?.value,
       pageCountLocked: this.metadataForm.get('pageCountLocked')?.value,
       languageLocked: this.metadataForm.get('languageLocked')?.value,
-      ratingLocked: this.metadataForm.get('ratingLocked')?.value,
-      reviewCountLocked: this.metadataForm.get('reviewCountLocked')?.value,
+      amazonRatingLocked: this.metadataForm.get('amazonRatingLocked')?.value,
+      amazonReviewCountLocked: this.metadataForm.get('amazonReviewCountLocked')?.value,
+      goodreadsRatingLocked: this.metadataForm.get('goodreadsRatingLocked')?.value,
+      goodreadsReviewCountLocked: this.metadataForm.get('goodreadsReviewCountLocked')?.value,
       seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,

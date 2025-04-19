@@ -64,6 +64,10 @@ export class MetadataEditorComponent implements OnInit {
       language: new FormControl(''),
       rating: new FormControl(''),
       reviewCount: new FormControl(''),
+      amazonRating: new FormControl(''),
+      amazonReviewCount: new FormControl(''),
+      goodreadsRating: new FormControl(''),
+      goodreadsReviewCount: new FormControl(''),
       seriesName: new FormControl(''),
       seriesNumber: new FormControl(''),
       seriesTotal: new FormControl(''),
@@ -81,6 +85,10 @@ export class MetadataEditorComponent implements OnInit {
       languageLocked: new FormControl(false),
       ratingLocked: new FormControl(false),
       reviewCountLocked: new FormControl(false),
+      amazonRatingLocked: new FormControl(false),
+      amazonReviewCountLocked: new FormControl(false),
+      goodreadsRatingLocked: new FormControl(false),
+      goodreadsReviewCountLocked: new FormControl(false),
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
@@ -107,6 +115,10 @@ export class MetadataEditorComponent implements OnInit {
           language: metadata.language || null,
           rating: metadata.rating || null,
           reviewCount: metadata.reviewCount || null,
+          amazonRating: metadata.amazonRating || null,
+          amazonReviewCount: metadata.amazonReviewCount || null,
+          goodreadsRating: metadata.goodreadsRating || null,
+          goodreadsReviewCount: metadata.goodreadsReviewCount || null,
           seriesName: metadata.seriesName || null,
           seriesNumber: metadata.seriesNumber || null,
           seriesTotal: metadata.seriesTotal || null,
@@ -124,6 +136,10 @@ export class MetadataEditorComponent implements OnInit {
           languageLocked: metadata.languageLocked || false,
           ratingLocked: metadata.ratingLocked || false,
           reviewCountLocked: metadata.reviewCountLocked || false,
+          amazonRatingLocked: metadata.amazonRatingLocked || false,
+          amazonReviewCountLocked: metadata.amazonReviewCountLocked || false,
+          goodreadsRatingLocked: metadata.goodreadsRatingLocked || false,
+          goodreadsReviewCountLocked: metadata.goodreadsReviewCountLocked || false,
           seriesNameLocked: metadata.seriesNameLocked || false,
           seriesNumberLocked: metadata.seriesNumberLocked || false,
           seriesTotalLocked: metadata.seriesTotalLocked || false,
@@ -139,8 +155,12 @@ export class MetadataEditorComponent implements OnInit {
         if (metadata.languageLocked) this.metadataForm.get('language')?.disable();
         if (metadata.isbn10Locked) this.metadataForm.get('isbn10')?.disable();
         if (metadata.isbn13Locked) this.metadataForm.get('isbn13')?.disable();
-        if (metadata.reviewCountLocked) this.metadataForm.get('reviewCount')?.disable();
-        if (metadata.ratingLocked) this.metadataForm.get('rating')?.disable();
+        this.metadataForm.get('reviewCount')?.disable();
+        this.metadataForm.get('rating')?.disable();
+        if (metadata.amazonReviewCountLocked) this.metadataForm.get('amazonReviewCount')?.disable();
+        if (metadata.amazonRatingLocked) this.metadataForm.get('amazonRating')?.disable();
+        if (metadata.goodreadsReviewCountLocked) this.metadataForm.get('goodreadsReviewCount')?.disable();
+        if (metadata.goodreadsRatingLocked) this.metadataForm.get('goodreadsRating')?.disable();
         if (metadata.pageCountLocked) this.metadataForm.get('pageCount')?.disable();
         if (metadata.descriptionLocked) this.metadataForm.get('description')?.disable();
         if (metadata.seriesNameLocked) this.metadataForm.get('seriesName')?.disable();
@@ -211,6 +231,10 @@ export class MetadataEditorComponent implements OnInit {
       pageCount: this.metadataForm.get('pageCount')?.value,
       rating: this.metadataForm.get('rating')?.value,
       reviewCount: this.metadataForm.get('reviewCount')?.value,
+      amazonRating: this.metadataForm.get('amazonRating')?.value,
+      amazonReviewCount: this.metadataForm.get('amazonReviewCount')?.value,
+      goodreadsRating: this.metadataForm.get('goodreadsRating')?.value,
+      goodreadsReviewCount: this.metadataForm.get('goodreadsReviewCount')?.value,
       language: this.metadataForm.get('language')?.value,
       seriesName: this.metadataForm.get('seriesName')?.value,
       seriesNumber: this.metadataForm.get('seriesNumber')?.value,
@@ -229,6 +253,10 @@ export class MetadataEditorComponent implements OnInit {
       languageLocked: this.metadataForm.get('languageLocked')?.value,
       ratingLocked: this.metadataForm.get('ratingLocked')?.value,
       reviewCountLocked: this.metadataForm.get('reviewCountLocked')?.value,
+      amazonRatingLocked: this.metadataForm.get('amazonRatingLocked')?.value,
+      amazonReviewCountLocked: this.metadataForm.get('amazonReviewCountLocked')?.value,
+      goodreadsRatingLocked: this.metadataForm.get('goodreadsRatingLocked')?.value,
+      goodreadsReviewCountLocked: this.metadataForm.get('goodreadsReviewCountLocked')?.value,
       seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,

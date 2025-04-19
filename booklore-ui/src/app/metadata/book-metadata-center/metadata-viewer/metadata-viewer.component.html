@@ -28,9 +28,23 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-4 pt-2">
-            <p-rating [(ngModel)]="metadata.rating" readonly stars="5"></p-rating>
-            <p class="font-semibold">({{ metadata.reviewCount || 0 }} Reviews)</p>
+          <div class="flex items-center gap-2 pt-2">
+            <ng-container *ngIf="metadata.amazonRating || metadata.goodreadsRating; else legacyRating">
+              <p *ngIf="metadata.amazonRating" class="font-semibold">Amazon: {{ metadata.amazonRating }}</p>
+              <p-rating *ngIf="metadata.amazonRating" [(ngModel)]="metadata.amazonRating" readonly stars="5"></p-rating>
+              <p *ngIf="metadata.amazonRating" class="font-semibold"> ({{ metadata.amazonReviewCount | number:'1.0-0' }})</p>
+
+              <p *ngIf="metadata.amazonRating && metadata.goodreadsRating">|</p>
+
+              <p *ngIf="metadata.goodreadsRating" class="font-semibold">Goodreads: {{ metadata.goodreadsRating }}</p>
+              <p-rating *ngIf="metadata.goodreadsRating" [(ngModel)]="metadata.goodreadsRating" readonly stars="5"></p-rating>
+              <p *ngIf="metadata.goodreadsRating" class="font-semibold"> ({{ metadata.goodreadsReviewCount | number:'1.0-0' }})</p>
+            </ng-container>
+
+            <ng-template #legacyRating>
+              <p-rating [(ngModel)]="metadata.rating" readonly stars="5"></p-rating>
+              <p class="font-semibold">({{ metadata.reviewCount | number:'1.0-0' }} Ratings)</p>
+            </ng-template>
           </div>
 
           <div class="flex gap-2 pt-4 overflow-x-auto scrollbar-hide">
@@ -54,7 +68,8 @@
           <p-button label="Read" icon="pi pi-book" severity="info" (onClick)="read(metadata.bookId)"></p-button>
           <p-button label="Assign Shelf" icon="pi pi-folder" severity="info" outlined (onClick)="assignShelf(metadata.bookId)"></p-button>
           <p-button *ngIf="userData.permissions.canDownload" label="Download" icon="pi pi-download" severity="info" outlined (onClick)="download(metadata.bookId)"></p-button>
-          <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined severity="info"/>
+          <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined
+                         severity="info"/>
           <!--<p-button
             outlined
             [label]="metadata.allFieldsLocked ? 'Unlock Metadata' : 'Lock Metadata'"

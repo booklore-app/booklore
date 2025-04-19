@@ -80,12 +80,20 @@ public class BookMetadataUpdater {
             metadata.setPageCount(newMetadata.getPageCount());
         }
 
-        if ((metadata.getRatingLocked() == null || !metadata.getRatingLocked()) && newMetadata.getRating() != null) {
-            metadata.setRating(newMetadata.getRating());
+        if ((metadata.getAmazonRatingLocked() == null || !metadata.getAmazonRatingLocked()) && newMetadata.getAmazonRating() != null) {
+            metadata.setAmazonRating(newMetadata.getAmazonRating());
         }
 
-        if ((metadata.getReviewCountLocked() == null || !metadata.getReviewCountLocked()) && newMetadata.getReviewCount() != null) {
-            metadata.setReviewCount(newMetadata.getReviewCount());
+        if ((metadata.getAmazonReviewCountLocked() == null || !metadata.getAmazonReviewCountLocked()) && newMetadata.getAmazonReviewCount() != null) {
+            metadata.setAmazonReviewCount(newMetadata.getAmazonReviewCount());
+        }
+
+        if ((metadata.getGoodreadsRatingLocked() == null || !metadata.getGoodreadsRatingLocked()) && newMetadata.getGoodreadsRating() != null) {
+            metadata.setGoodreadsRating(newMetadata.getGoodreadsRating());
+        }
+
+        if ((metadata.getGoodreadsReviewCountLocked() == null || !metadata.getGoodreadsReviewCountLocked()) && newMetadata.getGoodreadsReviewCount() != null) {
+            metadata.setGoodreadsReviewCount(newMetadata.getGoodreadsReviewCount());
         }
 
         if ((metadata.getSeriesNameLocked() == null || !metadata.getSeriesNameLocked()) && newMetadata.getSeriesName() != null) {
@@ -214,11 +222,17 @@ public class BookMetadataUpdater {
         if (newMetadata.getLanguageLocked() != null) {
             metadata.setLanguageLocked(newMetadata.getLanguageLocked());
         }
-        if (newMetadata.getRatingLocked() != null) {
-            metadata.setRatingLocked(newMetadata.getRatingLocked());
+        if (newMetadata.getAmazonRatingLocked() != null) {
+            metadata.setAmazonRatingLocked(newMetadata.getAmazonRatingLocked());
         }
-        if (newMetadata.getReviewCountLocked() != null) {
-            metadata.setReviewCountLocked(newMetadata.getReviewCountLocked());
+        if (newMetadata.getAmazonReviewCountLocked() != null) {
+            metadata.setAmazonReviewCountLocked(newMetadata.getAmazonReviewCountLocked());
+        }
+        if (newMetadata.getGoodreadsRatingLocked() != null) {
+            metadata.setGoodreadsRatingLocked(newMetadata.getGoodreadsRatingLocked());
+        }
+        if (newMetadata.getGoodreadsReviewCountLocked() != null) {
+            metadata.setGoodreadsReviewCountLocked(newMetadata.getGoodreadsReviewCountLocked());
         }
         if (newMetadata.getSeriesNameLocked() != null) {
             metadata.setSeriesNameLocked(newMetadata.getSeriesNameLocked());

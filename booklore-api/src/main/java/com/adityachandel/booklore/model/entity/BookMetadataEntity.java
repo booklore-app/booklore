@@ -69,6 +69,18 @@ public class BookMetadataEntity {
     @Column(name = "cover_updated_on")
     private Instant coverUpdatedOn;
 
+    @Column(name = "amazon_rating")
+    private Double amazonRating;
+
+    @Column(name = "amazon_review_count")
+    private Integer amazonReviewCount;
+
+    @Column(name = "goodreads_rating")
+    private Double goodreadsRating;
+
+    @Column(name = "goodreads_review_count")
+    private Integer goodreadsReviewCount;
+
     // Locking fields
     @Column(name = "all_fields_locked")
     private Boolean allFieldsLocked = Boolean.FALSE;
@@ -108,6 +120,18 @@ public class BookMetadataEntity {
 
     @Column(name = "review_count_locked")
     private Boolean reviewCountLocked = Boolean.FALSE;
+
+    @Column(name = "amazon_rating_locked")
+    private Boolean amazonRatingLocked = Boolean.FALSE;
+
+    @Column(name = "amazon_review_count_locked")
+    private Boolean amazonReviewCountLocked = Boolean.FALSE;
+
+    @Column(name = "goodreads_rating_locked")
+    private Boolean goodreadsRatingLocked = Boolean.FALSE;
+
+    @Column(name = "goodreads_review_count_locked")
+    private Boolean goodreadsReviewCountLocked = Boolean.FALSE;
 
     @Column(name = "cover_locked")
     private Boolean coverLocked = Boolean.FALSE;
@@ -151,7 +175,6 @@ public class BookMetadataEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
     private List<BookAwardEntity> awards;
 
-
     public void applyLockToAllFields(boolean lock) {
         this.allFieldsLocked = lock;
         this.titleLocked = lock;
@@ -172,5 +195,9 @@ public class BookMetadataEntity {
         this.seriesTotalLocked = lock;
         this.authorsLocked = lock;
         this.categoriesLocked = lock;
+        this.amazonRatingLocked = lock;
+        this.amazonReviewCountLocked = lock;
+        this.goodreadsRatingLocked = lock;
+        this.goodreadsReviewCountLocked = lock;
     }
 }

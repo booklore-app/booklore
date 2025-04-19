@@ -153,9 +153,8 @@ public class GoodReadsParser implements BookParser {
             if (workJson != null) {
                 JSONObject statsJson = workJson.optJSONObject("stats");
                 if (statsJson != null) {
-                    builder.rating(parseDouble(statsJson.optString("averageRating")))
-                            .ratingCount(parseInteger(statsJson.optString("ratingsCount")))
-                            .reviewCount(parseInteger(statsJson.optString("textReviewsCount")));
+                    builder.goodreadsRating(parseDouble(statsJson.optString("averageRating")))
+                            .goodreadsReviewCount(parseInteger(statsJson.optString("ratingsCount")));
                 }
 
                 JSONObject detailsJson = workJson.optJSONObject("details");

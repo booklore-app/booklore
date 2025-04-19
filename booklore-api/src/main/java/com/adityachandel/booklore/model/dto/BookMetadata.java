@@ -29,6 +29,10 @@ public class BookMetadata {
     private Double rating;
     private Integer ratingCount;
     private Integer reviewCount;
+    private Double amazonRating;
+    private Integer amazonReviewCount;
+    private Double goodreadsRating;
+    private Integer goodreadsReviewCount;
     private Instant coverUpdatedOn;
     private List<String> authors;
     private List<String> categories;
@@ -53,6 +57,10 @@ public class BookMetadata {
     private Boolean languageLocked;
     private Boolean ratingLocked;
     private Boolean reviewCountLocked;
+    private Boolean amazonRatingLocked;
+    private Boolean amazonReviewCountLocked;
+    private Boolean goodreadsRatingLocked;
+    private Boolean goodreadsReviewCountLocked;
     private Boolean coverLocked;
     private Boolean authorsLocked;
     private Boolean categoriesLocked;

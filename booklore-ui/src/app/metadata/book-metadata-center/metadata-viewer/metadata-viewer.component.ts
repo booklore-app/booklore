@@ -1,6 +1,6 @@
 import {Component, inject, Input, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {first, Observable} from 'rxjs';
 import {BookService} from '../../../book/service/book.service';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
@@ -24,7 +24,7 @@ import {Tooltip} from 'primeng/tooltip';
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip]
+  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe]
 })
 export class MetadataViewerComponent implements OnInit {
 

@@ -137,8 +137,8 @@ public class AmazonBookParser implements BookParser {
                 .language(getLanguage(doc))
                 .pageCount(getPageCount(doc))
                 .thumbnailUrl(getThumbnail(doc))
-                .rating(getRating(doc))
-                .reviewCount(getReviewCount(doc))
+                .amazonRating(getRating(doc))
+                .amazonReviewCount(getReviewCount(doc))
                 .build();
     }
 
