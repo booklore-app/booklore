@@ -48,9 +48,9 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore
-      - DATABASE_USERNAME=booklore
-      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match the one in the mariadb service
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore # Only modify this if you're familiar with JDBC and your database setup
+      - DATABASE_USERNAME=booklore # Must match MYSQL_USER defined in the mariadb container
+      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
     depends_on:
       mariadb:
         condition: service_healthy
@@ -68,10 +68,10 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password
+      - MYSQL_ROOT_PASSWORD=super_secure_password # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
       - MYSQL_DATABASE=booklore
-      - MYSQL_USER=booklore
-      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match the one in the booklore service
+      - MYSQL_USER=booklore # Must match DATABASE_USERNAME defined in the booklore container
+      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
     volumes:
       - /your/local/path/to/mariadb/config:/config
     restart: unless-stopped
