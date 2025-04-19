@@ -42,10 +42,8 @@
       </div>
       <div *ngIf="versionInfo.latest && versionInfo.latest !== versionInfo.current">
         <a
-          [href]="getVersionUrl(versionInfo.latest)"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-orange-400 hover:underline hover:text-orange-300 text-xs"
+          (click)="openChangelogDialog()"
+          class="cursor-pointer text-orange-400 hover:underline hover:text-orange-300 text-xs"
         >
           (Update)
         </a>

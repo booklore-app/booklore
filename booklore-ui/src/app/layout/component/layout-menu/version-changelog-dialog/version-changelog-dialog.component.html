@@ -1,0 +1,18 @@
+<div *ngIf="loading" class="p-4 text-center text-gray-400">
+  Loading changelog...
+</div>
+
+<div *ngIf="!loading && changelog.length === 0" class="p-4 text-center text-gray-400">
+  No updates available.
+</div>
+
+<div *ngIf="!loading && changelog.length > 0" class="space-y-6 p-4 max-h-[70vh] overflow-auto">
+  <div *ngFor="let release of changelog" class="border-b pb-4">
+    <p class="font-bold text-2xl pb-2">
+      <a [href]="release.url" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">
+        {{ release.name }}
+      </a>
+    </p>
+    <div [innerHTML]="markdownToHtml(release.changelog)" class="prose prose-invert w-full max-w-full"></div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 app:
   path-book: '/app/books'
   path-config: '/app/data'
-  version: 'development'
+  version: 'v0.0.40'
 
 spring:
   servlet:

@@ -9,6 +9,8 @@ import {ShelfService} from '../../../book/service/shelf.service';
 import {BookService} from '../../../book/service/book.service';
 import {LibraryShelfMenuService} from '../../../book/service/library-shelf-menu.service';
 import {AppVersion, VersionService} from '../../../core/service/version.service';
+import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {VersionChangelogDialogComponent} from './version-changelog-dialog/version-changelog-dialog.component';
 
 @Component({
   selector: 'app-menu',
@@ -21,12 +23,15 @@ export class AppMenuComponent implements OnInit {
   homeMenu$: Observable<any> | undefined;
 
   versionInfo: AppVersion | null = null;
+  dynamicDialogRef: DynamicDialogRef | undefined;
 
   private libraryService = inject(LibraryService);
   private shelfService = inject(ShelfService);
   private bookService = inject(BookService);
   private versionService = inject(VersionService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
+  private dialogService = inject(DialogService);
+
 
   ngOnInit(): void {
 
@@ -92,6 +97,20 @@ export class AppMenuComponent implements OnInit {
         ];
       })
     );
+  }
+
+  openChangelogDialog() {
+    this.dynamicDialogRef = this.dialogService.open(VersionChangelogDialogComponent, {
+      header: 'What’s New',
+      modal: true,
+      closable: true,
+      style: {
+        position: 'absolute',
+        top: '10%',
+        bottom: '10%',
+        minWidth: '800px',
+      },
+    });
   }
 
   getVersionUrl(version: string | undefined): string {

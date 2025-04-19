@@ -8,6 +8,13 @@ export interface AppVersion {
   latest: string;
 }
 
+export interface ReleaseNote {
+  version: string;
+  name: string;
+  changelog: string;
+  url: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,5 +25,9 @@ export class VersionService {
 
   getVersion(): Observable<AppVersion> {
     return this.http.get<AppVersion>(this.versionUrl);
+  }
+
+  getChangelog(): Observable<ReleaseNote[]> {
+    return this.http.get<ReleaseNote[]>(`${this.versionUrl}/changelog`);
   }
 }
