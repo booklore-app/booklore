@@ -14,12 +14,10 @@ spring:
   application:
     name: booklore-api
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://${DB_HOST:mariadb}:3306/booklore?createDatabaseIfNotExist=true
-    username: root
-    password: ${MYSQL_ROOT_PASSWORD}
+    url: ${DATABASE_URL:jdbc:mariadb://${DATABASE_HOST:${DB_HOST:mariadb}}:${DATABASE_PORT:3306}/${DATABASE_NAME:booklore}?createDatabaseIfNotExist=true}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:${MYSQL_ROOT_PASSWORD}}
   jpa:
-    database-platform: org.hibernate.dialect.MariaDBDialect
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl

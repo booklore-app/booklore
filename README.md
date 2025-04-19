@@ -48,7 +48,9 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password; must match the one in the mariadb service
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore
+      - DATABASE_USERNAME=booklore
+      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match the one in the mariadb service
     depends_on:
       mariadb:
         condition: service_healthy
@@ -66,7 +68,10 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password; must match the one in the booklore service
+      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password
+      - MYSQL_DATABASE=booklore
+      - MYSQL_USER=booklore
+      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match the one in the booklore service
     volumes:
       - /your/local/path/to/mariadb/config:/config
     restart: unless-stopped
@@ -106,6 +111,19 @@ Password: admin123
 ```
 > ⚠️ **Important:**  
 > You’ll be prompted to change the default password upon your first login to ensure better security.
+
+## Configuration
+
+The following environment variables can be configured:
+
+| Variable Name     | Description               | Default Value                                                       |
+|-------------------|---------------------------|---------------------------------------------------------------------|
+| DATABASE_URL      | JDBC connection URL       | `jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}` |
+| DATABASE_HOST     | Database hostname         | `mariadb`                                                           |
+| DATABASE_PORT     | Database port             | `3306`                                                              |
+| DATABASE_NAME     | Database name             | `booklore`                                                          |
+| DATABASE_USERNAME | Database username for app | `root`                                                              |
+| DATABASE_PASSWORD | Database password for app | **required**                                                        |
 
 ## Tech Stack
 
