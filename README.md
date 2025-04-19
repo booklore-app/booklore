@@ -1,15 +1,19 @@
 # BookLore
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/adityachandelgit/BookLore)
+![License](https://img.shields.io/github/license/adityachandelgit/BookLore)
+![Issues](https://img.shields.io/github/issues/adityachandelgit/BookLore)
+![Stars](https://img.shields.io/github/stars/adityachandelgit/BookLore?style=social)
 
 BookLore is a self-hosted web app for organizing and managing your personal book collection. It provides an intuitive interface to browse, read, and track your progress across PDFs and eBooks. With robust metadata management, multi-user support, and a sleek, modern UI, BookLore makes it easy to build and explore your personal library.
 
-![BookLore Screenshot](assets/booklore-screenshot.jpg)
+![BookLore Demo](assets/demo.gif)
 
 > ⚠️ **Warning:**  
 > This project is in early development by a sole developer. Expect bugs, missing features, and frequent changes.  
 > **Data Loss Risk:** Non-backwards compatible database changes may result in loss of metadata, such as book titles, authors, and reading progress. Your actual book files (PDFs and ePubs) are unlikely to be affected, but it's always a good idea to keep a backup of both your database and your book files.  
 > **Limited Support:** As this is a one-person project, support may be slow, and features could be experimental or incomplete. Contributions and feedback are welcome!
 
-## Key Features
+## ✨ Key Features
 - **Modern, Responsive UI** – A sleek, highly reactive, and fluent interface for a seamless reading experience.
 - **Organized Book Management** – Categorize books using Libraries and Shelves for better organization.
 - **Smart Metadata Handling** – Automatically fetch book details from sources like Goodreads, Amazon, and Google Books, or edit them manually.
@@ -19,7 +23,7 @@ BookLore is a self-hosted web app for organizing and managing your personal book
 
 BookLore is perfect for self-hosters who want complete control over their digital library. Stay tuned for updates!
 
-## Video Guides & Tutorials
+## 🎥 Video Guides & Tutorials
 
 For a step-by-step walkthrough, check out the official BookLore video guides on YouTube:
 
@@ -27,7 +31,7 @@ For a step-by-step walkthrough, check out the official BookLore video guides on 
 
 These videos cover deployment, configuration, and feature highlights to help you get started quickly.
 
-## Deploy with Docker
+## 🐳 Deploy with Docker
 
 You can quickly set up and run BookLore using Docker.
 
@@ -107,14 +111,37 @@ Password: admin123
 > ⚠️ **Important:**  
 > You’ll be prompted to change the default password upon your first login to ensure better security.
 
-## Tech Stack
+## 🤝 Community & Support
 
-- **Backend:** Spring Boot (Java)
-- **Frontend:** Angular (TypeScript)
-- **Database:** MariaDB
-- **Containerization:** Docker & Docker Compose  
+- 🐞 Found a bug? [Open an issue](https://github.com/adityachandelgit/BookLore/issues)
+- ✨ Want to contribute? [Check out CONTRIBUTING.md](https://github.com/adityachandelgit/BookLore/blob/master/CONTRIBUTING.md)
+- 💬 Ask questions or share feedback: [Discussions](https://github.com/adityachandelgit/BookLore/discussions)
 
-## License
+## 👨‍💻 Contributors & Developers
+
+Thanks to all the amazing people who contribute to Booklore.
+
+[![Contributors List](https://contrib.rocks/image?repo=adityachandelgit/BookLore)](https://github.com/adityachandelgit/BookLore/graphs/contributors)
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=adityachandelgit/BookLore&type=Date&theme=dark)](https://star-history.com/#adityachandelgit/BookLore&Date&theme=dark)
+
+## 💖 Support the Project
+
+If you find BookLore helpful, consider ⭐ starring the repo!
+
+## 🧰 Tech Stack
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" style="margin-right: 10px;"/>
+  <img src="https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular" style="margin-right: 10px;"/>
+  <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white" alt="MariaDB" style="margin-right: 10px;"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" style="margin-right: 10px;"/>
+</p>
+
+## ⚖️ License
 
 * [GNU GPL v3](http://www.gnu.org/licenses/gpl.html)
 * Copyright 2024-2025
+
