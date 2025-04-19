@@ -41,13 +41,31 @@ jobs:
         if: github.ref == 'refs/heads/master'
         id: determine_bump
         run: |
-          labels=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name' || echo "")
-          if echo "$labels" | grep -q 'breaking-change'; then
+          # Step 1: Check if the PR has a label (priority over commit message)
+          pr_number=$(gh pr list --state merged --base master --limit 1 --json number --jq '.[0].number')
+          echo "PR Number: $pr_number"
+          labels=$(gh pr view "$pr_number" --json labels --jq '.labels[].name' || echo "")
+          if echo "$labels" | grep -q 'major'; then
             bump="major"
-          elif echo "$labels" | grep -q 'feature\|enhancement'; then
+          elif echo "$labels" | grep -q 'minor'; then
             bump="minor"
-          else
+          elif echo "$labels" | grep -q 'patch'; then
             bump="patch"
+          fi
+          # Step 2: If no label, fallback to commit message keywords
+          if [ -z "$bump" ]; then
+            last_commit_msg=$(git log -1 --pretty=%B)
+            echo "Last commit message: $last_commit_msg"
+
+            if echo "$last_commit_msg" | grep -iq '#major'; then
+              bump="major"
+            elif echo "$last_commit_msg" | grep -iq '#minor'; then
+              bump="minor"
+            elif echo "$last_commit_msg" | grep -iq '#patch'; then
+              bump="patch"
+            else
+              bump="patch"  # Default to patch if no keyword or label
+            fi
           fi
           echo "bump=$bump" >> $GITHUB_ENV
           echo "Version bump type: $bump"
