@@ -52,7 +52,9 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password; must match the one in the mariadb service
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore # Only modify this if you're familiar with JDBC and your database setup
+      - DATABASE_USERNAME=booklore # Must match MYSQL_USER defined in the mariadb container
+      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
     depends_on:
       mariadb:
         condition: service_healthy
@@ -70,7 +72,10 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=your_secure_password # Use a strong password; must match the one in the booklore service
+      - MYSQL_ROOT_PASSWORD=super_secure_password # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
+      - MYSQL_DATABASE=booklore
+      - MYSQL_USER=booklore # Must match DATABASE_USERNAME defined in the booklore container
+      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
     volumes:
       - /your/local/path/to/mariadb/config:/config
     restart: unless-stopped
@@ -110,6 +115,19 @@ Password: admin123
 ```
 > ⚠️ **Important:**  
 > You’ll be prompted to change the default password upon your first login to ensure better security.
+
+## 🔧 Configuration
+
+The following environment variables can be configured:
+
+| Variable Name     | Description               | Default Value                                                       |
+|-------------------|---------------------------|---------------------------------------------------------------------|
+| DATABASE_URL      | JDBC connection URL       | `jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}` |
+| DATABASE_HOST     | Database hostname         | `mariadb`                                                           |
+| DATABASE_PORT     | Database port             | `3306`                                                              |
+| DATABASE_NAME     | Database name             | `booklore`                                                          |
+| DATABASE_USERNAME | Database username for app | `root`                                                              |
+| DATABASE_PASSWORD | Database password for app | **required**                                                        |
 
 ## 🤝 Community & Support
 

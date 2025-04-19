@@ -5,6 +5,10 @@ services:
     container_name: booklore_server
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/${MYSQL_DATABASE}
+      - DATABASE_USERNAME=${MYSQL_USER}
+      - DATABASE_PASSWORD=${MYSQL_PASSWORD}
     depends_on:
       mariadb:
         condition: service_healthy
@@ -15,7 +19,7 @@ services:
       - ${BOOKLORE_BOOKS_PATH}:/books
 
   mariadb:
-    image: lscr.io/linuxserver/mariadb:11.4.5
+    image: lscr.io/linuxserver/mariadb:11.4
     container_name: booklore_mariadb
     env_file:
       - .env
