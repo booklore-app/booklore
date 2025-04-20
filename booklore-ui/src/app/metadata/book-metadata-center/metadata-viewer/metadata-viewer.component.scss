@@ -31,8 +31,8 @@
   scroll-snap-type: x mandatory;
   padding: 0.25rem;
   gap: 1.25rem;
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 .dashboard-scroller-card {
@@ -41,4 +41,20 @@
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: 101px;
+}
+
+.description-container {
+  max-height: 60px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.description-container .description-content {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.line-clamp-none {
+  max-height: none;
+  overflow: visible;
 }

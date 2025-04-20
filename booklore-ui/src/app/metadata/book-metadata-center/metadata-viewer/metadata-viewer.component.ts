@@ -1,5 +1,5 @@
-import {Component, inject, Input, OnInit} from '@angular/core';
-import {Button} from 'primeng/button';
+import {Component, DestroyRef, inject, Input, OnInit} from '@angular/core';
+import {Button, ButtonDirective} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {first, Observable} from 'rxjs';
 import {BookService} from '../../../book/service/book.service';
@@ -7,7 +7,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {Book, BookMetadata} from '../../../book/model/book.model';
+import {Book, BookMetadata, BookRecommendation} from '../../../book/model/book.model';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {UserService} from '../../../user.service';
@@ -18,13 +18,16 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {EmailService} from '../../../settings/email/email.service';
 import {ShelfAssignerComponent} from '../../../book/components/shelf-assigner/shelf-assigner.component';
 import {Tooltip} from 'primeng/tooltip';
+import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
+import {BookCardComponent} from '../../../book/components/book-browser/book-card/book-card.component';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe]
+  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective]
 })
 export class MetadataViewerComponent implements OnInit {
 
@@ -35,12 +38,23 @@ export class MetadataViewerComponent implements OnInit {
   private messageService = inject(MessageService);
   private bookService = inject(BookService);
   private metadataCenterService = inject(BookMetadataCenterService);
-
   protected urlHelper = inject(UrlHelperService);
   protected userService = inject(UserService);
+  private destroyRef = inject(DestroyRef);
 
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   items: MenuItem[] | undefined;
+  recommendedBooks: BookRecommendation[] = [];
+
+  isExpanded = false;
+
+  toggleExpand(): void {
+    this.isExpanded = !this.isExpanded;
+  }
+
+  shouldShowToggle(description?: string): boolean {
+    return (description?.length || 0) > 300;
+  }
 
   ngOnInit(): void {
     this.items = [
@@ -66,6 +80,20 @@ export class MetadataViewerComponent implements OnInit {
         }
       }
     ];
+
+    this.metadata$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((metadata) => {
+        if (metadata) {
+          this.getBookRecommendations(metadata.bookId);
+        }
+      });
+  }
+
+  getBookRecommendations(bookId: number): void {
+    this.bookService.getBookRecommendations(bookId).subscribe((recommendations) => {
+      this.recommendedBooks = recommendations;
+    });
   }
 
   read(bookId: number): void {

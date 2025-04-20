@@ -6,7 +6,7 @@
            class="book-cover placeholder"
            alt="Cover of {{ metadata.title }}"
            loading="lazy"
-           width="250"/>
+           width="225"/>
 
       <div class="flex flex-col justify-between">
         <div class="pl-6 flex flex-col w-full">
@@ -68,8 +68,7 @@
           <p-button label="Read" icon="pi pi-book" severity="info" (onClick)="read(metadata.bookId)"></p-button>
           <p-button label="Assign Shelf" icon="pi pi-folder" severity="info" outlined (onClick)="assignShelf(metadata.bookId)"></p-button>
           <p-button *ngIf="userData.permissions.canDownload" label="Download" icon="pi pi-download" severity="info" outlined (onClick)="download(metadata.bookId)"></p-button>
-          <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined
-                         severity="info"/>
+          <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined severity="info"/>
         </div>
       </div>
 
@@ -78,8 +77,44 @@
 
   <p-divider></p-divider>
 
-  <div *ngIf="metadata$ | async as metadata" class="book-description space-y-4 overflow-y-auto flex-1">
-    <p class="pt-2 px-2" [innerHTML]="metadata.description || 'No description available.'"></p>
+  <div *ngIf="metadata$ | async as metadata" class="space-y-2 px-2">
+    <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }"
+         class="transition-all duration-300 overflow-hidden description-container">
+      <div class="description-content" [innerHTML]="metadata.description || 'No description available.'"></div>
+    </div>
+
+    <div *ngIf="metadata.description && metadata.description.length > 100" class="text-left">
+      <button pButton
+              type="button"
+              [label]="isExpanded ? 'Show less' : 'Show more'"
+              [icon]="isExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+              iconPos="right"
+              class="p-button-text p-button-sm"
+              (click)="toggleExpand()">
+      </button>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="recommended-books-header pb-2">
+    <h3 class="text-xl font-semibold">Similar Books</h3>
+  </div>
+
+  <div class="dashboard-scroller-infinite"
+       *ngIf="recommendedBooks.length > 0"
+       infiniteScroll
+       [infiniteScrollDistance]="2"
+       [infiniteScrollThrottle]="50"
+       [horizontal]="true">
+    <div class="dashboard-scroller-card" *ngFor="let book of recommendedBooks">
+      <app-book-card
+        [book]="book.book"
+        [isCheckboxEnabled]="false"
+        [readButtonHidden]="true"
+        [bottomBarHidden]="true">
+      </app-book-card>
+    </div>
   </div>
 
 </div>

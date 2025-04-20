@@ -13,5 +13,4 @@ export class BookMetadataCenterService {
   emit(bookMetadata: BookMetadata) {
     this.bookMetadataSubject.next(bookMetadata);
   }
-
 }
