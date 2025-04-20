@@ -1,4 +1,4 @@
-import {Component, inject, Input, OnInit} from '@angular/core';
+import {Component, inject, Input, OnInit, ViewChild} from '@angular/core';
 import {Book} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
@@ -8,7 +8,6 @@ import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.compon
 import {BookService} from '../../../service/book.service';
 import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
-import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {MetadataFetchOptionsComponent} from '../../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
@@ -17,8 +16,9 @@ import {NgClass, NgIf} from '@angular/common';
 import {UserService} from '../../../../user.service';
 import {filter} from 'rxjs';
 import {EmailService} from '../../../../settings/email/email.service';
-import {TieredMenu, TieredMenuModule} from 'primeng/tieredmenu';
+import {TieredMenu} from 'primeng/tieredmenu';
 import {BookSenderComponent} from '../../book-sender/book-sender.component';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-book-card',
@@ -32,6 +32,8 @@ export class BookCardComponent implements OnInit {
   @Input() isCheckboxEnabled: boolean = false;
   @Input() onBookSelect?: (bookId: number, selected: boolean) => void;
   @Input() isSelected: boolean = false;
+  @Input() bottomBarHidden: boolean = false;
+  @Input() readButtonHidden: boolean = false;
 
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
@@ -39,14 +41,14 @@ export class BookCardComponent implements OnInit {
 
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
-  private metadataDialogService = inject(MetadataDialogService);
   private userService = inject(UserService);
   private emailService = inject(EmailService);
   private messageService = inject(MessageService);
-
+  private router = inject(Router);
   protected urlHelper = inject(UrlHelperService);
 
   private userPermissions: any;
+
 
   ngOnInit(): void {
     this.userService.userData$
@@ -84,7 +86,13 @@ export class BookCardComponent implements OnInit {
       {
         label: 'View Details',
         icon: 'pi pi-info-circle',
-        command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'view'),
+        command: () => {
+          setTimeout(() => {
+            this.router.navigate(['/book', this.book.id], {
+              queryParams: {tab: 'view'}
+            })
+          }, 150);
+        },
       },
       ...this.getPermissionBasedMenuItems(),
     ];
@@ -98,7 +106,13 @@ export class BookCardComponent implements OnInit {
         {
           label: 'Match Book',
           icon: 'pi pi-sparkles',
-          command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'match'),
+          command: () => {
+            setTimeout(() => {
+              this.router.navigate(['/book', this.book.id], {
+                queryParams: {tab: 'match'}
+              })
+            }, 150);
+          },
         },
         {
           label: 'Quick Refresh',
@@ -211,7 +225,9 @@ export class BookCardComponent implements OnInit {
   }
 
   openBookInfo(book: Book): void {
-    this.metadataDialogService.openBookMetadataCenterDialog(book.id, 'view');
+    this.router.navigate(['/book', book.id], {
+      queryParams: {tab: 'view'}
+    });
   }
 
   private hasEditMetadataPermission(): boolean {

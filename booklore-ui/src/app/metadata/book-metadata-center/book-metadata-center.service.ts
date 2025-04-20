@@ -10,14 +10,8 @@ export class BookMetadataCenterService {
   private bookMetadataSubject = new BehaviorSubject<BookMetadata | null>(null);
   currentMetadata$ = this.bookMetadataSubject.asObservable();
 
-  private dialogCloseSubject = new BehaviorSubject<boolean | null>(null);
-  dialogClose$ = this.dialogCloseSubject.asObservable();
-
   emit(bookMetadata: BookMetadata) {
     this.bookMetadataSubject.next(bookMetadata);
   }
 
-  closeDialog(close: boolean) {
-    return this.dialogCloseSubject.next(close);
-  }
 }

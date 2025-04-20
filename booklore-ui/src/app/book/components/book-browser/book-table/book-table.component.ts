@@ -5,11 +5,11 @@ import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Book, BookMetadata} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
-import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {Button} from 'primeng/button';
 import {BookService} from '../../../service/book.service';
 import {MessageService} from 'primeng/api';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-book-table',
@@ -33,9 +33,9 @@ export class BookTableComponent implements OnChanges {
   @Input() sortOption: SortOption | null = null;
 
   protected urlHelper = inject(UrlHelperService);
-  private metadataDialogService = inject(MetadataDialogService);
   private bookService = inject(BookService);
   private messageService = inject(MessageService);
+  private router = inject(Router);
 
   // Hack to set virtual-scroller height
   ngOnChanges() {
@@ -72,7 +72,9 @@ export class BookTableComponent implements OnChanges {
   }
 
   openMetadataCenter(id: number): void {
-    this.metadataDialogService.openBookMetadataCenterDialog(id, 'view');
+    this.router.navigate(['/book', id], {
+      queryParams: {tab: 'view'}
+    });
   }
 
   getStarColor(rating: number): string {

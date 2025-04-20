@@ -1,18 +1,20 @@
-<p-tabs [value]="tab" lazy="true" style="height: 100%; overflow: hidden;">
-  <p-tablist>
-    <p-tab value="view">Book Details</p-tab>
-    <p-tab *ngIf="canEditMetadata" value="edit">Edit Details</p-tab>
-    <p-tab *ngIf="canEditMetadata" value="match">Match Book</p-tab>
-  </p-tablist>
-  <p-tabpanels style="height: 100%; overflow: hidden; padding-bottom: 0">
-    <p-tabpanel value="view" style="height: 100%; overflow: hidden;">
-      <app-metadata-viewer [book]="book"></app-metadata-viewer>
-    </p-tabpanel>
-    <p-tabpanel *ngIf="canEditMetadata" value="edit" style="height: 100%; overflow: hidden;">
-      <app-metadata-editor></app-metadata-editor>
-    </p-tabpanel>
-    <p-tabpanel *ngIf="canEditMetadata" value="match" style="height: 100%; overflow: hidden;">
-      <app-metadata-searcher></app-metadata-searcher>
-    </p-tabpanel>
-  </p-tabpanels>
-</p-tabs>
+<div class="rounded-xl overflow-hidden bg-card">
+  <p-tabs [value]="tab" lazy="true">
+    <p-tablist>
+      <p-tab value="view">Book Details</p-tab>
+      <p-tab *ngIf="canEditMetadata" value="edit">Edit Details</p-tab>
+      <p-tab *ngIf="canEditMetadata" value="match">Match Book</p-tab>
+    </p-tablist>
+    <p-tabpanels class="h-[calc(100vh-10rem)]">
+      <p-tabpanel value="view">
+        <app-metadata-viewer [book]="book"></app-metadata-viewer>
+      </p-tabpanel>
+      <p-tabpanel *ngIf="canEditMetadata" value="edit">
+        <app-metadata-editor></app-metadata-editor>
+      </p-tabpanel>
+      <p-tabpanel *ngIf="canEditMetadata" value="match">
+        <app-metadata-searcher></app-metadata-searcher>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

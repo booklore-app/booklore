@@ -7,9 +7,9 @@ import {InputTextModule} from 'primeng/inputtext';
 import {BookService} from '../../service/book.service';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf, SlicePipe} from '@angular/common';
-import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.service';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-book-searcher',
@@ -33,7 +33,7 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
   #subscription!: Subscription;
 
   private bookService = inject(BookService);
-  private metadataDialogService = inject(MetadataDialogService);
+  private router = inject(Router);
   protected urlHelper = inject(UrlHelperService);
 
   ngOnInit(): void {
@@ -68,7 +68,9 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
 
   onBookClick(book: Book): void {
     this.clearSearch();
-    this.metadataDialogService.openBookMetadataCenterDialog(book.id, 'view');
+    this.router.navigate(['/book', book.id], {
+      queryParams: {tab: 'view'}
+    });
   }
 
   clearSearch(): void {

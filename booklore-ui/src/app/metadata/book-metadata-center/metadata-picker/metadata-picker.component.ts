@@ -414,10 +414,6 @@ export class MetadataPickerComponent implements OnInit {
     this.goBack.emit(true);
   }
 
-  closeDialog() {
-    this.metadataCenterService.closeDialog(true);
-  }
-
   hoveredFields: { [key: string]: boolean } = {};
 
   onMouseEnter(controlName: string): void {

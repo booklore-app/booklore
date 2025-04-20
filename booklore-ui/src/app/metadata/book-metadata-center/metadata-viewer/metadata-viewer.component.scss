@@ -23,3 +23,22 @@
   scrollbar-width: none;
   -ms-overflow-style: none; /* for IE 10+ */
 }
+
+.dashboard-scroller-infinite {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  padding: 0.25rem;
+  gap: 1.25rem;
+  height: 100%;
+  width: 100%;
+}
+
+.dashboard-scroller-card {
+  height: 165px;
+  width: 101px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 101px;
+}

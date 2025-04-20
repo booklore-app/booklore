@@ -3,7 +3,7 @@
      (mouseover)="isHovered = true"
      (mouseout)="isHovered = false">
 
-  <div class="cover-container" [ngClass]="{ 'shimmer': !isImageLoaded }">
+  <div class="cover-container" [ngClass]="{ 'shimmer': !isImageLoaded, 'center-info-btn': readButtonHidden }">
     <img
       [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
       class="book-cover"
@@ -13,7 +13,7 @@
       (load)="onImageLoad()"/>
 
     <p-button [rounded]="true" icon="pi pi-info" class="info-btn" (click)="openBookInfo(book)"></p-button>
-    <p-button [rounded]="true" icon="pi pi-book" class="read-btn" (click)="readBook(book)"></p-button>
+    <p-button [hidden]="readButtonHidden" [rounded]="true" icon="pi pi-book" class="read-btn" (click)="readBook(book)"></p-button>
 
     <p-checkbox
       *ngIf="isCheckboxEnabled"
@@ -25,7 +25,7 @@
     </p-checkbox>
   </div>
 
-  <div class="book-info">
+  <div [hidden]="bottomBarHidden">
     <div class="book-title-container flex items-center">
       <p class="m-0 pl-2">
         <i
@@ -44,6 +44,7 @@
         (click)="menu.toggle($event)"
         icon="pi pi-ellipsis-v">
       </p-button>
+
     </div>
   </div>
 </div>

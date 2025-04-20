@@ -70,13 +70,6 @@
           <p-button *ngIf="userData.permissions.canDownload" label="Download" icon="pi pi-download" severity="info" outlined (onClick)="download(metadata.bookId)"></p-button>
           <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined
                          severity="info"/>
-          <!--<p-button
-            outlined
-            [label]="metadata.allFieldsLocked ? 'Unlock Metadata' : 'Lock Metadata'"
-            [icon]="metadata.allFieldsLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
-            [severity]="metadata.allFieldsLocked ? 'danger' : 'success'"
-            (onClick)="toggleMetadataLock(metadata)">
-          </p-button>-->
         </div>
       </div>
 
@@ -87,18 +80,6 @@
 
   <div *ngIf="metadata$ | async as metadata" class="book-description space-y-4 overflow-y-auto flex-1">
     <p class="pt-2 px-2" [innerHTML]="metadata.description || 'No description available.'"></p>
-    <!--<div class="pt-6">
-      <p-editor [(ngModel)]="metadata.description" [style]="{ height: '350px' }" [readonly]="true">
-        <ng-template #header>
-        </ng-template>
-      </p-editor>
-    </div>-->
   </div>
 
-  <div class="flex flex-col gap-x-4 mt-auto">
-    <p-divider></p-divider>
-    <div class="flex gap-x-4 justify-end">
-      <p-button label="Close" icon="pi pi-times" severity="secondary" (onClick)="closeDialog()"></p-button>
-    </div>
-  </div>
 </div>

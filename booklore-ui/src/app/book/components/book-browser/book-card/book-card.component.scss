@@ -13,7 +13,6 @@
 .cover-container {
   position: relative;
   width: 100%;
-  height: 190px;
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -105,6 +104,11 @@
 .cover-container:hover .read-btn {
   opacity: 1;
   visibility: visible;
+}
+
+.cover-container.center-info-btn .info-btn {
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .select-checkbox {

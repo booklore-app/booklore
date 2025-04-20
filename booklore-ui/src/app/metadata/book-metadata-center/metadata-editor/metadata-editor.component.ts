@@ -292,10 +292,6 @@ export class MetadataEditorComponent implements OnInit {
     });
   }
 
-  closeDialog() {
-    this.metadataCenterService.closeDialog(true);
-  }
-
   getUploadCoverUrl(): string {
     return this.bookService.getUploadCoverUrl(this.currentBookId);
   }

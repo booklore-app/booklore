@@ -72,10 +72,6 @@ export class MetadataViewerComponent implements OnInit {
     this.bookService.readBook(bookId);
   }
 
-  closeDialog(): void {
-    this.metadataCenterService.closeDialog(true);
-  }
-
   getAuthorNames(authors: string[]): string {
     return authors.join(', ');
   }
@@ -120,24 +116,4 @@ export class MetadataViewerComponent implements OnInit {
       },
     });
   }
-
-  /*toggleMetadataLock(metadata: BookMetadata): void {
-    const lockAction = metadata.allFieldsLocked ? 'UNLOCK' : 'LOCK';
-    this.bookService.toggleAllLock(new Set([metadata.bookId]), lockAction).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: `Metadata ${lockAction === 'LOCK' ? 'Locked' : 'Unlocked'}`,
-          detail: `Book metadata has been ${lockAction === 'LOCK' ? 'locked' : 'unlocked'} successfully.`,
-        });
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: `Failed to ${lockAction === 'LOCK' ? 'Lock' : 'Unlock'}`,
-          detail: `An error occurred while ${lockAction === 'LOCK' ? 'locking' : 'unlocking'} the metadata.`,
-        });
-      }
-    });
-  }*/
 }
