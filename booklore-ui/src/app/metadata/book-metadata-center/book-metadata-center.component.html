@@ -7,7 +7,7 @@
     </p-tablist>
     <p-tabpanels class="h-[calc(100vh-10rem)]">
       <p-tabpanel value="view">
-        <app-metadata-viewer [book]="book"></app-metadata-viewer>
+        <app-metadata-viewer [book]="book" [recommendedBooks]="recommendedBooks"></app-metadata-viewer>
       </p-tabpanel>
       <p-tabpanel *ngIf="canEditMetadata" value="edit">
         <app-metadata-editor></app-metadata-editor>

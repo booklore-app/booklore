@@ -21,9 +21,6 @@ import {Tooltip} from 'primeng/tooltip';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {BookCardComponent} from '../../../book/components/book-browser/book-card/book-card.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {AppSettings} from '../../../core/model/app-settings.model';
-import {filter, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -35,6 +32,7 @@ import {filter, take} from 'rxjs/operators';
 export class MetadataViewerComponent implements OnInit {
 
   @Input() book: Book | undefined;
+  @Input() recommendedBooks: BookRecommendation[] = [];
 
   private dialogService = inject(DialogService);
   private emailService = inject(EmailService);
@@ -44,15 +42,11 @@ export class MetadataViewerComponent implements OnInit {
   protected urlHelper = inject(UrlHelperService);
   protected userService = inject(UserService);
   private destroyRef = inject(DestroyRef);
-  private appSettingsService = inject(AppSettingsService);
 
-  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   items: MenuItem[] | undefined;
-  recommendedBooks: BookRecommendation[] = [];
   bookInSeries: Book[] = [];
   isExpanded = false;
-  similarBookRecommendation = false;
 
   ngOnInit(): void {
     this.items = [
@@ -79,25 +73,6 @@ export class MetadataViewerComponent implements OnInit {
       }
     ];
 
-    this.appSettings$
-      .pipe(
-        filter(settings => settings != null),
-        take(1)
-      )
-      .subscribe(settings => {
-        this.similarBookRecommendation = settings!.similarBookRecommendation ?? false;
-        if (this.similarBookRecommendation) {
-          this.metadata$
-            .pipe(
-              filter((metadata): metadata is BookMetadata => metadata !== null),
-              take(1)
-            )
-            .subscribe(metadata => {
-              this.getBookRecommendations(metadata.bookId);
-            });
-        }
-      });
-
     this.metadata$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((metadata) => {
@@ -109,12 +84,6 @@ export class MetadataViewerComponent implements OnInit {
 
   toggleExpand(): void {
     this.isExpanded = !this.isExpanded;
-  }
-
-  getBookRecommendations(bookId: number): void {
-    this.bookService.getBookRecommendations(bookId).subscribe((recommendations) => {
-      this.recommendedBooks = recommendations;
-    });
   }
 
   getBooksInSeries(bookId: number): void {
