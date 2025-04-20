@@ -1,7 +1,6 @@
-<div class="pt-2 flex flex-col h-full">
+<div class="pt-2 flex flex-col h-full overflow-hidden">
   <div *ngIf="metadata$ | async as metadata">
     <div class="flex flex-row">
-
       <img [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
            class="book-cover placeholder"
            alt="Cover of {{ metadata.title }}"
@@ -12,7 +11,7 @@
         <div class="pl-6 flex flex-col w-full">
           <div class="flex flex-row items-center justify-between">
             <div>
-              <p *ngIf="metadata.seriesName" class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }} </p>
+              <p *ngIf="metadata.seriesName" class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }}</p>
               <div class="flex items-center gap-2">
                 <p class="text-2xl font-bold m-0">{{ metadata.title }}</p>
                 <i
@@ -61,7 +60,6 @@
           </div>
 
           <p class="pt-2"><span class="font-bold">File Path:</span> {{ book?.filePath }}</p>
-
         </div>
 
         <div *ngIf="userService.userData$ | async as userData" class="pl-6 pt-4 flex flex-row w-full gap-4">
@@ -71,13 +69,12 @@
           <p-splitbutton *ngIf="userData.permissions.canEmailBook" label="Quick Send" icon="pi pi-send" [model]="items" (onClick)="quickSend(metadata.bookId)" outlined severity="info"/>
         </div>
       </div>
-
     </div>
   </div>
 
   <p-divider></p-divider>
 
-  <div *ngIf="metadata$ | async as metadata" class="space-y-2 px-2">
+  <div *ngIf="metadata$ | async as metadata" class="flex-1 overflow-auto space-y-2 px-2 pb-4">
     <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }"
          class="transition-all duration-300 overflow-hidden description-container">
       <div class="description-content" [innerHTML]="metadata.description || 'No description available.'"></div>
@@ -93,28 +90,47 @@
               (click)="toggleExpand()">
       </button>
     </div>
+
+    <p-divider></p-divider>
+
+    <ng-container *ngIf="recommendedBooks.length > 0">
+      <div>
+        <h3 class="text-xl font-semibold">Similar Books</h3>
+        <div class="dashboard-scroller-infinite"
+             infiniteScroll
+             [infiniteScrollDistance]="2"
+             [infiniteScrollThrottle]="50"
+             [horizontal]="true">
+          <div class="dashboard-scroller-card" *ngFor="let book of recommendedBooks">
+            <app-book-card
+              [book]="book.book"
+              [isCheckboxEnabled]="false"
+              [readButtonHidden]="true"
+              [bottomBarHidden]="true">
+            </app-book-card>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="bookInSeries.length > 0">
+      <div>
+        <h3 class="text-xl font-semibold pt-2">More in the Series</h3>
+        <div class="dashboard-scroller-infinite"
+             infiniteScroll
+             [infiniteScrollDistance]="2"
+             [infiniteScrollThrottle]="50"
+             [horizontal]="true">
+          <div class="dashboard-scroller-card" *ngFor="let book of bookInSeries">
+            <app-book-card
+              [book]="book"
+              [isCheckboxEnabled]="false"
+              [readButtonHidden]="true"
+              [bottomBarHidden]="true">
+            </app-book-card>
+          </div>
+        </div>
+      </div>
+    </ng-container>
   </div>
-
-  <p-divider></p-divider>
-
-  <div class="recommended-books-header pb-2">
-    <h3 class="text-xl font-semibold">Similar Books</h3>
-  </div>
-
-  <div class="dashboard-scroller-infinite"
-       *ngIf="recommendedBooks.length > 0"
-       infiniteScroll
-       [infiniteScrollDistance]="2"
-       [infiniteScrollThrottle]="50"
-       [horizontal]="true">
-    <div class="dashboard-scroller-card" *ngFor="let book of recommendedBooks">
-      <app-book-card
-        [book]="book.book"
-        [isCheckboxEnabled]="false"
-        [readButtonHidden]="true"
-        [bottomBarHidden]="true">
-      </app-book-card>
-    </div>
-  </div>
-
 </div>

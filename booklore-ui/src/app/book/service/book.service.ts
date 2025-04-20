@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, first, Observable, of} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, filter, map, tap} from 'rxjs/operators';
 import {Book, BookMetadata, BookRecommendation, BookSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
@@ -278,6 +278,27 @@ export class BookService {
     return this.http.get<BookRecommendation[]>(`${this.url}/${bookId}/recommendations`, {
       params: { limit: limit.toString() }
     });
+  }
+
+  getBooksInSeries(bookId: number): Observable<Book[]> {
+    return this.bookStateSubject.asObservable().pipe(
+      filter(state => state.loaded),
+      first(),
+      map(state => {
+        const allBooks = state.books || [];
+        const currentBook = allBooks.find(b => b.id === bookId);
+
+        if (!currentBook || !currentBook.metadata?.seriesName) {
+          return [];
+        }
+
+        const seriesName = currentBook.metadata.seriesName.toLowerCase();
+        return allBooks.filter(b =>
+          b.id !== bookId &&
+          b.metadata?.seriesName?.toLowerCase() === seriesName
+        );
+      })
+    );
   }
 
 

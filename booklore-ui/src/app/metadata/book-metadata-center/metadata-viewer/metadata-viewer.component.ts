@@ -45,16 +45,9 @@ export class MetadataViewerComponent implements OnInit {
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   items: MenuItem[] | undefined;
   recommendedBooks: BookRecommendation[] = [];
-
+  bookInSeries: Book[] = [];
   isExpanded = false;
 
-  toggleExpand(): void {
-    this.isExpanded = !this.isExpanded;
-  }
-
-  shouldShowToggle(description?: string): boolean {
-    return (description?.length || 0) > 300;
-  }
 
   ngOnInit(): void {
     this.items = [
@@ -88,11 +81,29 @@ export class MetadataViewerComponent implements OnInit {
           this.getBookRecommendations(metadata.bookId);
         }
       });
+
+    this.metadata$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((metadata) => {
+        if (metadata) {
+          this.getBooksInSeries(metadata.bookId);
+        }
+      });
+  }
+
+  toggleExpand(): void {
+    this.isExpanded = !this.isExpanded;
   }
 
   getBookRecommendations(bookId: number): void {
     this.bookService.getBookRecommendations(bookId).subscribe((recommendations) => {
       this.recommendedBooks = recommendations;
+    });
+  }
+
+  getBooksInSeries(bookId: number): void {
+    this.bookService.getBooksInSeries(bookId).subscribe((bookInSeries) => {
+      this.bookInSeries = bookInSeries;
     });
   }
 

@@ -42,6 +42,7 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
   private routeSubscription: Subscription = Subscription.EMPTY;
 
   ngOnInit(): void {
+    this.bookService.loadBooks();
     this.routeSubscription = this.route.paramMap
       .pipe(
         switchMap(params => {
