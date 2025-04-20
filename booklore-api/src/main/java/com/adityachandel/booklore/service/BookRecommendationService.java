@@ -6,6 +6,7 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookRecommendation;
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.repository.BookRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,20 @@ public class BookRecommendationService {
 
         List<BookEntity> candidates = bookRepository.findAll();
 
+        String targetSeriesName = Optional.ofNullable(target.getMetadata())
+                .map(BookMetadataEntity::getSeriesName)
+                .map(String::toLowerCase)
+                .orElse(null);
+
         List<SimpleEntry<BookEntity, Double>> scored = candidates.stream()
-                .filter(candidate -> !candidate.getId().equals(bookId))
+                .filter(candidate -> !candidate.getId().equals(bookId)) // exclude self
+                .filter(candidate -> {
+                    String candidateSeriesName = Optional.ofNullable(candidate.getMetadata())
+                            .map(BookMetadataEntity::getSeriesName)
+                            .map(String::toLowerCase)
+                            .orElse(null);
+                    return targetSeriesName == null || !targetSeriesName.equals(candidateSeriesName);
+                })
                 .map(candidate -> new SimpleEntry<>(candidate, similarityService.calculateSimilarity(target, candidate)))
                 .filter(entry -> entry.getValue() > 0.0)
                 .sorted(Map.Entry.<BookEntity, Double>comparingByValue().reversed())
