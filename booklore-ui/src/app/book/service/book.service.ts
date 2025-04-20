@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {catchError, map, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting} from '../model/book.model';
+import {Book, BookMetadata, BookRecommendation, BookSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
 import {FetchMetadataRequest} from '../../metadata/model/request/fetch-metadata-request.model';
@@ -272,6 +272,12 @@ export class BookService {
 
   getUploadCoverUrl(bookId: number): string {
     return this.url + '/' + bookId + "/metadata/cover"
+  }
+
+  getBookRecommendations(bookId: number, limit: number = 20): Observable<BookRecommendation[]> {
+    return this.http.get<BookRecommendation[]>(`${this.url}/${bookId}/recommendations`, {
+      params: { limit: limit.toString() }
+    });
   }
 
 

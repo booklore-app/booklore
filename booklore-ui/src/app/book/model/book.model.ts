@@ -97,3 +97,8 @@ export interface BookSetting {
 
   [key: string]: any;
 }
+
+export interface BookRecommendation {
+  book: Book;
+  similarityScore: number;
+}

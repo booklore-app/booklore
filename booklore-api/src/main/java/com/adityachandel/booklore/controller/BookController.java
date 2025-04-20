@@ -1,16 +1,17 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookRecommendation;
 import com.adityachandel.booklore.model.dto.BookViewerSettings;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
+import com.adityachandel.booklore.service.BookRecommendationService;
 import com.adityachandel.booklore.service.BooksService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.List;
 public class BookController {
 
     private final BooksService booksService;
+    private final BookRecommendationService bookRecommendationService;
 
     @GetMapping
     public ResponseEntity<List<Book>> getBooks(@RequestParam(required = false, defaultValue = "false") boolean withDescription) {
@@ -68,5 +70,10 @@ public class BookController {
     public ResponseEntity<Void> addBookToProgress(@RequestBody @Valid ReadProgressRequest request) {
         booksService.updateReadProgress(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public ResponseEntity<List<BookRecommendation>> getRecommendations(@PathVariable Long id, @RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(bookRecommendationService.findSimilarBooks(id, limit));
     }
 }
