@@ -30,20 +30,42 @@
 
   <p-divider></p-divider>
 
-  <p class="text-xl pb-4 pt-8">Auto Book Search
-    <i class="pi pi-info-circle text-sky-600"
-       pTooltip="If enabled, Booklore will automatically perform a metadata match/search when the book information tab is opened."
-       tooltipPosition="right"
-       style="cursor: pointer;">
-    </i>
-  </p>
-  <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
-    <p class="text-lg py-1">Enable:</p>
-    <div class="flex gap-4 justify-start">
-      <p-toggleswitch
-        [(ngModel)]="autoMetadataChecked"
-        (onChange)="onAutoMetaChange($event)"
-      />
+  <div class="flex flex-row gap-11">
+    <div>
+      <p class="text-xl pb-4 pt-8">Auto Book Search
+        <i class="pi pi-info-circle text-sky-600"
+           pTooltip="If enabled, Booklore will automatically perform a metadata match/search when the book information tab is opened."
+           tooltipPosition="right"
+           style="cursor: pointer;">
+        </i>
+      </p>
+      <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+        <p class="text-lg py-1">Enable:</p>
+        <div class="flex gap-4 justify-start">
+          <p-toggleswitch
+            [(ngModel)]="autoMetadataChecked"
+            (onChange)="onAutoMetaChange($event)"
+          />
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="text-xl pb-4 pt-8">Similar Book Recommendation
+        <i class="pi pi-info-circle text-sky-600"
+           pTooltip="Enable or disable similar book recommendations entirely."
+           tooltipPosition="right"
+           style="cursor: pointer;">
+        </i>
+      </p>
+      <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+        <p class="text-lg py-1">Enable:</p>
+        <div class="flex gap-4 justify-start">
+          <p-toggleswitch
+            [(ngModel)]="recommendationEnabled"
+            (onChange)="onToggleRecommendation($event)"
+          />
+        </div>
+      </div>
     </div>
   </div>
 

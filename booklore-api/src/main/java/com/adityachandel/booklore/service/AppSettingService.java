@@ -25,6 +25,7 @@ public class AppSettingService {
     public static final String QUICK_BOOK_MATCH = "quick_book_match";
     public static final String AUTO_BOOK_SEARCH = "auto_book_search";
     public static final String COVER_IMAGE_RESOLUTION = "cover_image_resolution";
+    public static final String SIMILAR_BOOK_RECOMMENDATION = "similar_book_recommendation";
 
     private volatile AppSettings appSettings;
     private final ReentrantLock lock = new ReentrantLock();
@@ -87,8 +88,25 @@ public class AppSettingService {
                     .resolution(settingsMap.get(COVER_IMAGE_RESOLUTION))
                     .build());
         }
-        if(settingsMap.containsKey(AUTO_BOOK_SEARCH)) {
+
+        if (settingsMap.containsKey(AUTO_BOOK_SEARCH)) {
             builder.autoBookSearch(Boolean.parseBoolean(settingsMap.get(AUTO_BOOK_SEARCH)));
+        } else {
+            AppSettingEntity setting = new AppSettingEntity();
+            setting.setName(AUTO_BOOK_SEARCH);
+            setting.setVal("true");
+            appSettingsRepository.save(setting);
+            builder.autoBookSearch(true);
+        }
+
+        if (settingsMap.containsKey(SIMILAR_BOOK_RECOMMENDATION)) {
+            builder.similarBookRecommendation(Boolean.parseBoolean(settingsMap.get(SIMILAR_BOOK_RECOMMENDATION)));
+        } else {
+            AppSettingEntity setting = new AppSettingEntity();
+            setting.setName(SIMILAR_BOOK_RECOMMENDATION);
+            setting.setVal("true");
+            appSettingsRepository.save(setting);
+            builder.similarBookRecommendation(true);
         }
 
         return builder.build();

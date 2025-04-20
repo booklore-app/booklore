@@ -15,6 +15,7 @@ import {BookService} from '../../book/service/book.service';
 import {AppSettings} from '../../core/model/app-settings.model';
 import {MetadataRefreshOptions} from '../../metadata/model/request/metadata-refresh-options.model';
 import {MetadataAdvancedFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
+import {filter, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-global-preferences',
@@ -43,6 +44,7 @@ export class GlobalPreferencesComponent implements OnInit {
   selectedResolution = '250x350';
   currentMetadataOptions!: MetadataRefreshOptions;
   autoMetadataChecked = false;
+  recommendationEnabled = false;
 
   private appSettingsService = inject(AppSettingsService);
   private bookService = inject(BookService);
@@ -50,15 +52,20 @@ export class GlobalPreferencesComponent implements OnInit {
 
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
+
   ngOnInit(): void {
-    this.appSettings$.subscribe(settings => {
-      if (settings?.coverSettings) {
+    this.appSettings$.pipe(
+      filter(settings => settings != null),
+      take(1)
+    ).subscribe(settings => {
+      if (settings.coverSettings) {
         this.selectedResolution = settings.coverSettings.resolution;
       }
-      if (settings?.metadataRefreshOptions) {
+      if (settings.metadataRefreshOptions) {
         this.currentMetadataOptions = settings.metadataRefreshOptions;
       }
-      this.autoMetadataChecked = settings?.autoBookSearch ?? false;
+      this.autoMetadataChecked = settings.autoBookSearch ?? false;
+      this.recommendationEnabled = settings.similarBookRecommendation ?? false;
     });
   }
 
@@ -70,6 +77,10 @@ export class GlobalPreferencesComponent implements OnInit {
 
   onAutoMetaChange(event: { checked: boolean }): void {
     this.saveSetting('auto_book_search', event.checked);
+  }
+
+  onToggleRecommendation(event: { checked: boolean }) {
+    this.saveSetting('similar_book_recommendation', event.checked);
   }
 
   onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions): void {

@@ -14,6 +14,7 @@ public class AppSettings {
     private CoverSettings coverSettings;
     private MetadataRefreshOptions metadataRefreshOptions;
     private boolean autoBookSearch;
+    private boolean similarBookRecommendation;
 
     @Data
     @Builder

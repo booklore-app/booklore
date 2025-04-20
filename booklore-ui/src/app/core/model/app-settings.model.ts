@@ -6,6 +6,7 @@ export interface CoverSettings {
 
 export interface AppSettings {
   autoBookSearch: boolean;
+  similarBookRecommendation: boolean;
   metadataRefreshOptions: MetadataRefreshOptions;
   coverSettings?: CoverSettings
 }
