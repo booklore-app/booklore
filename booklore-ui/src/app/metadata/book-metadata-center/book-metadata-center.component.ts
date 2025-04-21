@@ -3,12 +3,12 @@ import {ActivatedRoute} from '@angular/router';
 import {BookMetadataCenterService} from './book-metadata-center.service';
 import {UserService} from '../../user.service';
 import {Book, BookRecommendation} from '../../book/model/book.model';
-import {Subscription, switchMap} from 'rxjs';
-import {filter, take} from 'rxjs/operators';
+import {Subscription} from 'rxjs';
+import {distinctUntilChanged, filter, map, switchMap, take} from 'rxjs/operators';
 import {BookService} from '../../book/service/book.service';
 import {AppSettingsService} from '../../core/service/app-settings.service';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
-import {NgIf} from '@angular/common';
+import {NgIf, NgTemplateOutlet} from '@angular/common';
 import {MetadataViewerComponent} from './metadata-viewer/metadata-viewer.component';
 import {MetadataEditorComponent} from './metadata-editor/metadata-editor.component';
 import {MetadataSearcherComponent} from './metadata-searcher/metadata-searcher.component';
@@ -27,7 +27,8 @@ import {MetadataSearcherComponent} from './metadata-searcher/metadata-searcher.c
     MetadataViewerComponent,
     TabPanel,
     MetadataEditorComponent,
-    MetadataSearcherComponent
+    MetadataSearcherComponent,
+    NgTemplateOutlet
   ]
 })
 export class BookMetadataCenterComponent implements OnInit, OnDestroy {
@@ -51,30 +52,30 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.bookService.loadBooks();
 
-    this.routeSubscription = this.route.paramMap
-      .pipe(
-        switchMap(params => {
-          const bookIdStr = params.get('bookId');
-          const bookId = Number(bookIdStr);
-          if (isNaN(bookId)) throw new Error('Invalid book ID');
-
-          return this.route.queryParamMap.pipe(
-            switchMap(queryParams => {
-              const rawTab = queryParams.get('tab');
-              const validTabs = ['view', 'edit', 'match'];
-              this.tab = validTabs.includes(rawTab || '') ? rawTab! : 'view';
-              return this.bookService.getBookByIdFromAPI(bookId, true);
-            })
-          );
-        })
-      )
-      .subscribe(book => {
-        this.book = book;
-        if (book?.metadata) {
-          this.metadataCenterService.emit(book.metadata);
-          this.fetchBookRecommendationsIfNeeded(book.metadata.bookId);
-        }
-      });
+    this.routeSubscription = this.route.paramMap.pipe(
+      switchMap(params => {
+        const bookId = Number(params.get('bookId'));
+        if (isNaN(bookId)) throw new Error('Invalid book ID');
+        return this.route.queryParamMap.pipe(
+          map(queryParams => ({
+            bookId,
+            tab: queryParams.get('tab') ?? 'view'
+          }))
+        );
+      }),
+      switchMap(({bookId, tab}) => {
+        const validTabs = ['view', 'edit', 'match'];
+        this.tab = validTabs.includes(tab) ? tab : 'view';
+        return this.bookService.getBookByIdFromAPI(bookId, true);
+      }),
+      filter(book => !!book && !!book.metadata),
+      distinctUntilChanged((prev, curr) => prev.id === curr.id)
+    ).subscribe(book => {
+      this.book = book;
+      this.metadataCenterService.emitBookChanged(book);
+      this.metadataCenterService.emitMetadata(book.metadata!);
+      this.fetchBookRecommendationsIfNeeded(book.metadata!.bookId);
+    });
 
     this.userSubscription = this.userService.userData$.subscribe(userData => {
       const userPermissions = userData?.permissions;
@@ -85,6 +86,7 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.userSubscription.unsubscribe();
     this.routeSubscription.unsubscribe();
+    this.metadataCenterService.emitBookChanged(null);
   }
 
   private fetchBookRecommendationsIfNeeded(bookId: number): void {

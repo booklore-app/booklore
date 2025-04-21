@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
@@ -10,12 +10,12 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
-import {BookMetadata} from '../../../book/model/book.model';
+import {Book, BookMetadata} from '../../../book/model/book.model';
 import {BookService} from '../../../book/service/book.service';
-import {Observable} from 'rxjs';
+import {combineLatest, Observable, Subscription} from 'rxjs';
 import {AppSettings} from '../../../core/model/app-settings.model';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {filter, take} from 'rxjs/operators';
+import {distinctUntilChanged, filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -24,8 +24,7 @@ import {filter, take} from 'rxjs/operators';
   imports: [ReactiveFormsModule, Button, InputText, Divider, NgForOf, NgIf, ProgressSpinner, MetadataPickerComponent, MultiSelect],
   standalone: true
 })
-export class MetadataSearcherComponent implements OnInit {
-
+export class MetadataSearcherComponent implements OnInit, OnDestroy {
   form: FormGroup;
   providers = Object.values(MetadataProvider);
   allFetchedMetadata: BookMetadata[] = [];
@@ -38,7 +37,10 @@ export class MetadataSearcherComponent implements OnInit {
   private bookService = inject(BookService);
   private appSettingsService = inject(AppSettingsService);
 
+  private subscription: Subscription = new Subscription();
+
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
+  bookChanged$: Observable<Book | null> = this.metadataCenterService.bookChanged$;
 
   constructor() {
     this.form = this.formBuilder.group({
@@ -49,27 +51,38 @@ export class MetadataSearcherComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.metadataCenterService.currentMetadata$.subscribe((metadata => {
-      if (metadata) {
-        this.bookId = metadata.bookId;
-        this.form.patchValue(({
-          provider: Object.values(MetadataProvider),
-          title: metadata.title || null,
-          author: metadata.authors?.length! > 0 ? metadata.authors[0] : ''
-        }));
-      }
-    }));
+    this.subscription.add(
+      combineLatest([this.bookChanged$, this.appSettings$])
+        .pipe(
+          filter(([book, settings]) => !!book && !!settings),
+          distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
+        )
+        .subscribe(([book, settings]) => {
+          const autoBookSearchEnabled = settings!.autoBookSearch ?? false;
 
-    this.appSettings$
-      .pipe(
-        filter(settings => settings != null),
-        take(1)
-      )
-      .subscribe(settings => {
-        if (settings.autoBookSearch) {
-          this.onSubmit();
-        }
-      });
+          if (book) {
+            this.selectedFetchedMetadata = null;
+            this.allFetchedMetadata = [];
+            this.bookId = book.id;
+
+            this.form.patchValue({
+              provider: Object.values(MetadataProvider),
+              title: book.metadata?.title || null,
+              author: book.metadata?.authors?.length ? book.metadata.authors[0] : ''
+            });
+
+            if (autoBookSearchEnabled) {
+              this.onSubmit();
+            }
+          }
+        })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+    this.allFetchedMetadata = [];
+    this.selectedFetchedMetadata = null;
   }
 
   get isSearchEnabled(): boolean {

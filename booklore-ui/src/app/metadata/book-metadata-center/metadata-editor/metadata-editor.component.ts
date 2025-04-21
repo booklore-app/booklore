@@ -174,7 +174,7 @@ export class MetadataEditorComponent implements OnInit {
     this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(undefined), false).subscribe({
       next: (response) => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
-        this.metadataCenterService.emit(response);
+        this.metadataCenterService.emitMetadata(response);
       },
       error: () => {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
@@ -270,7 +270,7 @@ export class MetadataEditorComponent implements OnInit {
   private updateMetadata(shouldLockAllFields: boolean | undefined): void {
     this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(shouldLockAllFields), false).subscribe({
       next: (response) => {
-        this.metadataCenterService.emit(response);
+        this.metadataCenterService.emitMetadata(response);
 
         if (shouldLockAllFields !== undefined) {
           this.messageService.add({
@@ -305,7 +305,7 @@ export class MetadataEditorComponent implements OnInit {
     if (response && response.status === 200) {
       const bookMetadata: BookMetadata = response.body as BookMetadata;
       this.bookService.handleBookMetadataUpdate(this.currentBookId, bookMetadata);
-      this.metadataCenterService.emit(bookMetadata);
+      this.metadataCenterService.emitMetadata(bookMetadata);
       this.isUploading = false;
     } else {
       this.isUploading = false;

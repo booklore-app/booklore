@@ -201,7 +201,7 @@ export class MetadataPickerComponent implements OnInit {
           }
         });
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
-        this.metadataCenterService.emit(bookMetadata);
+        this.metadataCenterService.emitMetadata(bookMetadata);
       },
       error: () => {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
@@ -268,7 +268,7 @@ export class MetadataPickerComponent implements OnInit {
   private updateMetadata(shouldLockAllFields: boolean | undefined): void {
     this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(shouldLockAllFields), false).subscribe({
       next: (response) => {
-        this.metadataCenterService.emit(response);
+        this.metadataCenterService.emitMetadata(response);
 
         if (shouldLockAllFields !== undefined) {
           this.messageService.add({
