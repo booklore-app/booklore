@@ -44,6 +44,10 @@ public class AppSettingService {
         return appSettings;
     }
 
+    public boolean isSimilarBookRecommendationEnabled() {
+        return getAppSettings().isSimilarBookRecommendation();
+    }
+
     @Transactional
     public void updateSetting(String name, Object val) throws JsonProcessingException {
         AppSettingEntity setting = appSettingsRepository.findByName(name);

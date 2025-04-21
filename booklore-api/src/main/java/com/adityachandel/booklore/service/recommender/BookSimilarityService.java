@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.recommender;
 
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;

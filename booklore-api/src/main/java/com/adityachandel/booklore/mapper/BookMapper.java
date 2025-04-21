@@ -29,17 +29,16 @@ public interface BookMapper {
             return null;
         }
         return authors.stream()
-                .map(AuthorEntity::getName) // Assuming 'name' is the field in AuthorEntity
+                .map(AuthorEntity::getName)
                 .collect(Collectors.toList());
     }
 
-    // Map List<CategoryEntity> to List<String> (category names)
     default List<String> mapCategories(List<CategoryEntity> categories) {
         if (categories == null) {
             return null;
         }
         return categories.stream()
-                .map(CategoryEntity::getName) // Assuming 'name' is the field in CategoryEntity
+                .map(CategoryEntity::getName)
                 .collect(Collectors.toList());
     }
 }

@@ -1,10 +1,11 @@
 package com.adityachandel.booklore.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class BookRecommendation {
     private Book book;
     private double similarityScore;

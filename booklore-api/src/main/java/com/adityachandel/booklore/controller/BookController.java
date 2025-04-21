@@ -5,9 +5,11 @@ import com.adityachandel.booklore.model.dto.BookRecommendation;
 import com.adityachandel.booklore.model.dto.BookViewerSettings;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
-import com.adityachandel.booklore.service.BookRecommendationService;
+import com.adityachandel.booklore.service.recommender.BookRecommendationService;
 import com.adityachandel.booklore.service.BooksService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -73,7 +75,7 @@ public class BookController {
     }
 
     @GetMapping("/{id}/recommendations")
-    public ResponseEntity<List<BookRecommendation>> getRecommendations(@PathVariable Long id, @RequestParam(defaultValue = "10") int limit) {
-        return ResponseEntity.ok(bookRecommendationService.findSimilarBooks(id, limit));
+    public ResponseEntity<List<BookRecommendation>> getRecommendations(@PathVariable Long id, @RequestParam(defaultValue = "25") @Max(25) @Min(1) int limit) {
+        return ResponseEntity.ok(bookRecommendationService.getRecommendations(id, limit));
     }
 }

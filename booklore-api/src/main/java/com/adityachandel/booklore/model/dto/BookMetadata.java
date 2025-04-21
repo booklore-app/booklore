@@ -2,15 +2,17 @@ package com.adityachandel.booklore.model.dto;
 
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookMetadata {
     private Long bookId;

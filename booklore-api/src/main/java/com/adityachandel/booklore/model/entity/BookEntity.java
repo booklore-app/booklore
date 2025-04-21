@@ -1,5 +1,7 @@
 package com.adityachandel.booklore.model.entity;
 
+import com.adityachandel.booklore.convertor.BookRecommendationIdsListConverter;
+import com.adityachandel.booklore.model.dto.BookRecommendationLite;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,4 +52,9 @@ public class BookEntity {
             inverseJoinColumns = @JoinColumn(name = "shelf_id")
     )
     private List<ShelfEntity> shelves;
+
+    @Convert(converter = BookRecommendationIdsListConverter.class)
+    @Column(name = "similar_books_json", columnDefinition = "TEXT")
+    private List<BookRecommendationLite> similarBooksJson;
+
 }
