@@ -17,6 +17,11 @@ spring:
     url: ${DATABASE_URL:jdbc:mariadb://${DATABASE_HOST:${DB_HOST:mariadb}}:${DATABASE_PORT:3306}/${DATABASE_NAME:booklore}?createDatabaseIfNotExist=true}
     username: ${DATABASE_USERNAME:root}
     password: ${DATABASE_PASSWORD:${MYSQL_ROOT_PASSWORD}}
+    hikari:
+      max-lifetime: 580000  # 580 seconds
+      connection-test-query: SELECT 1
+      maximum-pool-size: 10
+      idle-timeout: 300000  # 5 minutes
   jpa:
     hibernate:
       naming:

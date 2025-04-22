@@ -47,7 +47,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             }
 
             accessor.setUser(auth);
-            log.info("WebSocket authentication successful for user: {}", auth.getName());
+            log.debug("WebSocket authentication successful for user: {}", auth.getName());
         }
 
         return message;
