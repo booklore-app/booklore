@@ -106,9 +106,9 @@
         </div>
 
         <div class="book-card-container" *ngIf="bookState?.books as books">
-          <app-book-table *ngIf="gridOrTable === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)" [sortOption]="selectedSort"></app-book-table>
+          <app-book-table *ngIf="currentViewMode === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)" [sortOption]="selectedSort!"></app-book-table>
 
-          <virtual-scroller *ngIf="gridOrTable === 'grid'" class="virtual-scroller" #scroll [items]="books">
+          <virtual-scroller *ngIf="currentViewMode === 'grid'" class="virtual-scroller" #scroll [items]="books">
             <div class="grid grid-cols-12 gap-4" #container>
               <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
                 <app-book-card
