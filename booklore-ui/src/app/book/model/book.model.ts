@@ -44,7 +44,6 @@ export interface BookMetadata {
   providerBookId?: string;
   thumbnailUrl?: string | null;
 
-  allFieldsLocked?: boolean;
   titleLocked?: boolean;
   subtitleLocked?: boolean;
   publisherLocked?: boolean;

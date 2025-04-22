@@ -8,7 +8,7 @@ import {distinctUntilChanged, filter, map, switchMap, take} from 'rxjs/operators
 import {BookService} from '../../book/service/book.service';
 import {AppSettingsService} from '../../core/service/app-settings.service';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
-import {NgIf, NgTemplateOutlet} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {MetadataViewerComponent} from './metadata-viewer/metadata-viewer.component';
 import {MetadataEditorComponent} from './metadata-editor/metadata-editor.component';
 import {MetadataSearcherComponent} from './metadata-searcher/metadata-searcher.component';
@@ -27,8 +27,7 @@ import {MetadataSearcherComponent} from './metadata-searcher/metadata-searcher.c
     MetadataViewerComponent,
     TabPanel,
     MetadataEditorComponent,
-    MetadataSearcherComponent,
-    NgTemplateOutlet
+    MetadataSearcherComponent
   ]
 })
 export class BookMetadataCenterComponent implements OnInit, OnDestroy {

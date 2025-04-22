@@ -93,7 +93,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private dialogService = inject(DialogService);
   private sortService = inject(SortService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
-  private confirmationService = inject(ConfirmationService);
 
   protected resetFilterSubject = new Subject<void>();
 
@@ -101,16 +100,20 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   sortOptions: any[] = [
     {label: 'Title', icon: '', field: 'title', command: () => this.sortBooks('title')},
     {label: 'Author', icon: '', field: 'author', command: () => this.sortBooks('author')},
+    {label: 'Last Read', field: 'lastReadTime', command: () => this.sortBooks('lastReadTime')},
+    {label: 'Added On', field: 'addedOn', command: () => this.sortBooks('addedOn')},
+    {label: 'Locked', icon: '', field: 'locked', command: () => this.sortBooks('locked')},
     {label: 'Publisher', icon: '', field: 'publisher', command: () => this.sortBooks('publisher')},
-    {label: 'Published', icon: '', field: 'publishedDate', command: () => this.sortBooks('publishedDate')},
-    {label: 'Pages', icon: '', field: 'pageCount', command: () => this.sortBooks('pageCount')},
-    {label: 'Rating', icon: '', field: 'rating', command: () => this.sortBooks('rating')},
-    {label: 'Reviews', icon: '', field: 'reviewCount', command: () => this.sortBooks('reviewCount')},
+    {label: 'Published Date', icon: '', field: 'publishedDate', command: () => this.sortBooks('publishedDate')},
+    {label: 'Rating (Legacy)', icon: '', field: 'rating', command: () => this.sortBooks('rating')},
+    {label: 'Amazon Rating', icon: '', field: 'amazonRating', command: () => this.sortBooks('amazonRating')},
+    {label: 'Goodreads Rating', icon: '', field: 'goodreadsRating', command: () => this.sortBooks('goodreadsRating')},
+    {label: 'Pages', icon: '', field: 'pageCount', command: () => this.sortBooks('pageCount')}
   ];
 
   selectedSort: SortOption = {
-    label: 'Title',
-    field: 'title',
+    label: 'Added On',
+    field: 'addedOn',
     direction: SortDirection.DESCENDING,
   };
 
@@ -386,19 +389,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private setSelectedSortFromEntity(entity: Library | Shelf | null): void {
-    if (entity?.sort) {
-      const {field, direction} = entity.sort;
-      this.selectedSort = this.sortOptions.find(option => option.field === field && option.direction === direction) || null;
-    } else {
-      this.selectedSort = {
-        label: 'Title',
-        field: 'title',
-        direction: SortDirection.ASCENDING,
-      };
-    }
-  }
-
   onBookTitleChange(newTitle: string): void {
     this.bookOrAuthor$.next(newTitle);
   }
@@ -496,7 +486,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       }
     });
     this.dynamicDialogRef.onClose.subscribe(() => {
-        this.deselectAllBooks();
+      this.deselectAllBooks();
     });
   }
 }

@@ -99,8 +99,17 @@ export class BookTableComponent implements OnChanges {
     return genres?.join(', ') || '';
   }
 
+  isMetadataFullyLocked(metadata: BookMetadata): boolean {
+    return Object.keys(metadata)
+      .filter(key => key.endsWith('Locked'))
+      .every(key => metadata[key] === true);
+  }
+
   toggleMetadataLock(metadata: BookMetadata): void {
-    const lockAction = metadata.allFieldsLocked ? 'UNLOCK' : 'LOCK';
+    const lockKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
+    const allLocked = lockKeys.every(key => metadata[key] === true);
+    const lockAction = allLocked ? 'UNLOCK' : 'LOCK';
+
     this.bookService.toggleAllLock(new Set([metadata.bookId]), lockAction).subscribe({
       next: () => {
         this.messageService.add({

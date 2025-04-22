@@ -37,10 +37,10 @@
       </td>
       <td class="text-center">
         <p-button
-          [icon]="metadata.allFieldsLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
-          [severity]="metadata.allFieldsLocked ? 'danger' : 'success'"
+          [icon]="isMetadataFullyLocked(metadata) ? 'pi pi-lock' : 'pi pi-lock-open'"
+          [severity]="isMetadataFullyLocked(metadata) ? 'danger' : 'success'"
           [text]="true"
-          [title]="metadata.allFieldsLocked ? 'Locked' : 'Unlocked'"
+          [title]="isMetadataFullyLocked(metadata) ? 'Locked' : 'Unlocked'"
           size="small"
           [style]="{ width: '1.5rem', height: '1.5rem', padding: '0', fontSize: '0.75rem' }"
           (click)="toggleMetadataLock(metadata)">
