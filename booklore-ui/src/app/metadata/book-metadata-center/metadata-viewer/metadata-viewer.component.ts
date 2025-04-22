@@ -140,4 +140,10 @@ export class MetadataViewerComponent implements OnInit {
       },
     });
   }
+
+  isMetadataFullyLocked(metadata: BookMetadata): boolean {
+    return Object.keys(metadata)
+      .filter(key => key.endsWith('Locked'))
+      .every(key => metadata[key] === true);
+  }
 }

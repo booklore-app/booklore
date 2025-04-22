@@ -16,10 +16,10 @@
                 <p class="text-2xl font-bold m-0">{{ metadata.title }}</p>
                 <i
                   class="pi"
-                  [ngClass]="metadata.allFieldsLocked ? 'pi-lock text-red-500' : 'pi-lock-open text-green-500'"
-                  [title]="metadata.allFieldsLocked ? 'Metadata is locked' : 'Metadata is unlocked'"
+                  [ngClass]="isMetadataFullyLocked(metadata) ? 'pi-lock text-red-500' : 'pi-lock-open text-green-500'"
+                  [title]="isMetadataFullyLocked(metadata) ? 'Metadata is locked' : 'Metadata is unlocked'"
                   style="font-size: 1.25rem;"
-                  pTooltip="{{ metadata.allFieldsLocked ? 'This book metadata is locked.' : 'This book metadata is unlocked.' }}"
+                  pTooltip="{{ isMetadataFullyLocked(metadata) ? 'This book metadata is locked.' : 'This book metadata is unlocked.' }}"
                   tooltipPosition="top">
                 </i>
               </div>

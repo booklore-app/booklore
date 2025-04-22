@@ -1,5 +1,5 @@
 import {Component, inject, Input, OnInit, ViewChild} from '@angular/core';
-import {Book} from '../../../model/book.model';
+import {Book, BookMetadata} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
 import {MenuItem, MessageService} from 'primeng/api';
@@ -240,5 +240,11 @@ export class BookCardComponent implements OnInit {
 
   private hasEmailBookPermission(): boolean {
     return this.userPermissions?.canEmailBook ?? false;
+  }
+
+  isMetadataFullyLocked(metadata: BookMetadata): boolean {
+    return Object.keys(metadata)
+      .filter(key => key.endsWith('Locked'))
+      .every(key => metadata[key] === true);
   }
 }

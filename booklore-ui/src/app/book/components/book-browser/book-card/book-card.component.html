@@ -30,8 +30,8 @@
       <p class="m-0 pl-2">
         <i
           class="pi"
-          [ngClass]="book.metadata?.allFieldsLocked ? 'pi-lock text-red-400' : 'pi-lock-open text-green-400'"
-          [title]="book.metadata?.allFieldsLocked ? 'Locked' : 'Unlocked'"
+          [ngClass]="isMetadataFullyLocked(book.metadata!) ? 'pi-lock text-red-400' : 'pi-lock-open text-green-400'"
+          [title]="isMetadataFullyLocked(book.metadata!) ? 'Locked' : 'Unlocked'"
           style="font-size: 0.75rem;">
         </i>
       </p>
