@@ -105,9 +105,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     {label: 'Locked', icon: '', field: 'locked', command: () => this.sortBooks('locked')},
     {label: 'Publisher', icon: '', field: 'publisher', command: () => this.sortBooks('publisher')},
     {label: 'Published Date', icon: '', field: 'publishedDate', command: () => this.sortBooks('publishedDate')},
-    {label: 'Rating (Legacy)', icon: '', field: 'rating', command: () => this.sortBooks('rating')},
     {label: 'Amazon Rating', icon: '', field: 'amazonRating', command: () => this.sortBooks('amazonRating')},
+    {label: 'Amazon #', icon: '', field: 'amazonReviewCount', command: () => this.sortBooks('amazonReviewCount')},
     {label: 'Goodreads Rating', icon: '', field: 'goodreadsRating', command: () => this.sortBooks('goodreadsRating')},
+    {label: 'Goodreads #', icon: '', field: 'goodreadsReviewCount', command: () => this.sortBooks('goodreadsReviewCount')},
     {label: 'Pages', icon: '', field: 'pageCount', command: () => this.sortBooks('pageCount')}
   ];
 

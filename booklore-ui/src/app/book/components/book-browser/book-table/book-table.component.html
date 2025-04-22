@@ -21,13 +21,18 @@
       <th pResizableColumn>Title</th>
       <th pResizableColumn>Authors</th>
       <th pResizableColumn>Publisher</th>
+      <th pResizableColumn>Genres</th>
       <th>Published</th>
-      <th>Genres</th>
-      <th>ISBN</th>
-      <th>Language</th>
-      <th>Rating</th>
+      <th>Last Read</th>
+      <th>Added</th>
+      <th>Lang</th>
       <th>Pages</th>
-      <th>Reviews</th>
+      <th>Amazon</th>
+      <th>Amz #</th>
+      <th>Goodreads</th>
+      <th>GR #</th>
+      <th>Rating (L)</th>
+      <th>Reviews (L)</th>
     </tr>
   </ng-template>
   <ng-template #body let-book>
@@ -49,25 +54,59 @@
       <td (click)="openMetadataCenter(book.id)">
         <img [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)" alt="Book Cover" class="size-7"/>
       </td>
-      <td class="min-w-[15rem] max-w-[20rem] overflow-hidden truncate">{{ metadata.title }}</td>
-      <td class="min-w-[10rem] max-w-[13rem] overflow-hidden truncate">{{ getAuthorNames(metadata.authors) }}</td>
-      <td class="min-w-[12rem] max-w-[12rem] overflow-hidden truncate">{{ metadata.publisher }}</td>
-      <td class="min-w-[8rem] max-w-[8rem] overflow-hidden truncate">{{ metadata.publishedDate }}</td>
-      <td class="min-w-[8rem] max-w-[10rem] overflow-hidden truncate">{{ getGenres(metadata.categories) }}</td>
-      <td class="overflow-hidden truncate min-w-[8rem] max-w-[8rem]">{{ metadata.isbn10 }}</td>
+      <td class="min-w-[15rem] max-w-[20rem] overflow-hidden truncate" [title]="metadata.title">{{ metadata.title }}</td>
+      <td class="min-w-[10rem] max-w-[15rem] overflow-hidden truncate" [title]="getAuthorNames(metadata.authors)">{{ getAuthorNames(metadata.authors) }}</td>
+      <td class="min-w-[9rem] max-w-[13rem] overflow-hidden truncate" [title]="metadata.publisher">{{ metadata.publisher }}</td>
+      <td class="min-w-[12rem] max-w-[18rem] overflow-hidden truncate" [title]="getGenres(metadata.categories)">{{ getGenres(metadata.categories) }}</td>
+      <td class="min-w-[9rem] max-w-[9rem] overflow-hidden truncate">
+        {{ metadata.publishedDate ? (metadata.publishedDate | date: 'dd-MMM-yyyy') : '' }}
+      </td>
+      <td class="min-w-[9rem] max-w-[9rem] overflow-hidden truncate text-right">
+        {{ book.lastReadTime ? (book.lastReadTime | date: 'dd-MMM-yyyy') : '' }}
+      </td>
+      <td class="min-w-[9rem] max-w-[9rem] overflow-hidden truncate text-right">
+        {{ book.addedOn ? (book.addedOn | date: 'dd-MMM-yyyy') : '' }}
+      </td>
       <td class="min-w-[6rem] max-w-[6rem] overflow-hidden truncate">{{ metadata.language }}</td>
-      <td class="min-w-[8rem] max-w-[8rem] overflow-hidden truncate">
-        <ng-container>
+      <td class="min-w-[4rem] max-w-[5rem] overflow-hidden truncate">{{ metadata.pageCount }}</td>
+      <td class="min-w-[10rem] max-w-[10rem] overflow-hidden truncate">
+        <span class="flex items-center gap-1">
           <p-rating
-            [(ngModel)]="metadata.rating"
+            [(ngModel)]="metadata.amazonRating"
             readonly
             stars="5"
-            [style.--p-rating-icon-active-color]="getStarColor(metadata.rating)">
+            [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
           </p-rating>
-        </ng-container>
+          <span *ngIf="metadata.amazonRating != null">({{ metadata.amazonRating?.toFixed(1) }})</span>
+        </span>
       </td>
-      <td class="min-w-[5rem] max-w-[5rem] overflow-hidden truncate">{{ metadata.pageCount }}</td>
-      <td class="min-w-[5rem] max-w-[5rem] overflow-hidden truncate">{{ metadata.reviewCount }}</td>
+      <td class="min-w-[7rem] max-w-[7rem] overflow-hidden truncate text-right">
+        {{ metadata.amazonReviewCount ?? '' }}
+      </td>
+      <td class="min-w-[10rem] max-w-[10rem] overflow-hidden truncate">
+        <span class="flex items-center gap-1">
+          <p-rating
+            [(ngModel)]="metadata.goodreadsRating"
+            readonly
+            stars="5"
+            [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
+          </p-rating>
+          <span *ngIf="metadata.goodreadsRating != null">({{ metadata.goodreadsRating?.toFixed(1) }})</span>
+        </span>
+      </td>
+      <td class="min-w-[7rem] max-w-[7rem] overflow-hidden truncate text-right">
+        {{ metadata.goodreadsReviewCount ?? '' }}
+      </td>
+      <td class="min-w-[8rem] max-w-[8rem] overflow-hidden truncate">
+        <p-rating
+          [(ngModel)]="metadata.rating"
+          readonly
+          stars="5"
+          [style.--p-rating-icon-active-color]="getStarColor(metadata.rating)">
+        </p-rating>
+        <span *ngIf="metadata.rating != null">({{ metadata.rating?.toFixed(1) }})</span>
+      </td>
+      <td class="min-w-[3rem] max-w-[3rem] overflow-hidden truncate">{{ metadata.reviewCount }}</td>
     </tr>
   </ng-template>
 </p-table>

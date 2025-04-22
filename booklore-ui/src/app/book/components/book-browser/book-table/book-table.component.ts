@@ -1,6 +1,6 @@
 import {Component, EventEmitter, inject, Input, OnChanges, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
-import {NgIf} from '@angular/common';
+import {DatePipe, NgIf} from '@angular/common';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Book, BookMetadata} from '../../../model/book.model';
@@ -20,7 +20,8 @@ import {Router} from '@angular/router';
     NgIf,
     Rating,
     FormsModule,
-    Button
+    Button,
+    DatePipe
   ],
   styleUrl: './book-table.component.scss'
 })
