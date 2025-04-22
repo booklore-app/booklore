@@ -74,7 +74,7 @@
 
   <p-divider></p-divider>
 
-  <div *ngIf="metadata$ | async as metadata" class="flex-1 overflow-auto space-y-2 px-2 pb-4">
+  <div *ngIf="metadata$ | async as metadata" class="flex-1 overflow-auto space-y-2 px-2">
     <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }"
          class="transition-all duration-300 overflow-hidden description-container">
       <div class="description-content" [innerHTML]="metadata.description || 'No description available.'"></div>
@@ -114,6 +114,7 @@
     </ng-container>
 
     <ng-container *ngIf="bookInSeries.length > 0">
+      <p-divider></p-divider>
       <div>
         <h3 class="text-xl font-semibold pt-2">More in the Series</h3>
         <div class="dashboard-scroller-infinite"
@@ -131,6 +132,8 @@
           </div>
         </div>
       </div>
+      <p-divider></p-divider>
     </ng-container>
+
   </div>
 </div>
