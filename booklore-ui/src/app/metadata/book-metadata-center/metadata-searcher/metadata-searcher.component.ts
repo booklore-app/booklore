@@ -12,10 +12,11 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
 import {Book, BookMetadata} from '../../../book/model/book.model';
 import {BookService} from '../../../book/service/book.service';
-import {combineLatest, Observable, Subscription} from 'rxjs';
+import {combineLatest, Observable, Subscription, Subject, takeUntil} from 'rxjs';
 import {AppSettings} from '../../../core/model/app-settings.model';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {distinctUntilChanged, filter} from 'rxjs/operators';
+import {distinctUntilChanged, filter, switchMap} from 'rxjs/operators';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -36,8 +37,10 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
   private metadataCenterService = inject(BookMetadataCenterService);
   private bookService = inject(BookService);
   private appSettingsService = inject(AppSettingsService);
+  private route = inject(ActivatedRoute);
 
   private subscription: Subscription = new Subscription();
+  private cancelRequest$ = new Subject<void>();
 
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
   bookChanged$: Observable<Book | null> = this.metadataCenterService.bookChanged$;
@@ -52,34 +55,49 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription.add(
-      combineLatest([this.bookChanged$, this.appSettings$])
-        .pipe(
-          filter(([book, settings]) => !!book && !!settings),
-          distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
-        )
-        .subscribe(([book, settings]) => {
-          const autoBookSearchEnabled = settings!.autoBookSearch ?? false;
-
-          if (book) {
+      this.route.paramMap.pipe(
+        switchMap(params => {
+          const bookId = +params.get('id')!;
+          if (this.bookId !== bookId) {
+            this.bookId = bookId;
+            this.cancelRequest$.next();
+            this.loading = false;
             this.selectedFetchedMetadata = null;
             this.allFetchedMetadata = [];
-            this.bookId = book.id;
-
             this.form.patchValue({
               provider: Object.values(MetadataProvider),
-              title: book.metadata?.title || null,
-              author: book.metadata?.authors?.length ? book.metadata.authors[0] : ''
+              title: '',
+              author: '',
             });
-
-            if (autoBookSearchEnabled) {
-              this.onSubmit();
-            }
           }
-        })
+          return combineLatest([this.bookChanged$, this.appSettings$]);
+        }),
+        filter(([book, settings]) => !!book && !!settings),
+        distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
+      ).subscribe(([book, settings]) => {
+        const autoBookSearchEnabled = settings!.autoBookSearch ?? false;
+
+        if (book) {
+          this.selectedFetchedMetadata = null;
+          this.allFetchedMetadata = [];
+          this.bookId = book.id;
+
+          this.form.patchValue({
+            provider: Object.values(MetadataProvider),
+            title: book.metadata?.title || null,
+            author: book.metadata?.authors?.length ? book.metadata.authors[0] : ''
+          });
+
+          if (autoBookSearchEnabled) {
+            this.onSubmit();
+          }
+        }
+      })
     );
   }
 
   ngOnDestroy(): void {
+    this.cancelRequest$.next();
     this.subscription.unsubscribe();
     this.allFetchedMetadata = [];
     this.selectedFetchedMetadata = null;
@@ -106,7 +124,9 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
         author: this.form.get('author')?.value
       };
       this.loading = true;
+      this.cancelRequest$.next();
       this.bookService.fetchBookMetadata(fetchRequest.bookId, fetchRequest)
+        .pipe(takeUntil(this.cancelRequest$))
         .subscribe({
           next: (fetchedMetadata) => {
             this.loading = false;
