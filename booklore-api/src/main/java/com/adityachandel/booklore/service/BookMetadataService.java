@@ -106,9 +106,8 @@ public class BookMetadataService {
         List<BookEntity> books = getBookEntities(request);
         for (BookEntity bookEntity : books) {
             try {
-                Boolean allFieldsLocked = bookEntity.getMetadata().getAllFieldsLocked();
-                if (Boolean.TRUE.equals(allFieldsLocked)) {
-                    log.info("Skipping metadata refresh for locked book: {}", bookEntity.getFileName());
+                if (bookEntity.getMetadata().areAllFieldsLocked()) {
+                    log.info("Skipping metadata refresh for fully locked book: {}", bookEntity.getFileName());
                     continue;
                 }
                 Map<MetadataProvider, BookMetadata> metadataMap = fetchMetadataForBook(providers, bookEntity);

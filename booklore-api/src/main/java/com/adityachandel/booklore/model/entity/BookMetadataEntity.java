@@ -82,8 +82,6 @@ public class BookMetadataEntity {
     private Integer goodreadsReviewCount;
 
     // Locking fields
-    @Column(name = "all_fields_locked")
-    private Boolean allFieldsLocked = Boolean.FALSE;
 
     @Column(name = "title_locked")
     private Boolean titleLocked = Boolean.FALSE;
@@ -176,7 +174,6 @@ public class BookMetadataEntity {
     private List<BookAwardEntity> awards;
 
     public void applyLockToAllFields(boolean lock) {
-        this.allFieldsLocked = lock;
         this.titleLocked = lock;
         this.subtitleLocked = lock;
         this.publisherLocked = lock;
@@ -199,5 +196,55 @@ public class BookMetadataEntity {
         this.amazonReviewCountLocked = lock;
         this.goodreadsRatingLocked = lock;
         this.goodreadsReviewCountLocked = lock;
+    }
+
+    public boolean isAnyFieldLocked() {
+        return Boolean.TRUE.equals(this.titleLocked)
+                || Boolean.TRUE.equals(this.subtitleLocked)
+                || Boolean.TRUE.equals(this.publisherLocked)
+                || Boolean.TRUE.equals(this.publishedDateLocked)
+                || Boolean.TRUE.equals(this.descriptionLocked)
+                || Boolean.TRUE.equals(this.isbn13Locked)
+                || Boolean.TRUE.equals(this.isbn10Locked)
+                || Boolean.TRUE.equals(this.pageCountLocked)
+                || Boolean.TRUE.equals(this.thumbnailLocked)
+                || Boolean.TRUE.equals(this.languageLocked)
+                || Boolean.TRUE.equals(this.ratingLocked)
+                || Boolean.TRUE.equals(this.reviewCountLocked)
+                || Boolean.TRUE.equals(this.coverLocked)
+                || Boolean.TRUE.equals(this.seriesNameLocked)
+                || Boolean.TRUE.equals(this.seriesNumberLocked)
+                || Boolean.TRUE.equals(this.seriesTotalLocked)
+                || Boolean.TRUE.equals(this.authorsLocked)
+                || Boolean.TRUE.equals(this.categoriesLocked)
+                || Boolean.TRUE.equals(this.amazonRatingLocked)
+                || Boolean.TRUE.equals(this.amazonReviewCountLocked)
+                || Boolean.TRUE.equals(this.goodreadsRatingLocked)
+                || Boolean.TRUE.equals(this.goodreadsReviewCountLocked);
+    }
+
+    public boolean areAllFieldsLocked() {
+        return Boolean.TRUE.equals(this.titleLocked)
+                && Boolean.TRUE.equals(this.subtitleLocked)
+                && Boolean.TRUE.equals(this.publisherLocked)
+                && Boolean.TRUE.equals(this.publishedDateLocked)
+                && Boolean.TRUE.equals(this.descriptionLocked)
+                && Boolean.TRUE.equals(this.isbn13Locked)
+                && Boolean.TRUE.equals(this.isbn10Locked)
+                && Boolean.TRUE.equals(this.pageCountLocked)
+                && Boolean.TRUE.equals(this.thumbnailLocked)
+                && Boolean.TRUE.equals(this.languageLocked)
+                && Boolean.TRUE.equals(this.ratingLocked)
+                && Boolean.TRUE.equals(this.reviewCountLocked)
+                && Boolean.TRUE.equals(this.coverLocked)
+                && Boolean.TRUE.equals(this.seriesNameLocked)
+                && Boolean.TRUE.equals(this.seriesNumberLocked)
+                && Boolean.TRUE.equals(this.seriesTotalLocked)
+                && Boolean.TRUE.equals(this.authorsLocked)
+                && Boolean.TRUE.equals(this.categoriesLocked)
+                && Boolean.TRUE.equals(this.amazonRatingLocked)
+                && Boolean.TRUE.equals(this.amazonReviewCountLocked)
+                && Boolean.TRUE.equals(this.goodreadsRatingLocked)
+                && Boolean.TRUE.equals(this.goodreadsReviewCountLocked);
     }
 }

@@ -44,7 +44,6 @@ public class BookMetadata {
     private String providerBookId;
     private String thumbnailUrl;
 
-    private Boolean allFieldsLocked;
     private Boolean titleLocked;
     private Boolean subtitleLocked;
     private Boolean publisherLocked;

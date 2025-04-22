@@ -39,7 +39,7 @@ public class BookMetadataUpdater {
 
         updateLocks(newMetadata, metadata);
 
-        if (Boolean.TRUE.equals(metadata.getAllFieldsLocked())) {
+        if (metadata.areAllFieldsLocked()) {
             log.warn("Attempted to update metadata for book with ID {}, but all fields are locked. No update performed.", bookId);
             return metadata;
         }
@@ -251,9 +251,6 @@ public class BookMetadataUpdater {
         }
         if (newMetadata.getCoverLocked() != null) {
             metadata.setCoverLocked(newMetadata.getCoverLocked());
-        }
-        if (newMetadata.getAllFieldsLocked() != null) {
-            metadata.setAllFieldsLocked(newMetadata.getAllFieldsLocked());
         }
     }
 
