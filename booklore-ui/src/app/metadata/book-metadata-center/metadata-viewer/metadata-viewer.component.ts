@@ -154,4 +154,13 @@ export class MetadataViewerComponent implements OnInit {
     }
     return lockedKeys.every(key => metadata[key] === true);
   }
+
+  getFileSizeInMB(): string {
+    const sizeKb = this.book?.fileSizeKb;
+    if (sizeKb != null) {
+      const sizeMb = sizeKb / 1024;
+      return `${sizeMb.toFixed(2)} MB`;
+    }
+    return '-';
+  }
 }
