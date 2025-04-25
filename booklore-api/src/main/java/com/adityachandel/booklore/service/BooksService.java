@@ -120,14 +120,6 @@ public class BooksService {
 
         UserBookProgressEntity userProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), bookId).orElse(new UserBookProgressEntity());
 
-        if (bookEntity.getFileSizeKb() == null) {
-            Long sizeInKb = FileUtils.getFileSizeInKb(bookEntity);
-            if (sizeInKb != null) {
-                bookEntity.setFileSizeKb(sizeInKb);
-                bookRepository.save(bookEntity);
-            }
-        }
-
         Book book = bookMapper.toBook(bookEntity);
         book.setLastReadTime(userProgress.getLastReadTime());
         book.setPdfProgress(userProgress.getPdfProgress());
@@ -143,7 +135,8 @@ public class BooksService {
 
     public List<Book> getBooks(boolean withDescription) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
-        BookLoreUserEntity userEntity = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        BookLoreUserEntity userEntity = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         List<BookEntity> books;
         if (userEntity.getPermissions().isPermissionAdmin()) {
@@ -155,17 +148,11 @@ public class BooksService {
             books = bookRepository.findByLibraryIdIn(userLibraryIds);
         }
 
-        return books
-                .stream()
+        return books.stream()
                 .map(bookEntity -> {
-                    if (bookEntity.getFileSizeKb() == null) {
-                        Long sizeInKb = FileUtils.getFileSizeInKb(bookEntity);
-                        if (sizeInKb != null) {
-                            bookEntity.setFileSizeKb(sizeInKb);
-                            bookRepository.save(bookEntity);
-                        }
-                    }
-                    UserBookProgressEntity userProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), bookEntity.getId()).orElse(new UserBookProgressEntity());
+                    UserBookProgressEntity userProgress = userBookProgressRepository
+                            .findByUserIdAndBookId(user.getId(), bookEntity.getId())
+                            .orElse(new UserBookProgressEntity());
                     Book book = bookMapper.toBookWithDescription(bookEntity, withDescription);
                     book.setLastReadTime(userProgress.getLastReadTime());
                     book.setPdfProgress(userProgress.getPdfProgress());
