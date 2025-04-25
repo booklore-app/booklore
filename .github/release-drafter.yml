@@ -32,22 +32,20 @@ categories:
 change-template: '- $TITLE (#$NUMBER) by @$AUTHOR'
 
 template: |
-  ## Release Notes:
-  
-  ### 🚀 Features:
-  $FEATURES
+  ## 🚀 Features
+  $CHANGES_BY_LABEL:feature,enhancement
 
-  ### 🐛 Bug Fixes:
-  $BUGS
+  ## 🐛 Bug Fixes
+  $CHANGES_BY_LABEL:bug,fix
 
-  ### 🛠️ Refactoring:
-  $REFACTOR
+  ## 🛠️ Refactoring
+  $CHANGES_BY_LABEL:refactor,cleanup
 
-  ### 📖 Documentation:
-  $DOCS
+  ## 📖 Documentation
+  $CHANGES_BY_LABEL:docs,documentation
 
-  ### ⚙️ CI/CD:
-  $CICD
+  ## ⚙️ CI/CD
+  $CHANGES_BY_LABEL:ci,cd,workflow
 
-  ### 🗂️ Other:
-  $OTHER
+  ## 🗂️ Other
+  $CHANGES_BY_LABEL:other,misc
