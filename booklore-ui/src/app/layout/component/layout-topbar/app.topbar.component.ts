@@ -118,6 +118,10 @@ export class AppTopBarComponent implements OnDestroy {
     this.router.navigate(['/settings']);
   }
 
+  navigateToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
   logout() {
     this.authService.logout();
     window.location.href = '/login';
