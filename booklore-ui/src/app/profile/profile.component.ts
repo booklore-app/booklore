@@ -8,6 +8,7 @@ import {Password} from 'primeng/password';
 import {InputTextModule} from 'primeng/inputtext';
 import {Subscription} from 'rxjs';
 import {ToastModule} from 'primeng/toast';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-profile',
@@ -19,6 +20,7 @@ import {ToastModule} from 'primeng/toast';
     Password,
     InputTextModule,
     ToastModule,
+    Divider,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
@@ -117,17 +119,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     this.userService.changePassword(this.currentPassword, this.newPassword).subscribe({
-        next: () => {
-          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Password changed successfully'});
-          this.resetPasswordForm();
-        },
-        error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: err?.message || 'Failed to change password'
-          });
-        }
-      });
+      next: () => {
+        this.messageService.add({severity: 'success', summary: 'Success', detail: 'Password changed successfully'});
+        this.resetPasswordForm();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.message || 'Failed to change password'
+        });
+      }
+    });
   }
 }

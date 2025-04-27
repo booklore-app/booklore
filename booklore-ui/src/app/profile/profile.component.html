@@ -1,60 +1,65 @@
-<div class="card mx-auto max-w-xl" *ngIf="currentUser">
-  <div class="p-4">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl">User Profile</h2>
-      <div>
-        <p-button *ngIf="!isEditing" label="Edit Profile" icon="pi pi-pencil" (onClick)="toggleEdit()" styleClass="p-button-sm p-button-secondary"></p-button>
-        <div *ngIf="isEditing" class="flex gap-2">
-          <p-button label="Cancel" icon="pi pi-times" (onClick)="toggleEdit()" styleClass="p-button-sm p-button-secondary"></p-button>
-          <p-button label="Save" icon="pi pi-check" (onClick)="saveChanges()" styleClass="p-button-sm p-button-success"></p-button>
+<div class="card mx-auto max-w-2xl" *ngIf="currentUser">
+  <div class="p-6 space-y-8">
+
+    <!-- Profile Info -->
+    <section class="space-y-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-semibold">Profile Information</h2>
+        <div class="flex gap-2">
+          <p-button *ngIf="!isEditing" label="Edit Profile" icon="pi pi-pencil" (onClick)="toggleEdit()" styleClass="p-button-sm p-button-secondary"></p-button>
+          <div *ngIf="isEditing" class="flex gap-2">
+            <p-button label="Cancel" icon="pi pi-times" (onClick)="toggleEdit()" styleClass="p-button-sm p-button-secondary"></p-button>
+            <p-button label="Save" icon="pi pi-check" (onClick)="saveChanges()" styleClass="p-button-sm p-button-success"></p-button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-      <div>
-        <label for="username" class="block text-lg">Username</label>
-        <p *ngIf="!isEditing" class="mt-1 text-lg">{{ currentUser.username }}</p>
-        <input *ngIf="isEditing" id="username" type="text" pInputText [(ngModel)]="currentUser.username" class="w-full mt-1" disabled>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">Username</label>
+          <p *ngIf="!isEditing" class="text-lg">{{ currentUser.username }}</p>
+          <input *ngIf="isEditing" id="username" type="text" pInputText [(ngModel)]="currentUser.username" class="w-full" disabled />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Full Name</label>
+          <p *ngIf="!isEditing" class="text-lg">{{ currentUser.name }}</p>
+          <input *ngIf="isEditing" id="fullname" type="text" pInputText [(ngModel)]="editUserData.name" class="w-full" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium mb-1">Email</label>
+          <p *ngIf="!isEditing" class="text-lg">{{ currentUser.email }}</p>
+          <input *ngIf="isEditing" id="email" type="email" pInputText [(ngModel)]="editUserData.email" class="w-full" />
+        </div>
       </div>
-      <div>
-        <label for="fullname" class="block text-lg">Full Name</label>
-        <p *ngIf="!isEditing" class="mt-1 text-lg">{{ currentUser.name }}</p>
-        <input *ngIf="isEditing" id="fullname" type="text" pInputText [(ngModel)]="editUserData.name" class="w-full mt-1">
-      </div>
-      <div>
-        <label for="email" class="block text-lg">Email</label>
-        <p *ngIf="!isEditing" class="mt-1 text-lg">{{ currentUser.email }}</p>
-        <input *ngIf="isEditing" id="email" type="email" pInputText [(ngModel)]="editUserData.email" class="w-full mt-1">
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="p-4">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl">Change Password</h2>
-    </div>
+    <p-divider></p-divider>
 
-    <form #changePasswordForm="ngForm" (ngSubmit)="submitPasswordChange()">
-      <div class="p-field mb-3">
-        <label for="currentPassword" class="block mb-3 text-lg">Current Password</label>
-        <p-password id="currentPassword" [(ngModel)]="currentPassword" name="currentPassword" [feedback]="false" fluid/>
-      </div>
+    <!-- Change Password -->
+    <section class="space-y-6">
+      <h2 class="text-2xl font-semibold">Change Password</h2>
+      <form #changePasswordForm="ngForm" (ngSubmit)="submitPasswordChange()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1" for="currentPassword">Current Password</label>
+          <p-password id="currentPassword" [(ngModel)]="currentPassword" name="currentPassword" [feedback]="false" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="newPassword">New Password</label>
+          <p-password id="newPassword" [(ngModel)]="newPassword" name="newPassword" [feedback]="false" class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="confirmNewPassword">Confirm New Password</label>
+          <p-password id="confirmNewPassword" [(ngModel)]="confirmNewPassword" name="confirmNewPassword" [feedback]="false" class="w-full" />
+        </div>
+        <div class="flex justify-end">
+          <p-button type="submit" label="Change Password" icon="pi pi-key" class="p-button-sm p-button-primary" />
+        </div>
+      </form>
+    </section>
 
-      <div class="p-field mb-3">
-        <label for="newPassword" class="block mb-3 text-lg">New Password</label>
-        <p-password id="newPassword" [(ngModel)]="newPassword" name="newPassword" [feedback]="false" fluid/>
-      </div>
-
-      <div class="p-field mb-6">
-        <label for="confirmNewPassword" class="block mb-3 text-lg">Confirm New Password</label>
-        <p-password id="confirmNewPassword" [(ngModel)]="confirmNewPassword" name="confirmNewPassword" [feedback]="false" fluid/>
-      </div>
-
-      <p-button type="submit" label="Change Password" icon="pi pi-key" class="p-fluid"/>
-    </form>
   </div>
 </div>
-<div *ngIf="!currentUser">
+
+<div *ngIf="!currentUser" class="flex items-center justify-center min-h-[50vh] text-lg">
   Loading user data...
 </div>

@@ -18,6 +18,7 @@ import {LiveNotificationBoxComponent} from '../../../core/component/live-notific
 import {BookUploaderComponent} from '../../../utilities/component/book-uploader/book-uploader.component';
 import {AuthService} from '../../../core/service/auth.service';
 import {UserService} from '../../../user.service';
+import {UserProfileDialogComponent} from '../../../user-profile-dialog/user-profile-dialog.component';
 
 @Component({
   selector: 'app-topbar',
@@ -118,8 +119,16 @@ export class AppTopBarComponent implements OnDestroy {
     this.router.navigate(['/settings']);
   }
 
-  navigateToProfile() {
-    this.router.navigate(['/profile']);
+  openUserProfileDialog() {
+    this.ref = this.dialogService.open(UserProfileDialogComponent, {
+      header: 'User Profile Information',
+      modal: true,
+      closable: true,
+      style: {
+        position: 'absolute',
+        top: '10%',
+      }
+    });
   }
 
   logout() {
