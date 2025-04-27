@@ -43,14 +43,15 @@ public class UserService {
         user.setName(updateRequest.getName());
         user.setEmail(updateRequest.getEmail());
 
-        if (updateRequest.getPermissions() != null) {
+        // only admins can update permissions and assigned libraries
+        if (updateRequest.getPermissions() != null && getMyself().getPermissions().isAdmin()) {
             user.getPermissions().setPermissionUpload(updateRequest.getPermissions().isCanUpload());
             user.getPermissions().setPermissionDownload(updateRequest.getPermissions().isCanDownload());
             user.getPermissions().setPermissionEditMetadata(updateRequest.getPermissions().isCanEditMetadata());
             user.getPermissions().setPermissionEmailBook(updateRequest.getPermissions().isCanEmailBook());
         }
 
-        if (updateRequest.getAssignedLibraries() != null) {
+        if (updateRequest.getAssignedLibraries() != null && getMyself().getPermissions().isAdmin()) {
             List<Long> libraryIds = updateRequest.getAssignedLibraries();
             List<LibraryEntity> updatedLibraries = libraryRepository.findAllById(libraryIds);
             user.setLibraries(updatedLibraries);
