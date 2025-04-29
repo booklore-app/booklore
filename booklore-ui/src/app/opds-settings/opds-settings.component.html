@@ -20,6 +20,25 @@
     </p-toggleButton>
   </div>
 
+  <div *ngIf="opdsEnabled" class="flex flex-col gap-2 mt-4 rounded-lg">
+    <p class="text-lg py-1">OPDS Endpoint:</p>
+    <div class="flex items-center gap-4">
+      <input
+        class="min-w-[500px] max-w-[800px]"
+        type="text"
+        pInputText
+        [value]="opdsEndpoint"
+        readonly/>
+      <p-button
+        icon="pi pi-copy"
+        severity="info"
+        (onClick)="copyOpdsEndpoint()"
+        label="Copy"
+        outlined="true">
+      </p-button>
+    </div>
+  </div>
+
   <div *ngIf="opdsEnabled" class="mt-6">
     <p-button
       label="Create New User"
@@ -44,7 +63,7 @@
             <td>{{ user.username }}</td>
             <td class="flex items-center gap-2">
               <p-password
-                [(ngModel)]="user.password"
+                [(ngModel)]="dummyPassword"
                 [disabled]="true">
               </p-password>
               <i

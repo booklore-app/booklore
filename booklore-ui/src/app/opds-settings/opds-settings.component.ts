@@ -1,19 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
-import { TableModule } from 'primeng/table';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
-import { Dialog } from 'primeng/dialog';
-import { Tooltip } from 'primeng/tooltip';
-import { ToggleButton } from 'primeng/togglebutton';
-import { MessageService } from 'primeng/api';
-import { filter, take } from 'rxjs/operators';
+import {Component, inject, OnInit} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {NgIf} from '@angular/common';
+import {TableModule} from 'primeng/table';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
+import {Dialog} from 'primeng/dialog';
+import {Tooltip} from 'primeng/tooltip';
+import {ToggleButton} from 'primeng/togglebutton';
+import {MessageService} from 'primeng/api';
+import {filter, take} from 'rxjs/operators';
 
-import { OpdsUser, OpdsUserService } from '../opds-user.service';
-import { AppSettingsService } from '../core/service/app-settings.service';
-import { AppSettings } from '../core/model/app-settings.model';
-import { Password } from 'primeng/password';
+import {OpdsUser, OpdsUserService} from '../opds-user.service';
+import {AppSettingsService} from '../core/service/app-settings.service';
+import {AppSettings} from '../core/model/app-settings.model';
+import {Password} from 'primeng/password';
+import {API_CONFIG} from '../config/api-config';
 
 @Component({
   selector: 'app-opds-settings',
@@ -38,8 +39,10 @@ export class OpdsSettingsComponent implements OnInit {
   selectedUser: OpdsUser | null = null;
   createUserDialogVisible = false;
   resetPasswordDialogVisible = false;
-  newUser = { username: '', password: '' };
+  newUser = {username: '', password: ''};
   newPassword = '';
+  opdsEndpoint: string = `${API_CONFIG.BASE_URL}/api/v1/opds/catalog`;
+  dummyPassword: string = '********************************';
 
   private readonly appSettings$ = inject(AppSettingsService).appSettings$;
   private readonly opdsUserService = inject(OpdsUserService);
@@ -77,7 +80,7 @@ export class OpdsSettingsComponent implements OnInit {
   }
 
   openCreateUserDialog(): void {
-    this.newUser = { username: '', password: '' };
+    this.newUser = {username: '', password: ''};
     this.createUserDialogVisible = true;
   }
 
@@ -86,7 +89,7 @@ export class OpdsSettingsComponent implements OnInit {
   }
 
   saveNewUser(): void {
-    const { username, password } = this.newUser;
+    const {username, password} = this.newUser;
 
     if (username.trim() && password.trim()) {
       this.opdsUserService.createUser(this.newUser).subscribe({
@@ -115,6 +118,14 @@ export class OpdsSettingsComponent implements OnInit {
     this.resetPasswordDialogVisible = false;
     this.selectedUser = null;
     this.newPassword = '';
+  }
+
+  copyOpdsEndpoint() {
+    navigator.clipboard.writeText(this.opdsEndpoint)
+      .then(() => {
+      })
+      .catch(err => {
+      });
   }
 
   confirmResetPassword(): void {
@@ -147,7 +158,7 @@ export class OpdsSettingsComponent implements OnInit {
   }
 
   private saveSetting(key: string, value: unknown): void {
-    this.appSettingsService.saveSettings([{ key, newValue: value }]).subscribe({
+    this.appSettingsService.saveSettings([{key, newValue: value}]).subscribe({
       next: () => {
         let successMessage = 'Settings saved successfully.';
         if (key === 'opds_server_enabled') {
@@ -164,14 +175,14 @@ export class OpdsSettingsComponent implements OnInit {
   }
 
   private showSuccess(summary: string, detail: string): void {
-    this.messageService.add({ severity: 'success', summary, detail });
+    this.messageService.add({severity: 'success', summary, detail});
   }
 
   private showError(summary: string, detail: string): void {
-    this.messageService.add({ severity: 'error', summary, detail });
+    this.messageService.add({severity: 'error', summary, detail});
   }
 
   private showWarning(summary: string, detail: string): void {
-    this.messageService.add({ severity: 'warn', summary, detail });
+    this.messageService.add({severity: 'warn', summary, detail});
   }
 }
