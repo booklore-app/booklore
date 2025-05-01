@@ -38,7 +38,7 @@ dependencies {
 
     // --- Database & Migration ---
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
-    implementation 'org.flywaydb:flyway-mysql:11.7.1'
+    implementation 'org.flywaydb:flyway-mysql:11.8.0'
 
     // --- Security & Authentication ---
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'

@@ -27,10 +27,11 @@ spring:
     username: ${DATABASE_USERNAME:root}
     password: ${DATABASE_PASSWORD:${MYSQL_ROOT_PASSWORD}}
     hikari:
-      max-lifetime: 580000  # 580 seconds
+      max-lifetime: 580000         # 9.6 minutes (avoid DB-side connection cuts)
       connection-test-query: SELECT 1
-      maximum-pool-size: 10
-      idle-timeout: 300000  # 5 minutes
+      maximum-pool-size: 10        # Allows bursts
+      minimum-idle: 1              # Shrinks when idle
+      idle-timeout: 300000         # 5 minutes before idle connections are closed
   jpa:
     hibernate:
       naming:
@@ -42,6 +43,7 @@ spring:
           batch_size: 500
           order_inserts: true
           order_updates: true
+    open-in-view: false
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -52,3 +54,8 @@ logging:
     com.adityachandel.booklore: ${LOG_LEVEL:INFO}
     org.apache.fontbox: ERROR
     org.apache.pdfbox: ERROR
+    org.quartz.core.QuartzScheduler: WARN
+    org.quartz.simpl.SimpleThreadPool: WARN
+    org.quartz.simpl.RAMJobStore: WARN
+    org.hibernate.orm.connections.pooling: WARN
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR

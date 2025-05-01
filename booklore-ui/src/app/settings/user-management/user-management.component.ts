@@ -13,7 +13,6 @@ import {Library} from '../../book/model/library.model';
 import {LibraryService} from '../../book/service/library.service';
 import {Dialog} from 'primeng/dialog';
 import {Password} from 'primeng/password';
-import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-user-management',
@@ -26,8 +25,7 @@ import {Tooltip} from 'primeng/tooltip';
     NgStyle,
     MultiSelect,
     Dialog,
-    Password,
-    Tooltip,
+    Password
   ],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
