@@ -32,14 +32,14 @@ type Filter<T> = { value: T; bookCount: number };
   ]
 })
 export class BookFilterComponent implements OnInit {
-  @Output() filterSelected = new EventEmitter<{ type: string; value: any } | null>();
+  @Output() filterSelected = new EventEmitter<Record<string, any> | null>();
 
   @Input() showFilters: boolean = true;
   @Input() entity$!: Observable<Library | Shelf | null> | undefined;
   @Input() entityType$!: Observable<EntityType> | undefined;
   @Input() resetFilter$!: Subject<void>;
 
-  activeFilter: { type: string; value: any | null } = {type: '', value: null};
+  activeFilters: Record<string, any> = {};
   filterStreams: Record<string, Observable<Filter<any>[]>> = {};
   filterTypes: string[] = [];
 
@@ -91,18 +91,29 @@ export class BookFilterComponent implements OnInit {
     return books;
   }
 
-  handleFilterClick(filterType: string, value: any) {
-    if (this.activeFilter.type === filterType && this.activeFilter.value === value) {
-      this.activeFilter = {type: '', value: null};
-      this.filterSelected.emit(null);
-    } else {
-      this.activeFilter = {type: filterType, value};
-      this.filterSelected.emit({type: filterType, value});
+  handleFilterClick(filterType: string, value: any): void {
+    if (!this.activeFilters[filterType]) {
+      this.activeFilters[filterType] = [];
     }
+
+    const index = this.activeFilters[filterType].indexOf(value);
+    if (index > -1) {
+      // Deselect
+      this.activeFilters[filterType].splice(index, 1);
+      if (this.activeFilters[filterType].length === 0) {
+        delete this.activeFilters[filterType];
+      }
+    } else {
+      // Select
+      this.activeFilters[filterType].push(value);
+    }
+
+    // Emit updated filter state
+    this.filterSelected.emit({ ...this.activeFilters });
   }
 
   clearActiveFilter() {
-    this.activeFilter = { type: '', value: null };
+    this.activeFilters = {};
     this.filterSelected.emit(null);
   }
 }

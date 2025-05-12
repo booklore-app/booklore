@@ -97,7 +97,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
   @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
 
-  selectedFilter = new BehaviorSubject<{ type: string; value: any } | null>(null);
+  selectedFilter = new BehaviorSubject<Record<string, any> | null>(null);
   protected resetFilterSubject = new Subject<void>();
 
   protected userService = inject(UserService);
@@ -257,43 +257,37 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   private sideBarFilter(bookState: BookState): Observable<BookState> {
     return this.selectedFilter.pipe(
-      map(selectedFilter => {
-        if (!selectedFilter) {
+      map((activeFilters: Record<string, any[]> | null) => {
+        if (!activeFilters) {
           return bookState;
         }
-        let filteredBooks = bookState.books || [];
-        switch (selectedFilter.type) {
-          case 'author':
-            filteredBooks = filteredBooks.filter(book =>
-              book.metadata?.authors?.some(author => author === selectedFilter.value)
-            );
-            break;
-          case 'category':
-            filteredBooks = filteredBooks.filter(book =>
-              book.metadata?.categories?.some(category => category === selectedFilter.value)
-            );
-            break;
-          case 'publisher':
-            filteredBooks = filteredBooks.filter(book =>
-              book.metadata?.publisher === selectedFilter.value
-            );
-            break;
-          case 'award':
-            filteredBooks = filteredBooks.filter(book =>
-              book.metadata?.awards?.some(
-                award => award.name === selectedFilter.value.name && award.designation === 'WINNER'
-              )
-            );
-            break;
-          case 'series':
-            filteredBooks = filteredBooks.filter(book =>
-              book.metadata?.seriesName === selectedFilter.value
-            );
-            break;
-          default:
-            break;
-        }
-        return {...bookState, books: filteredBooks};
+
+        const filteredBooks = (bookState.books || []).filter(book => {
+          return Object.entries(activeFilters).every(([filterType, filterValues]) => {
+            if (!Array.isArray(filterValues) || filterValues.length === 0) return true;
+
+            switch (filterType) {
+              case 'author':
+                return filterValues.every(val => book.metadata?.authors?.includes(val));
+              case 'category':
+                return filterValues.every(val => book.metadata?.categories?.includes(val));
+              case 'publisher':
+                return filterValues.every(val => book.metadata?.publisher === val);
+              case 'award':
+                return filterValues.every(val =>
+                  book.metadata?.awards?.some(
+                    award => award.name === val.name && award.designation === 'WINNER'
+                  )
+                );
+              case 'series':
+                return filterValues.every(val => book.metadata?.seriesName === val);
+              default:
+                return true;
+            }
+          });
+        });
+
+        return { ...bookState, books: filteredBooks };
       })
     );
   }
@@ -523,8 +517,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.bookFilterComponent.filterSelected.subscribe((item) => {
-      this.selectedFilter.next(item);
+    this.bookFilterComponent.filterSelected.subscribe((filters: Record<string, any> | null) => {
+      this.selectedFilter.next(filters);
     });
 
     this.activatedRoute.queryParamMap.subscribe(paramMap => {

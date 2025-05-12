@@ -43,7 +43,6 @@ spring:
           batch_size: 500
           order_inserts: true
           order_updates: true
-    open-in-view: false
   flyway:
     enabled: true
     locations: classpath:db/migration
