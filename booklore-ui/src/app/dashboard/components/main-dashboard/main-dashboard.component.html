@@ -1,47 +1,46 @@
-<p-progressSpinner *ngIf="(bookState$ | async)?.loaded === false" styleClass="spinner center-spinner"></p-progressSpinner>
-
-<div class="dashboard" *ngIf="(bookState$ | async)?.loaded === true">
-  <div>
-    <div class="dashboard-no-library" *ngIf="isLibrariesEmpty$ | async; else dashboardScroller">
-      <div *ngIf="(userService.userData$ | async)?.permissions as permissions">
-        <div *ngIf="permissions.admin || permissions.canManipulateLibrary">
-          <h1 class="no-library-header">Looks like you haven't added a library yet. Let's add one!</h1>
-          <p-button
-            label="Add a Library"
-            icon="pi pi-plus"
-            styleClass="p-button-rounded p-button-outlined"
-            (click)="createNewLibrary()">
-          </p-button>
+<div class="dashboard-container">
+  <p-progressSpinner *ngIf="(bookState$ | async)?.loaded === false" styleClass="spinner center-spinner"></p-progressSpinner>
+  <div class="dashboard" *ngIf="(bookState$ | async)?.loaded === true">
+    <div>
+      <div class="dashboard-no-library" *ngIf="isLibrariesEmpty$ | async; else dashboardScroller">
+        <div *ngIf="(userService.userData$ | async)?.permissions as permissions">
+          <div *ngIf="permissions.admin || permissions.canManipulateLibrary">
+            <h1 class="no-library-header">Looks like you haven't added a library yet. Let's add one!</h1>
+            <p-button
+              label="Add a Library"
+              icon="pi pi-plus"
+              styleClass="p-button-rounded p-button-outlined"
+              (click)="createNewLibrary()">
+            </p-button>
+          </div>
         </div>
       </div>
+
+      <ng-template #dashboardScroller>
+        <app-dashboard-scroller
+          [books]="lastReadBooks$ | async"
+          [bookListType]="'lastRead'"
+          [title]="'Last Read Books'">
+        </app-dashboard-scroller>
+
+        <div class="mb-6">
+          <p-divider></p-divider>
+        </div>
+
+        <app-dashboard-scroller
+          [books]="latestAddedBooks$ | async"
+          [title]="'Latest Added Books'">
+        </app-dashboard-scroller>
+
+        <div class="mb-6">
+          <p-divider></p-divider>
+        </div>
+
+        <app-dashboard-scroller
+          [books]="randomBooks$ | async"
+          [title]="'Discover Random Reads'">
+        </app-dashboard-scroller>
+      </ng-template>
     </div>
-
-    <ng-template #dashboardScroller>
-      <app-dashboard-scroller
-        [books]="lastReadBooks$ | async"
-        [bookListType]="'lastRead'"
-        [title]="'Last Read Books'">
-      </app-dashboard-scroller>
-
-      <div class="mb-6">
-        <p-divider></p-divider>
-      </div>
-
-      <app-dashboard-scroller
-        [books]="latestAddedBooks$ | async"
-        [title]="'Latest Added Books'">
-      </app-dashboard-scroller>
-
-      <div class="mb-6">
-        <p-divider></p-divider>
-      </div>
-
-      <app-dashboard-scroller
-        [books]="randomBooks$ | async"
-        [title]="'Discover Random Reads'">
-      </app-dashboard-scroller>
-
-      <p-divider></p-divider>
-    </ng-template>
   </div>
 </div>
