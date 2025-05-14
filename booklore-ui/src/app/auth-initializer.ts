@@ -23,7 +23,7 @@ export function initializeAuthFactory() {
               responseType: 'code',
               showDebugInformation: false,
               requireHttps: true,
-              strictDiscoveryDocumentValidation: true,
+              strictDiscoveryDocumentValidation: false,
             });
 
             oauthService.events
