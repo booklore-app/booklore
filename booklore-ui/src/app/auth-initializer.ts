@@ -21,9 +21,9 @@ export function initializeAuthFactory() {
               scope: 'openid profile email offline_access',
               redirectUri: window.location.origin + '/oauth2-callback',
               responseType: 'code',
-              showDebugInformation: true,
-              requireHttps: false,
-              strictDiscoveryDocumentValidation: false,
+              showDebugInformation: false,
+              requireHttps: true,
+              strictDiscoveryDocumentValidation: true,
             });
 
             oauthService.events
@@ -36,11 +36,20 @@ export function initializeAuthFactory() {
                 authService.saveOidcTokens(accessToken, refreshToken ?? '');
               });
 
-            oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
-              oauthService.setupAutomaticSilentRefresh();
-              websocketInitializer(authService);
-              resolve();
-            });
+            oauthService.loadDiscoveryDocumentAndTryLogin()
+              .then(() => {
+                oauthService.setupAutomaticSilentRefresh();
+                websocketInitializer(authService);
+                resolve();
+              })
+              .catch(err => {
+                console.error(
+                  'OIDC initialization failed: Unable to complete OpenID Connect discovery or login. ' +
+                  'This may be due to an incorrect issuer URL, client ID, or network issue. ' +
+                  'Falling back to local login. Details:', err
+                );
+                resolve();
+              });
           } else {
             resolve();
           }
