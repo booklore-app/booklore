@@ -8,21 +8,17 @@ BookLore is a self-hosted web app for organizing and managing your personal book
 
 ![BookLore Demo](assets/demo.gif)
 
-> ⚠️ **Warning:**  
-> This project is in early development by a sole developer. Expect bugs, missing features, and frequent changes.  
-> **Data Loss Risk:** Non-backwards compatible database changes may result in loss of metadata, such as book titles, authors, and reading progress. Your actual book files (PDFs and ePubs) are unlikely to be affected, but it's always a good idea to keep a backup of both your database and your book files.  
-> **Limited Support:** As this is a one-person project, support may be slow, and features could be experimental or incomplete. Contributions and feedback are welcome!
-
 ## ✨ Key Features
-- **Modern, Responsive UI** – A sleek, highly reactive, and fluent interface for a seamless reading experience.
-- **Organized Book Management** – Categorize books using Libraries and Shelves for better organization.
-- **Smart Metadata Handling** – Automatically fetch book details from sources like Goodreads, Amazon, and Google Books, or edit them manually.
-- **Multi-User Support** – Admins can create user accounts, assign libraries, and manage permissions for metadata edits, uploads, and downloads.
-- **Powerful eBook & PDF Reader** – A feature-rich reader for PDFs and ePubs, with customizable reading settings.
-- **And More to Come!** – Continuous improvements and exciting new features are in development.
 
-BookLore is perfect for self-hosters who want complete control over their digital library. Stay tuned for updates!
-
+- 📚 **Organized Book Management** - Categorize books with **Libraries** and **Shelves** for easy discovery and structured organization.
+- 🧠 **Smart Metadata Handling** - Automatically fetch book details from **Goodreads**, **Amazon**, and **Google Books**, or edit them manually with fine-grained control.
+- 👥 **Multi-User Support** - Admins can create accounts, assign libraries, and manage permissions for metadata edits, uploads, and downloads.
+- 📖 **Built-in PDF & ePub Reader** - A fast, feature-rich reader for PDFs and ePubs, with customizable reading settings and a clean UI.
+- 🌐 **OPDS 1.2 Support** - Browse and download books through the **Open Publication Distribution System** – compatible with many reading apps.
+- 🔐 **Optional OIDC Authentication** - Secure access with **OpenID Connect**, supporting both local JWT authentication and external providers like **Authentik**.
+- 📤 **Multi-Book Uploads** - Upload multiple books at once with metadata auto-detection and file organization.
+- 📧 **Send Books via Email** - Share books directly with others by sending them via email – quick and easy.
+- 🚀 **Continuous Improvements** - Frequent updates with new features, performance enhancements, and UI improvements. BookLore is perfect for self-hosters who want complete control over their digital library. Stay tuned for updates!
 ## 🎥 Video Guides & Tutorials
 
 For a step-by-step walkthrough, check out the official BookLore video guides on YouTube:
@@ -30,6 +26,7 @@ For a step-by-step walkthrough, check out the official BookLore video guides on 
 📺 [BookLore Tutorials – YouTube](https://www.youtube.com/watch?v=UMrn_fIeFRo&list=PLi0fq0zaM7lqY7dX0R66jQtKW64z4_Tdz)
 
 These videos cover deployment, configuration, and feature highlights to help you get started quickly.
+
 
 ## 🐳 Deploy with Docker
 
@@ -105,16 +102,16 @@ Once the containers are up, access BookLore in your browser at:
 http://localhost:6060
 ```
 
-### 5️⃣ First-Time Login
+## 🔑 OIDC/OAuth2 Authentication
 
-After starting the containers, you can log into BookLore with the default admin credentials:
+> **Note:** This is an experimental feature and may not be fully stable
 
-```ini
-Username: admin
-Password: admin123
-```
-> ⚠️ **Important:**  
-> You’ll be prompted to change the default password upon your first login to ensure better security.
+BookLore supports optional OIDC/OAuth2 authentication for secure access. This feature allows you to integrate external authentication providers for a seamless login experience.
+
+While the integration has been tested with **Authentik**, it should work with other OIDC providers like **Authelia** as well. The setup allows you to use either JWT-based local authentication or external providers, giving users the flexibility to choose their preferred method.
+
+For detailed instructions on setting up OIDC authentication with **Authentik**, refer to the [YouTube guide on configuring OIDC in BookLore](https://www.youtube.com/watch?v=r6Ufh9ldF9M), which provides step-by-step walkthroughs.
+
 
 ## 🔧 Configuration
 
