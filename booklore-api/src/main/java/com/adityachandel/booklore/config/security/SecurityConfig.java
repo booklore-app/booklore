@@ -51,11 +51,7 @@ public class SecurityConfig {
                                 "/api/v1/settings",
                                 "/api/v1/setup",
                                 "/api/v1/setup/**",
-
-                                "/api/v1/opds/*/cover.jpg",
-                                "/api/v1/opds/*/cover.jpg/**",
-                                "/api/v1/opds/**/cover.jpg",
-                                "/api/v1/opds/**/cover.jpg/**"
+                                "/api/v1/opds/*/cover.jpg"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
