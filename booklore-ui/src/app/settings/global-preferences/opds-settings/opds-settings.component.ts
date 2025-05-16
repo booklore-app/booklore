@@ -11,7 +11,7 @@ import {filter, take} from 'rxjs/operators';
 
 import {OpdsUser, OpdsUserService} from './opds-user.service';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {AppSettings} from '../../../core/model/app-settings.model';
+import {AppSettingKey, AppSettings} from '../../../core/model/app-settings.model';
 import {Password} from 'primeng/password';
 import {API_CONFIG} from '../../../config/api-config';
 import {ToggleSwitch} from 'primeng/toggleswitch';
@@ -64,7 +64,7 @@ export class OpdsSettingsComponent implements OnInit {
   }
 
   toggleOpdsServer(): void {
-    this.saveSetting('opds_server_enabled', this.opdsEnabled);
+    this.saveSetting(AppSettingKey.OPDS_SERVER_ENABLED, this.opdsEnabled);
     if (this.opdsEnabled) {
       this.loadUsers();
     } else {
@@ -161,7 +161,7 @@ export class OpdsSettingsComponent implements OnInit {
     this.appSettingsService.saveSettings([{key, newValue: value}]).subscribe({
       next: () => {
         let successMessage = 'Settings saved successfully.';
-        if (key === 'opds_server_enabled') {
+        if (key === AppSettingKey.OPDS_SERVER_ENABLED) {
           successMessage = (value === true)
             ? 'OPDS Server Enabled.'
             : 'OPDS Server Disabled.';

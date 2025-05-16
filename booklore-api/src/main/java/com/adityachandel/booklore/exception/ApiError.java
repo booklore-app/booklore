@@ -40,7 +40,8 @@ public enum ApiError {
     PASSWORD_TOO_SHORT(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters long"),
     PASSWORD_SAME_AS_CURRENT(HttpStatus.BAD_REQUEST, "New password cannot be the same as the current password"),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid credentials"),
-    REMOTE_AUTH_DISABLED(HttpStatus.NON_AUTHORITATIVE_INFORMATION, "Remote login is disabled");
+    REMOTE_AUTH_DISABLED(HttpStatus.NON_AUTHORITATIVE_INFORMATION, "Remote login is disabled"),
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "%s");
 
     private final HttpStatus status;
     private final String message;

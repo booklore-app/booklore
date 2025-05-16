@@ -8,9 +8,9 @@ import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.compon
 import {BookService} from '../../../service/book.service';
 import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
-import {MetadataFetchOptionsComponent} from '../../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
-import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-refresh-type.enum';
-import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
+import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
+import {MetadataRefreshRequest} from '../../../metadata/model/request/metadata-refresh-request.model';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {NgClass, NgIf} from '@angular/common';
 import {UserService} from '../../../../settings/user-management/user.service';

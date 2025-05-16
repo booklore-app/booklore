@@ -1,13 +1,10 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
-import com.adityachandel.booklore.model.dto.settings.AppSettings;
-import com.adityachandel.booklore.model.dto.settings.OidcAutoProvisionDetails;
-import com.adityachandel.booklore.model.dto.settings.OidcProviderDetails;
+import com.adityachandel.booklore.model.dto.settings.*;
 import com.adityachandel.booklore.model.entity.AppSettingEntity;
 import com.adityachandel.booklore.repository.AppSettingsRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +20,6 @@ public class AppSettingService {
 
     private final AppSettingsRepository appSettingsRepository;
     private final ObjectMapper objectMapper;
-
-    public static final String QUICK_BOOK_MATCH = "quick_book_match";
-    public static final String AUTO_BOOK_SEARCH = "auto_book_search";
-    public static final String COVER_IMAGE_RESOLUTION = "cover_image_resolution";
-    public static final String SIMILAR_BOOK_RECOMMENDATION = "similar_book_recommendation";
-    public static final String UPLOAD_FILE_PATTERN = "upload_file_pattern";
-    public static final String OPDS_SERVER_ENABLED = "opds_server_enabled";
-    public static final String OIDC_ENABLED = "oidc_enabled";
-    public static final String OIDC_PROVIDER_DETAILS = "oidc_provider_details";
-    public static final String OIDC_AUTO_PROVISION_DETAILS = "oidc_auto_provision_details";
 
     private volatile AppSettings appSettings;
     private final ReentrantLock lock = new ReentrantLock();
@@ -52,19 +39,13 @@ public class AppSettingService {
     }
 
     @Transactional
-    public void updateSetting(String name, Object val) throws JsonProcessingException {
-        AppSettingEntity setting = appSettingsRepository.findByName(name);
+    public void updateSetting(AppSettingKey key, Object val) throws JsonProcessingException {
+        AppSettingEntity setting = appSettingsRepository.findByName(key.toString());
         if (setting == null) {
             setting = new AppSettingEntity();
-            setting.setName(name);
+            setting.setName(key.toString());
         }
-
-        if (QUICK_BOOK_MATCH.equals(name) || OIDC_PROVIDER_DETAILS.equals(name) || OIDC_AUTO_PROVISION_DETAILS.equals(name)) {
-            setting.setVal(objectMapper.writeValueAsString(val));
-        } else {
-            setting.setVal(val.toString());
-        }
-
+        setting.setVal(serializeSettingValue(key, val));
         appSettingsRepository.save(setting);
         refreshCache();
     }
@@ -83,59 +64,56 @@ public class AppSettingService {
 
         AppSettings.AppSettingsBuilder builder = AppSettings.builder();
 
-        if (settingsMap.containsKey(QUICK_BOOK_MATCH)) {
-            try {
-                builder.metadataRefreshOptions(objectMapper.readValue(settingsMap.get(QUICK_BOOK_MATCH), MetadataRefreshOptions.class));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Failed to parse " + QUICK_BOOK_MATCH, e);
-            }
-        }
+        builder.metadataRefreshOptions(getJsonSetting(settingsMap, AppSettingKey.QUICK_BOOK_MATCH, MetadataRefreshOptions.class, null, false));
+        builder.oidcProviderDetails(getJsonSetting(settingsMap, AppSettingKey.OIDC_PROVIDER_DETAILS, OidcProviderDetails.class, null, false));
+        builder.oidcAutoProvisionDetails(getJsonSetting(settingsMap, AppSettingKey.OIDC_AUTO_PROVISION_DETAILS, OidcAutoProvisionDetails.class, null, false));
 
-        String oidcProviderDetailsJson = settingsMap.get(OIDC_PROVIDER_DETAILS);
-        if (oidcProviderDetailsJson != null && !oidcProviderDetailsJson.isBlank()) {
-            try {
-                builder.oidcProviderDetails(objectMapper.readValue(oidcProviderDetailsJson, OidcProviderDetails.class));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Failed to parse " + OIDC_PROVIDER_DETAILS, e);
-            }
-        } else {
-            builder.oidcProviderDetails(null);
-        }
-
-        String oidcAutoProvisionDetailsJson = settingsMap.get(OIDC_AUTO_PROVISION_DETAILS);
-        if (oidcAutoProvisionDetailsJson != null && !oidcAutoProvisionDetailsJson.isBlank()) {
-            try {
-                builder.oidcAutoProvisionDetails(objectMapper.readValue(oidcAutoProvisionDetailsJson, OidcAutoProvisionDetails.class));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Failed to parse " + OIDC_AUTO_PROVISION_DETAILS, e);
-            }
-        } else {
-            builder.oidcAutoProvisionDetails(null);
-        }
-
-        builder.coverResolution(getOrCreateSetting(COVER_IMAGE_RESOLUTION, "250x350"));
-        builder.autoBookSearch(Boolean.parseBoolean(getOrCreateSetting(AUTO_BOOK_SEARCH, "true")));
-        builder.uploadPattern(getOrCreateSetting(UPLOAD_FILE_PATTERN, ""));
-        builder.similarBookRecommendation(Boolean.parseBoolean(getOrCreateSetting(SIMILAR_BOOK_RECOMMENDATION, "true")));
-        builder.opdsServerEnabled(Boolean.parseBoolean(getOrCreateSetting(OPDS_SERVER_ENABLED, "false")));
-        builder.oidcEnabled(Boolean.parseBoolean(getOrCreateSetting(OIDC_ENABLED, "false")));
+        builder.coverResolution(getOrCreateSetting(AppSettingKey.COVER_IMAGE_RESOLUTION, "250x350"));
+        builder.autoBookSearch(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.AUTO_BOOK_SEARCH, "true")));
+        builder.uploadPattern(getOrCreateSetting(AppSettingKey.UPLOAD_FILE_PATTERN, ""));
+        builder.similarBookRecommendation(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.SIMILAR_BOOK_RECOMMENDATION, "true")));
+        builder.opdsServerEnabled(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.OPDS_SERVER_ENABLED, "false")));
+        builder.oidcEnabled(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.OIDC_ENABLED, "false")));
 
         return builder.build();
     }
 
-    private String getOrCreateSetting(String name, String defaultValue) {
-        AppSettingEntity setting = appSettingsRepository.findByName(name);
+    private String getOrCreateSetting(AppSettingKey key, String defaultValue) {
+        AppSettingEntity setting = appSettingsRepository.findByName(key.toString());
         if (setting != null) {
             return setting.getVal();
         }
-        saveDefaultSetting(name, defaultValue);
+        saveDefaultSetting(key, defaultValue);
         return defaultValue;
     }
 
-    private void saveDefaultSetting(String name, String value) {
+    private void saveDefaultSetting(AppSettingKey key, String value) {
         AppSettingEntity setting = new AppSettingEntity();
-        setting.setName(name);
+        setting.setName(key.toString());
         setting.setVal(value);
         appSettingsRepository.save(setting);
+    }
+
+    private <T> T getJsonSetting(Map<String, String> settingsMap, AppSettingKey key, Class<T> clazz, T defaultValue, boolean persistDefault) {
+        String json = settingsMap.get(key.toString());
+        if (json != null && !json.isBlank()) {
+            try {
+                return objectMapper.readValue(json, clazz);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to parse " + key.toString(), e);
+            }
+        }
+        if (defaultValue != null && persistDefault) {
+            try {
+                saveDefaultSetting(key, objectMapper.writeValueAsString(defaultValue));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to persist default for " + key.toString(), e);
+            }
+        }
+        return defaultValue;
+    }
+
+    private String serializeSettingValue(AppSettingKey key, Object val) throws JsonProcessingException {
+        return key.isJson() ? objectMapper.writeValueAsString(val) : val.toString();
     }
 }

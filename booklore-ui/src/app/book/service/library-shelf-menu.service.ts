@@ -6,8 +6,8 @@ import {ShelfService} from './shelf.service';
 import {Library} from '../model/library.model';
 import {Shelf} from '../model/shelf.model';
 import {DialogService} from 'primeng/dynamicdialog';
-import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
-import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
+import {MetadataFetchOptionsComponent} from '../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../metadata/model/request/metadata-refresh-type.enum';
 import {LibraryCreatorComponent} from '../components/library-creator/library-creator.component';
 import {ShelfEditDialogComponent} from '../components/shelf-edit-dialog/shelf-edit-dialog.component';
 

@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final BookLoreUserTransformer bookLoreUserTransformer;
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
     private final AppSettingService appSettingService;
@@ -81,7 +82,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
     private void authenticateLocalUser(String token, HttpServletRequest request) {
         Long userId = jwtUtils.extractUserId(token);
         BookLoreUserEntity entity = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
-        BookLoreUser user = BookLoreUserTransformer.toDTO(entity);
+        BookLoreUser user = bookLoreUserTransformer.toDTO(entity);
         List<GrantedAuthority> authorities = getAuthorities(entity.getPermissions());
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
         authentication.setDetails(new UserAuthenticationDetails(request, user.getId()));
@@ -136,7 +137,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
 
             BookLoreUserEntity entity = userOpt.orElseGet(() -> userProvisioningService.provisionOidcUser(username, email, name, oidcAutoProvisionDetails));
 
-            BookLoreUser user = BookLoreUserTransformer.toDTO(entity);
+            BookLoreUser user = bookLoreUserTransformer.toDTO(entity);
             List<GrantedAuthority> authorities = getAuthorities(entity.getPermissions());
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);

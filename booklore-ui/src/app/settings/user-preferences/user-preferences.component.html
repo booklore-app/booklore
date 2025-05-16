@@ -1,0 +1,178 @@
+<div class="w-full h-[calc(100vh-12.1rem)] overflow-y-auto border rounded-lg enclosing-container">
+
+
+  <div class="p-4">
+    <p class="text-lg pb-4 pt-4 font-bold">
+      Book Reader Settings: Global or Per-Book
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Select whether to apply the same reader settings (font, theme, spread, zoom, etc.) globally for all books or individually per book."
+         tooltipPosition="right"
+         style="cursor: pointer;">
+      </i>
+    </p>
+    <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+      <p class="py-1">PDF:</p>
+      <div class="flex gap-4 justify-start">
+        <div *ngFor="let item of scopeOptions" class="flex items-center gap-2">
+          <p-radiobutton
+            [inputId]="item"
+            name="spread"
+            [value]="item"
+            [(ngModel)]="selectedPdfScope"
+            (ngModelChange)="onPdfScopeChange()">
+          </p-radiobutton>
+          <label [for]="item">{{ item }}</label>
+        </div>
+      </div>
+
+      <p class="py-1">Epub:</p>
+      <div class="flex gap-4 justify-start">
+        <div *ngFor="let item of scopeOptions" class="flex items-center gap-2">
+          <p-radiobutton
+            [inputId]="item"
+            name="spread"
+            [value]="item"
+            [(ngModel)]="selectedEpubScope"
+            (ngModelChange)="onEpubScopeChange()">
+          </p-radiobutton>
+          <label [for]="item">{{ item }}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="p-4">
+    <p class="text-lg pb-6 pt-4 font-bold">
+      PDF Reader: Global Preferences
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Configure global PDF reading options such as page spread, zoom level, and sidebar visibility that apply to all PDFs."
+         tooltipPosition="right"
+         style="cursor: pointer;"></i>
+    </p>
+
+    <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+      <p class="py-1">Page Spread:</p>
+      <div class="flex gap-4 justify-start">
+        <div *ngFor="let spread of spreads" class="flex items-center gap-2">
+          <p-radiobutton
+            [inputId]="spread.key"
+            name="spread"
+            [value]="spread.key"
+            [(ngModel)]="selectedSpread"
+            (ngModelChange)="onSpreadChange()">
+          </p-radiobutton>
+          <label [for]="spread.key">{{ spread.name }}</label>
+        </div>
+      </div>
+
+      <p class="py-1">Page Zoom:</p>
+      <div class="flex gap-4 justify-start">
+        <div *ngFor="let zoom of zooms" class="flex items-center gap-2">
+          <p-radiobutton
+            [inputId]="zoom.key"
+            name="zoom"
+            [value]="zoom.key"
+            [(ngModel)]="selectedZoom"
+            (ngModelChange)="onZoomChange()">
+          </p-radiobutton>
+          <label [for]="zoom.key">{{ zoom.name }}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="p-4">
+    <p class="text-lg pb-6 pt-4 font-bold">
+      Epub Reader: Global Preferences
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Set global EPUB reader options such as themes, font families, and font sizes applied to all EPUBs."
+         tooltipPosition="right"
+         style="cursor: pointer;"></i></p>
+
+    <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+      <p>Theme:</p>
+      <div class="flex gap-4 justify-start">
+        <p-select
+          [options]="themes"
+          [(ngModel)]="selectedTheme"
+          optionLabel="name"
+          optionValue="key"
+          placeholder="Select a Theme"
+          class="w-full md:w-56"
+          (ngModelChange)="onThemeChange()">
+        </p-select>
+      </div>
+
+      <p>Font:</p>
+      <div class="flex gap-4 justify-start">
+        <p-select
+          [options]="fonts"
+          [(ngModel)]="selectedFont"
+          optionLabel="name"
+          optionValue="key"
+          placeholder="Select a Font"
+          class="w-full md:w-56"
+          (ngModelChange)="onFontChange()">
+        </p-select>
+      </div>
+
+      <p class="py-1">Font Size:</p>
+      <div class="flex gap-4 justify-start items-center">
+        <p-button icon="pi pi-minus" rounded="true" size="small" (click)="decreaseFontSize()"></p-button>
+        <p>{{ fontSize }}%</p>
+        <p-button icon="pi pi-plus" rounded="true" size="small" (click)="increaseFontSize()"></p-button>
+      </div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="p-4">
+    <div class="flex items-center gap-2 pb-4 pt-4">
+      <p class="text-lg font-bold">Sidebar Library and Shelf Sorting Perference</p>
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Configure sorting options for your library and shelves shown in the sidebar."
+         tooltipPosition="right"
+         style="cursor: pointer;">
+      </i>
+    </div>
+
+    <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+      <p class="py-1">Library:
+        <i class="pi pi-info-circle text-sky-600"
+           pTooltip="Choose how books are sorted and displayed in the library sidebar."
+           tooltipPosition="right"
+           style="cursor: pointer;">
+        </i>
+      </p>
+      <div class="flex gap-4 justify-start">
+        <p-select
+          [options]="sortingOptions"
+          [(ngModel)]="selectedLibrarySorting"
+          (ngModelChange)="onLibrarySortingChange()"
+          placeholder="Select Sorting">
+        </p-select>
+      </div>
+
+      <p class="py-1">Shelf:
+        <i class="pi pi-info-circle text-sky-600"
+           pTooltip="Choose how books are sorted and displayed in the shelf sidebar."
+           tooltipPosition="right"
+           style="cursor: pointer;">
+        </i>
+      </p>
+      <div class="flex gap-4 justify-start">
+        <p-select
+          [options]="sortingOptions"
+          [(ngModel)]="selectedShelfSorting"
+          (ngModelChange)="onShelfSortingChange()"
+          placeholder="Select Sorting">
+        </p-select>
+      </div>
+    </div>
+  </div>
+</div>

@@ -138,15 +138,15 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
               this.rendition.themes.register(name, theme);
             });
 
-            let globalOrIndividual = myself.bookPreferences.perBookSetting.epub;
+            let globalOrIndividual = myself.userSettings.perBookSetting.epub;
             if (globalOrIndividual === 'Global') {
-              this.selectedTheme = myself.bookPreferences.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
-              this.selectedFontType = myself.bookPreferences.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
-              this.fontSize = myself.bookPreferences.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+              this.selectedTheme = myself.userSettings.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
+              this.selectedFontType = myself.userSettings.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
+              this.fontSize = myself.userSettings.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
             } else {
-              this.selectedTheme = individualSetting?.theme || myself.bookPreferences.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
-              this.selectedFontType = individualSetting?.font || myself.bookPreferences.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
-              this.fontSize = individualSetting?.fontSize || myself.bookPreferences.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+              this.selectedTheme = individualSetting?.theme || myself.userSettings.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
+              this.selectedFontType = individualSetting?.font || myself.userSettings.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
+              this.fontSize = individualSetting?.fontSize || myself.userSettings.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
             }
 
             this.rendition.themes.select(this.selectedTheme);

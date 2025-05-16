@@ -2,16 +2,20 @@ package com.adityachandel.booklore.service.user;
 
 import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.mapper.BookLoreUserMapper;
+import com.adityachandel.booklore.mapper.custom.BookLoreUserTransformer;
+import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.request.ChangePasswordRequest;
 import com.adityachandel.booklore.model.dto.request.ChangeUserPasswordRequest;
-import com.adityachandel.booklore.model.dto.settings.BookPreferences;
-import com.adityachandel.booklore.model.dto.BookLoreUser;
+import com.adityachandel.booklore.model.dto.request.UpdateUserSettingRequest;
 import com.adityachandel.booklore.model.dto.request.UserUpdateRequest;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.model.entity.UserSettingEntity;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,15 +30,16 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final BookLoreUserMapper bookLoreUserMapper;
     private final LibraryRepository libraryRepository;
     private final AuthenticationService authenticationService;
     private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
+    private final BookLoreUserTransformer bookLoreUserTransformer;
 
     public List<BookLoreUser> getBookLoreUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(bookLoreUserMapper::toDto)
+                .map(bookLoreUserTransformer::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +63,7 @@ public class UserService {
         }
 
         userRepository.save(user);
-        return bookLoreUserMapper.toDto(user);
+        return bookLoreUserTransformer.toDTO(user);
     }
 
     public void deleteUser(Long id) {
@@ -80,14 +85,7 @@ public class UserService {
 
     public BookLoreUser getBookLoreUser(Long id) {
         BookLoreUserEntity user = userRepository.findById(id).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(id));
-        return bookLoreUserMapper.toDto(user);
-    }
-
-
-    public void updateBookPreferences(long userId, BookPreferences bookPreferences) {
-        BookLoreUserEntity user = userRepository.findById(userId).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(userId));
-        user.setBookPreferences(bookPreferences);
-        userRepository.save(user);
+        return bookLoreUserTransformer.toDTO(user);
     }
 
     public BookLoreUser getMyself() {
@@ -123,6 +121,38 @@ public class UserService {
         }
         userEntity.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(userEntity);
+    }
+
+    public void updateUserSetting(Long userId, UpdateUserSettingRequest request) {
+        BookLoreUserEntity user = userRepository.findById(userId).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(userId));
+
+        String key = request.getKey();
+        Object value = request.getValue();
+
+        if (key == null || key.isBlank()) {
+            throw ApiError.INVALID_INPUT.createException("Setting key cannot be null or blank.");
+        }
+
+        JsonNode valueNode = objectMapper.valueToTree(value);
+
+        UserSettingEntity setting = user.getSettings().stream()
+                .filter(s -> s.getSettingKey().equals(key))
+                .findFirst()
+                .orElseGet(() -> {
+                    UserSettingEntity newSetting = new UserSettingEntity();
+                    newSetting.setUser(user);
+                    newSetting.setSettingKey(key);
+                    user.getSettings().add(newSetting);
+                    return newSetting;
+                });
+
+        try {
+            setting.setSettingValue(objectMapper.writeValueAsString(valueNode));
+        } catch (JsonProcessingException e) {
+            throw ApiError.INVALID_INPUT.createException("Could not serialize setting value.");
+        }
+
+        userRepository.save(user);
     }
 
     private boolean meetsMinimumPasswordRequirements(String password) {

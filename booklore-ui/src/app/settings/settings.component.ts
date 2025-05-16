@@ -1,6 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
-import {BookPreferences} from './book-preferences/book-preferences.component';
 import {UserService} from './user-management/user.service';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {EmailComponent} from './email/email.component';
@@ -8,7 +7,8 @@ import {GlobalPreferencesComponent} from './global-preferences/global-preference
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {UserManagementComponent} from './user-management/user-management.component';
-import {AuthenticationSettingsComponent} from '../oauth2-management/authentication-settings.component';
+import {AuthenticationSettingsComponent} from '../core/security/oauth2-management/authentication-settings.component';
+import {UserPreferences} from './user-preferences/user-preferences.component';
 
 export enum SettingsTab {
   BookReader = 'book-reader',
@@ -26,7 +26,7 @@ export enum SettingsTab {
     Tab,
     TabPanels,
     TabPanel,
-    BookPreferences,
+    UserPreferences,
     NgIf,
     AsyncPipe,
     EmailComponent,

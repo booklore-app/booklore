@@ -12,9 +12,9 @@ import {MessageService} from 'primeng/api';
 
 import {AppSettingsService} from '../../core/service/app-settings.service';
 import {BookService} from '../../book/service/book.service';
-import {AppSettings} from '../../core/model/app-settings.model';
-import {MetadataRefreshOptions} from '../../metadata/model/request/metadata-refresh-options.model';
-import {MetadataAdvancedFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
+import {AppSettingKey, AppSettings} from '../../core/model/app-settings.model';
+import {MetadataRefreshOptions} from '../../book/metadata/model/request/metadata-refresh-options.model';
+import {MetadataAdvancedFetchOptionsComponent} from '../../book/metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
 import {filter, take} from 'rxjs/operators';
 import {FileUploadPatternComponent} from './file-upload-pattern/file-upload-pattern.component';
 import {OpdsSettingsComponent} from './opds-settings/opds-settings.component';
@@ -38,7 +38,7 @@ import {OpdsSettingsComponent} from './opds-settings/opds-settings.component';
   styleUrl: './global-preferences.component.scss'
 })
 export class GlobalPreferencesComponent implements OnInit {
-  resolutionOptions = [
+  readonly resolutionOptions = [
     {label: '250x350', value: '250x350'},
     {label: '375x525', value: '375x525'},
     {label: '500x700', value: '500x700'},
@@ -46,9 +46,13 @@ export class GlobalPreferencesComponent implements OnInit {
   ];
 
   selectedResolution = '250x350';
+
+  toggles = {
+    autoBookSearch: false,
+    similarBookRecommendation: false,
+  };
+
   currentMetadataOptions!: MetadataRefreshOptions;
-  autoMetadataChecked = false;
-  recommendationEnabled = false;
 
   private appSettingsService = inject(AppSettingsService);
   private bookService = inject(BookService);
@@ -56,10 +60,9 @@ export class GlobalPreferencesComponent implements OnInit {
 
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
-
   ngOnInit(): void {
     this.appSettings$.pipe(
-      filter(settings => settings != null),
+      filter(settings => !!settings),
       take(1)
     ).subscribe(settings => {
       if (settings?.coverResolution) {
@@ -68,27 +71,31 @@ export class GlobalPreferencesComponent implements OnInit {
       if (settings.metadataRefreshOptions) {
         this.currentMetadataOptions = settings.metadataRefreshOptions;
       }
-      this.autoMetadataChecked = settings.autoBookSearch ?? false;
-      this.recommendationEnabled = settings.similarBookRecommendation ?? false;
+      this.toggles.autoBookSearch = settings.autoBookSearch ?? false;
+      this.toggles.similarBookRecommendation = settings.similarBookRecommendation ?? false;
     });
   }
 
   onResolutionChange(): void {
-    if (this.selectedResolution) {
-      this.saveSetting('cover_image_resolution', this.selectedResolution);
+    this.saveSetting(AppSettingKey.COVER_IMAGE_RESOLUTION, this.selectedResolution);
+  }
+
+  onToggleChange(settingKey: keyof typeof this.toggles, checked: boolean): void {
+    this.toggles[settingKey] = checked;
+    const toggleKeyMap: Record<string, AppSettingKey> = {
+      autoBookSearch: AppSettingKey.AUTO_BOOK_SEARCH,
+      similarBookRecommendation: AppSettingKey.SIMILAR_BOOK_RECOMMENDATION,
+    };
+    const keyToSend = toggleKeyMap[settingKey];
+    if (keyToSend) {
+      this.saveSetting(keyToSend, checked);
+    } else {
+      console.warn(`Unknown toggle key: ${settingKey}`);
     }
   }
 
-  onAutoMetaChange(event: { checked: boolean }): void {
-    this.saveSetting('auto_book_search', event.checked);
-  }
-
-  onToggleRecommendation(event: { checked: boolean }) {
-    this.saveSetting('similar_book_recommendation', event.checked);
-  }
-
   onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions): void {
-    this.saveSetting('quick_book_match', metadataRefreshOptions);
+    this.saveSetting(AppSettingKey.QUICK_BOOK_MATCH, metadataRefreshOptions);
   }
 
   regenerateCovers(): void {

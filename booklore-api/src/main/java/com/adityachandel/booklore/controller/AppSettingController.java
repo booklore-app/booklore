@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.controller;
 
+import com.adityachandel.booklore.model.dto.settings.AppSettingKey;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
 import com.adityachandel.booklore.model.dto.settings.SettingRequest;
 import com.adityachandel.booklore.service.AppSettingService;
@@ -24,7 +25,8 @@ public class AppSettingController {
     @PutMapping
     public void updateSettings(@RequestBody List<SettingRequest> settingRequests) throws JsonProcessingException {
         for (SettingRequest settingRequest : settingRequests) {
-            appSettingService.updateSetting(settingRequest.getName(), settingRequest.getValue());
+            AppSettingKey key = AppSettingKey.valueOf(settingRequest.getName());
+            appSettingService.updateSetting(key, settingRequest.getValue());
         }
     }
 }

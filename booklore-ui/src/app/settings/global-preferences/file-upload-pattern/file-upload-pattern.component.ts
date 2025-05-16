@@ -56,7 +56,7 @@ export class FileUploadPatternComponent implements OnInit {
   }
 
   savePattern(): void {
-    this.saveSetting('upload_file_pattern', this.uploadPattern);
+    this.saveSetting('UPLOAD_FILE_PATTERN', this.uploadPattern);
   }
 
   private saveSetting(key: string, value: unknown): void {

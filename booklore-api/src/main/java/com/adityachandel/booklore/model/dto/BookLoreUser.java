@@ -1,8 +1,11 @@
 package com.adityachandel.booklore.model.dto;
 
-import com.adityachandel.booklore.model.dto.settings.BookPreferences;
+import com.adityachandel.booklore.model.dto.settings.SidebarSortOption;
 import com.adityachandel.booklore.model.enums.ProvisioningMethod;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -16,7 +19,7 @@ public class BookLoreUser {
     private ProvisioningMethod provisioningMethod;
     private List<Library> assignedLibraries;
     private UserPermissions permissions;
-    private BookPreferences bookPreferences;
+    private UserSettings userSettings;
 
     @Data
     public static class UserPermissions {
@@ -26,5 +29,47 @@ public class BookLoreUser {
         private boolean canEditMetadata;
         private boolean canManipulateLibrary;
         private boolean canEmailBook;
+    }
+
+    @Data
+    public static class UserSettings {
+        public PerBookSetting perBookSetting;
+        public PdfReaderSetting pdfReaderSetting;
+        public EpubReaderSetting epubReaderSetting;
+        public SidebarSortOption sidebarLibrarySorting;
+        public SidebarSortOption sidebarShelfSorting;
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class EpubReaderSetting {
+            private String theme;
+            private String font;
+            private int fontSize;
+        }
+
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class PdfReaderSetting {
+            private String pageSpread;
+            private String pageZoom;
+        }
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class PerBookSetting {
+            private GlobalOrIndividual pdf;
+            private GlobalOrIndividual epub;
+
+            public enum GlobalOrIndividual {
+                Global, Individual
+            }
+        }
     }
 }

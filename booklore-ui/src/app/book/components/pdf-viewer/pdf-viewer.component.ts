@@ -51,13 +51,13 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
           const pdfData = results[2];
           const myself = results[3];
 
-          let globalOrIndividual = myself.bookPreferences.perBookSetting.pdf;
+          let globalOrIndividual = myself.userSettings.perBookSetting.pdf;
           if (globalOrIndividual === 'Global') {
-            this.zoom = myself.bookPreferences.pdfReaderSetting.pageZoom || 'page-fit';
-            this.spread = myself.bookPreferences.pdfReaderSetting.pageSpread || 'odd';
+            this.zoom = myself.userSettings.pdfReaderSetting.pageZoom || 'page-fit';
+            this.spread = myself.userSettings.pdfReaderSetting.pageSpread || 'odd';
           } else {
-            this.zoom = pdfPrefs.pdfSettings?.zoom || myself.bookPreferences.pdfReaderSetting.pageZoom || 'page-fit';
-            this.spread = pdfPrefs.pdfSettings?.spread || myself.bookPreferences.pdfReaderSetting.pageSpread || 'odd';
+            this.zoom = pdfPrefs.pdfSettings?.zoom || myself.userSettings.pdfReaderSetting.pageZoom || 'page-fit';
+            this.spread = pdfPrefs.pdfSettings?.spread || myself.userSettings.pdfReaderSetting.pageSpread || 'odd';
           }
           this.page = pdfMeta.pdfProgress || 1;
           this.bookData = pdfData;

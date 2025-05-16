@@ -1,29 +1,29 @@
 <div *ngIf="userService.userData$ | async as userData">
   <div class="rounded-xl overflow-hidden">
-    <p-tabs [(value)]="activeTab">
+    <p-tabs [(value)]="activeTab" scrollable>
       <p-tablist>
-        <p-tab [value]="SettingsTab.BookReader">Reader Settings</p-tab>
+        <p-tab [value]="SettingsTab.BookReader">User Preferences</p-tab>
         <ng-container *ngIf="userData.permissions.admin">
+          <p-tab [value]="SettingsTab.GlobalSettings">Global Settings</p-tab>
           <p-tab [value]="SettingsTab.UserManagement">User Management</p-tab>
           <p-tab [value]="SettingsTab.Email">Email Setting</p-tab>
-          <p-tab [value]="SettingsTab.GlobalSettings">Admin Settings</p-tab>
           <p-tab [value]="SettingsTab.AuthenticationSettings">Authentication Settings</p-tab>
         </ng-container>
       </p-tablist>
 
       <p-tabpanels>
         <p-tabpanel [value]="SettingsTab.BookReader">
-          <app-book-preferences></app-book-preferences>
+          <app-user-preferences></app-user-preferences>
         </p-tabpanel>
         <ng-container *ngIf="userData.permissions.admin">
+          <p-tabpanel [value]="SettingsTab.GlobalSettings">
+            <app-global-preferences></app-global-preferences>
+          </p-tabpanel>
           <p-tabpanel [value]="SettingsTab.UserManagement">
             <app-user-management></app-user-management>
           </p-tabpanel>
           <p-tabpanel [value]="SettingsTab.Email">
             <app-email></app-email>
-          </p-tabpanel>
-          <p-tabpanel [value]="SettingsTab.GlobalSettings">
-            <app-global-preferences></app-global-preferences>
           </p-tabpanel>
           <p-tabpanel [value]="SettingsTab.AuthenticationSettings">
             <app-authentication-settings></app-authentication-settings>

@@ -1,7 +1,5 @@
 package com.adityachandel.booklore.model.entity;
 
-import com.adityachandel.booklore.convertor.BookPreferencesConverter;
-import com.adityachandel.booklore.model.dto.settings.BookPreferences;
 import com.adityachandel.booklore.model.enums.ProvisioningMethod;
 import jakarta.persistence.*;
 import lombok.*;
@@ -46,23 +44,22 @@ public class BookLoreUserEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "book_preferences")
-    @Convert(converter = BookPreferencesConverter.class)
-    private BookPreferences bookPreferences;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserPermissionsEntity permissions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<ShelfEntity> shelves = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_library_mapping",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "library_id")
     )
     private List<LibraryEntity> libraries;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<UserSettingEntity> settings = new HashSet<>();
 
     @PrePersist
     public void prePersist() {

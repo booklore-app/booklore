@@ -2,7 +2,7 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.request.ChangePasswordRequest;
 import com.adityachandel.booklore.model.dto.request.ChangeUserPasswordRequest;
-import com.adityachandel.booklore.model.dto.settings.BookPreferences;
+import com.adityachandel.booklore.model.dto.request.UpdateUserSettingRequest;
 import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.request.UserUpdateRequest;
 import com.adityachandel.booklore.service.user.UserService;
@@ -64,10 +64,9 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/book-preferences")
+    @PutMapping("/{id}/settings")
     @PreAuthorize("@securityUtil.isSelf(#id)")
-    public void updateUserBookPreferences(@PathVariable Long id, @RequestBody BookPreferences bookPreferences) {
-        userService.updateBookPreferences(id, bookPreferences);
+    public void updateUserSetting(@PathVariable Long id, @RequestBody UpdateUserSettingRequest request) {
+        userService.updateUserSetting(id, request);
     }
-
 }

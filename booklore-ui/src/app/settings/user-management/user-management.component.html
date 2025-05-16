@@ -1,7 +1,7 @@
 <div class="w-full h-[calc(100vh-12.1rem)] overflow-y-auto border rounded-lg p-4 enclosing-container">
 
-  <div class="flex justify-between items-center pb-2 pt-4">
-    <h2 class="text-xl flex items-center gap-2">
+  <div class="flex justify-between items-center pb-2 pt-2">
+    <h2 class="text-lg font-bold flex items-center gap-2">
       Current Booklore Users
     </h2>
     <p-button outlined="true" label="Create BookLore User" icon="pi pi-plus" (onClick)="openCreateUserDialog()"></p-button>
@@ -70,12 +70,12 @@
           <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook" disabled *ngIf="!user.isEditing"></p-checkbox>
         </td>
         <td class="text-center">
-          <ng-container *ngIf="user.username !== 'admin'">
+          <ng-container *ngIf="!user.permissions.admin">
             <p-button *ngIf="!user.isEditing" icon="pi pi-pencil" outlined="true" severity="info" (onClick)="toggleEdit(user)"></p-button>
             <p-button *ngIf="user.isEditing" icon="pi pi-check" outlined="true" severity="success" (onClick)="saveUser(user)"></p-button>
             <p-button *ngIf="user.isEditing" icon="pi pi-times" outlined="true" severity="danger" (onClick)="toggleEdit(user)"></p-button>
           </ng-container>
-          <p-button *ngIf="user.username === 'admin'"
+          <p-button *ngIf="!user.permissions.admin"
                     icon="pi pi-pencil"
                     outlined="true"
                     severity="primary"
@@ -83,12 +83,12 @@
           </p-button>
         </td>
         <td class="text-center">
-          <ng-container *ngIf="user.username !== 'admin'">
+          <ng-container *ngIf="!user.permissions.admin">
             <p-button icon="pi pi-key" outlined="true" severity="warn" (onClick)="openChangePasswordDialog(user)"></p-button>
           </ng-container>
         </td>
         <td class="text-center">
-          <ng-container *ngIf="user.username !== 'admin'">
+          <ng-container *ngIf="!user.permissions.admin">
             <p-button icon="pi pi-trash" outlined="true" severity="danger" (onClick)="deleteUser(user)"></p-button>
           </ng-container>
         </td>

@@ -1,0 +1,40 @@
+package com.adityachandel.booklore.model.dto.settings;
+
+import lombok.Getter;
+
+@Getter
+public enum AppSettingKey {
+    QUICK_BOOK_MATCH("quick_book_match", true),
+    AUTO_BOOK_SEARCH("auto_book_search", false),
+    COVER_IMAGE_RESOLUTION("cover_image_resolution", false),
+    SIMILAR_BOOK_RECOMMENDATION("similar_book_recommendation", false),
+    UPLOAD_FILE_PATTERN("upload_file_pattern", false),
+    OPDS_SERVER_ENABLED("opds_server_enabled", false),
+    OIDC_ENABLED("oidc_enabled", false),
+    OIDC_PROVIDER_DETAILS("oidc_provider_details", true),
+    OIDC_AUTO_PROVISION_DETAILS("oidc_auto_provision_details", true),
+    SIDEBAR_LIBRARY_SORTING("sidebar_library_sorting", true),
+    SIDEBAR_SHELF_SORTING("sidebar_shelf_sorting", true);
+
+    private final String dbKey;
+    private final boolean isJson;
+
+    AppSettingKey(String dbKey, boolean isJson) {
+        this.dbKey = dbKey;
+        this.isJson = isJson;
+    }
+
+    @Override
+    public String toString() {
+        return dbKey;
+    }
+
+    public static AppSettingKey fromDbKey(String dbKey) {
+        for (AppSettingKey key : values()) {
+            if (key.dbKey.equals(dbKey)) {
+                return key;
+            }
+        }
+        throw new IllegalArgumentException("Unknown setting key: " + dbKey);
+    }
+}

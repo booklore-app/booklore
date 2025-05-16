@@ -6,6 +6,43 @@ import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {Library} from '../../book/model/library.model';
 import {catchError} from 'rxjs/operators';
 
+export interface SidebarLibrarySorting {
+  field: string;
+  order: string;
+}
+
+export interface SidebarShelfSorting {
+  field: string;
+  order: string;
+}
+
+export interface PerBookSetting {
+  pdf: string;
+  epub: string;
+}
+
+export type PageSpread = 'off' | 'even' | 'odd';
+
+export interface PdfReaderSetting {
+  pageSpread: PageSpread;
+  pageZoom: string;
+  showSidebar: boolean;
+}
+
+export interface EpubReaderSetting {
+  theme: string;
+  font: string;
+  fontSize: number;
+}
+
+export interface UserSettings {
+  perBookSetting: PerBookSetting;
+  pdfReaderSetting: PdfReaderSetting;
+  epubReaderSetting: EpubReaderSetting;
+  sidebarLibrarySorting: SidebarLibrarySorting;
+  sidebarShelfSorting: SidebarShelfSorting
+}
+
 export interface User {
   id: number;
   username: string;
@@ -20,25 +57,8 @@ export interface User {
     canEditMetadata: boolean;
     canManipulateLibrary: boolean;
   };
-  bookPreferences: UserBookPreferences;
+  userSettings: UserSettings;
   provisioningMethod?: 'LOCAL' | 'OIDC' | 'REMOTE';
-}
-
-export interface UserBookPreferences {
-  perBookSetting: {
-    pdf: string;
-    epub: string;
-  };
-  pdfReaderSetting: {
-    pageSpread: 'off' | 'even' | 'odd';
-    pageZoom: string;
-    showSidebar: boolean;
-  };
-  epubReaderSetting: {
-    theme: string;
-    font: string;
-    fontSize: number;
-  };
 }
 
 @Injectable({
@@ -67,10 +87,6 @@ export class UserService {
     return this.http.get<User>(`${this.userUrl}/me`);
   }
 
-  getLocalUser(): User | null {
-    return this.userDataSubject.getValue();
-  }
-
   createUser(userData: Omit<User, 'id'>): Observable<void> {
     return this.http.post<void>(this.apiUrl, userData);
   }
@@ -80,11 +96,7 @@ export class UserService {
   }
 
   updateUser(userId: number, updateData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.userUrl}/${userId}`, updateData).pipe(
-      tap(user => {
-        this.userDataSubject.next(user);
-      })
-    );
+    return this.http.put<User>(`${this.userUrl}/${userId}`, updateData);
   }
 
   deleteUser(userId: number): Observable<void> {
@@ -117,15 +129,22 @@ export class UserService {
     );
   }
 
-  updateBookPreferences(userId: number, prefs: UserBookPreferences): void {
-    this.http.put<void>(`${this.userUrl}/${userId}/book-preferences`, prefs)
-      .subscribe(() => {
-        const currentUser = this.userDataSubject.getValue();
-        if (currentUser) {
-          const updatedUser = {...currentUser, bookPreferences: {...prefs}};
-          this.userDataSubject.next(updatedUser);
-        }
-      });
+  updateUserSetting(userId: number, key: string, value: any): void {
+    const payload = {
+      key,
+      value
+    };
+    this.http.put<void>(`${this.userUrl}/${userId}/settings`, payload, {
+      headers: {'Content-Type': 'application/json'},
+      responseType: 'text' as 'json'
+    }).subscribe(() => {
+      const currentUser = this.userDataSubject.getValue();
+      if (currentUser) {
+        const updatedSettings = {...currentUser.userSettings, [key]: value};
+        const updatedUser = {...currentUser, settings: updatedSettings};
+        this.userDataSubject.next(updatedUser);
+      }
+    });
   }
 
   private startWebSocket(): void {

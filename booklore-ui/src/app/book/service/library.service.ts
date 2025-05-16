@@ -7,7 +7,7 @@ import {BookService} from './book.service';
 import {SortOption} from '../model/sort.model';
 import {LibraryState} from '../model/state/library-state.model';
 import {API_CONFIG} from '../../config/api-config';
-import {FetchMetadataRequest} from '../../metadata/model/request/fetch-metadata-request.model';
+import {FetchMetadataRequest} from '../metadata/model/request/fetch-metadata-request.model';
 import {BookMetadata} from '../model/book.model';
 
 @Injectable({
