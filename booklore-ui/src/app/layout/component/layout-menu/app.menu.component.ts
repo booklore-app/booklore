@@ -57,20 +57,32 @@ export class AppMenuComponent implements OnInit {
     );
 
     this.shelfMenu$ = this.shelfService.shelfState$.pipe(
-      map((state) => [
-        {
-          label: 'Shelves',
-          separator: false,
-          items: state.shelves?.map((shelf) => ({
-            menu: this.libraryShelfMenuService.initializeShelfMenuItems(shelf),
-            label: shelf.name,
-            type: 'Shelf',
-            icon: 'pi pi-' + shelf.icon,
-            routerLink: [`/shelf/${shelf.id}/books`],
-            bookCount$: this.shelfService.getBookCount(shelf.id ?? 0),
-          })) || [],
-        },
-      ])
+      map((state) => {
+        const shelves = state.shelves?.map((shelf) => ({
+          menu: this.libraryShelfMenuService.initializeShelfMenuItems(shelf),
+          label: shelf.name,
+          type: 'Shelf',
+          icon: 'pi pi-' + shelf.icon,
+          routerLink: [`/shelf/${shelf.id}/books`],
+          bookCount$: this.shelfService.getBookCount(shelf.id ?? 0),
+        })) || [];
+
+        const unshelvedItem = {
+          label: 'Unshelved',
+          type: 'Shelf',
+          icon: 'pi pi-inbox',
+          routerLink: ['/unshelved-books'],
+          bookCount$: this.shelfService.getUnshelvedBookCount?.() ?? of(0),
+        };
+
+        return [
+          {
+            label: 'Shelves',
+            separator: false,
+            items: [unshelvedItem, ...shelves],
+          },
+        ];
+      })
     );
 
     this.homeMenu$ = this.bookService.bookState$.pipe(

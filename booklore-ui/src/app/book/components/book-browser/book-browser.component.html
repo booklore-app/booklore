@@ -3,14 +3,17 @@
     <div class="flex justify-between items-center p-2 rounded-t-xl mb-4 bg-[var(--card-background)]">
       <div class="flex items-center pl-2">
         <ng-container *ngIf="entityType$ | async as entityType">
-          <p *ngIf="entityType !== EntityType.ALL_BOOKS" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
+          <p *ngIf="entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
             {{ entityType }}: {{ (entity$ | async)?.name }}
           </p>
           <p *ngIf="entityType === EntityType.ALL_BOOKS" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
             All Books
           </p>
+          <p *ngIf="entityType === EntityType.UNSHELVED" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
+            Unshelved Books
+          </p>
           <div *ngIf="userService.userData$ | async as userData">
-            <div *ngIf="entityType !== EntityType.ALL_BOOKS && userData.permissions.canManipulateLibrary">
+            <div *ngIf="entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED && userData.permissions.canManipulateLibrary">
               <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"></p-button>
               <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
             </div>
@@ -126,7 +129,7 @@
           <div class="flex justify-between gap-8">
             <ng-container *ngIf="entityType$ | async as entityType">
               <p-button
-                *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"
+                *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS || entityType === EntityType.UNSHELVED"
                 icon="pi pi-bookmark-fill"
                 outlined="true"
                 severity="info"

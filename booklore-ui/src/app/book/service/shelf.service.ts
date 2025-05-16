@@ -106,4 +106,12 @@ export class ShelfService {
       )
     );
   }
+
+  getUnshelvedBookCount(): Observable<number> {
+    return this.bookService.bookState$.pipe(
+      map(state =>
+        (state.books || []).filter(book => !book.shelves || book.shelves.length === 0).length
+      )
+    );
+  }
 }

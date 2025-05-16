@@ -38,6 +38,7 @@ export const routes: Routes = [
       {path: 'settings', component: SettingsComponent, canActivate: [AuthGuard]},
       {path: 'library/:libraryId/books', component: BookBrowserComponent, canActivate: [AuthGuard]},
       {path: 'shelf/:shelfId/books', component: BookBrowserComponent, canActivate: [AuthGuard]},
+      {path: 'unshelved-books', component: BookBrowserComponent, canActivate: [AuthGuard]},
       {path: 'book/:bookId', component: BookMetadataCenterComponent, canActivate: [AuthGuard]}
     ]
   },

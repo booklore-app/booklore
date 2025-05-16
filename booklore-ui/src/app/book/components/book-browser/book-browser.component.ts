@@ -36,7 +36,8 @@ import {LockUnlockMetadataDialogComponent} from './lock-unlock-metadata-dialog/l
 export enum EntityType {
   LIBRARY = 'Library',
   SHELF = 'Shelf',
-  ALL_BOOKS = 'All Books'
+  ALL_BOOKS = 'All Books',
+  UNSHELVED = 'Unshelved Books',
 }
 
 const QUERY_PARAMS = {
@@ -137,20 +138,20 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.bookService.loadBooks();
 
-    const isAllBooksRoute = this.activatedRoute.snapshot.routeConfig?.path === 'all-books';
+    const currentPath = this.activatedRoute.snapshot.routeConfig?.path;
 
-    if (isAllBooksRoute) {
+    if (currentPath === 'all-books') {
       this.entityType = EntityType.ALL_BOOKS;
       this.entityType$ = of(EntityType.ALL_BOOKS);
       this.entity$ = of(null);
-      this.bookState$ = this.fetchAllBooks();
+
+    } else if (currentPath === 'unshelved-books') {
+      this.entityType = EntityType.UNSHELVED;
+      this.entityType$ = of(EntityType.UNSHELVED);
+      this.entity$ = of(null);
+
     } else {
-
       const routeEntityInfo$ = this.getEntityInfoFromRoute();
-
-      this.bookState$ = routeEntityInfo$.pipe(
-        switchMap(({entityId, entityType}) => this.fetchBooksByEntity(entityId, entityType)),
-      );
 
       this.entity$ = routeEntityInfo$.pipe(
         switchMap(({entityId, entityType}) => this.fetchEntity(entityId, entityType))
@@ -255,6 +256,23 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     );
   }
 
+  private fetchUnshelvedBooks(): Observable<BookState> {
+    return this.bookService.bookState$.pipe(
+      map(bookState => {
+        const unshelvedBooks = (bookState.books || []).filter(book =>
+          !book.shelves || book.shelves.length === 0
+        );
+        return {
+          ...bookState,
+          books: unshelvedBooks
+        };
+      }),
+      map(bookState => this.processBookState(bookState)),
+      switchMap(bookState => this.headerFilter(bookState)),
+      switchMap(bookState => this.sideBarFilter(bookState))
+    );
+  }
+
   private sideBarFilter(bookState: BookState): Observable<BookState> {
     return this.selectedFilter.pipe(
       map((activeFilters: Record<string, any[]> | null) => {
@@ -287,7 +305,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           });
         });
 
-        return { ...bookState, books: filteredBooks };
+        return {...bookState, books: filteredBooks};
       })
     );
   }
@@ -397,6 +415,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   applySortOption(sortOption: SortOption): void {
     if (this.entityType === EntityType.ALL_BOOKS) {
       this.bookState$ = this.fetchAllBooks();
+    } else if (this.entityType === EntityType.UNSHELVED) {
+      this.bookState$ = this.fetchUnshelvedBooks();
     } else {
       const routeParam$ = this.getEntityInfoFromRoute();
       this.bookState$ = routeParam$.pipe(
