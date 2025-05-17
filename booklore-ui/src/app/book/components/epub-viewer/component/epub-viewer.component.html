@@ -33,6 +33,9 @@
               <p-divider></p-divider>
               <label for="theme">Theme:</label>
               <p-select id="theme" [options]="themes" [(ngModel)]="selectedTheme" (onChange)="changeThemes()"></p-select>
+              <p-divider></p-divider>
+              <label for="flow">Flow:</label>
+              <p-select id="flow" [options]="flows" [(ngModel)]="selectedFlow" (onChange)="changeScrollMode()"></p-select>
             </div>
           </div>
         </p-drawer>
@@ -42,7 +45,7 @@
 
     <div id="epubContainer" #epubContainer></div>
 
-    <button *ngIf="!isMobile" class="epub-controls-left" (click)="prevPage()">←</button>
-    <button *ngIf="!isMobile" class="epub-controls-right" (click)="nextPage()">→</button>
+    <button *ngIf="selectedFlow !== 'scrolled'" class="epub-controls-left" (click)="prevPage()">←</button>
+    <button *ngIf="selectedFlow !== 'scrolled'" class="epub-controls-right" (click)="nextPage()">→</button>
   </div>
 </div>

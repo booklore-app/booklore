@@ -33,6 +33,7 @@ export interface EpubReaderSetting {
   theme: string;
   font: string;
   fontSize: number;
+  flow: string;
 }
 
 export interface UserSettings {

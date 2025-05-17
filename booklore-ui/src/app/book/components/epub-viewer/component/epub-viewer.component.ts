@@ -18,6 +18,7 @@ const FALLBACK_EPUB_SETTINGS = {
   fontSize: 150,
   fontType: 'serif',
   theme: 'white',
+  flow: 'paginated',
   maxFontSize: 300,
   minFontSize: 50,
 };
@@ -60,16 +61,15 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   currentChapter = '';
   isDrawerVisible = false;
   isSettingsDrawerVisible = false;
-  isMobile = false; 
+
   private book: any;
   private rendition: any;
   private keyListener: (e: KeyboardEvent) => void = () => {
   };
 
   fontSize = FALLBACK_EPUB_SETTINGS.fontSize;
-  selectedFontType = FALLBACK_EPUB_SETTINGS.fontType;
-  selectedTheme = FALLBACK_EPUB_SETTINGS.theme;
 
+  selectedFontType = FALLBACK_EPUB_SETTINGS.fontType;
   fontTypes: any[] = [
     {label: 'Serif', value: 'serif'},
     {label: 'Sans Serif', value: 'sans-serif'},
@@ -78,11 +78,18 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     {label: 'Monospace', value: 'monospace'},
   ];
 
+  selectedTheme = FALLBACK_EPUB_SETTINGS.theme;
   themes: any[] = [
     {label: 'White', value: 'white'},
     {label: 'Black', value: 'black'},
     {label: 'Grey', value: 'grey'},
     {label: 'Sepia', value: 'sepia'},
+  ];
+
+  selectedFlow = FALLBACK_EPUB_SETTINGS.flow;
+  flows: any[] = [
+    {label: 'Scrolled', value: 'scrolled'},
+    {label: 'Paginated', value: 'paginated'}
   ];
 
   private route = inject(ActivatedRoute);
@@ -115,8 +122,6 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
           fileReader.onload = () => {
             this.book = ePub(fileReader.result as ArrayBuffer);
 
-            this.isMobile = window.innerWidth <= 768;
-
             this.book.loaded.navigation.then((nav: any) => {
               this.chapters = nav.toc.map((chapter: any) => ({
                 label: chapter.label,
@@ -124,9 +129,15 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
               }));
             });
 
+            let globalOrIndividual = myself.userSettings.perBookSetting.epub;
+
+            const flow = globalOrIndividual === 'Global'
+              ? myself.userSettings.epubReaderSetting.flow || 'paginated'
+              : individualSetting?.flow || myself.userSettings.epubReaderSetting.flow || 'paginated';
+
             this.rendition = this.book.renderTo(this.epubContainer.nativeElement, {
-              flow: this.isMobile ? 'scrolled' : 'paginated',
-              manager: this.isMobile ? 'continuous' : 'default',
+              flow,
+              manager: flow === 'scrolled' ? 'continuous' : 'default',
               width: '100%',
               height: '100%',
               allowScriptedContent: true,
@@ -142,15 +153,16 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
               this.rendition.themes.register(name, theme);
             });
 
-            let globalOrIndividual = myself.userSettings.perBookSetting.epub;
             if (globalOrIndividual === 'Global') {
               this.selectedTheme = myself.userSettings.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
               this.selectedFontType = myself.userSettings.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
               this.fontSize = myself.userSettings.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+              this.selectedFlow = myself.userSettings.epubReaderSetting.flow || FALLBACK_EPUB_SETTINGS.flow;
             } else {
               this.selectedTheme = individualSetting?.theme || myself.userSettings.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
               this.selectedFontType = individualSetting?.font || myself.userSettings.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;
               this.fontSize = individualSetting?.fontSize || myself.userSettings.epubReaderSetting.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+              this.selectedFlow = individualSetting?.flow || myself.userSettings.epubReaderSetting.flow || FALLBACK_EPUB_SETTINGS.flow;
             }
 
             this.rendition.themes.select(this.selectedTheme);
@@ -170,6 +182,31 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
         }
       });
     });
+  }
+
+  changeScrollMode(): void {
+    if (!this.rendition || !this.book) return;
+
+    const cfi = this.rendition.currentLocation()?.start?.cfi;
+    this.rendition.destroy();
+
+    this.rendition = this.book.renderTo(this.epubContainer.nativeElement, {
+      flow: this.selectedFlow,
+      manager: this.selectedFlow === 'scrolled' ? 'continuous' : 'default',
+      width: '100%',
+      height: '100%',
+      allowScriptedContent: true,
+    });
+
+    this.themesMap.forEach((theme, name) => this.rendition.themes.register(name, theme));
+    this.rendition.themes.select(this.selectedTheme);
+    this.rendition.themes.font(this.selectedFontType);
+    this.rendition.themes.fontSize(`${this.fontSize}%`);
+
+    this.setupKeyListener();
+    this.trackProgress();
+    this.rendition.display(cfi || undefined);
+    this.updateViewerSetting();
   }
 
   changeThemes(): void {
@@ -211,6 +248,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
         theme: this.selectedTheme,
         font: this.selectedFontType,
         fontSize: this.fontSize,
+        flow: this.selectedFlow
       }
     }
     this.bookService.updateViewerSetting(bookSetting, this.epub.id).subscribe();
@@ -333,5 +371,4 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     }
     ]
   ]);
-
 }

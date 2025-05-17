@@ -32,4 +32,7 @@ public class EpubViewerPreferencesEntity {
 
     @Column(name = "font_size")
     private Integer fontSize;
+
+    @Column(name = "flow")
+    private String flow;
 }

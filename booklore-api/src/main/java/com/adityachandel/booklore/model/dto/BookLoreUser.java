@@ -47,6 +47,7 @@ public class BookLoreUser {
             private String theme;
             private String font;
             private int fontSize;
+            private String flow;
         }
 
 
