@@ -96,7 +96,7 @@ public class VersionService {
                 if (num1 < num2) return false;
             }
         } catch (Exception e) {
-            log.error("Version comparison failed", e);
+            log.error("Version comparison failed: {}", e.getMessage());
         }
         return false;
     }
