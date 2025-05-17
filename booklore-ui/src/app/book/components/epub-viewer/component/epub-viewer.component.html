@@ -42,7 +42,7 @@
 
     <div id="epubContainer" #epubContainer></div>
 
-    <button class="epub-controls-left" (click)="prevPage()">←</button>
-    <button class="epub-controls-right" (click)="nextPage()">→</button>
+    <button *ngIf="!isMobile" class="epub-controls-left" (click)="prevPage()">←</button>
+    <button *ngIf="!isMobile" class="epub-controls-right" (click)="nextPage()">→</button>
   </div>
 </div>

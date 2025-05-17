@@ -60,6 +60,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   currentChapter = '';
   isDrawerVisible = false;
   isSettingsDrawerVisible = false;
+  isMobile = false; 
   private book: any;
   private rendition: any;
   private keyListener: (e: KeyboardEvent) => void = () => {
@@ -114,6 +115,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
           fileReader.onload = () => {
             this.book = ePub(fileReader.result as ArrayBuffer);
 
+            this.isMobile = window.innerWidth <= 768;
+
             this.book.loaded.navigation.then((nav: any) => {
               this.chapters = nav.toc.map((chapter: any) => ({
                 label: chapter.label,
@@ -122,7 +125,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
             });
 
             this.rendition = this.book.renderTo(this.epubContainer.nativeElement, {
-              flow: 'paginated',
+              flow: this.isMobile ? 'scrolled' : 'paginated',
+              manager: this.isMobile ? 'continuous' : 'default',
               width: '100%',
               height: '100%',
               allowScriptedContent: true,
