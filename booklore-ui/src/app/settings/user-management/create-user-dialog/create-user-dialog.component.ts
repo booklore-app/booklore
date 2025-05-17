@@ -48,7 +48,8 @@ export class CreateUserDialogComponent implements OnInit {
       permissionUpload: [false],
       permissionDownload: [false],
       permissionEditMetadata: [false],
-      permissionEmailBook: [false]
+      permissionEmailBook: [false],
+      permissionAdmin: [false],
     });
   }
 

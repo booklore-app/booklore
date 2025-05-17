@@ -22,13 +22,13 @@
     <ul class="topbar-items pl-6">
       <div class="flex gap-6">
         <li *ngIf="userService.userData$ | async as userData">
-          <a class="topbar-item" *ngIf="userData.permissions.canManipulateLibrary">
+          <a class="topbar-item" *ngIf="userData.permissions.canManipulateLibrary || userData.permissions.admin">
             <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
                pTooltip="Create New Library" tooltipPosition="top"></i>
           </a>
         </li>
         <li *ngIf="userService.userData$ | async as userData">
-          <a class="topbar-item" *ngIf="userData.permissions.canUpload">
+          <a class="topbar-item" *ngIf="userData.permissions.canManipulateLibrary || userData.permissions.admin">
             <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
                pTooltip="Upload Book" tooltipPosition="top"></i>
           </a>
@@ -83,5 +83,4 @@
       </div>
     </ul>
   </div>
-
 </div>

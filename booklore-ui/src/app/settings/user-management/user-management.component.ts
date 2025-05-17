@@ -40,6 +40,7 @@ export class UserManagementComponent implements OnInit {
   private messageService = inject(MessageService);
 
   users: User[] = [];
+  currentUser: User | undefined;
   editingLibraryIds: number[] = [];
   allLibraries: Library[] = [];
 
@@ -51,6 +52,7 @@ export class UserManagementComponent implements OnInit {
 
   ngOnInit() {
     this.loadUsers();
+    this.loadMyself();
     this.libraryService.getAllLibrariesFromAPI().subscribe({
       next: (libraries) => {
         this.allLibraries = libraries;
@@ -63,6 +65,21 @@ export class UserManagementComponent implements OnInit {
         });
       },
     });
+  }
+
+  loadMyself() {
+    this.userService.getMyself().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to fetch current user',
+        });
+      }
+    })
   }
 
   loadUsers() {

@@ -41,6 +41,7 @@ public enum ApiError {
     PASSWORD_SAME_AS_CURRENT(HttpStatus.BAD_REQUEST, "New password cannot be the same as the current password"),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid credentials"),
     REMOTE_AUTH_DISABLED(HttpStatus.NON_AUTHORITATIVE_INFORMATION, "Remote login is disabled"),
+    SELF_DELETION_NOT_ALLOWED(HttpStatus.FORBIDDEN, "You cannot delete your own account"),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "%s");
 
     private final HttpStatus status;

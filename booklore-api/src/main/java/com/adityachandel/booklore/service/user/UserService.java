@@ -67,20 +67,16 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        BookLoreUserEntity user = userRepository.findById(id).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(id));
-
-        if (user.getPermissions().isPermissionAdmin()) {
-            throw ApiError.CANNOT_DELETE_ADMIN.createException();
+        BookLoreUserEntity userToDelete = userRepository.findById(id).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(id));
+        BookLoreUser currentUser = authenticationService.getAuthenticatedUser();
+        boolean isAdmin = currentUser.getPermissions().isAdmin();
+        if (!isAdmin) {
+            throw ApiError.UNAUTHORIZED.createException("You do not have permission to delete this User");
         }
-
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails userDetails) {
-            if (userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-                throw ApiError.UNAUTHORIZED.createException();
-            }
+        if (currentUser.getId().equals(userToDelete.getId())) {
+            throw ApiError.SELF_DELETION_NOT_ALLOWED.createException();
         }
-
-        userRepository.delete(user);
+        userRepository.delete(userToDelete);
     }
 
     public BookLoreUser getBookLoreUser(Long id) {

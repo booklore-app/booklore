@@ -33,7 +33,11 @@ public class AuthenticationService {
 
     public BookLoreUser getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (BookLoreUser) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof BookLoreUser) {
+            return (BookLoreUser) principal;
+        }
+        throw new IllegalStateException("Authenticated principal is not of type BookLoreUser");
     }
 
     public ResponseEntity<Map<String, String>> loginUser(UserLoginRequest loginRequest) {

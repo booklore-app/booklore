@@ -6,6 +6,8 @@ import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.UserCreateRequest;
 import com.adityachandel.booklore.model.dto.request.InitialUserRequest;
 import com.adityachandel.booklore.model.dto.settings.OidcAutoProvisionDetails;
+import com.adityachandel.booklore.model.dto.settings.SidebarSortOption;
+import com.adityachandel.booklore.model.dto.settings.UserSettingKey;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.ProvisioningMethod;
 import com.adityachandel.booklore.repository.LibraryRepository;
@@ -81,6 +83,7 @@ public class UserProvisioningService {
         permissions.setPermissionDownload(request.isPermissionDownload());
         permissions.setPermissionEditMetadata(request.isPermissionEditMetadata());
         permissions.setPermissionEmailBook(request.isPermissionEmailBook());
+        permissions.setPermissionAdmin(request.isPermissionAdmin());
         user.setPermissions(permissions);
 
         if (request.getSelectedLibraries() != null && !request.getSelectedLibraries().isEmpty()) {
@@ -173,19 +176,21 @@ public class UserProvisioningService {
             shelfRepository.save(shelfEntity);
         }
 
-        addUserSetting(user, "bookPreferences.perBookSetting", buildDefaultPerBookSetting());
-        addUserSetting(user, "bookPreferences.pdfReaderSetting", buildDefaultPdfReaderSetting());
-        addUserSetting(user, "bookPreferences.epubReaderSetting", buildDefaultEpubReaderSetting());
+        addUserSetting(user, UserSettingKey.PER_BOOK_SETTING, buildDefaultPerBookSetting());
+        addUserSetting(user, UserSettingKey.PDF_READER_SETTING, buildDefaultPdfReaderSetting());
+        addUserSetting(user, UserSettingKey.EPUB_READER_SETTING, buildDefaultEpubReaderSetting());
+        addUserSetting(user, UserSettingKey.SIDEBAR_LIBRARY_SORTING, buildDefaultSidebarLibrarySorting());
+        addUserSetting(user, UserSettingKey.SIDEBAR_SHELF_SORTING, buildDefaultSidebarShelfSorting());
 
         return user;
     }
 
-    private void addUserSetting(BookLoreUserEntity user, String key, Object value) {
+    private void addUserSetting(BookLoreUserEntity user, UserSettingKey key, Object value) {
         try {
             String json = objectMapper.writeValueAsString(value);
             UserSettingEntity setting = UserSettingEntity.builder()
                     .user(user)
-                    .settingKey(key)
+                    .settingKey(key.toString())
                     .settingValue(json)
                     .build();
             user.getSettings().add(setting);
@@ -213,6 +218,20 @@ public class UserProvisioningService {
                 .theme("white")
                 .font("serif")
                 .fontSize(150)
+                .build();
+    }
+
+    private Object buildDefaultSidebarLibrarySorting() {
+        return SidebarSortOption.builder()
+                .field("id")
+                .order("asc")
+                .build();
+    }
+
+    private Object buildDefaultSidebarShelfSorting() {
+        return SidebarSortOption.builder()
+                .field("id")
+                .order("asc")
                 .build();
     }
 }
