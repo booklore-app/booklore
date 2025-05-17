@@ -35,7 +35,8 @@
 
         &.layout-static {
             .layout-main-container {
-                margin-left: 208px;
+                padding-left: 250px;
+                box-sizing: border-box;
             }
 
             &.layout-static-inactive {
