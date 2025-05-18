@@ -38,6 +38,3 @@ out/
 local/
 
 booklore-api/src/main/resources/application-local.yaml
-
-docker-compose.yml
-/test/
