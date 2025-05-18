@@ -122,14 +122,14 @@ public class EpubProcessor implements FileProcessor {
             BookMetadataEntity bookMetadata = bookEntity.getMetadata();
             Metadata epubMetadata = book.getMetadata();
             if (epubMetadata != null) {
-                bookMetadata.setTitle(epubMetadata.getFirstTitle());
+                bookMetadata.setTitle(truncate(epubMetadata.getFirstTitle(), 1000));
 
                 if (epubMetadata.getDescriptions() != null && !epubMetadata.getDescriptions().isEmpty()) {
-                    bookMetadata.setDescription(epubMetadata.getDescriptions().getFirst());
+                    bookMetadata.setDescription(truncate(epubMetadata.getDescriptions().getFirst(), 2000));
                 }
 
                 if (epubMetadata.getPublishers() != null && !epubMetadata.getPublishers().isEmpty()) {
-                    bookMetadata.setPublisher(epubMetadata.getPublishers().getFirst());
+                    bookMetadata.setPublisher(truncate(epubMetadata.getPublishers().getFirst(), 2000));
                 }
 
                 List<String> identifiers = epubMetadata.getIdentifiers().stream()
@@ -138,11 +138,13 @@ public class EpubProcessor implements FileProcessor {
                 if (!identifiers.isEmpty()) {
                     String isbn13 = identifiers.stream().filter(id -> id.length() == 13).findFirst().orElse(null);
                     String isbn10 = identifiers.stream().filter(id -> id.length() == 10).findFirst().orElse(null);
-                    bookMetadata.setIsbn13(isbn13);
-                    bookMetadata.setIsbn10(isbn10);
+                    bookMetadata.setIsbn13(truncate(isbn13, 64));
+                    bookMetadata.setIsbn10(truncate(isbn10, 64));
                 }
 
-                bookMetadata.setLanguage(epubMetadata.getLanguage() == null || epubMetadata.getLanguage().equalsIgnoreCase("UND") ? "en" : epubMetadata.getLanguage());
+                bookMetadata.setLanguage(truncate(
+                        epubMetadata.getLanguage() == null || epubMetadata.getLanguage().equalsIgnoreCase("UND") ? "en" : epubMetadata.getLanguage(), 1000
+                ));
 
                 if (epubMetadata.getDates() != null && !epubMetadata.getDates().isEmpty()) {
                     epubMetadata.getDates().stream()
@@ -163,7 +165,7 @@ public class EpubProcessor implements FileProcessor {
 
                 String seriesName = epubMetadata.getMetaAttribute("calibre:series");
                 if (seriesName != null && !seriesName.isEmpty()) {
-                    bookMetadata.setSeriesName(seriesName);
+                    bookMetadata.setSeriesName(truncate(seriesName, 1000));
                 }
 
                 String seriesIndex = epubMetadata.getMetaAttribute("calibre:series_index");
@@ -205,5 +207,10 @@ public class EpubProcessor implements FileProcessor {
         } catch (DateTimeParseException e) {
             return false;
         }
+    }
+
+    private String truncate(String input, int maxLength) {
+        if (input == null) return null;
+        return input.length() <= maxLength ? input : input.substring(0, maxLength);
     }
 }

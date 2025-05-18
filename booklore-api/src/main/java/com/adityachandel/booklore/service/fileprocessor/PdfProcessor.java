@@ -86,7 +86,7 @@ public class PdfProcessor implements FileProcessor {
                 log.warn("No document information found");
             } else {
                 if (pdf.getDocumentInformation().getTitle() != null) {
-                    bookEntity.getMetadata().setTitle(pdf.getDocumentInformation().getTitle());
+                    bookEntity.getMetadata().setTitle(truncate(pdf.getDocumentInformation().getTitle(), 1000));
                 }
                 if (pdf.getDocumentInformation().getAuthor() != null) {
                     Set<String> authors = getAuthors(pdf);
@@ -114,5 +114,10 @@ public class PdfProcessor implements FileProcessor {
     private boolean generateCoverImageAndSave(Long bookId, PDDocument document) throws IOException {
         BufferedImage coverImage = new PDFRenderer(document).renderImageWithDPI(0, 300, ImageType.RGB);
         return fileProcessingUtils.saveCoverImage(coverImage, bookId);
+    }
+
+    private String truncate(String input, int maxLength) {
+        if (input == null) return null;
+        return input.length() <= maxLength ? input : input.substring(0, maxLength);
     }
 }
