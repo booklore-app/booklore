@@ -76,26 +76,26 @@ public class EpubProcessor implements FileProcessor {
 
     public boolean generateCover(BookEntity bookEntity) {
         try {
-            FileInputStream epubStream = new FileInputStream(FileUtils.getBookFullPath(bookEntity));
-            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(epubStream);
+            File epubFile = new File(FileUtils.getBookFullPath(bookEntity));
+            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(new FileInputStream(epubFile));
 
             // Try the default method
             Resource coverImage = epub.getCoverImage();
 
-            // Fallback: manually resolve <meta name="cover" content="cover-image"/>
+            // Fallback: look for a manifest resource with common "cover" keywords
             if (coverImage == null) {
-                Metadata metadata = epub.getMetadata();
-                String coverId = null;
+                for (Resource res : epub.getResources().getAll()) {
+                    String id = res.getId();
+                    String href = res.getHref();
 
-                for (Meta meta : metadata.getOtherMeta()) {
-                    if ("cover".equalsIgnoreCase(meta.getName())) {
-                        coverId = meta.getContent();
-                        break;
+                    if ((id != null && id.toLowerCase().contains("cover")) ||
+                        (href != null && href.toLowerCase().contains("cover"))) {
+
+                        if (res.getMediaType() != null && res.getMediaType().getName().startsWith("image")) {
+                            coverImage = res;
+                            break;
+                        }
                     }
-                }
-
-                if (coverId != null) {
-                    coverImage = epub.getResources().getByIdOrHref(coverId);
                 }
             }
 
