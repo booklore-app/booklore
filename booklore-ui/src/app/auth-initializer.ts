@@ -1,4 +1,5 @@
 import {inject} from '@angular/core';
+import {Router} from '@angular/router';
 import {OAuthEvent, OAuthService} from 'angular-oauth2-oidc';
 import {AppSettingsService} from './core/service/app-settings.service';
 import {AuthService, websocketInitializer} from './core/service/auth.service';
@@ -9,6 +10,7 @@ export function initializeAuthFactory() {
     const oauthService = inject(OAuthService);
     const appSettingsService = inject(AppSettingsService);
     const authService = inject(AuthService);
+    const router = inject(Router);
 
     return new Promise<void>((resolve) => {
       const sub = appSettingsService.appSettings$.subscribe(settings => {
@@ -50,6 +52,14 @@ export function initializeAuthFactory() {
                 );
                 resolve();
               });
+          } else if (settings.remoteAuthEnabled) {
+            authService.remoteLogin().subscribe({
+              next: () => {
+                router.navigate(['/dashboard']);
+                resolve();
+              },
+              error: resolve
+            });
           } else {
             resolve();
           }

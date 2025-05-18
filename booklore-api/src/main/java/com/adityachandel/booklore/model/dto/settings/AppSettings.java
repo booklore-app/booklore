@@ -17,6 +17,8 @@ public class AppSettings {
     private boolean similarBookRecommendation;
     private boolean opdsServerEnabled;
     private String uploadPattern;
+
+    private boolean remoteAuthEnabled;
     private boolean oidcEnabled;
     private OidcProviderDetails oidcProviderDetails;
     private OidcAutoProvisionDetails oidcAutoProvisionDetails;

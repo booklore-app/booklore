@@ -25,6 +25,7 @@ export interface AppSettings {
   coverResolution: string;
   uploadPattern: string;
   opdsServerEnabled: boolean;
+  remoteAuthEnabled: boolean;
   oidcEnabled: boolean;
   oidcProviderDetails: OidcProviderDetails;
   oidcAutoProvisionDetails: OidcAutoProvisionDetails;

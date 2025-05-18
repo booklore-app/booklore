@@ -16,8 +16,8 @@ export class AuthService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
 
-  internalLogin(credentials: { username: string; password: string }): Observable<any> {
-    return this.http.post<{ accessToken: string; refreshToken: string }>(`${this.apiUrl}/login`, credentials).pipe(
+  internalLogin(credentials: { username: string; password: string }): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
+    return this.http.post<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => {
         if (response.accessToken && response.refreshToken) {
           this.saveInternalTokens(response.accessToken, response.refreshToken);
@@ -33,6 +33,17 @@ export class AuthService {
       tap((response) => {
         if (response.accessToken && response.refreshToken) {
           this.saveInternalTokens(response.accessToken, response.refreshToken);
+        }
+      })
+    );
+  }
+
+  remoteLogin(): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
+    return this.http.get<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/remote`).pipe(
+      tap((response) => {
+        if (response.accessToken && response.refreshToken) {
+          this.saveInternalTokens(response.accessToken, response.refreshToken);
+          this.initializeWebSocketConnection();
         }
       })
     );

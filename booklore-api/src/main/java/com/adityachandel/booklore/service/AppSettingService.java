@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service;
 
+import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.settings.*;
 import com.adityachandel.booklore.model.entity.AppSettingEntity;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AppSettingService {
 
+    private final AppProperties appProperties;
     private final AppSettingsRepository appSettingsRepository;
     private final ObjectMapper objectMapper;
 
@@ -63,6 +65,7 @@ public class AppSettingService {
         Map<String, String> settingsMap = appSettingsRepository.findAll().stream().collect(Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal));
 
         AppSettings.AppSettingsBuilder builder = AppSettings.builder();
+        builder.remoteAuthEnabled(appProperties.getRemoteAuth().isEnabled());
 
         builder.metadataRefreshOptions(getJsonSetting(settingsMap, AppSettingKey.QUICK_BOOK_MATCH, MetadataRefreshOptions.class, null, false));
         builder.oidcProviderDetails(getJsonSetting(settingsMap, AppSettingKey.OIDC_PROVIDER_DETAILS, OidcProviderDetails.class, null, false));
