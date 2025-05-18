@@ -120,6 +120,19 @@
         </p-select>
       </div>
 
+      <p>Flow:</p>
+      <div class="flex gap-4 justify-start">
+        <p-select
+          [options]="flowOptions"
+          [(ngModel)]="selectedFlow"
+          optionLabel="name"
+          optionValue="key"
+          placeholder="Select a Flow"
+          class="w-full md:w-56"
+          (ngModelChange)="onFlowChange()">
+        </p-select>
+      </div>
+
       <p class="py-1">Font Size:</p>
       <div class="flex gap-4 justify-start items-center">
         <p-button icon="pi pi-minus" rounded="true" size="small" (click)="decreaseFontSize()"></p-button>

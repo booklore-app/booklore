@@ -47,6 +47,11 @@ export class UserPreferences implements OnInit, OnDestroy {
     {name: 'Monospace', key: 'monospace'}
   ];
 
+  flowOptions = [
+    {name: 'Paginated', key: 'paginated'},
+    {name: 'Scrolled', key: 'scrolled'}
+  ];
+
   readonly sortingOptions = [
     {label: 'Name | Ascending', value: {field: 'name', order: 'asc'}},
     {label: 'Name | Descending', value: {field: 'name', order: 'desc'}},
@@ -59,6 +64,7 @@ export class UserPreferences implements OnInit, OnDestroy {
   selectedZoom!: string;
   selectedTheme!: string;
   selectedFont!: string;
+  selectedFlow!: string;
   fontSize = 100;
   showSidebar = false;
   selectedPdfScope!: string;
@@ -93,6 +99,7 @@ export class UserPreferences implements OnInit, OnDestroy {
     this.selectedZoom = settings.pdfReaderSetting.pageZoom;
     this.showSidebar = settings.pdfReaderSetting.showSidebar;
     this.selectedTheme = settings.epubReaderSetting.theme;
+    this.selectedFlow = settings.epubReaderSetting.flow;
     this.fontSize = settings.epubReaderSetting.fontSize;
     this.selectedFont = settings.epubReaderSetting.font;
     this.selectedLibrarySorting = settings.sidebarLibrarySorting;
@@ -124,6 +131,10 @@ export class UserPreferences implements OnInit, OnDestroy {
 
   onFontChange() {
     this.updatePreference(['epubReaderSetting', 'font'], this.selectedFont);
+  }
+
+  onFlowChange() {
+    this.updatePreference(['epubReaderSetting', 'flow'], this.selectedFlow);
   }
 
   onFontSizeChange() {
@@ -167,5 +178,4 @@ export class UserPreferences implements OnInit, OnDestroy {
       this.onFontSizeChange();
     }
   }
-
 }

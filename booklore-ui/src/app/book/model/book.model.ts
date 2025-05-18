@@ -89,6 +89,7 @@ export interface EpubViewerSetting {
   theme: string;
   font: string;
   fontSize: number;
+  flow: string;
 }
 
 export interface BookSetting {
