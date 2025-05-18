@@ -1,5 +1,7 @@
 <div #epubContainer class="epub-viewer-container">
-  <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+  <div *ngIf="isLoading" class="spinner-wrapper">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
   <div *ngIf="!isLoading">
 
     <div class="epub-header">
