@@ -13,14 +13,15 @@
   <ng-template pTemplate="header">
     <tr>
       <th style="width: 5%;">Default</th>
-      <th style="width: 15%;">Name</th>
+      <th style="width: 10%;">Name</th>
       <th style="width: 15%;">Host</th>
-      <th style="width: 10%;">Port</th>
+      <th style="width: 6%;">Port</th>
       <th style="width: 15%;">Username</th>
       <th style="width: 15%;">Password</th>
-      <th style="width: 5%;">Auth</th>
+      <th style="width: 4%;">Auth</th>
       <th style="width: 5%;">StartTLS</th>
-      <th style="width: 10%;">Edit</th>
+      <th style="width: 12%;">From Address</th>
+      <th style="width: 8%;">Edit</th>
       <th style="width: 10%;">Delete</th>
     </tr>
   </ng-template>
@@ -75,6 +76,11 @@
           [binary]="true"
           [disabled]="!provider.isEditing">
         </p-checkbox>
+      </td>
+
+      <td>
+        <input *ngIf="provider.isEditing" type="text" [(ngModel)]="provider.fromAddress" class="p-inputtext w-full"/>
+        <span *ngIf="!provider.isEditing">{{ provider.fromAddress }}</span>
       </td>
 
       <td class="text-center">
