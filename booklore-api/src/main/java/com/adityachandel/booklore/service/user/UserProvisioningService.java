@@ -218,6 +218,7 @@ public class UserProvisioningService {
                 .theme("white")
                 .font("serif")
                 .fontSize(150)
+                .flow("paginated")
                 .build();
     }
 

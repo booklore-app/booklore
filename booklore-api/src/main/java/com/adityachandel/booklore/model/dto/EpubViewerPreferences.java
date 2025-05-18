@@ -9,5 +9,6 @@ public class EpubViewerPreferences {
     private Long bookId;
     private String theme;
     private String font;
+    private String flow;
     private Integer fontSize;
 }
