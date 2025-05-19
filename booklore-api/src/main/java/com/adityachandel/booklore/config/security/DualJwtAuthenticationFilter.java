@@ -60,6 +60,14 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String token = extractToken(request);
+
+        String path = request.getRequestURI();
+
+        if (path.equals("/api/v1/auth/refresh")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (token == null) {
             chain.doFilter(request, response);
             return;
