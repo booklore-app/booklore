@@ -35,6 +35,11 @@
   </div>
 
   <div class="flex items-center gap-4">
+    <label class="w-40 text-right font-medium">From Address:</label>
+    <input type="text" pInputText formControlName="fromAddress" placeholder="Enter from address... " class="w-full md:w-80"/>
+  </div>
+
+  <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Auth:</label>
     <p-checkbox formControlName="auth" [binary]="true"></p-checkbox>
   </div>
@@ -42,11 +47,6 @@
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">StartTLS:</label>
     <p-checkbox formControlName="startTls" [binary]="true"></p-checkbox>
-  </div>
-
-  <div class="flex items-center gap-4">
-    <label class="w-40 text-right font-medium">From Address:</label>
-    <input type="text" pInputText formControlName="fromAddress" placeholder="Enter from address... " class="w-full md:w-80"/>
   </div>
 
   <div class="flex justify-end">
