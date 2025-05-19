@@ -70,11 +70,14 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
             } else if (appSettingService.getAppSettings().isOidcEnabled()) {
                 authenticateOidcUser(token, request);
             } else {
-                log.debug("OIDC is disabled. Skipping OIDC authentication.");
+                log.debug("OIDC is disabled and token is invalid. Rejecting request.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
         } catch (Exception ex) {
             log.error("Authentication error: {}", ex.getMessage(), ex);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
         chain.doFilter(request, response);
     }
