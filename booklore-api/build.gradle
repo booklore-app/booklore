@@ -75,6 +75,7 @@ dependencies {
     }
     testImplementation 'org.mockito:mockito-core:5.17.0'  // Java 21‑compatible
     testImplementation 'org.assertj:assertj-core:3.25.3'
+    testImplementation 'com.h2database:h2:2.1.214'
 }
 
 hibernate {
