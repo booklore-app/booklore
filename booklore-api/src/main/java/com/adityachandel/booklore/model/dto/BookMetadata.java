@@ -22,7 +22,7 @@ public class BookMetadata {
     private LocalDate publishedDate;
     private String description;
     private String seriesName;
-    private Integer seriesNumber;
+    private Float seriesNumber;
     private Integer seriesTotal;
     private String isbn13;
     private String isbn10;
