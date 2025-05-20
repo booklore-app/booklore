@@ -19,11 +19,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.FileHeader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.apache.commons.lang3.StringUtils;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -117,10 +127,15 @@ public class EpubProcessor implements FileProcessor {
     }
 
     private void setBookMetadata(BookEntity bookEntity) {
-        try {
-            io.documentnode.epub4j.domain.Book book = new EpubReader().readEpub(new FileInputStream(FileUtils.getBookFullPath(bookEntity)));
+        try (FileInputStream fis =
+                new FileInputStream(FileUtils.getBookFullPath(bookEntity))) {
+
+            io.documentnode.epub4j.domain.Book book =
+                new EpubReader().readEpub(fis);
+
             BookMetadataEntity bookMetadata = bookEntity.getMetadata();
-            Metadata epubMetadata = book.getMetadata();
+            Metadata            epubMetadata = book.getMetadata();
+
             if (epubMetadata != null) {
                 bookMetadata.setTitle(truncate(epubMetadata.getFirstTitle(), 1000));
 
@@ -162,7 +177,8 @@ public class EpubProcessor implements FileProcessor {
                                 }
                             });
                 }
-
+                
+                // Calibre (EPUB2) series tags
                 String seriesName = epubMetadata.getMetaAttribute("calibre:series");
                 if (seriesName != null && !seriesName.isEmpty()) {
                     bookMetadata.setSeriesName(truncate(seriesName, 1000));
@@ -177,6 +193,8 @@ public class EpubProcessor implements FileProcessor {
                         log.warn("Unable to parse series number: {}", seriesIndex);
                     }
                 }
+            //  fall-back to OPF for anything still missing
+            enrichFromOpf(FileUtils.getBookFullPath(bookEntity), bookMetadata);
 
                 bookCreatorService.addAuthorsToBook(getAuthors(book), bookEntity);
                 bookCreatorService.addCategoriesToBook(epubMetadata.getSubjects(), bookEntity);
@@ -212,5 +230,91 @@ public class EpubProcessor implements FileProcessor {
     private String truncate(String input, int maxLength) {
         if (input == null) return null;
         return input.length() <= maxLength ? input : input.substring(0, maxLength);
+    }
+
+    private void enrichFromOpf(String epubPath, BookMetadataEntity meta) {
+        try {
+            // 1) open as a zip
+            ZipFile zip = new ZipFile(epubPath);
+
+            // 2) prepare secure DOM builder
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+
+            // 3) pull container.xml
+            FileHeader containerHdr = zip.getFileHeader("META-INF/container.xml");
+            if (containerHdr == null) return;
+            try (InputStream cis = zip.getInputStream(containerHdr)) {
+                Document containerDoc = builder.parse(cis);
+                NodeList roots = containerDoc.getElementsByTagName("rootfile");
+                if (roots.getLength() == 0) return;
+
+                String opfPath = ((Element) roots.item(0)).getAttribute("full-path");
+                if (StringUtils.isBlank(opfPath)) return;
+
+                // 4) pull the OPF itself
+                FileHeader opfHdr = zip.getFileHeader(opfPath);
+                if (opfHdr == null) return;
+
+                try (InputStream in = zip.getInputStream(opfHdr)) {
+                    Document doc = builder.parse(in);
+
+                    // ── IDENTIFIERS (ISBN) ───────────────────────────────
+                    if (StringUtils.isBlank(meta.getIsbn13()) ||
+                        StringUtils.isBlank(meta.getIsbn10())) {
+                        NodeList idNodes = doc.getElementsByTagNameNS("*", "identifier");
+                        for (int i = 0; i < idNodes.getLength(); i++) {
+                            String id = idNodes.item(i).getTextContent().trim();
+                            if (id.length() == 13 && StringUtils.isBlank(meta.getIsbn13())) {
+                                meta.setIsbn13(truncate(id, 64));
+                            }
+                            if (id.length() == 10 && StringUtils.isBlank(meta.getIsbn10())) {
+                                meta.setIsbn10(truncate(id, 64));
+                            }
+                        }
+                    }
+
+                    // ── <meta> TAGS (series & pages) ────────────────────
+                    NodeList metaNodes = doc.getElementsByTagName("meta");
+                    for (int i = 0; i < metaNodes.getLength(); i++) {
+                        Element m        = (Element) metaNodes.item(i);
+                        String  nameAttr = m.getAttribute("name");
+                        String  propAttr = m.getAttribute("property");
+                        String  content  = m.hasAttribute("content")
+                                        ? m.getAttribute("content").trim()
+                                        : m.getTextContent().trim();
+
+                        // series name
+                        if (StringUtils.isBlank(meta.getSeriesName())
+                            && ("calibre:series".equalsIgnoreCase(nameAttr)
+                                || "belongs-to-collection".equalsIgnoreCase(propAttr))) {
+                            meta.setSeriesName(truncate(content, 1000));
+                        }
+                        // series number
+                        if (meta.getSeriesNumber() == null
+                            && ("calibre:series_index".equalsIgnoreCase(nameAttr)
+                                || "group-position".equalsIgnoreCase(propAttr))) {
+                            try {
+                                meta.setSeriesNumber((int) Double.parseDouble(content));
+                            } catch (NumberFormatException ignored) { }
+                        }
+                        // page count
+                        if (meta.getPageCount() == null
+                            && ("calibre:pages".equalsIgnoreCase(nameAttr)
+                                || "pageCount".equalsIgnoreCase(nameAttr)
+                                || "schema:pageCount".equalsIgnoreCase(propAttr)
+                                || "media:pageCount".equalsIgnoreCase(propAttr))) {
+                            try {
+                                meta.setPageCount(Integer.parseInt(content));
+                            } catch (NumberFormatException ignored) { }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Unable to parse OPF metadata for {}: {}", epubPath, e.getMessage());
+        }
     }
 }
