@@ -138,8 +138,7 @@ public class EpubProcessor implements FileProcessor {
                 new EpubReader().readEpub(fis);
 
             BookMetadataEntity bookMetadata = bookEntity.getMetadata();
-            Metadata            epubMetadata = book.getMetadata();
-
+            Metadata epubMetadata = book.getMetadata();
             if (epubMetadata != null) {
                 bookMetadata.setTitle(truncate(epubMetadata.getFirstTitle(), 1000));
 
@@ -181,8 +180,7 @@ public class EpubProcessor implements FileProcessor {
                                 }
                             });
                 }
-                
-                // Calibre (EPUB2) series tags
+
                 String seriesName = epubMetadata.getMetaAttribute("calibre:series");
                 if (seriesName != null && !seriesName.isEmpty()) {
                     bookMetadata.setSeriesName(truncate(seriesName, 1000));
@@ -192,7 +190,7 @@ public class EpubProcessor implements FileProcessor {
                 if (seriesIndex != null && !seriesIndex.isEmpty()) {
                     try {
                         double indexValue = Double.parseDouble(seriesIndex);
-                        bookMetadata.setSeriesNumber((int) indexValue);
+                        bookMetadata.setSeriesNumber((float) indexValue);
                     } catch (NumberFormatException e) {
                         log.warn("Unable to parse series number: {}", seriesIndex);
                     }

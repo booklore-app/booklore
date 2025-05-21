@@ -40,7 +40,7 @@ public class BookMetadataEntity {
     private String seriesName;
 
     @Column(name = "series_number")
-    private Integer seriesNumber;
+    private Float seriesNumber;
 
     @Column(name = "series_total")
     private Integer seriesTotal;
