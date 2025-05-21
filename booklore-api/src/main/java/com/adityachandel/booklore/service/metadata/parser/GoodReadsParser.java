@@ -140,7 +140,7 @@ public class GoodReadsParser implements BookParser {
             if (bookSeriesJson != null && bookSeriesJson.length() > 0) {
                 JSONObject firstElement = bookSeriesJson.optJSONObject(0);
                 if (firstElement != null) {
-                    builder.seriesNumber(parseInteger(firstElement.optString("userPosition")));
+                    builder.seriesNumber(parseFloat(firstElement.optString("userPosition")));
                 }
             }
         }
@@ -170,6 +170,15 @@ public class GoodReadsParser implements BookParser {
     private Double parseDouble(String value) {
         try {
             return value != null ? Double.parseDouble(value) : null;
+        } catch (NumberFormatException e) {
+            log.error("Error parsing double: {}, Error: {}", value, e.getMessage());
+            return null;
+        }
+    }
+
+    private Float parseFloat(String value) {
+        try {
+            return value != null ? Float.parseFloat(value) : null;
         } catch (NumberFormatException e) {
             log.error("Error parsing double: {}, Error: {}", value, e.getMessage());
             return null;

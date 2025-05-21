@@ -172,7 +172,7 @@ public class EpubProcessor implements FileProcessor {
                 if (seriesIndex != null && !seriesIndex.isEmpty()) {
                     try {
                         double indexValue = Double.parseDouble(seriesIndex);
-                        bookMetadata.setSeriesNumber((int) indexValue);
+                        bookMetadata.setSeriesNumber((float) indexValue);
                     } catch (NumberFormatException e) {
                         log.warn("Unable to parse series number: {}", seriesIndex);
                     }

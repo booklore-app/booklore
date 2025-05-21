@@ -306,14 +306,14 @@ public class AmazonBookParser implements BookParser {
         return null;
     }
 
-    private Integer getSeriesNumber(Document doc) {
+    private Float getSeriesNumber(Document doc) {
         try {
             Element bookDetailsLabel = doc.selectFirst("#rpi-attribute-book_details-series .rpi-attribute-label span");
             if (bookDetailsLabel != null) {
                 String bookAndTotal = bookDetailsLabel.text();
-                if (bookAndTotal.matches("Book \\d+ of \\d+")) {
+                if (bookAndTotal.matches("Book \\d+(\\.\\d+)? of \\d+")) {
                     String[] parts = bookAndTotal.split(" ");
-                    return Integer.parseInt(parts[1]);
+                    return Float.parseFloat(parts[1]);
                 }
             } else {
                 log.debug("Error fetching series number: Element not found.");
