@@ -1,0 +1,1 @@
+ALTER TABLE book_metadata ADD COLUMN asin VARCHAR(20);
