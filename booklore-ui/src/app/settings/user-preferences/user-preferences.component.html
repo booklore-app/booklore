@@ -38,6 +38,20 @@
           <label [for]="item">{{ item }}</label>
         </div>
       </div>
+
+      <p class="py-1">CBX:</p>
+      <div class="flex gap-4 justify-start">
+        <div *ngFor="let item of scopeOptions" class="flex items-center gap-2">
+          <p-radiobutton
+            [inputId]="item"
+            name="spread"
+            [value]="item"
+            [(ngModel)]="selectedCbxScope"
+            (ngModelChange)="onCbxScopeChange()">
+          </p-radiobutton>
+          <label [for]="item">{{ item }}</label>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -97,12 +111,13 @@
       <p>Theme:</p>
       <div class="flex gap-4 justify-start">
         <p-select
+          size="small"
           [options]="themes"
           [(ngModel)]="selectedTheme"
           optionLabel="name"
           optionValue="key"
           placeholder="Select a Theme"
-          class="w-full md:w-56"
+          class="w-full md:w-32"
           (ngModelChange)="onThemeChange()">
         </p-select>
       </div>
@@ -110,12 +125,13 @@
       <p>Font:</p>
       <div class="flex gap-4 justify-start">
         <p-select
+          size="small"
           [options]="fonts"
           [(ngModel)]="selectedFont"
           optionLabel="name"
           optionValue="key"
           placeholder="Select a Font"
-          class="w-full md:w-56"
+          class="w-full md:w-32"
           (ngModelChange)="onFontChange()">
         </p-select>
       </div>
@@ -123,21 +139,64 @@
       <p>Flow:</p>
       <div class="flex gap-4 justify-start">
         <p-select
+          size="small"
           [options]="flowOptions"
           [(ngModel)]="selectedFlow"
           optionLabel="name"
           optionValue="key"
           placeholder="Select a Flow"
-          class="w-full md:w-56"
+          class="w-full md:w-32"
           (ngModelChange)="onFlowChange()">
         </p-select>
       </div>
 
       <p class="py-1">Font Size:</p>
       <div class="flex gap-4 justify-start items-center">
-        <p-button icon="pi pi-minus" rounded="true" size="small" (click)="decreaseFontSize()"></p-button>
+        <p-button icon="pi pi-minus" size="small"  (click)="decreaseFontSize()"></p-button>
         <p>{{ fontSize }}%</p>
-        <p-button icon="pi pi-plus" rounded="true" size="small" (click)="increaseFontSize()"></p-button>
+        <p-button icon="pi pi-plus" size="small" (click)="increaseFontSize()"></p-button>
+      </div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="p-4">
+    <p class="text-lg pb-6 pt-4 ">
+      CBX Reader: Global Preferences
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Configure global PDF reading options such as page spread, zoom level, and sidebar visibility that apply to all PDFs."
+         tooltipPosition="right"
+         style="cursor: pointer;"></i>
+    </p>
+
+    <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+      <p class="py-1">Page Spread:</p>
+      <div class="flex gap-4 justify-start">
+        <div *ngFor="let spread of cbxSpreads" class="flex items-center gap-2">
+          <p-radiobutton
+            [inputId]="spread.key"
+            name="spread"
+            [value]="spread.key"
+            [(ngModel)]="selectedCbxSpread"
+            (ngModelChange)="onCbxSpreadChange()">
+          </p-radiobutton>
+          <label [for]="spread.key">{{ spread.name }}</label>
+        </div>
+      </div>
+
+      <p class="py-1">Page Zoom:</p>
+      <div class="flex gap-4 justify-start">
+        <div *ngFor="let mode of cbxViewModes" class="flex items-center gap-2">
+          <p-radiobutton
+            [inputId]="mode.key"
+            name="zoom"
+            [value]="mode.key"
+            [(ngModel)]="selectedCbxViewMode"
+            (ngModelChange)="onCbxViewModeChange()">
+          </p-radiobutton>
+          <label [for]="mode.key">{{ mode.name }}</label>
+        </div>
       </div>
     </div>
   </div>
@@ -164,6 +223,7 @@
       </p>
       <div class="flex gap-4 justify-start">
         <p-select
+          size="small"
           [options]="sortingOptions"
           [(ngModel)]="selectedLibrarySorting"
           (ngModelChange)="onLibrarySortingChange()"
@@ -180,6 +240,7 @@
       </p>
       <div class="flex gap-4 justify-start">
         <p-select
+          size="small"
           [options]="sortingOptions"
           [(ngModel)]="selectedShelfSorting"
           (ngModelChange)="onShelfSortingChange()"

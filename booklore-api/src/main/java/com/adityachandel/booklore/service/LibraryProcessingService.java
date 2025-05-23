@@ -10,6 +10,7 @@ import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.service.fileprocessor.CbxProcessor;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.util.FileUtils;
@@ -40,6 +41,7 @@ public class LibraryProcessingService {
     private final NotificationService notificationService;
     private final PdfProcessor pdfProcessor;
     private final EpubProcessor epubProcessor;
+    private final CbxProcessor cbxProcessor;
     private final BookRepository bookRepository;
     private final EntityManager entityManager;
     private final TransactionTemplate transactionTemplate;
@@ -138,8 +140,15 @@ public class LibraryProcessingService {
 
     @Transactional
     protected BookFileType getBookFileType(String fileName) {
-        if (fileName.endsWith(".pdf")) {
+        String lowerCaseName = fileName.toLowerCase();
+        if (lowerCaseName.endsWith(".pdf")) {
             return BookFileType.PDF;
+        } else if (lowerCaseName.endsWith(".cbz")) {
+            return BookFileType.CBX;
+        } else if (lowerCaseName.endsWith(".cbr")) {
+            return BookFileType.CBX;
+        } else if (lowerCaseName.endsWith(".cb7")) {
+            return BookFileType.CBX;
         } else {
             return BookFileType.EPUB;
         }
@@ -220,6 +229,8 @@ public class LibraryProcessingService {
             return pdfProcessor.processFile(libraryFile, false);
         } else if (libraryFile.getBookFileType() == BookFileType.EPUB) {
             return epubProcessor.processFile(libraryFile, false);
+        } else if (libraryFile.getBookFileType() == BookFileType.CBX) {
+            return cbxProcessor.processFile(libraryFile, false);
         }
         return null;
     }
@@ -239,12 +250,29 @@ public class LibraryProcessingService {
             stream.filter(Files::isRegularFile)
                     .filter(file -> {
                         String fileName = file.getFileName().toString().toLowerCase();
-                        return fileName.endsWith(".pdf") || fileName.endsWith(".epub");
+                        return fileName.endsWith(".pdf") ||
+                                fileName.endsWith(".epub") ||
+                                fileName.endsWith(".cbz") ||
+                                fileName.endsWith(".cbr") ||
+                                fileName.endsWith(".cb7");
                     })
                     .forEach(fullFilePath -> {
-                        BookFileType fileType = fullFilePath.getFileName().toString().toLowerCase().endsWith(".pdf")
-                                ? BookFileType.PDF
-                                : BookFileType.EPUB;
+                        String fileName = fullFilePath.getFileName().toString().toLowerCase();
+                        BookFileType fileType;
+                        if (fileName.endsWith(".pdf")) {
+                            fileType = BookFileType.PDF;
+                        } else if (fileName.endsWith(".epub")) {
+                            fileType = BookFileType.EPUB;
+                        } else if (fileName.endsWith(".cbz")) {
+                            fileType = BookFileType.CBX;
+                        } else if (fileName.endsWith(".cbr")) {
+                            fileType = BookFileType.CBX;
+                        } else if (fileName.endsWith(".cb7")) {
+                            fileType = BookFileType.CBX;
+                        } else {
+                            return;
+                        }
+
                         String relativePath = FileUtils.getRelativeSubPath(libraryPathEntity.getPath(), fullFilePath);
                         LibraryFile libraryFile = LibraryFile.builder()
                                 .libraryEntity(libraryEntity)

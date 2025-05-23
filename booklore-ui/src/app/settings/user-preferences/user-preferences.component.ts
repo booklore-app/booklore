@@ -9,6 +9,7 @@ import {Button} from 'primeng/button';
 import {Tooltip} from 'primeng/tooltip';
 import {SidebarLibrarySorting, SidebarShelfSorting, User, UserService, UserSettings} from '../user-management/user.service';
 import {MessageService} from 'primeng/api';
+import {CbxPageSpread, CbxPageViewMode} from '../../book/model/book.model';
 
 @Component({
   selector: 'app-user-preferences',
@@ -19,10 +20,22 @@ import {MessageService} from 'primeng/api';
 })
 export class UserPreferences implements OnInit, OnDestroy {
 
+
+  readonly cbxSpreads = [
+    {name: 'Even', key: 'EVEN'},
+    {name: 'Odd', key: 'ODD'}
+  ];
+
+  readonly cbxViewModes = [
+    {name: 'Single Page', key: 'SINGLE_PAGE'},
+    {name: 'Two Page', key: 'TWO_PAGE'},
+  ];
+
+
   readonly spreads = [
-    {name: 'Even Spread', key: 'even'},
-    {name: 'Odd Spread', key: 'odd'},
-    {name: 'No Spread', key: 'off'}
+    {name: 'Even', key: 'even'},
+    {name: 'Odd', key: 'odd'},
+    {name: 'None', key: 'off'}
   ];
 
   readonly zooms = [
@@ -47,7 +60,7 @@ export class UserPreferences implements OnInit, OnDestroy {
     {name: 'Monospace', key: 'monospace'}
   ];
 
-  flowOptions = [
+  readonly flowOptions = [
     {name: 'Paginated', key: 'paginated'},
     {name: 'Scrolled', key: 'scrolled'}
   ];
@@ -60,6 +73,11 @@ export class UserPreferences implements OnInit, OnDestroy {
   ];
 
   readonly scopeOptions = ['Global', 'Individual'];
+
+
+  selectedCbxSpread!: CbxPageSpread;
+  selectedCbxViewMode!: CbxPageViewMode;
+
   selectedSpread!: 'even' | 'odd' | 'off';
   selectedZoom!: string;
   selectedTheme!: string;
@@ -67,8 +85,11 @@ export class UserPreferences implements OnInit, OnDestroy {
   selectedFlow!: string;
   fontSize = 100;
   showSidebar = false;
+
   selectedPdfScope!: string;
   selectedEpubScope!: string;
+  selectedCbxScope!: string;
+
   selectedLibrarySorting: SidebarLibrarySorting = {field: 'id', order: 'asc'};
   selectedShelfSorting: SidebarShelfSorting = {field: 'id', order: 'asc'};
 
@@ -95,13 +116,20 @@ export class UserPreferences implements OnInit, OnDestroy {
   private loadPreferences(settings: UserSettings): void {
     this.selectedPdfScope = settings.perBookSetting.pdf;
     this.selectedEpubScope = settings.perBookSetting.epub;
+    this.selectedCbxScope = settings.perBookSetting.cbx;
+
     this.selectedSpread = settings.pdfReaderSetting.pageSpread;
     this.selectedZoom = settings.pdfReaderSetting.pageZoom;
     this.showSidebar = settings.pdfReaderSetting.showSidebar;
+
     this.selectedTheme = settings.epubReaderSetting.theme;
     this.selectedFlow = settings.epubReaderSetting.flow;
     this.fontSize = settings.epubReaderSetting.fontSize;
     this.selectedFont = settings.epubReaderSetting.font;
+
+    this.selectedCbxSpread = settings.cbxReaderSetting.pageSpread;
+    this.selectedCbxViewMode = settings.cbxReaderSetting.pageViewMode;
+
     this.selectedLibrarySorting = settings.sidebarLibrarySorting;
     this.selectedShelfSorting = settings.sidebarShelfSorting;
   }
@@ -145,6 +173,14 @@ export class UserPreferences implements OnInit, OnDestroy {
     this.updatePreference(['pdfReaderSetting', 'pageSpread'], this.selectedSpread);
   }
 
+  onCbxSpreadChange() {
+    this.updatePreference(['cbxReaderSetting', 'pageSpread'], this.selectedCbxSpread);
+  }
+
+  onCbxViewModeChange() {
+    this.updatePreference(['cbxReaderSetting', 'pageViewMode'], this.selectedCbxViewMode);
+  }
+
   onZoomChange() {
     this.updatePreference(['pdfReaderSetting', 'pageZoom'], this.selectedZoom);
   }
@@ -155,6 +191,10 @@ export class UserPreferences implements OnInit, OnDestroy {
 
   onEpubScopeChange() {
     this.updatePreference(['perBookSetting', 'epub'], this.selectedEpubScope);
+  }
+
+  onCbxScopeChange() {
+    this.updatePreference(['perBookSetting', 'cbx'], this.selectedCbxScope);
   }
 
   onLibrarySortingChange() {

@@ -1,6 +1,8 @@
 package com.adityachandel.booklore.model.dto;
 
 import com.adityachandel.booklore.model.dto.settings.SidebarSortOption;
+import com.adityachandel.booklore.model.enums.CbxPageSpread;
+import com.adityachandel.booklore.model.enums.CbxPageViewMode;
 import com.adityachandel.booklore.model.enums.ProvisioningMethod;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +38,7 @@ public class BookLoreUser {
         public PerBookSetting perBookSetting;
         public PdfReaderSetting pdfReaderSetting;
         public EpubReaderSetting epubReaderSetting;
+        public CbxReaderSetting cbxReaderSetting;
         public SidebarSortOption sidebarLibrarySorting;
         public SidebarSortOption sidebarShelfSorting;
 
@@ -50,7 +53,6 @@ public class BookLoreUser {
             private String flow;
         }
 
-
         @Data
         @Builder
         @AllArgsConstructor
@@ -64,9 +66,19 @@ public class BookLoreUser {
         @Builder
         @AllArgsConstructor
         @NoArgsConstructor
+        public static class CbxReaderSetting {
+            private CbxPageSpread pageSpread;
+            private CbxPageViewMode pageViewMode;
+        }
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
         public static class PerBookSetting {
             private GlobalOrIndividual pdf;
             private GlobalOrIndividual epub;
+            private GlobalOrIndividual cbx;
 
             public enum GlobalOrIndividual {
                 Global, Individual

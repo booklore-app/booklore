@@ -39,6 +39,7 @@ public class BooksService {
     private final BookRepository bookRepository;
     private final PdfViewerPreferencesRepository pdfViewerPreferencesRepository;
     private final EpubViewerPreferencesRepository epubViewerPreferencesRepository;
+    private final CbxViewerPreferencesRepository cbxViewerPreferencesRepository;
     private final ShelfRepository shelfRepository;
     private final FileService fileService;
     private final BookMapper bookMapper;
@@ -66,6 +67,13 @@ public class BooksService {
                             .bookId(bookId)
                             .zoom(pdfPref.getZoom())
                             .spread(pdfPref.getSpread())
+                            .build()));
+        } else if (bookEntity.getBookType() == BookFileType.CBX) {
+            cbxViewerPreferencesRepository.findByBookIdAndUserId(bookId, user.getId())
+                    .ifPresent(cbxPref -> settingsBuilder.cbxSettings(CbxViewerPreferences.builder()
+                            .bookId(bookId)
+                            .pageViewMode(cbxPref.getPageViewMode())
+                            .pageSpread(cbxPref.getPageSpread())
                             .build()));
         } else {
             throw ApiError.UNSUPPORTED_BOOK_TYPE.createException();
@@ -111,6 +119,22 @@ public class BooksService {
             epubPrefs.setFlow(epubSettings.getFlow());
             epubViewerPreferencesRepository.save(epubPrefs);
 
+        } else if (bookEntity.getBookType() == BookFileType.CBX) {
+            CbxViewerPreferencesEntity cbxPrefs = cbxViewerPreferencesRepository
+                    .findByBookIdAndUserId(bookId, user.getId())
+                    .orElseGet(() -> {
+                        CbxViewerPreferencesEntity newPrefs = CbxViewerPreferencesEntity.builder()
+                                .bookId(bookId)
+                                .userId(user.getId())
+                                .build();
+                        return cbxViewerPreferencesRepository.save(newPrefs);
+                    });
+
+            CbxViewerPreferences cbxSettings = bookViewerSettings.getCbxSettings();
+            cbxPrefs.setPageSpread(cbxSettings.getPageSpread());
+            cbxPrefs.setPageViewMode(cbxSettings.getPageViewMode());
+            cbxViewerPreferencesRepository.save(cbxPrefs);
+
         } else {
             throw ApiError.UNSUPPORTED_BOOK_TYPE.createException();
         }
@@ -135,6 +159,12 @@ public class BooksService {
             book.setEpubProgress(EpubProgress.builder()
                     .cfi(userProgress.getEpubProgress())
                     .percentage(userProgress.getEpubProgressPercent())
+                    .build());
+        }
+        if (bookEntity.getBookType() == BookFileType.CBX) {
+            book.setCbxProgress(CbxProgress.builder()
+                    .page(userProgress.getCbxProgress())
+                    .percentage(userProgress.getCbxProgressPercent())
                     .build());
         }
         book.setFilePath(FileUtils.getBookFullPath(bookEntity));
@@ -178,6 +208,12 @@ public class BooksService {
                         book.setPdfProgress(PdfProgress.builder()
                                 .page(userProgress.getPdfProgress())
                                 .percentage(userProgress.getPdfProgressPercent())
+                                .build());
+                    }
+                    if (bookEntity.getBookType() == BookFileType.CBX) {
+                        book.setCbxProgress(CbxProgress.builder()
+                                .page(userProgress.getCbxProgress())
+                                .percentage(userProgress.getCbxProgressPercent())
                                 .build());
                     }
                     book.setFilePath(FileUtils.getBookFullPath(bookEntity));
@@ -236,6 +272,9 @@ public class BooksService {
         } else if (book.getBookType() == BookFileType.PDF && request.getPdfProgress() != null) {
             userBookProgress.setPdfProgress(request.getPdfProgress().getPage());
             userBookProgress.setPdfProgressPercent(request.getPdfProgress().getPercentage());
+        } else if (book.getBookType() == BookFileType.CBX && request.getCbxProgress() != null) {
+            userBookProgress.setCbxProgress(request.getCbxProgress().getPage());
+            userBookProgress.setCbxProgressPercent(request.getCbxProgress().getPercentage());
         }
         userBookProgressRepository.save(userBookProgress);
     }

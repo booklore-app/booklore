@@ -29,6 +29,8 @@ export interface AppSettings {
   oidcEnabled: boolean;
   oidcProviderDetails: OidcProviderDetails;
   oidcAutoProvisionDetails: OidcAutoProvisionDetails;
+  cbxCacheSizeInMb: number;
+  maxFileUploadSizeInMb: number;
 }
 
 export enum AppSettingKey {
@@ -40,5 +42,7 @@ export enum AppSettingKey {
   OPDS_SERVER_ENABLED = 'OPDS_SERVER_ENABLED',
   OIDC_ENABLED = 'OIDC_ENABLED',
   OIDC_PROVIDER_DETAILS = 'OIDC_PROVIDER_DETAILS',
-  OIDC_AUTO_PROVISION_DETAILS = 'OIDC_AUTO_PROVISION_DETAILS'
+  OIDC_AUTO_PROVISION_DETAILS = 'OIDC_AUTO_PROVISION_DETAILS',
+  CBX_CACHE_SIZE_IN_MB = 'CBX_CACHE_SIZE_IN_MB',
+  MAX_FILE_UPLOAD_SIZE_IN_MB = 'MAX_FILE_UPLOAD_SIZE_IN_MB'
 }

@@ -18,6 +18,7 @@ import {MetadataAdvancedFetchOptionsComponent} from '../../book/metadata/metadat
 import {filter, take} from 'rxjs/operators';
 import {FileUploadPatternComponent} from './file-upload-pattern/file-upload-pattern.component';
 import {OpdsSettingsComponent} from './opds-settings/opds-settings.component';
+import {InputText} from 'primeng/inputtext';
 
 @Component({
   selector: 'app-global-preferences',
@@ -32,7 +33,8 @@ import {OpdsSettingsComponent} from './opds-settings/opds-settings.component';
     FormsModule,
     MetadataAdvancedFetchOptionsComponent,
     FileUploadPatternComponent,
-    OpdsSettingsComponent
+    OpdsSettingsComponent,
+    InputText
   ],
   templateUrl: './global-preferences.component.html',
   styleUrl: './global-preferences.component.scss'
@@ -59,6 +61,8 @@ export class GlobalPreferencesComponent implements OnInit {
   private messageService = inject(MessageService);
 
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
+  cbxCacheValue?: number;
+  maxFileUploadSizeInMb?: number;
 
   ngOnInit(): void {
     this.appSettings$.pipe(
@@ -68,8 +72,14 @@ export class GlobalPreferencesComponent implements OnInit {
       if (settings?.coverResolution) {
         this.selectedResolution = settings.coverResolution;
       }
-      if (settings.metadataRefreshOptions) {
+      if (settings?.metadataRefreshOptions) {
         this.currentMetadataOptions = settings.metadataRefreshOptions;
+      }
+      if (settings?.cbxCacheSizeInMb) {
+        this.cbxCacheValue = settings.cbxCacheSizeInMb;
+      }
+      if (settings?.maxFileUploadSizeInMb) {
+        this.maxFileUploadSizeInMb = settings.maxFileUploadSizeInMb;
       }
       this.toggles.autoBookSearch = settings.autoBookSearch ?? false;
       this.toggles.similarBookRecommendation = settings.similarBookRecommendation ?? false;
@@ -96,6 +106,23 @@ export class GlobalPreferencesComponent implements OnInit {
 
   onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions): void {
     this.saveSetting(AppSettingKey.QUICK_BOOK_MATCH, metadataRefreshOptions);
+  }
+
+  saveCacheSize(): void {
+    if (!this.cbxCacheValue || this.cbxCacheValue <= 0) {
+      this.showMessage('error', 'Invalid Input', 'Please enter a valid cache size in MB.');
+      return;
+    }
+
+    this.saveSetting(AppSettingKey.CBX_CACHE_SIZE_IN_MB, this.cbxCacheValue);
+  }
+
+  saveFileSize() {
+    if (!this.maxFileUploadSizeInMb || this.maxFileUploadSizeInMb <= 0) {
+      this.showMessage('error', 'Invalid Input', 'Please enter a valid max file upload size in MB.');
+      return;
+    }
+    this.saveSetting(AppSettingKey.MAX_FILE_UPLOAD_SIZE_IN_MB, this.maxFileUploadSizeInMb);
   }
 
   regenerateCovers(): void {

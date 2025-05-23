@@ -23,5 +23,6 @@ public class Book {
     private BookMetadata metadata;
     private PdfProgress pdfProgress;
     private EpubProgress epubProgress;
+    private CbxProgress cbxProgress;
     private List<Shelf> shelves;
 }

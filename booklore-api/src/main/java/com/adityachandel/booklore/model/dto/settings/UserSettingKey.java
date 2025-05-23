@@ -7,6 +7,7 @@ public enum UserSettingKey {
     PER_BOOK_SETTING("perBookSetting", true),
     PDF_READER_SETTING("pdfReaderSetting", true),
     EPUB_READER_SETTING("epubReaderSetting", true),
+    CBX_READER_SETTING("cbxReaderSetting", true),
     SIDEBAR_LIBRARY_SORTING("sidebarLibrarySorting", true),
     SIDEBAR_SHELF_SORTING("sidebarShelfSorting", true);
 

@@ -2,6 +2,7 @@ package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.model.UploadedFileMetadata;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 @Slf4j
 @Service
-public class PdfMetadataExtractor implements BookFileMetadataExtractor {
+public class PdfMetadataExtractor implements UploadedFileMetadataExtractor {
 
     @Override
     public UploadedFileMetadata extractMetadata(String filePath) {
@@ -24,6 +25,8 @@ public class PdfMetadataExtractor implements BookFileMetadataExtractor {
             if (info != null) {
                 if (info.getTitle() != null && !info.getTitle().isBlank()) {
                     metadata.setTitle(info.getTitle());
+                } else {
+                    metadata.setTitle(FilenameUtils.getBaseName(filePath));
                 }
                 if (info.getAuthor() != null && !info.getAuthor().isBlank()) {
                     metadata.setAuthors(Set.of(info.getAuthor().split(",")));

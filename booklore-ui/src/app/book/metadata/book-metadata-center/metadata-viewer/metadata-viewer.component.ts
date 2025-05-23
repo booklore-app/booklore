@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, DestroyRef, inject, Input, OnInit, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
 import {Button, ButtonDirective} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {first, Observable} from 'rxjs';
@@ -31,10 +31,11 @@ import {ProgressBar} from 'primeng/progressbar';
   styleUrl: './metadata-viewer.component.scss',
   imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar]
 })
-export class MetadataViewerComponent implements OnInit {
+export class MetadataViewerComponent implements OnInit, OnChanges {
 
   @Input() book: Book | undefined;
   @Input() recommendedBooks: BookRecommendation[] = [];
+  private originalRecommendedBooks: BookRecommendation[] = [];
 
   @ViewChild(Editor) quillEditor!: Editor;
 
@@ -81,7 +82,7 @@ export class MetadataViewerComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((metadata) => {
         if (metadata) {
-          this.getBooksInSeries(metadata.bookId);
+          this.loadBooksInSeriesAndFilterRecommended(metadata.bookId);
           if (this.quillEditor && this.quillEditor.quill) {
             this.quillEditor.quill.root.innerHTML = metadata.description;
           }
@@ -89,14 +90,34 @@ export class MetadataViewerComponent implements OnInit {
       });
   }
 
-  toggleExpand(): void {
-    this.isExpanded = !this.isExpanded;
+  private loadBooksInSeriesAndFilterRecommended(bookId: number): void {
+    this.bookService.getBooksInSeries(bookId).subscribe((bookInSeries) => {
+      bookInSeries.sort((a, b) => (a.metadata?.seriesNumber ?? 0) - (b.metadata?.seriesNumber ?? 0));
+      this.bookInSeries = bookInSeries;
+      this.originalRecommendedBooks = [...this.recommendedBooks];
+      this.filterRecommendations();
+    });
   }
 
-  getBooksInSeries(bookId: number): void {
-    this.bookService.getBooksInSeries(bookId).subscribe((bookInSeries) => {
-      this.bookInSeries = bookInSeries;
-    });
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['recommendedBooks']) {
+      this.originalRecommendedBooks = [...this.recommendedBooks];
+      this.filterRecommendations();
+    }
+  }
+
+  private filterRecommendations(): void {
+    if (!this.originalRecommendedBooks) {
+      return;
+    }
+    const bookInSeriesIds = new Set(this.bookInSeries.map(book => book.id));
+    this.recommendedBooks = this.originalRecommendedBooks.filter(
+      rec => !bookInSeriesIds.has(rec.book.id)
+    );
+  }
+
+  toggleExpand(): void {
+    this.isExpanded = !this.isExpanded;
   }
 
   read(bookId: number): void {
@@ -168,6 +189,8 @@ export class MetadataViewerComponent implements OnInit {
   getProgressPercent(): number | undefined {
     if (this.book?.bookType === 'PDF') {
       return this.book.pdfProgress?.percentage;
+    } else if(this.book?.bookType === 'CBX') {
+      return this.book?.cbxProgress?.percentage;
     } else {
       return this.book?.epubProgress?.percentage;
     }

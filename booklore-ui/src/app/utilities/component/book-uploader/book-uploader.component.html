@@ -18,9 +18,9 @@
     class="w-full"></p-select>
 
   <p-fileupload class="w-full" name="file"
-                maxFileSize="104857600"
+                [maxFileSize]="maxFileSizeBytes"
                 [customUpload]="true"
-                [multiple]="true" accept=".pdf,.epub"
+                [multiple]="true" accept=".pdf,.epub,.cbz,.cbr,.cb7"
                 (onSelect)="onFilesSelect($event)"
                 (uploadHandler)="uploadFiles($event)"
                 [disabled]="!selectedLibrary || !selectedPath">
@@ -101,7 +101,9 @@
       <div class="flex items-center justify-center flex-col text-center">
         <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color"></i>
         <p class="mt-6 mb-2">Drag and drop files here to upload.</p>
-        <p class="mt-2 mb-2">Only <strong>.epub</strong> and <strong>.pdf</strong> files are supported (max size: 100 MB per file).</p>
+        <p class="mt-2 mb-2">
+          Only <strong>.pdf</strong>, <strong>.epub</strong>, <strong>.cbz</strong>, <strong>.cbr</strong>, and <strong>.cb7</strong> files are supported (max size: 100 MB per file).
+        </p>
       </div>
     </ng-template>
   </p-fileupload>

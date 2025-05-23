@@ -1,6 +1,6 @@
 import {Shelf} from './shelf.model';
 
-export type BookType = "PDF" | "EPUB";
+export type BookType = "PDF" | "EPUB" | "CBX";
 
 export interface Book {
   id: number;
@@ -12,6 +12,7 @@ export interface Book {
   addedOn?: string;
   epubProgress?: EpubProgress;
   pdfProgress?: PdfProgress;
+  cbxProgress?: CbxProgress;
   filePath?: string;
   fileSizeKb?: number;
 }
@@ -22,6 +23,11 @@ export interface EpubProgress {
 }
 
 export interface PdfProgress {
+  page: number;
+  percentage: number;
+}
+
+export interface CbxProgress {
   page: number;
   percentage: number;
 }
@@ -102,9 +108,15 @@ export interface EpubViewerSetting {
   flow: string;
 }
 
+export interface CbxViewerSetting {
+  pageSpread: CbxPageSpread;
+  pageViewMode: CbxPageViewMode;
+}
+
 export interface BookSetting {
   pdfSettings?: PdfViewerSetting;
   epubSettings?: EpubViewerSetting;
+  cbxSettings?: CbxViewerSetting;
 
   [key: string]: any;
 }
@@ -112,4 +124,14 @@ export interface BookSetting {
 export interface BookRecommendation {
   book: Book;
   similarityScore: number;
+}
+
+export const enum CbxPageViewMode {
+  SINGLE_PAGE = 'SINGLE_PAGE',
+  TWO_PAGE = 'TWO_PAGE',
+}
+
+export const enum CbxPageSpread {
+  EVEN = 'EVEN',
+  ODD = 'ODD',
 }

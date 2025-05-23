@@ -118,6 +118,10 @@ public class FileService {
         return appProperties.getPathConfig() + "/thumbs/" + bookId + "/";
     }
 
+    public String getCbxCachePath() {
+        return appProperties.getPathConfig() + "/cbx_cache";
+    }
+
     public String getMissingThumbnailPath() {
         return appProperties.getPathConfig() + "/thumbs/missing/m.jpg";
     }

@@ -9,6 +9,8 @@ import com.adityachandel.booklore.model.dto.settings.OidcAutoProvisionDetails;
 import com.adityachandel.booklore.model.dto.settings.SidebarSortOption;
 import com.adityachandel.booklore.model.dto.settings.UserSettingKey;
 import com.adityachandel.booklore.model.entity.*;
+import com.adityachandel.booklore.model.enums.CbxPageSpread;
+import com.adityachandel.booklore.model.enums.CbxPageViewMode;
 import com.adityachandel.booklore.model.enums.ProvisioningMethod;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
@@ -179,6 +181,7 @@ public class UserProvisioningService {
         addUserSetting(user, UserSettingKey.PER_BOOK_SETTING, buildDefaultPerBookSetting());
         addUserSetting(user, UserSettingKey.PDF_READER_SETTING, buildDefaultPdfReaderSetting());
         addUserSetting(user, UserSettingKey.EPUB_READER_SETTING, buildDefaultEpubReaderSetting());
+        addUserSetting(user, UserSettingKey.CBX_READER_SETTING, buildDefaultEpubReaderSetting());
         addUserSetting(user, UserSettingKey.SIDEBAR_LIBRARY_SORTING, buildDefaultSidebarLibrarySorting());
         addUserSetting(user, UserSettingKey.SIDEBAR_SHELF_SORTING, buildDefaultSidebarShelfSorting());
 
@@ -219,6 +222,13 @@ public class UserProvisioningService {
                 .font("serif")
                 .fontSize(150)
                 .flow("paginated")
+                .build();
+    }
+
+    private BookLoreUser.UserSettings.CbxReaderSetting buildDefaultCbxReaderSetting() {
+        return BookLoreUser.UserSettings.CbxReaderSetting.builder()
+                .pageViewMode(CbxPageViewMode.SINGLE_PAGE)
+                .pageSpread(CbxPageSpread.ODD)
                 .build();
     }
 

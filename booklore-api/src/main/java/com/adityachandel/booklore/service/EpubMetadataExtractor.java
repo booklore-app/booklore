@@ -1,17 +1,13 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.model.UploadedFileMetadata;
-import com.adityachandel.booklore.util.FileUtils;
 import io.documentnode.epub4j.domain.Author;
 import io.documentnode.epub4j.domain.Book;
 import io.documentnode.epub4j.epub.EpubReader;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -20,21 +16,23 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class EpubMetadataExtractor implements BookFileMetadataExtractor {
+public class EpubMetadataExtractor implements UploadedFileMetadataExtractor {
 
     @Override
     public UploadedFileMetadata extractMetadata(String filePath) {
         UploadedFileMetadata metadata = new UploadedFileMetadata();
 
         try (FileInputStream fis = new FileInputStream(filePath)) {
-            Book epubBook = new EpubReader().readEpub(fis);
+            Book epub = new EpubReader().readEpub(fis);
 
-            String title = epubBook.getTitle();
+            String title = epub.getTitle();
             if (title != null && !title.isBlank()) {
                 metadata.setTitle(title);
+            } else {
+                metadata.setTitle(FilenameUtils.getBaseName(filePath));
             }
 
-            List<Author> epubAuthors = epubBook.getMetadata().getAuthors();
+            List<Author> epubAuthors = epub.getMetadata().getAuthors();
             if (!epubAuthors.isEmpty()) {
                 Set<String> authors = epubAuthors.stream()
                         .map(author -> author.getFirstname() + " " + author.getLastname())

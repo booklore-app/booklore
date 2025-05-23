@@ -5,6 +5,7 @@ import {API_CONFIG} from '../../config/api-config';
 import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {Library} from '../../book/model/library.model';
 import {catchError} from 'rxjs/operators';
+import {CbxPageSpread, CbxPageViewMode} from '../../book/model/book.model';
 
 export interface SidebarLibrarySorting {
   field: string;
@@ -19,6 +20,7 @@ export interface SidebarShelfSorting {
 export interface PerBookSetting {
   pdf: string;
   epub: string;
+  cbx: string;
 }
 
 export type PageSpread = 'off' | 'even' | 'odd';
@@ -36,10 +38,16 @@ export interface EpubReaderSetting {
   flow: string;
 }
 
+export interface CbxReaderSetting {
+  pageSpread: CbxPageSpread;
+  pageViewMode: CbxPageViewMode;
+}
+
 export interface UserSettings {
   perBookSetting: PerBookSetting;
   pdfReaderSetting: PdfReaderSetting;
   epubReaderSetting: EpubReaderSetting;
+  cbxReaderSetting: CbxReaderSetting;
   sidebarLibrarySorting: SidebarLibrarySorting;
   sidebarShelfSorting: SidebarShelfSorting
 }

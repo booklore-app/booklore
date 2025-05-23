@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {FileSelectEvent, FileUpload, FileUploadHandlerEvent} from 'primeng/fileupload';
 import {Button} from 'primeng/button';
 import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
@@ -14,6 +14,9 @@ import {API_CONFIG} from '../../../config/api-config';
 import {Book} from '../../../book/model/book.model';
 import {HttpClient} from '@angular/common/http';
 import {Tooltip} from 'primeng/tooltip';
+import {AppSettingsService} from '../../../core/service/app-settings.service';
+import {filter, take} from 'rxjs/operators';
+import {AppSettings} from '../../../core/model/app-settings.model';
 
 interface UploadingFile {
   file: File;
@@ -40,7 +43,7 @@ interface UploadingFile {
   templateUrl: './book-uploader.component.html',
   styleUrl: './book-uploader.component.scss'
 })
-export class BookUploaderComponent {
+export class BookUploaderComponent implements OnInit {
   files: UploadingFile[] = [];
   isUploading: boolean = false;
   selectedLibrary: Library | null = null;
@@ -48,9 +51,23 @@ export class BookUploaderComponent {
 
   private readonly libraryService = inject(LibraryService);
   private readonly messageService = inject(MessageService);
+  private readonly appSettingsService = inject(AppSettingsService);
   private readonly http = inject(HttpClient);
 
   readonly libraryState$: Observable<LibraryState> = this.libraryService.libraryState$;
+  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
+  maxFileSizeBytes?: number;
+
+  ngOnInit(): void {
+    this.appSettings$
+      .pipe(
+        filter(settings => settings != null),
+        take(1)
+      )
+      .subscribe(settings => {
+        this.maxFileSizeBytes = (settings?.maxFileUploadSizeInMb ?? 100) * 1024 * 1024;
+      });
+  }
 
   hasPendingFiles(): boolean {
     return this.files.some(f => f.status === 'Pending');

@@ -77,6 +77,8 @@ public class AppSettingService {
         builder.similarBookRecommendation(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.SIMILAR_BOOK_RECOMMENDATION, "true")));
         builder.opdsServerEnabled(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.OPDS_SERVER_ENABLED, "false")));
         builder.oidcEnabled(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.OIDC_ENABLED, "false")));
+        builder.cbxCacheSizeInMb(Integer.parseInt(getOrCreateSetting(AppSettingKey.CBX_CACHE_SIZE_IN_MB, "5120")));
+        builder.maxFileUploadSizeInMb(Integer.parseInt(getOrCreateSetting(AppSettingKey.MAX_FILE_UPLOAD_SIZE_IN_MB, "100")));
 
         return builder.build();
     }

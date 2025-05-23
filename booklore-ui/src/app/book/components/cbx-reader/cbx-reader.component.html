@@ -1,0 +1,35 @@
+<div class="comic-reader-container">
+  <div class="navigation">
+    <div class="page-controls">
+      <button (click)="previousPage()" [disabled]="currentPage === 0">&#8592;</button>
+      <span>
+        Page {{ currentPage + 1 }}{{ isTwoPageView && imageUrls.length > 1 ? '-' + (currentPage + 2) : '' }} of {{ pages.length }}
+      </span>
+      <button (click)="nextPage()" [disabled]="currentPage >= pages.length - 1">&#8594;</button>
+    </div>
+    <div class="spread-controls">
+      <button *ngIf="isTwoPageView" (click)="toggleSpreadDirection()" title="Toggle Spread Direction">
+        {{ pageSpread === 'ODD' ? '⬅️' : '➡️' }}
+      </button>
+      <button (click)="toggleView()" title="Toggle View">
+        {{ isTwoPageView ? '1️⃣' : '2️⃣' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="image-container" [class.two-page-view]="isTwoPageView">
+    <ng-container *ngIf="!isLoading; else loading">
+      <ng-container *ngIf="pages.length > 0; else noPages">
+        <img *ngFor="let url of imageUrls" [src]="url" alt="Comic Page"/>
+      </ng-container>
+    </ng-container>
+    <ng-template #noPages>
+      <p>No pages available.</p>
+    </ng-template>
+    <ng-template #loading>
+      <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </ng-template>
+  </div>
+</div>

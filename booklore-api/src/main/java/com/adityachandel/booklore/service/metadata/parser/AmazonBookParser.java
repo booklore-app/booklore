@@ -91,23 +91,17 @@ public class AmazonBookParser implements BookParser {
             Element link = item.select("a:containsOwn(" + type + ")").first();
             if (link != null) {
                 bookLink = link.attr("href");
-                //log.info("{} link found: {}", type, bookLink);
-                break; // Take the first found link, whether Paperback or Hardcover
-            } else {
-                //log.info("No link containing '{}' found.", type);
+                break;
             }
         }
         if (bookLink != null) {
             return extractAsinFromUrl(bookLink);
         } else {
-            String asin = item.attr("data-asin");
-            //log.info("No book link found, returning ASIN: {}", asin);
-            return asin;
+            return item.attr("data-asin");
         }
     }
 
     private String extractAsinFromUrl(String url) {
-        // Extract the ASIN (book ID) from the URL, which will be the part after "/dp/"
         String[] parts = url.split("/dp/");
         if (parts.length > 1) {
             String[] asinParts = parts[1].split("/");
@@ -184,7 +178,7 @@ public class AmazonBookParser implements BookParser {
         if (titleElement != null) {
             return titleElement.text();
         }
-        log.error("Error fetching title: Element not found.");
+        log.warn("Failed to parse title: Element not found.");
         return null;
     }
 
@@ -193,7 +187,7 @@ public class AmazonBookParser implements BookParser {
         if (subtitleElement != null) {
             return subtitleElement.text();
         }
-        log.debug("Error fetching subtitle: Element not found.");
+        log.warn("Failed to parse subtitle: Element not found.");
         return null;
     }
 
@@ -207,9 +201,9 @@ public class AmazonBookParser implements BookParser {
                         .map(Element::text)
                         .collect(Collectors.toSet());
             }
-            log.error("Error fetching authors: Byline element not found.");
+            log.warn("Failed to parse authors: Byline element not found.");
         } catch (Exception e) {
-            log.error("Error fetching authors: {}", e.getMessage());
+            log.warn("Failed to parse authors: {}", e.getMessage());
         }
         return Set.of();
     }
@@ -224,7 +218,7 @@ public class AmazonBookParser implements BookParser {
             }
             return null;
         } catch (Exception e) {
-            log.error("Error extracting description from the document", e);
+            log.warn("Failed to parse description: {}", e.getMessage());
         }
         return null;
     }
@@ -235,9 +229,9 @@ public class AmazonBookParser implements BookParser {
             if (isbn10Element != null) {
                 return isbn10Element.text();
             }
-            log.debug("Error fetching ISBN-10: Element not found.");
+            log.warn("Failed to parse isbn10: Element not found.");
         } catch (Exception e) {
-            log.debug("Error fetching ISBN-10: {}", e.getMessage());
+            log.warn("Failed to parse isbn10: {}", e.getMessage());
         }
         return null;
     }
@@ -248,9 +242,9 @@ public class AmazonBookParser implements BookParser {
             if (isbn13Element != null) {
                 return isbn13Element.text();
             }
-            log.debug("Error fetching ISBN-13: Element not found.");
+            log.warn("Failed to parse isbn13: Element not found.");
         } catch (Exception e) {
-            log.debug("Error fetching ISBN-13: {}", e.getMessage());
+            log.warn("Failed to parse isbn13: {}", e.getMessage());
         }
         return null;
     }
@@ -271,10 +265,10 @@ public class AmazonBookParser implements BookParser {
                     }
                 }
             } else {
-                log.warn("Error fetching publisher: Element 'detailBullets_feature_div' not found.");
+                log.warn("Failed to parse publisher: Element 'detailBullets_feature_div' not found.");
             }
         } catch (Exception e) {
-            log.warn("Error fetching publisher: {}", e.getMessage());
+            log.warn("Failed to parse publisher: {}", e.getMessage());
         }
         return null;
     }
@@ -285,9 +279,9 @@ public class AmazonBookParser implements BookParser {
             if (publicationDateElement != null) {
                 return parseAmazonDate(publicationDateElement.text());
             }
-            log.warn("Error fetching publication date: Element not found.");
+            log.warn("Failed to parse publishedDate: Element not found.");
         } catch (Exception e) {
-            log.warn("Error fetching publication date: {}", e.getMessage());
+            log.warn("Failed to parse publishedDate: {}", e.getMessage());
         }
         return null;
     }
@@ -298,10 +292,10 @@ public class AmazonBookParser implements BookParser {
             if (seriesNameElement != null) {
                 return seriesNameElement.text();
             } else {
-                log.debug("Error fetching series name: Element not found.");
+                log.warn("Failed to parse seriesName: Element not found.");
             }
         } catch (Exception e) {
-            log.debug("Error fetching series name: {}", e.getMessage());
+            log.warn("Failed to parse seriesName: {}", e.getMessage());
         }
         return null;
     }
@@ -316,10 +310,10 @@ public class AmazonBookParser implements BookParser {
                     return Float.parseFloat(parts[1]);
                 }
             } else {
-                log.debug("Error fetching series number: Element not found.");
+                log.warn("Failed to parse seriesNumber: Element not found.");
             }
         } catch (Exception e) {
-            log.debug("Error fetching series number: {}", e.getMessage());
+            log.warn("Failed to parse seriesNumber: {}", e.getMessage());
         }
         return null;
     }
@@ -334,10 +328,10 @@ public class AmazonBookParser implements BookParser {
                     return Integer.parseInt(parts[3]);
                 }
             } else {
-                log.debug("Error fetching series total: Element not found.");
+                log.warn("Failed to parse seriesTotal: Element not found.");
             }
         } catch (Exception e) {
-            log.debug("Error fetching series total: {}", e.getMessage());
+            log.warn("Failed to parse seriesTotal: {}", e.getMessage());
         }
         return null;
     }
@@ -348,9 +342,9 @@ public class AmazonBookParser implements BookParser {
             if (languageElement != null) {
                 return languageElement.text();
             }
-            log.warn("Error fetching language: Element not found.");
+            log.warn("Failed to parse language: Element not found.");
         } catch (Exception e) {
-            log.warn("Error fetching language: {}", e.getMessage());
+            log.warn("Failed to parse language: {}", e.getMessage());
         }
         return null;
     }
@@ -366,9 +360,9 @@ public class AmazonBookParser implements BookParser {
                         .map(c -> c.replace("(Books)", "").trim())
                         .collect(Collectors.toSet());
             }
-            log.warn("Error fetching best seller categories: Element not found.");
+            log.warn("Failed to parse categories: Element not found.");
         } catch (Exception e) {
-            log.warn("Error fetching best seller categories: {}", e.getMessage());
+            log.warn("Failed to parse categories: {}", e.getMessage());
         }
         return Set.of();
     }
@@ -386,7 +380,7 @@ public class AmazonBookParser implements BookParser {
                 }
             }
         } catch (Exception e) {
-            log.warn("Error fetching rating", e);
+            log.warn("Failed to parse amazonRating: {}", e.getMessage());
         }
         return null;
     }
@@ -405,7 +399,7 @@ public class AmazonBookParser implements BookParser {
                 }
             }
         } catch (Exception e) {
-            log.warn("Error fetching review count", e);
+            log.warn("Failed to parse amazonReviewCount: {}", e.getMessage());
         }
         return null;
     }
@@ -416,9 +410,9 @@ public class AmazonBookParser implements BookParser {
             if (imageElement != null) {
                 return imageElement.attr("src");
             }
-            log.warn("Error fetching image URL: Image element not found.");
+            log.warn("Failed to parse thumbnail: Image element not found.");
         } catch (Exception e) {
-            log.warn("Error fetching image URL: {}", e.getMessage());
+            log.warn("Failed to parse thumbnail: {}", e.getMessage());
         }
         return null;
     }
@@ -432,7 +426,7 @@ public class AmazonBookParser implements BookParser {
                     String cleanedPageCount = pageCountText.replaceAll("[^\\d]", "");
                     return Integer.parseInt(cleanedPageCount);
                 } catch (NumberFormatException e) {
-                    log.warn("Error parsing page count: {}", pageCountText, e);
+                    log.warn("Error parsing page count: {}, error: {}", pageCountText, e.getMessage());
                 }
             }
         }
@@ -485,7 +479,7 @@ public class AmazonBookParser implements BookParser {
             document.select("span.a-text-bold").tagName("b").removeAttr("class");
             document.select("span.a-text-italic").tagName("i").removeAttr("class");
             for (Element span : document.select("span.a-list-item")) {
-                span.unwrap();  // Removes the span and keeps its content
+                span.unwrap();
             }
             document.select("ol.a-ordered-list.a-vertical").tagName("ol").removeAttr("class");
             document.select("ul.a-unordered-list.a-vertical").tagName("ul").removeAttr("class");
@@ -493,13 +487,10 @@ public class AmazonBookParser implements BookParser {
                 span.unwrap();
             }
             document.select("li").forEach(li -> {
-                // Remove <br> tags preceding the <li> (if any)
                 Element prev = li.previousElementSibling();
                 if (prev != null && "br".equals(prev.tagName())) {
                     prev.remove();
                 }
-
-                // Remove <br> tags following the <li> (if any)
                 Element next = li.nextElementSibling();
                 if (next != null && "br".equals(next.tagName())) {
                     next.remove();
@@ -510,7 +501,7 @@ public class AmazonBookParser implements BookParser {
                     .forEach(Element::remove);
             return document.body().html();
         } catch (Exception e) {
-            log.warn("Error cleaning html description", e);
+            log.warn("Error cleaning html description, Error: {}", e.getMessage());
         }
         return html;
     }

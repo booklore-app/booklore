@@ -5,6 +5,7 @@ import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
+import com.adityachandel.booklore.model.dto.CbxProgress;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.request.ToggleAllLockRequest;
@@ -19,6 +20,7 @@ import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
+import com.adityachandel.booklore.service.fileprocessor.CbxProcessor;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
@@ -54,6 +56,7 @@ public class BookMetadataService {
     private final FileService fileService;
     private final PdfProcessor pdfProcessor;
     private final EpubProcessor epubProcessor;
+    private final CbxProcessor cbxProcessor;
     private final Map<MetadataProvider, BookParser> parserMap;
 
     public List<BookMetadata> getProspectiveMetadataListForBookId(long bookId, FetchMetadataRequest request) {
@@ -438,9 +441,10 @@ public class BookMetadataService {
         switch (book.getBookType()) {
             case PDF -> pdfProcessor.generateCover(book);
             case EPUB -> epubProcessor.generateCover(book);
+            case CBX -> cbxProcessor.generateCover(book);
             default -> throw ApiError.UNSUPPORTED_BOOK_TYPE.createException(book.getBookType());
         }
-        log.info("{} Successfully regenerated cover for book ID {} ({})", progress, book.getId(), title);
+        log.info("{}Successfully regenerated cover for book ID {} ({})", progress, book.getId(), title);
     }
 
     @Transactional

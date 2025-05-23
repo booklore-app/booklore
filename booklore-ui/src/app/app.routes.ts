@@ -15,6 +15,7 @@ import {SetupRedirectGuard} from './core/setup/setup-redirect.guard';
 import {EmptyComponent} from './core/empty/empty.component';
 import {LoginGuard} from './core/setup/ login.guard';
 import {OidcCallbackComponent} from './core/security/oidc-callback/oidc-callback.component';
+import {CbxReaderComponent} from './book/components/cbx-reader/cbx-reader.component';
 
 export const routes: Routes = [
   {
@@ -50,6 +51,11 @@ export const routes: Routes = [
   {
     path: 'epub-viewer/book/:bookId',
     component: EpubViewerComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'cbx-viewer/book/:bookId',
+    component: CbxReaderComponent,
     canActivate: [AuthGuard]
   },
   {

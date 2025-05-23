@@ -1,0 +1,96 @@
+.comic-reader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  .navigation {
+    position: relative;
+    width: 100%;
+    margin: 1rem;
+
+    .page-controls {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      white-space: nowrap;
+
+      span {
+        min-width: 8rem;
+        display: inline-block;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+
+      button {
+        min-width: 3rem;
+        padding: 0 0.5rem;
+        text-align: center;
+        white-space: nowrap;
+        cursor: pointer;
+
+        &:disabled {
+          cursor: default;
+          color: #999;
+        }
+      }
+    }
+
+    .spread-controls {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      button {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+    }
+  }
+
+  .image-container {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    overflow: hidden;
+    padding: 0 1rem;
+    box-sizing: border-box;
+
+    &.two-page-view {
+      img {
+        max-width: calc(50% - 0.5rem);
+      }
+    }
+
+    &:not(.two-page-view) {
+      img {
+        max-width: 100%;
+      }
+    }
+
+    img {
+      max-height: 100%;
+      height: auto;
+      width: auto;
+      object-fit: contain;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      flex-shrink: 1;
+      margin: 0;
+      display: block;
+    }
+  }
+}

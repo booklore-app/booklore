@@ -13,14 +13,13 @@
     <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
       <p class=" py-1">Resolution:
         <i class="pi pi-info-circle text-sky-600"
-           pTooltip="Specifies the resolution of the generated cover image. Higher resolutions result in sharper images but may increase file size. This setting will apply to future books, or else use 'Regenerate' button."
+           pTooltip="Sets the resolution for generated cover images. Higher resolutions produce sharper covers but increase file size. Applies only to future books unless covers are regenerated."
            tooltipPosition="right"
            style="cursor: pointer;">
         </i>
       </p>
       <div class="flex gap-4 justify-start">
         <p-select
-          size="small"
           [options]="resolutionOptions"
           [(ngModel)]="selectedResolution"
           (ngModelChange)="onResolutionChange()"
@@ -30,7 +29,7 @@
 
       <p class=" py-1">Regenerate Covers?
         <i class="pi pi-info-circle text-sky-600"
-           pTooltip="This option will regenerate the covers for all EPUB and PDF books (except locked ones) using the selected resolution."
+           pTooltip="Regenerates cover images for all EPUB and PDF books (excluding locked ones) using the selected resolution."
            tooltipPosition="right"
            style="cursor: pointer;">
         </i>
@@ -50,7 +49,7 @@
     <div>
       <p class="text-lg pb-4 ">Auto Book Search
         <i class="pi pi-info-circle text-sky-600"
-           pTooltip="If enabled, Booklore will automatically perform a metadata match/search when the book information tab is opened."
+           pTooltip="Automatically attempts metadata matching when the book information panel is opened."
            tooltipPosition="right"
            style="cursor: pointer;">
         </i>
@@ -68,7 +67,7 @@
     <div>
       <p class="text-lg pb-4 ">Similar Book Recommendation
         <i class="pi pi-info-circle text-sky-600"
-           pTooltip="Enable or disable similar book recommendations entirely."
+           pTooltip="Enables or disables similar book recommendations based on your library."
            tooltipPosition="right"
            style="cursor: pointer;">
         </i>
@@ -81,6 +80,55 @@
             (onChange)="onToggleChange('similarBookRecommendation', $event.checked)"
           />
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pt-2 pb-4">
+    <p-divider></p-divider>
+  </div>
+
+  <div class="flex flex-row gap-11 p-4">
+    <div>
+      <p class="text-lg pb-4 ">Max File Upload Size:
+        <i class="pi pi-info-circle text-sky-600"
+           pTooltip="Defines the maximum allowed size (in MB) for each uploaded file. Applies to EPUB, PDF, CBZ, CBR, and CB7 formats."
+           tooltipPosition="right"
+           style="cursor: pointer;">
+        </i>
+      </p>
+      <div class="flex gap-4 items-center">
+        <div class="relative w-28">
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="maxFileUploadSizeInMb"
+            class="pr-10 w-full"
+            placeholder="Max size"/>
+          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">MB</span>
+        </div>
+        <p-button label="Save" outlined (onClick)="saveFileSize()"></p-button>
+      </div>
+    </div>
+    <div>
+      <p class="text-lg pb-4 ">CBX Cache Size:
+        <i class="pi pi-info-circle text-sky-600"
+           pTooltip="Limits the total size (in MB) of the CBX image cache. If exceeded, older cache entries are removed automatically."
+           tooltipPosition="right"
+           style="cursor: pointer;">
+        </i>
+      </p>
+      <div class="flex gap-4 items-center">
+        <div class="relative w-28">
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="cbxCacheValue"
+            class="pr-10 w-full"
+            placeholder="Cache size"/>
+          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">MB</span>
+        </div>
+        <p-button label="Save" outlined (onClick)="saveCacheSize()"></p-button>
       </div>
     </div>
   </div>
@@ -114,7 +162,8 @@
          style="cursor: pointer;">
       </i>
     </p>
-    <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)" [currentMetadataOptions]="currentMetadataOptions"></app-metadata-advanced-fetch-options>
+    <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)"
+                                         [currentMetadataOptions]="currentMetadataOptions"></app-metadata-advanced-fetch-options>
   </div>
 
 </div>

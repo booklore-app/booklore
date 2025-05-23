@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto.request;
 
+import com.adityachandel.booklore.model.dto.CbxProgress;
 import com.adityachandel.booklore.model.dto.EpubProgress;
 import com.adityachandel.booklore.model.dto.PdfProgress;
 import jakarta.validation.constraints.AssertTrue;
@@ -12,9 +13,10 @@ public class ReadProgressRequest {
     private Long bookId;
     private EpubProgress epubProgress;
     private PdfProgress pdfProgress;
+    private CbxProgress cbxProgress;
 
     @AssertTrue(message = "Either epubProgress or pdfProgress must be provided")
     public boolean isProgressValid() {
-        return epubProgress != null || pdfProgress != null;
+        return epubProgress != null || pdfProgress != null || cbxProgress != null;
     }
 }

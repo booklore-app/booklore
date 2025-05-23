@@ -128,6 +128,10 @@ export class BookService {
         const url = `/epub-viewer/book/${book.id}`;
         window.open(url, '_blank');
         this.updateLastReadTime(book.id);
+      } else if (book.bookType === "CBX") {
+        const url = `/cbx-viewer/book/${book.id}`;
+        window.open(url, '_blank');
+        this.updateLastReadTime(book.id);
       } else {
         console.error('Unsupported book type:', book.bookType);
       }
@@ -201,6 +205,17 @@ export class BookService {
       bookId: bookId,
       epubProgress: {
         cfi: cfi,
+        percentage: percentage
+      }
+    };
+    return this.http.post<void>(`${this.url}/progress`, body);
+  }
+
+  saveCbxProgress(bookId: number, page: number, percentage: number): Observable<void> {
+    const body = {
+      bookId: bookId,
+      cbxProgress: {
+        page: page,
         percentage: percentage
       }
     };
