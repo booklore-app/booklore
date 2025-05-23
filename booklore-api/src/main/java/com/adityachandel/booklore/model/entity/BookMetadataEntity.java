@@ -51,7 +51,7 @@ public class BookMetadataEntity {
     @Column(name = "isbn_10", length = 10)
     private String isbn10;
 
-    @Column(name = "asin", length = 20)
+    @Column(name = "asin", length = 10)
     private String asin;
 
     @Column(name = "page_count")

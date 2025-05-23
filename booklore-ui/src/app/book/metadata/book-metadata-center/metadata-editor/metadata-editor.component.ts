@@ -175,7 +175,7 @@ export class MetadataEditorComponent implements OnInit {
           { key: 'languageLocked', control: 'language' },
           { key: 'isbn10Locked', control: 'isbn10' },
           { key: 'isbn13Locked', control: 'isbn13' },
-          { key: 'asin', control: 'asin'},
+          { key: 'asinLocked', control: 'asin'},
           { key: 'amazonReviewCountLocked', control: 'amazonReviewCount' },
           { key: 'amazonRatingLocked', control: 'amazonRating' },
           { key: 'goodreadsReviewCountLocked', control: 'goodreadsReviewCount' },
@@ -215,8 +215,13 @@ export class MetadataEditorComponent implements OnInit {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.metadataCenterService.emitMetadata(response);
       },
-      error: () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
+      error: (err) => {
+        console.error('Update metadata failed:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'Failed to update book metadata'
+        });
       }
     });
   }
@@ -303,7 +308,7 @@ export class MetadataEditorComponent implements OnInit {
       publishedDateLocked: this.metadataForm.get('publishedDateLocked')?.value,
       isbn10Locked: this.metadataForm.get('isbn10Locked')?.value,
       isbn13Locked: this.metadataForm.get('isbn13Locked')?.value,
-      asinLocked: this.metadataForm.get('asin')?.value,
+      asinLocked: this.metadataForm.get('asinLocked')?.value,
       descriptionLocked: this.metadataForm.get('descriptionLocked')?.value,
       pageCountLocked: this.metadataForm.get('pageCountLocked')?.value,
       languageLocked: this.metadataForm.get('languageLocked')?.value,
