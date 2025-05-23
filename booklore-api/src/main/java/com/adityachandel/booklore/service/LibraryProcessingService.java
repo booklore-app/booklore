@@ -111,6 +111,8 @@ public class LibraryProcessingService {
     @Transactional
     protected void deleteRemovedBooks(List<BookEntity> removedBookEntities) {
         if (!removedBookEntities.isEmpty()) {
+            entityManager.flush();
+            entityManager.clear();
             Set<Long> bookIds = removedBookEntities.stream().map(BookEntity::getId).collect(Collectors.toSet());
             bookRepository.deleteByIdIn(bookIds);
             notificationService.sendMessage(Topic.BOOKS_REMOVE, bookIds);
