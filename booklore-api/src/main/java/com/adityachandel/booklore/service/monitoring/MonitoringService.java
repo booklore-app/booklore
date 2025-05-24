@@ -84,7 +84,7 @@ public class MonitoringService {
         if (!eventQueue.offer(event)) {
             log.warn("Event queue is full, dropping event: {}", event.getFilePath());
         } else {
-            log.info("Queued file change event: {} ({} in queue)", event.getFilePath(), eventQueue.size());
+            log.debug("Queued file change event: {} ({} in queue)", event.getFilePath(), eventQueue.size());
         }
     }
 
@@ -113,8 +113,7 @@ public class MonitoringService {
             } catch (InvalidDataAccessApiUsageException e) {
                 log.debug("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
             }
-            log.info("Processed file change event for library {}: {} (from folder: {}) with kind: {}",
-                    libraryId, filePath, watchedFolder, event.getEventKind());
+            log.debug("Processed file change event for library {}: {} (from folder: {}) with kind: {}", libraryId, filePath, watchedFolder, event.getEventKind());
         } else {
             log.warn("No libraryId found for watched folder: {}", watchedFolder);
         }

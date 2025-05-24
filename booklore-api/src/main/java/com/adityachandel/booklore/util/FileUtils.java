@@ -14,7 +14,10 @@ public class FileUtils {
     private static final String FILE_NOT_FOUND_MESSAGE = "File does not exist: ";
 
     public static String getBookFullPath(BookEntity bookEntity) {
-        return String.format("%s/%s/%s", bookEntity.getLibraryPath().getPath(), bookEntity.getFileSubPath(), bookEntity.getFileName());
+        return Path.of(bookEntity.getLibraryPath().getPath(), bookEntity.getFileSubPath(), bookEntity.getFileName())
+                .normalize()
+                .toString()
+                .replace("\\", "/");
     }
 
     public static String getRelativeSubPath(String basePath, Path fullFilePath) {

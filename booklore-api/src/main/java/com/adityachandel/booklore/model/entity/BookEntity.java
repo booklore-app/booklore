@@ -6,6 +6,8 @@ import com.adityachandel.booklore.model.enums.BookFileType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 
@@ -60,4 +62,11 @@ public class BookEntity {
     @Column(name = "similar_books_json", columnDefinition = "TEXT")
     private List<BookRecommendationLite> similarBooksJson;
 
+    public Path getFullFilePath() {
+        if (libraryPath == null || libraryPath.getPath() == null || fileSubPath == null || fileName == null) {
+            throw new IllegalStateException("Cannot construct file path: missing library path, file subpath, or file name");
+        }
+
+        return Paths.get(libraryPath.getPath(), fileSubPath, fileName);
+    }
 }
