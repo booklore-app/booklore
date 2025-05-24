@@ -1,13 +1,25 @@
 <div class="comic-reader-container">
   <div class="navigation">
-    <div class="page-controls">
-      <button (click)="previousPage()" [disabled]="currentPage === 0">&#8592;</button>
+    <div class="goto-page-controls" style="display: flex; align-items: center; margin-right: auto;">
+      <input type="number" [(ngModel)]="goToPageInput" [min]="1" [max]="pages.length" placeholder="Page">
+      <button
+        (click)="goToPageInput !== null && goToPage(goToPageInput)"
+        [disabled]="goToPageInput === null || goToPageInput < 1 || goToPageInput > pages.length">
+        Go
+      </button>
+    </div>
+
+    <div class="page-controls" style="display: flex; align-items: center; justify-content: center; flex-grow: 1;">
+      <button class="mr-2" (click)="goToPage(1)" [disabled]="currentPage === 0">&lt;&lt;</button>
+      <button (click)="previousPage()" [disabled]="currentPage === 0">&lt;</button>
       <span>
         Page {{ currentPage + 1 }}{{ isTwoPageView && imageUrls.length > 1 ? '-' + (currentPage + 2) : '' }} of {{ pages.length }}
       </span>
-      <button (click)="nextPage()" [disabled]="currentPage >= pages.length - 1">&#8594;</button>
+      <button (click)="nextPage()" [disabled]="currentPage >= pages.length - 1">&gt;</button>
+      <button class="ml-2" (click)="goToPage(pages.length)" [disabled]="currentPage >= pages.length - 1">&gt;&gt;</button>
     </div>
-    <div class="spread-controls">
+
+    <div class="spread-controls" style="display: flex; align-items: center; margin-left: auto;">
       <button *ngIf="isTwoPageView" (click)="toggleSpreadDirection()" title="Toggle Spread Direction">
         {{ pageSpread === 'ODD' ? '⬅️' : '➡️' }}
       </button>

@@ -8,15 +8,17 @@ import {MessageService} from 'primeng/api';
 import {forkJoin} from 'rxjs';
 import {BookSetting, CbxPageSpread, CbxPageViewMode} from '../../model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-cbx-reader',
   standalone: true,
-  imports: [NgIf, NgFor, ProgressSpinner],
+  imports: [NgIf, NgFor, ProgressSpinner, FormsModule],
   templateUrl: './cbx-reader.component.html',
   styleUrl: './cbx-reader.component.scss'
 })
 export class CbxReaderComponent implements OnInit {
+  goToPageInput: number | null = null;
   bookId!: number;
   pages: number[] = [];
   currentPage = 0;
@@ -89,12 +91,21 @@ export class CbxReaderComponent implements OnInit {
   }
 
   nextPage() {
+    const previousPage = this.currentPage;
+
     if (this.isTwoPageView) {
-      this.currentPage += (this.currentPage < this.pages.length - 2) ? 2 : 1;
+      if (this.currentPage + 2 < this.pages.length) {
+        this.currentPage += 2;
+      } else if (this.currentPage + 1 < this.pages.length) {
+        this.currentPage += 1;
+      }
     } else if (this.currentPage < this.pages.length - 1) {
       this.currentPage++;
     }
-    this.updateProgress();
+
+    if (this.currentPage !== previousPage) {
+      this.updateProgress();
+    }
   }
 
   previousPage() {
@@ -191,5 +202,15 @@ export class CbxReaderComponent implements OnInit {
       : 0;
 
     this.bookService.saveCbxProgress(this.bookId, this.currentPage + 1, percentage).subscribe();
+  }
+  goToPage(page: number): void {
+    if (page < 1 || page > this.pages.length) return;
+
+    const targetIndex = page - 1;
+    if (targetIndex === this.currentPage) return;
+
+    this.currentPage = targetIndex;
+    this.alignCurrentPageToParity();
+    this.updateProgress();
   }
 }

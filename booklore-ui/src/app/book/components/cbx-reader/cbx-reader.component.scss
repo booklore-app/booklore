@@ -18,7 +18,6 @@
       top: 50%;
       transform: translate(-50%, -50%);
       display: flex;
-      gap: 1rem;
       align-items: center;
       white-space: nowrap;
 
@@ -26,12 +25,10 @@
         min-width: 8rem;
         display: inline-block;
         text-align: center;
-        font-variant-numeric: tabular-nums;
       }
 
       button {
-        min-width: 3rem;
-        padding: 0 0.5rem;
+        padding: 0 0.25rem;
         text-align: center;
         white-space: nowrap;
         cursor: pointer;
@@ -92,5 +89,27 @@
       margin: 0;
       display: block;
     }
+  }
+
+  .goto-page-controls {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-left: 6px;
+  }
+
+  .goto-page-controls input[type="number"] {
+    width: 40px;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  .goto-page-controls button:disabled {
+    cursor: default;
+    color: #999;
   }
 }

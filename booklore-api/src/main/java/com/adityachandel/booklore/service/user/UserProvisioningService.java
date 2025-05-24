@@ -181,7 +181,7 @@ public class UserProvisioningService {
         addUserSetting(user, UserSettingKey.PER_BOOK_SETTING, buildDefaultPerBookSetting());
         addUserSetting(user, UserSettingKey.PDF_READER_SETTING, buildDefaultPdfReaderSetting());
         addUserSetting(user, UserSettingKey.EPUB_READER_SETTING, buildDefaultEpubReaderSetting());
-        addUserSetting(user, UserSettingKey.CBX_READER_SETTING, buildDefaultEpubReaderSetting());
+        addUserSetting(user, UserSettingKey.CBX_READER_SETTING, buildDefaultCbxReaderSetting());
         addUserSetting(user, UserSettingKey.SIDEBAR_LIBRARY_SORTING, buildDefaultSidebarLibrarySorting());
         addUserSetting(user, UserSettingKey.SIDEBAR_SHELF_SORTING, buildDefaultSidebarShelfSorting());
 
@@ -206,6 +206,7 @@ public class UserProvisioningService {
         return BookLoreUser.UserSettings.PerBookSetting.builder()
                 .epub(BookLoreUser.UserSettings.PerBookSetting.GlobalOrIndividual.Individual)
                 .pdf(BookLoreUser.UserSettings.PerBookSetting.GlobalOrIndividual.Individual)
+                .cbx(BookLoreUser.UserSettings.PerBookSetting.GlobalOrIndividual.Individual)
                 .build();
     }
 
@@ -225,7 +226,7 @@ public class UserProvisioningService {
                 .build();
     }
 
-    private BookLoreUser.UserSettings.CbxReaderSetting buildDefaultCbxReaderSetting() {
+    public BookLoreUser.UserSettings.CbxReaderSetting buildDefaultCbxReaderSetting() {
         return BookLoreUser.UserSettings.CbxReaderSetting.builder()
                 .pageViewMode(CbxPageViewMode.SINGLE_PAGE)
                 .pageSpread(CbxPageSpread.ODD)
