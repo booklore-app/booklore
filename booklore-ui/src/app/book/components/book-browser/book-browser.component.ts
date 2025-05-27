@@ -115,6 +115,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   sortOptions: any[] = [
     {label: 'Title', icon: '', field: 'title', command: () => this.sortBooks('title')},
+    {label: 'Title + Series', icon: '', field: 'titleSeries', command: () => this.sortBooks('titleSeries')},
     {label: 'Author', icon: '', field: 'author', command: () => this.sortBooks('author')},
     {label: 'Last Read', field: 'lastReadTime', command: () => this.sortBooks('lastReadTime')},
     {label: 'Added On', field: 'addedOn', command: () => this.sortBooks('addedOn')},
@@ -497,7 +498,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   sortBooks(field: string): void {
     const existingSort = this.sortOptions.find(opt => opt.field === field);
-
     if (!existingSort) return;
 
     if (this.selectedSort?.field === field) {
@@ -521,7 +521,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.router.navigate([], {
       queryParams: {
         sort: this.selectedSort.field,
-        direction: this.selectedSort.direction === SortDirection.ASCENDING ? SORT_DIRECTION.ASCENDING : SORT_DIRECTION.DESCENDING
+        direction: this.selectedSort.direction === SortDirection.ASCENDING
+          ? SORT_DIRECTION.ASCENDING
+          : SORT_DIRECTION.DESCENDING
       },
       queryParamsHandling: 'merge',
       replaceUrl: true
