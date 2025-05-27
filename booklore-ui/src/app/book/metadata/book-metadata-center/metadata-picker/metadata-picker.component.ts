@@ -247,7 +247,7 @@ export class MetadataPickerComponent implements OnInit {
       publishedDateLocked: this.metadataForm.get('publishedDateLocked')?.value,
       isbn10Locked: this.metadataForm.get('isbn10Locked')?.value,
       isbn13Locked: this.metadataForm.get('isbn13Locked')?.value,
-      asinLocked: this.metadataForm.get('asin')?.value,
+      asinLocked: this.metadataForm.get('asinLocked')?.value,
       descriptionLocked: this.metadataForm.get('descriptionLocked')?.value,
       pageCountLocked: this.metadataForm.get('pageCountLocked')?.value,
       languageLocked: this.metadataForm.get('languageLocked')?.value,

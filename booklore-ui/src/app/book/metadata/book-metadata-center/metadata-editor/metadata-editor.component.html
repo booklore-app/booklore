@@ -119,7 +119,7 @@
 
         <div class="flex flex-row w-full gap-4 mt-2 pb-1">
 
-          <div class="flex flex-col gap-1 basis-2/6">
+          <div class="flex flex-col gap-1 basis-3/6">
             <label for="seriesName">Series Name</label>
             <div class="flex justify-between items-center gap-2">
               <input pInputText id="seriesName" formControlName="seriesName" class="w-full"/>
@@ -154,15 +154,6 @@
               <p-button *ngIf="metadata['languageLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('language')" severity="warn"></p-button>
             </div>
           </div>
-
-          <div class="flex flex-col gap-1 basis-1/6">
-            <label for="pageCount">Page Count</label>
-            <div class="flex justify-between items-center gap-2">
-              <input pInputText id="pageCount" formControlName="pageCount" class="w-full"/>
-              <p-button *ngIf="!metadata['pageCountLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="success"></p-button>
-              <p-button *ngIf="metadata['pageCountLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="warn"></p-button>
-            </div>
-          </div>
         </div>
 
         <!-- ISBN, Language, Review Count -->
@@ -191,18 +182,12 @@
               <p-button *ngIf="metadata['asinLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('asin')" severity="warn"></p-button>
             </div>
           </div>
-          <div class="flex flex-col gap-1 w-1/4">
-            <label for="reviewCount">Rating Count (Legacy)</label>
+          <div class="flex flex-col gap-1 basis-1/4">
+            <label for="pageCount">Page Count</label>
             <div class="flex justify-between items-center gap-2">
-              <input [disabled]="true" pInputText id="reviewCount" formControlName="reviewCount" class="w-full"/>
-              <p-button disabled icon="pi pi-lock" [outlined]="true" severity="warn"></p-button>
-            </div>
-          </div>
-          <div class="flex flex-col gap-1 w-1/4">
-            <label for="rating">Rating (Legacy)</label>
-            <div class="flex justify-between items-center gap-2">
-              <input [disabled]="true" pInputText id="rating" formControlName="rating" class="w-full"/>
-              <p-button disabled icon="pi pi-lock" [outlined]="true" severity="warn"></p-button>
+              <input pInputText id="pageCount" formControlName="pageCount" class="w-full"/>
+              <p-button *ngIf="!metadata['pageCountLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="success"></p-button>
+              <p-button *ngIf="metadata['pageCountLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="warn"></p-button>
             </div>
           </div>
         </div>
