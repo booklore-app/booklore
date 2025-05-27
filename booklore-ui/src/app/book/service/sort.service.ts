@@ -11,9 +11,12 @@ export class SortService {
     title: (book) => book.metadata?.title?.toLowerCase() || null,
     titleSeries: (book) => {
       const title = book.metadata?.title?.toLowerCase() || '';
-      const inSeries = !!book.metadata?.seriesName;
-      const seriesOrder = book.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
-      return [title, inSeries ? 1 : 0, seriesOrder];
+      const series = book.metadata?.seriesName?.toLowerCase();
+      const seriesNumber = book.metadata?.seriesNumber ?? Number.MAX_SAFE_INTEGER;
+      if (series) {
+        return [series, seriesNumber];
+      }
+      return [title, Number.MAX_SAFE_INTEGER];
     },
     author: (book) => book.metadata?.authors?.map(a => a.toLowerCase()).join(", ") || null,
     publishedDate: (book) => book.metadata?.publishedDate === null ? null : new Date(book.metadata?.publishedDate!).getTime(),
