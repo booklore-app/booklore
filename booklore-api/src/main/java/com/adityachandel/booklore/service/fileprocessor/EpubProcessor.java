@@ -140,8 +140,6 @@ public class EpubProcessor implements FileProcessor {
                         .map(id -> id.contains(":") ? id.substring(id.indexOf(":") + 1) : id) // strip prefix
                         .map(id -> id.replace("-", "")) // remove dashes
                         .toList();
-                        log.debug("Found {} identifier nodes.", identifiers.size());
-                        log.debug("Normalized identifiers: {}", identifiers);
 
 
                 if (!identifiers.isEmpty()) {
