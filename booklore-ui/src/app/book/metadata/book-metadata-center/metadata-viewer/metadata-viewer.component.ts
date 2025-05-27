@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, Input, OnInit, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {Button, ButtonDirective} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {first, Observable} from 'rxjs';
@@ -23,13 +23,14 @@ import {BookCardComponent} from '../../../components/book-browser/book-card/book
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Editor} from 'primeng/editor';
 import {ProgressBar} from 'primeng/progressbar';
+import {ToggleButton} from 'primeng/togglebutton';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar]
+  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 
@@ -52,6 +53,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   items: MenuItem[] | undefined;
   bookInSeries: Book[] = [];
   isExpanded = false;
+  showFilePath = false;
 
   ngOnInit(): void {
     this.items = [
@@ -193,6 +195,36 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
       return this.book?.cbxProgress?.percentage;
     } else {
       return this.book?.epubProgress?.percentage;
+    }
+  }
+
+  copyFilePath() {
+    if (this.book?.filePath) {
+      navigator.clipboard.writeText(this.book.filePath).then(() => {
+        this.messageService.add({ severity: 'success', summary: 'Copied', detail: 'File path copied to clipboard.' });
+      }, () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to copy file path.' });
+      });
+    }
+  }
+
+  getFileExtension(filePath?: string): string | null {
+    if (!filePath) return null;
+    const parts = filePath.split('.');
+    if (parts.length < 2) return null;
+    return parts.pop()?.toUpperCase() || null;
+  }
+
+  getFileTypeColorClass(fileType: string | null | undefined): string {
+    if (!fileType) return 'bg-gray-500 text-white';
+
+    switch (fileType.toLowerCase()) {
+      case 'pdf': return 'bg-red-700 text-white';
+      case 'epub': return 'bg-yellow-600 text-gray-900';
+      case 'cbz': return 'bg-green-700 text-white';
+      case 'cbr': return 'bg-purple-700 text-white';
+      case 'cb7': return 'bg-blue-700 text-white';
+      default: return 'bg-gray-600 text-white';
     }
   }
 
