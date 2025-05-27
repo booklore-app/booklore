@@ -85,3 +85,21 @@
     font-weight: 100;
   }
 }
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: var(--text-color-secondary);
+  font-size: 1.0rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding-left: 30px;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  font-size: 1rem;
+}

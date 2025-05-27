@@ -84,7 +84,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   bookState$: Observable<BookState> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
   entityType$: Observable<EntityType> | undefined;
-  bookOrAuthor$ = new BehaviorSubject<string>('');
+  searchTerm$ = new BehaviorSubject<string>('');
 
   entity: Library | Shelf | null = null;
   entityType: EntityType | undefined;
@@ -178,7 +178,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     }
 
     this.activatedRoute.paramMap.subscribe(() => {
-      this.bookOrAuthor$.next('');
+      this.searchTerm$.next('');
       this.bookTitle = '';
       this.deselectAllBooks();
       this.clearFilter();
@@ -312,15 +312,16 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   private headerFilter(bookState: BookState): Observable<BookState> {
-    return this.bookOrAuthor$.pipe(
-      map(title => {
-        if (title && title.trim() !== '') {
+    return this.searchTerm$.pipe(
+      map(term => {
+        if (term && term.trim() !== '') {
           const filteredBooks = bookState.books?.filter(book => {
-            const matchesTitle = book.metadata?.title?.toLowerCase().includes(title.toLowerCase());
+            const matchesTitle = book.metadata?.title?.toLowerCase().includes(term.toLowerCase());
+            const matchesSeries = book.metadata?.seriesName?.toLowerCase().includes(term.toLowerCase());
             const matchesAuthor = book.metadata?.authors.some(author =>
-              author.toLowerCase().includes(title.toLowerCase())
+              author.toLowerCase().includes(term.toLowerCase())
             );
-            return matchesTitle || matchesAuthor;
+            return matchesTitle || matchesSeries || matchesAuthor;
           }) || null;
           return {...bookState, books: filteredBooks};
         }
@@ -426,13 +427,13 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onBookTitleChange(newTitle: string): void {
-    this.bookOrAuthor$.next(newTitle);
+  onSearchTermChange(term: string): void {
+    this.searchTerm$.next(term);
   }
 
   clearSearch(): void {
     this.bookTitle = '';
-    this.onBookTitleChange('');
+    this.onSearchTermChange('');
     this.resetFilters();
   }
 

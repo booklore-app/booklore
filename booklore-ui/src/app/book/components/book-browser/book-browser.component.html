@@ -61,19 +61,22 @@
 
         <p-fluid>
           <div class="relative">
+            <i class="pi pi-search search-icon"></i>
             <input
               type="text"
               pInputText
-              placeholder="Search title or author..."
+              placeholder="Title, Series or Author..."
               [(ngModel)]="bookTitle"
-              (ngModelChange)="onBookTitleChange($event)"/>
+              (ngModelChange)="onSearchTermChange($event)"
+              class="search-input"
+            />
             <p-button
               *ngIf="bookTitle"
               icon="pi pi-times"
               [text]="true"
               size="small"
               [rounded]="true"
-              class="absolute right-2 top-1/2 transform -translate-y-1/2"
+              class="absolute right-2 top-1/2 -translate-y-1/2"
               (click)="clearSearch()">
             </p-button>
           </div>
