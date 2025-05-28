@@ -45,13 +45,15 @@ public class BookCreatorService {
 
     public void addCategoriesToBook(List<String> categories, BookEntity bookEntity) {
         for (String category : categories) {
-            Optional<CategoryEntity> catOpt = categoryRepository.findByName(category);
+            // Truncate category name to fit in VARCHAR(255)
+            String truncatedCategory = truncate(category, 255);
+            Optional<CategoryEntity> catOpt = categoryRepository.findByName(truncatedCategory);
             CategoryEntity categoryEntity;
             if (catOpt.isPresent()) {
                 categoryEntity = catOpt.get();
             } else {
                 categoryEntity = CategoryEntity.builder()
-                        .name(category)
+                        .name(truncatedCategory)
                         .build();
                 categoryEntity = categoryRepository.save(categoryEntity);
             }
@@ -79,6 +81,17 @@ public class BookCreatorService {
             }
             bookEntity.getMetadata().getAuthors().add(authorEntity);
         }
+    }
+    
+    /**
+     * Truncates a string to the specified maximum length
+     * @param input The input string
+     * @param maxLength The maximum length
+     * @return The truncated string, or null if input is null
+     */
+    private String truncate(String input, int maxLength) {
+        if (input == null) return null;
+        return input.length() <= maxLength ? input : input.substring(0, maxLength);
     }
 
     public void saveConnections(BookEntity bookEntity) {

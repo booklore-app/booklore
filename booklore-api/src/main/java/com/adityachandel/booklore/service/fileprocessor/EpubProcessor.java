@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -227,7 +228,40 @@ public class EpubProcessor implements FileProcessor {
                 extractFromOpf(FileUtils.getBookFullPath(bookEntity), bookMetadata);
 
                 bookCreatorService.addAuthorsToBook(getAuthors(book), bookEntity);
-                bookCreatorService.addCategoriesToBook(epubMetadata.getSubjects(), bookEntity);
+                
+                // Get subjects and filter out invalid ones
+                List<String> subjects = epubMetadata.getSubjects();
+                List<String> validSubjects = new ArrayList<>();
+                
+                if (subjects != null && !subjects.isEmpty()) {
+                    for (String subject : subjects) {
+                        // Skip null or empty subjects
+                        if (subject == null || subject.trim().isEmpty()) {
+                            continue;
+                        }
+                        
+                        // Skip subjects that are too long (likely not real categories)
+                        // Real categories are typically short, descriptive terms
+                        if (subject.length() > 100) {
+                            log.warn("Skipping suspiciously long subject in {}: length={}, value='{}'",
+                                    bookEntity.getFileName(), subject.length(),
+                                    subject.substring(0, Math.min(50, subject.length())) + "...");
+                            continue;
+                        }
+                        
+                        // Skip subjects that contain newlines or excessive whitespace (likely descriptions)
+                        if (subject.contains("\n") || subject.contains("\r") || subject.contains("  ")) {
+                            log.warn("Skipping subject with newlines/whitespace in {}: '{}'",
+                                    bookEntity.getFileName(),
+                                    subject.substring(0, Math.min(50, subject.length())) + "...");
+                            continue;
+                        }
+
+                        validSubjects.add(subject);
+                    }
+                }
+                
+                bookCreatorService.addCategoriesToBook(validSubjects, bookEntity);
             }
         } catch (Exception e) {
             log.error("Error loading epub file {}, error: {}", bookEntity.getFileName(), e.getMessage());
