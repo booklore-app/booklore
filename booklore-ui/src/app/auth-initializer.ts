@@ -55,7 +55,6 @@ export function initializeAuthFactory() {
           } else if (settings.remoteAuthEnabled) {
             authService.remoteLogin().subscribe({
               next: () => {
-                router.navigate(['/dashboard']);
                 resolve();
               },
               error: resolve
