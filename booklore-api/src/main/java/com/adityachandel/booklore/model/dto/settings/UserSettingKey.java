@@ -9,7 +9,8 @@ public enum UserSettingKey {
     EPUB_READER_SETTING("epubReaderSetting", true),
     CBX_READER_SETTING("cbxReaderSetting", true),
     SIDEBAR_LIBRARY_SORTING("sidebarLibrarySorting", true),
-    SIDEBAR_SHELF_SORTING("sidebarShelfSorting", true);
+    SIDEBAR_SHELF_SORTING("sidebarShelfSorting", true),
+    ENTITY_VIEW_PREFERENCES("entityViewPreferences", true);
 
     private final String dbKey;
     private final boolean isJson;

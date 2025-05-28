@@ -98,17 +98,13 @@ export class BookFilterComponent implements OnInit {
 
     const index = this.activeFilters[filterType].indexOf(value);
     if (index > -1) {
-      // Deselect
       this.activeFilters[filterType].splice(index, 1);
       if (this.activeFilters[filterType].length === 0) {
         delete this.activeFilters[filterType];
       }
     } else {
-      // Select
       this.activeFilters[filterType].push(value);
     }
-
-    // Emit updated filter state
     this.filterSelected.emit({ ...this.activeFilters });
   }
 

@@ -1,11 +1,28 @@
 import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable, tap, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {API_CONFIG} from '../../config/api-config';
 import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {Library} from '../../book/model/library.model';
 import {catchError} from 'rxjs/operators';
 import {CbxPageSpread, CbxPageViewMode} from '../../book/model/book.model';
+
+export interface EntityViewPreferences {
+  global: EntityViewPreference;
+  overrides: EntityViewPreferenceOverride[];
+}
+
+export interface EntityViewPreference {
+  sortKey: string;
+  sortDir: 'ASC' | 'DESC';
+  view: 'GRID' | 'TABLE';
+}
+
+export interface EntityViewPreferenceOverride {
+  entityType: 'LIBRARY' | 'SHELF';
+  entityId: number;
+  preferences: EntityViewPreference;
+}
 
 export interface SidebarLibrarySorting {
   field: string;
@@ -49,7 +66,8 @@ export interface UserSettings {
   epubReaderSetting: EpubReaderSetting;
   cbxReaderSetting: CbxReaderSetting;
   sidebarLibrarySorting: SidebarLibrarySorting;
-  sidebarShelfSorting: SidebarShelfSorting
+  sidebarShelfSorting: SidebarShelfSorting;
+  entityViewPreferences: EntityViewPreferences;
 }
 
 export interface User {

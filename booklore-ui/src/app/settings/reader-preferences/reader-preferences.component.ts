@@ -7,19 +7,18 @@ import {RadioButton} from 'primeng/radiobutton';
 import {Divider} from 'primeng/divider';
 import {Button} from 'primeng/button';
 import {Tooltip} from 'primeng/tooltip';
-import {SidebarLibrarySorting, SidebarShelfSorting, User, UserService, UserSettings} from '../user-management/user.service';
+import {User, UserService, UserSettings} from '../user-management/user.service';
 import {MessageService} from 'primeng/api';
 import {CbxPageSpread, CbxPageViewMode} from '../../book/model/book.model';
 
 @Component({
-  selector: 'app-user-preferences',
-  templateUrl: './user-preferences.component.html',
+  selector: 'app-reader-preferences',
+  templateUrl: './reader-preferences.component.html',
   standalone: true,
-  styleUrls: ['./user-preferences.component.scss'],
+  styleUrls: ['./reader-preferences.component.scss'],
   imports: [Select, FormsModule, NgForOf, RadioButton, Divider, Button, Tooltip]
 })
-export class UserPreferences implements OnInit, OnDestroy {
-
+export class ReaderPreferences implements OnInit, OnDestroy {
 
   readonly cbxSpreads = [
     {name: 'Even', key: 'EVEN'},
@@ -65,15 +64,7 @@ export class UserPreferences implements OnInit, OnDestroy {
     {name: 'Scrolled', key: 'scrolled'}
   ];
 
-  readonly sortingOptions = [
-    {label: 'Name | Ascending', value: {field: 'name', order: 'asc'}},
-    {label: 'Name | Descending', value: {field: 'name', order: 'desc'}},
-    {label: 'Creation Date | Ascending', value: {field: 'id', order: 'asc'}},
-    {label: 'Creation Date | Descending', value: {field: 'id', order: 'desc'}},
-  ];
-
   readonly scopeOptions = ['Global', 'Individual'];
-
 
   selectedCbxSpread!: CbxPageSpread;
   selectedCbxViewMode!: CbxPageViewMode;
@@ -89,9 +80,6 @@ export class UserPreferences implements OnInit, OnDestroy {
   selectedPdfScope!: string;
   selectedEpubScope!: string;
   selectedCbxScope!: string;
-
-  selectedLibrarySorting: SidebarLibrarySorting = {field: 'id', order: 'asc'};
-  selectedShelfSorting: SidebarShelfSorting = {field: 'id', order: 'asc'};
 
   private readonly userService = inject(UserService);
   private readonly messageService = inject(MessageService);
@@ -129,9 +117,6 @@ export class UserPreferences implements OnInit, OnDestroy {
 
     this.selectedCbxSpread = settings.cbxReaderSetting.pageSpread;
     this.selectedCbxViewMode = settings.cbxReaderSetting.pageViewMode;
-
-    this.selectedLibrarySorting = settings.sidebarLibrarySorting;
-    this.selectedShelfSorting = settings.sidebarShelfSorting;
   }
 
   private updatePreference(path: string[], value: any): void {
@@ -195,14 +180,6 @@ export class UserPreferences implements OnInit, OnDestroy {
 
   onCbxScopeChange() {
     this.updatePreference(['perBookSetting', 'cbx'], this.selectedCbxScope);
-  }
-
-  onLibrarySortingChange() {
-    this.updatePreference(['sidebarLibrarySorting'], this.selectedLibrarySorting);
-  }
-
-  onShelfSortingChange() {
-    this.updatePreference(['sidebarShelfSorting'], this.selectedShelfSorting);
   }
 
   increaseFontSize() {

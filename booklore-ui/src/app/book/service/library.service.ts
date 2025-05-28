@@ -4,11 +4,8 @@ import {HttpClient} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
 import {Library} from '../model/library.model';
 import {BookService} from './book.service';
-import {SortOption} from '../model/sort.model';
 import {LibraryState} from '../model/state/library-state.model';
 import {API_CONFIG} from '../../config/api-config';
-import {FetchMetadataRequest} from '../metadata/model/request/fetch-metadata-request.model';
-import {BookMetadata} from '../model/book.model';
 
 @Injectable({
   providedIn: 'root',

@@ -8,12 +8,14 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {UserManagementComponent} from './user-management/user-management.component';
 import {AuthenticationSettingsComponent} from '../core/security/oauth2-management/authentication-settings.component';
-import {UserPreferences} from './user-preferences/user-preferences.component';
+import {ViewPreferencesParentComponent} from './view-preferences-parent/view-preferences-parent.component';
+import {ReaderPreferences} from './reader-preferences/reader-preferences.component';
 
 export enum SettingsTab {
-  BookReader = 'book-reader',
+  ReaderSettings = 'reader-settings',
+  ViewPreferences = 'view-settings',
   UserManagement = 'user-management',
-  Email = 'email',
+  EmailSettings = 'email-settings',
   GlobalSettings = 'global-settings',
   AuthenticationSettings = 'auth-settings'
 }
@@ -26,13 +28,14 @@ export enum SettingsTab {
     Tab,
     TabPanels,
     TabPanel,
-    UserPreferences,
     NgIf,
     AsyncPipe,
     EmailComponent,
     GlobalPreferencesComponent,
     UserManagementComponent,
-    AuthenticationSettingsComponent
+    AuthenticationSettingsComponent,
+    ViewPreferencesParentComponent,
+    ReaderPreferences
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
@@ -48,7 +51,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   SettingsTab = SettingsTab;
 
   private validTabs = Object.values(SettingsTab);
-  private _activeTab: SettingsTab = SettingsTab.BookReader;
+  private _activeTab: SettingsTab = SettingsTab.ReaderSettings;
 
   get activeTab(): SettingsTab {
     return this._activeTab;
@@ -69,7 +72,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       if (this.validTabs.includes(tabParam)) {
         this._activeTab = tabParam as SettingsTab;
       } else {
-        this._activeTab = SettingsTab.BookReader;
+        this._activeTab = SettingsTab.ReaderSettings;
         this.router.navigate([], {
           relativeTo: this.route,
           queryParams: { tab: this._activeTab },

@@ -41,6 +41,46 @@ public class BookLoreUser {
         public CbxReaderSetting cbxReaderSetting;
         public SidebarSortOption sidebarLibrarySorting;
         public SidebarSortOption sidebarShelfSorting;
+        public EntityViewPreferences entityViewPreferences;
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class EntityViewPreferences {
+            private GlobalPreferences global;
+            private List<OverridePreference> overrides;
+        }
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class GlobalPreferences {
+            private String sortKey;
+            private String sortDir;
+            private String view;
+        }
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class OverridePreference {
+            private String entityType;
+            private Long entityId;
+            private OverrideDetails preferences;
+        }
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class OverrideDetails {
+            private String sortKey;
+            private String sortDir;
+            private String view;
+        }
 
         @Data
         @Builder

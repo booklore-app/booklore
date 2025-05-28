@@ -72,6 +72,10 @@ public class BookLoreUserTransformer {
                         var value = objectMapper.readValue(jsonValue, SidebarSortOption.class);
                         userSettings.setSidebarShelfSorting(value);
                     }
+                    case ENTITY_VIEW_PREFERENCES -> {
+                        var value = objectMapper.readValue(jsonValue, BookLoreUser.UserSettings.EntityViewPreferences.class);
+                        userSettings.setEntityViewPreferences(value);
+                    }
                 }
 
             } catch (IllegalArgumentException e) {
