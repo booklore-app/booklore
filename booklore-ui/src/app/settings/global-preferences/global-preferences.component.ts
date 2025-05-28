@@ -19,6 +19,7 @@ import {filter, take} from 'rxjs/operators';
 import {FileUploadPatternComponent} from './file-upload-pattern/file-upload-pattern.component';
 import {OpdsSettingsComponent} from './opds-settings/opds-settings.component';
 import {InputText} from 'primeng/inputtext';
+import {MetadataProviderSettingsComponent} from './metadata-provider-settings/metadata-provider-settings.component';
 
 @Component({
   selector: 'app-global-preferences',
@@ -34,7 +35,8 @@ import {InputText} from 'primeng/inputtext';
     MetadataAdvancedFetchOptionsComponent,
     FileUploadPatternComponent,
     OpdsSettingsComponent,
-    InputText
+    InputText,
+    MetadataProviderSettingsComponent
   ],
   templateUrl: './global-preferences.component.html',
   styleUrl: './global-preferences.component.scss'

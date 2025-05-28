@@ -70,6 +70,7 @@ public class AppSettingService {
         builder.metadataRefreshOptions(getJsonSetting(settingsMap, AppSettingKey.QUICK_BOOK_MATCH, MetadataRefreshOptions.class, null, false));
         builder.oidcProviderDetails(getJsonSetting(settingsMap, AppSettingKey.OIDC_PROVIDER_DETAILS, OidcProviderDetails.class, null, false));
         builder.oidcAutoProvisionDetails(getJsonSetting(settingsMap, AppSettingKey.OIDC_AUTO_PROVISION_DETAILS, OidcAutoProvisionDetails.class, null, false));
+        builder.metadataProviderSettings(getJsonSetting(settingsMap, AppSettingKey.METADATA_PROVIDER_SETTINGS, MetadataProviderSettings.class, getMetadataProviderSettings(), true));
 
         builder.coverResolution(getOrCreateSetting(AppSettingKey.COVER_IMAGE_RESOLUTION, "250x350"));
         builder.autoBookSearch(Boolean.parseBoolean(getOrCreateSetting(AppSettingKey.AUTO_BOOK_SEARCH, "true")));
@@ -120,5 +121,25 @@ public class AppSettingService {
 
     private String serializeSettingValue(AppSettingKey key, Object val) throws JsonProcessingException {
         return key.isJson() ? objectMapper.writeValueAsString(val) : val.toString();
+    }
+
+    private static MetadataProviderSettings getMetadataProviderSettings() {
+        MetadataProviderSettings defaultMetadataProviderSettings = new MetadataProviderSettings();
+
+        MetadataProviderSettings.Amazon defaultAmazon = new MetadataProviderSettings.Amazon();
+        defaultAmazon.setEnabled(true);
+        MetadataProviderSettings.Google defaultGoogle = new MetadataProviderSettings.Google();
+        defaultGoogle.setEnabled(true);
+        MetadataProviderSettings.Goodreads defaultGoodreads = new MetadataProviderSettings.Goodreads();
+        defaultGoodreads.setEnabled(true);
+        MetadataProviderSettings.Hardcover defaultHardcover = new MetadataProviderSettings.Hardcover();
+        defaultHardcover.setEnabled(false);
+        defaultHardcover.setApiKey(null);
+
+        defaultMetadataProviderSettings.setAmazon(defaultAmazon);
+        defaultMetadataProviderSettings.setGoogle(defaultGoogle);
+        defaultMetadataProviderSettings.setGoodReads(defaultGoodreads);
+        defaultMetadataProviderSettings.setHardcover(defaultHardcover);
+        return defaultMetadataProviderSettings;
     }
 }

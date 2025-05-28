@@ -18,6 +18,30 @@ export interface OidcAutoProvisionDetails {
   defaultLibraryIds: number[];
 }
 
+export interface MetadataProviderSettings {
+  amazon: Amazon;
+  google: Google;
+  goodReads: Goodreads;
+  hardcover: Hardcover;
+}
+
+export interface Amazon {
+  enabled: boolean;
+}
+
+export interface Google {
+  enabled: boolean;
+}
+
+export interface Goodreads {
+  enabled: boolean;
+}
+
+export interface Hardcover {
+  enabled: boolean;
+  apiKey: string;
+}
+
 export interface AppSettings {
   autoBookSearch: boolean;
   similarBookRecommendation: boolean;
@@ -31,6 +55,7 @@ export interface AppSettings {
   oidcAutoProvisionDetails: OidcAutoProvisionDetails;
   cbxCacheSizeInMb: number;
   maxFileUploadSizeInMb: number;
+  metadataProviderSettings: MetadataProviderSettings;
 }
 
 export enum AppSettingKey {
@@ -44,5 +69,6 @@ export enum AppSettingKey {
   OIDC_PROVIDER_DETAILS = 'OIDC_PROVIDER_DETAILS',
   OIDC_AUTO_PROVISION_DETAILS = 'OIDC_AUTO_PROVISION_DETAILS',
   CBX_CACHE_SIZE_IN_MB = 'CBX_CACHE_SIZE_IN_MB',
-  MAX_FILE_UPLOAD_SIZE_IN_MB = 'MAX_FILE_UPLOAD_SIZE_IN_MB'
+  MAX_FILE_UPLOAD_SIZE_IN_MB = 'MAX_FILE_UPLOAD_SIZE_IN_MB',
+  METADATA_PROVIDER_SETTINGS = 'METADATA_PROVIDER_SETTINGS'
 }

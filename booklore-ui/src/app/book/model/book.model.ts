@@ -53,6 +53,8 @@ export interface BookMetadata {
   amazonReviewCount?: number | null;
   goodreadsRating?: number | null;
   goodreadsReviewCount?: number | null;
+  hardcoverRating?: number | null;
+  hardcoverReviewCount?: number | null;
   coverUpdatedOn?: string;
   authors: string[];
   categories: string[];
@@ -80,6 +82,8 @@ export interface BookMetadata {
   amazonReviewCountLocked?: boolean;
   goodreadsRatingLocked?: boolean;
   goodreadsReviewCountLocked?: boolean;
+  hardcoverRatingLocked?: boolean;
+  hardcoverReviewCountLocked?: boolean;
   coverUpdatedOnLocked?: boolean;
   authorsLocked?: boolean;
   categoriesLocked?: boolean;

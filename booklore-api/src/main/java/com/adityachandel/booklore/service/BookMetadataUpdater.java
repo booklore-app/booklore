@@ -98,6 +98,14 @@ public class BookMetadataUpdater {
             metadata.setGoodreadsReviewCount(newMetadata.getGoodreadsReviewCount());
         }
 
+        if ((metadata.getHardcoverRatingLocked() == null || !metadata.getHardcoverRatingLocked()) && newMetadata.getHardcoverRating() != null) {
+            metadata.setHardcoverRating(newMetadata.getHardcoverRating());
+        }
+
+        if ((metadata.getHardcoverReviewCountLocked() == null || !metadata.getHardcoverReviewCountLocked()) && newMetadata.getHardcoverReviewCount() != null) {
+            metadata.setHardcoverReviewCount(newMetadata.getHardcoverReviewCount());
+        }
+
         if ((metadata.getSeriesNameLocked() == null || !metadata.getSeriesNameLocked()) && newMetadata.getSeriesName() != null) {
             metadata.setSeriesName(newMetadata.getSeriesName());
         }
@@ -238,6 +246,12 @@ public class BookMetadataUpdater {
         }
         if (newMetadata.getGoodreadsReviewCountLocked() != null) {
             metadata.setGoodreadsReviewCountLocked(newMetadata.getGoodreadsReviewCountLocked());
+        }
+        if (newMetadata.getHardcoverRatingLocked() != null) {
+            metadata.setHardcoverRatingLocked(newMetadata.getHardcoverRatingLocked());
+        }
+        if (newMetadata.getHardcoverReviewCountLocked() != null) {
+            metadata.setHardcoverReviewCountLocked(newMetadata.getHardcoverReviewCountLocked());
         }
         if (newMetadata.getSeriesNameLocked() != null) {
             metadata.setSeriesNameLocked(newMetadata.getSeriesNameLocked());

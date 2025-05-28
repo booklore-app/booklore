@@ -24,4 +24,5 @@ public class AppSettings {
     private boolean oidcEnabled;
     private OidcProviderDetails oidcProviderDetails;
     private OidcAutoProvisionDetails oidcAutoProvisionDetails;
+    private MetadataProviderSettings metadataProviderSettings;
 }

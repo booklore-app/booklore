@@ -194,7 +194,7 @@
 
         <!-- Review Count, Rating, Page Count -->
         <div class="flex flex-row w-full gap-4 mt-2 pb-1">
-          <div class="flex flex-col gap-1 w-1/4">
+          <div class="flex flex-col gap-1 w-1/6">
             <label for="amazonRatingCount">Amazon Rating Count</label>
             <div class="flex justify-between items-center gap-2">
               <input pInputText id="amazonRatingCount" formControlName="amazonReviewCount" class="w-full"/>
@@ -202,7 +202,7 @@
               <p-button *ngIf="metadata['amazonReviewCountLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('amazonReviewCount')" severity="warn"></p-button>
             </div>
           </div>
-          <div class="flex flex-col gap-1 w-1/4">
+          <div class="flex flex-col gap-1 w-1/6">
             <label for="amazonRating">Amazon Rating</label>
             <div class="flex justify-between items-center gap-2">
               <input pInputText id="amazonRating" formControlName="amazonRating" class="w-full"/>
@@ -210,7 +210,7 @@
               <p-button *ngIf="metadata['amazonRatingLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('amazonRating')" severity="warn"></p-button>
             </div>
           </div>
-          <div class="flex flex-col gap-1 w-1/4">
+          <div class="flex flex-col gap-1 w-1/6">
             <label for="goodreadsReviewCount">Goodreads Rating Count</label>
             <div class="flex justify-between items-center gap-2">
               <input pInputText id="goodreadsReviewCount" formControlName="goodreadsReviewCount" class="w-full"/>
@@ -218,12 +218,28 @@
               <p-button *ngIf="metadata['goodreadsReviewCountLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('goodreadsReviewCount')" severity="warn"></p-button>
             </div>
           </div>
-          <div class="flex flex-col gap-1 w-1/4">
+          <div class="flex flex-col gap-1 w-1/6">
             <label for="goodreadsRating">Goodreads Rating</label>
             <div class="flex justify-between items-center gap-2">
               <input pInputText id="goodreadsRating" formControlName="goodreadsRating" class="w-full"/>
               <p-button *ngIf="!metadata['goodreadsRatingLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('goodreadsRating')" severity="success"></p-button>
               <p-button *ngIf="metadata['goodreadsRatingLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('goodreadsRating')" severity="warn"></p-button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1 w-1/6">
+            <label for="hardcoverReviewCount">Hardcover Rating Count</label>
+            <div class="flex justify-between items-center gap-2">
+              <input pInputText id="hardcoverReviewCount" formControlName="hardcoverReviewCount" class="w-full"/>
+              <p-button *ngIf="!metadata['hardcoverReviewCountLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('hardcoverReviewCount')" severity="success"></p-button>
+              <p-button *ngIf="metadata['hardcoverReviewCountLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('hardcoverReviewCount')" severity="warn"></p-button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1 w-1/6">
+            <label for="hardcoverRating">Hardcover Rating</label>
+            <div class="flex justify-between items-center gap-2">
+              <input pInputText id="hardcoverRating" formControlName="hardcoverRating" class="w-full"/>
+              <p-button *ngIf="!metadata['hardcoverRatingLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('hardcoverRating')" severity="success"></p-button>
+              <p-button *ngIf="metadata['hardcoverRatingLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('hardcoverRating')" severity="warn"></p-button>
             </div>
           </div>
         </div>

@@ -84,6 +84,12 @@ public class BookMetadataEntity {
     @Column(name = "goodreads_review_count")
     private Integer goodreadsReviewCount;
 
+    @Column(name = "hardcover_rating")
+    private Double hardcoverRating;
+
+    @Column(name = "hardcover_review_count")
+    private Integer hardcoverReviewCount;
+
     // Locking fields
 
     @Column(name = "title_locked")
@@ -136,6 +142,12 @@ public class BookMetadataEntity {
 
     @Column(name = "goodreads_review_count_locked")
     private Boolean goodreadsReviewCountLocked = Boolean.FALSE;
+
+    @Column(name = "hardcover_rating_locked")
+    private Boolean hardcoverRatingLocked = Boolean.FALSE;
+
+    @Column(name = "hardcover_review_count_locked")
+    private Boolean hardcoverReviewCountLocked = Boolean.FALSE;
 
     @Column(name = "cover_locked")
     private Boolean coverLocked = Boolean.FALSE;
@@ -203,6 +215,8 @@ public class BookMetadataEntity {
         this.amazonReviewCountLocked = lock;
         this.goodreadsRatingLocked = lock;
         this.goodreadsReviewCountLocked = lock;
+        this.hardcoverRatingLocked = lock;
+        this.hardcoverReviewCountLocked = lock;
     }
 
     public boolean isAnyFieldLocked() {
@@ -228,7 +242,9 @@ public class BookMetadataEntity {
                 || Boolean.TRUE.equals(this.amazonRatingLocked)
                 || Boolean.TRUE.equals(this.amazonReviewCountLocked)
                 || Boolean.TRUE.equals(this.goodreadsRatingLocked)
-                || Boolean.TRUE.equals(this.goodreadsReviewCountLocked);
+                || Boolean.TRUE.equals(this.goodreadsReviewCountLocked)
+                || Boolean.TRUE.equals(this.hardcoverRatingLocked)
+                || Boolean.TRUE.equals(this.hardcoverReviewCountLocked);
     }
 
     public boolean areAllFieldsLocked() {
@@ -254,6 +270,9 @@ public class BookMetadataEntity {
                 && Boolean.TRUE.equals(this.amazonRatingLocked)
                 && Boolean.TRUE.equals(this.amazonReviewCountLocked)
                 && Boolean.TRUE.equals(this.goodreadsRatingLocked)
-                && Boolean.TRUE.equals(this.goodreadsReviewCountLocked);
+                && Boolean.TRUE.equals(this.goodreadsReviewCountLocked)
+                && Boolean.TRUE.equals(this.hardcoverRatingLocked)
+                && Boolean.TRUE.equals(this.hardcoverReviewCountLocked)
+                ;
     }
 }

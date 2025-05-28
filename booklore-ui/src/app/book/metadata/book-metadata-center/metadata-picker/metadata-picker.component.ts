@@ -59,6 +59,8 @@ export class MetadataPickerComponent implements OnInit {
     {label: 'Amazon Rating', controlName: 'amazonRating', lockedKey: 'amazonRatingLocked', fetchedKey: 'amazonRating'},
     {label: 'Goodreads Reviews', controlName: 'goodreadsReviewCount', lockedKey: 'goodreadsReviewCountLocked', fetchedKey: 'goodreadsReviewCount'},
     {label: 'Goodreads Rating', controlName: 'goodreadsRating', lockedKey: 'goodreadsRatingLocked', fetchedKey: 'goodreadsRating'},
+    {label: 'Hardcover Reviews', controlName: 'hardcoverReviewCount', lockedKey: 'hardcoverReviewCountLocked', fetchedKey: 'hardcoverReviewCount'},
+    {label: 'Hardcover Rating', controlName: 'hardcoverRating', lockedKey: 'hardcoverRatingLocked', fetchedKey: 'hardcoverRating'},
     {label: 'Pages', controlName: 'pageCount', lockedKey: 'pageCountLocked', fetchedKey: 'pageCount'}
   ];
 
@@ -96,6 +98,8 @@ export class MetadataPickerComponent implements OnInit {
       amazonReviewCount: new FormControl(''),
       goodreadsRating: new FormControl(''),
       goodreadsReviewCount: new FormControl(''),
+      hardcoverRating: new FormControl(''),
+      hardcoverReviewCount: new FormControl(''),
       seriesName: new FormControl(''),
       seriesNumber: new FormControl(''),
       seriesTotal: new FormControl(''),
@@ -117,6 +121,8 @@ export class MetadataPickerComponent implements OnInit {
       amazonReviewCountLocked: new FormControl(false),
       goodreadsRatingLocked: new FormControl(false),
       goodreadsReviewCountLocked: new FormControl(false),
+      hardcoverRatingLocked: new FormControl(false),
+      hardcoverReviewCountLocked: new FormControl(false),
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
@@ -147,6 +153,8 @@ export class MetadataPickerComponent implements OnInit {
           amazonReviewCount: metadata.amazonReviewCount || null,
           goodreadsRating: metadata.goodreadsRating || null,
           goodreadsReviewCount: metadata.goodreadsReviewCount || null,
+          hardcoverRating: metadata.hardcoverRating || null,
+          hardcoverReviewCount: metadata.hardcoverReviewCount || null,
           seriesName: metadata.seriesName || null,
           seriesNumber: metadata.seriesNumber || null,
           seriesTotal: metadata.seriesTotal || null,
@@ -168,6 +176,8 @@ export class MetadataPickerComponent implements OnInit {
           amazonReviewCountLocked: metadata.amazonReviewCountLocked || false,
           goodreadsRatingLocked: metadata.goodreadsRatingLocked || false,
           goodreadsReviewCountLocked: metadata.goodreadsReviewCountLocked || false,
+          hardcoverRatingLocked: metadata.hardcoverRatingLocked || false,
+          hardcoverReviewCountLocked: metadata.hardcoverReviewCountLocked || false,
           seriesNameLocked: metadata.seriesNameLocked || false,
           seriesNumberLocked: metadata.seriesNumberLocked || false,
           seriesTotalLocked: metadata.seriesTotalLocked || false,
@@ -188,6 +198,8 @@ export class MetadataPickerComponent implements OnInit {
         if (metadata.amazonRatingLocked) this.metadataForm.get('amazonRating')?.disable();
         if (metadata.goodreadsReviewCountLocked) this.metadataForm.get('goodreadsReviewCount')?.disable();
         if (metadata.goodreadsRatingLocked) this.metadataForm.get('goodreadsRating')?.disable();
+        if (metadata.hardcoverReviewCountLocked) this.metadataForm.get('hardcoverReviewCount')?.disable();
+        if (metadata.hardcoverRatingLocked) this.metadataForm.get('hardcoverRating')?.disable();
         if (metadata.pageCountLocked) this.metadataForm.get('pageCount')?.disable();
         if (metadata.descriptionLocked) this.metadataForm.get('description')?.disable();
         if (metadata.seriesNameLocked) this.metadataForm.get('seriesName')?.disable();
@@ -234,6 +246,8 @@ export class MetadataPickerComponent implements OnInit {
       amazonReviewCount: this.metadataForm.get('amazonReviewCount')?.value || this.copiedFields['amazonReviewCount'] ? this.getNumberOrCopied('amazonReviewCount') : null,
       goodreadsRating: this.metadataForm.get('goodreadsRating')?.value || this.copiedFields['goodreadsRating'] ? this.getNumberOrCopied('goodreadsRating') : null,
       goodreadsReviewCount: this.metadataForm.get('goodreadsReviewCount')?.value || this.copiedFields['goodreadsReviewCount'] ? this.getNumberOrCopied('goodreadsReviewCount') : null,
+      hardcoverRating: this.metadataForm.get('hardcoverRating')?.value || this.copiedFields['hardcoverRating'] ? this.getNumberOrCopied('hardcoverRating') : null,
+      hardcoverReviewCount: this.metadataForm.get('hardcoverReviewCount')?.value || this.copiedFields['hardcoverReviewCount'] ? this.getNumberOrCopied('hardcoverReviewCount') : null,
       seriesName: this.metadataForm.get('seriesName')?.value || this.copiedFields['seriesName'] ? this.getValueOrCopied('seriesName') : '',
       seriesNumber: this.metadataForm.get('seriesNumber')?.value || this.copiedFields['seriesNumber'] ? this.getNumberOrCopied('seriesNumber') : null,
       seriesTotal: this.metadataForm.get('seriesTotal')?.value || this.copiedFields['seriesTotal'] ? this.getNumberOrCopied('seriesTotal') : null,
@@ -255,6 +269,8 @@ export class MetadataPickerComponent implements OnInit {
       amazonReviewCountLocked: this.metadataForm.get('amazonReviewCountLocked')?.value,
       goodreadsRatingLocked: this.metadataForm.get('goodreadsRatingLocked')?.value,
       goodreadsReviewCountLocked: this.metadataForm.get('goodreadsReviewCountLocked')?.value,
+      hardcoverRatingLocked: this.metadataForm.get('hardcoverRatingLocked')?.value,
+      hardcoverReviewCountLocked: this.metadataForm.get('hardcoverReviewCountLocked')?.value,
       seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,

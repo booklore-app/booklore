@@ -4,7 +4,6 @@ import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';
-import {MetadataProvider} from '../../model/provider.model';
 import {FetchMetadataRequest} from '../../model/request/fetch-metadata-request.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
@@ -12,11 +11,11 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
 import {Book, BookMetadata} from '../../../model/book.model';
 import {BookService} from '../../../service/book.service';
-import {combineLatest, Observable, Subscription, Subject, takeUntil} from 'rxjs';
+import {combineLatest, Observable, Subject, Subscription, takeUntil} from 'rxjs';
 import {AppSettings} from '../../../../core/model/app-settings.model';
 import {AppSettingsService} from '../../../../core/service/app-settings.service';
 import {distinctUntilChanged, filter, switchMap} from 'rxjs/operators';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -27,7 +26,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 })
 export class MetadataSearcherComponent implements OnInit, OnDestroy {
   form: FormGroup;
-  providers = Object.values(MetadataProvider);
+  providers: string[] = [];
   allFetchedMetadata: BookMetadata[] = [];
   selectedFetchedMetadata!: BookMetadata | null;
   bookId!: number;
@@ -65,7 +64,7 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
             this.selectedFetchedMetadata = null;
             this.allFetchedMetadata = [];
             this.form.patchValue({
-              provider: Object.values(MetadataProvider),
+              provider: this.providers,
               title: '',
               author: '',
             });
@@ -75,6 +74,13 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
         filter(([book, settings]) => !!book && !!settings),
         distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
       ).subscribe(([book, settings]) => {
+
+        console.log(settings!.metadataProviderSettings)
+
+        this.providers = Object.entries(settings!.metadataProviderSettings)
+          .filter(([key, value]) => value.enabled)
+          .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));
+
         const autoBookSearchEnabled = settings!.autoBookSearch ?? false;
 
         if (book) {
@@ -83,7 +89,7 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
           this.bookId = book.id;
 
           this.form.patchValue({
-            provider: Object.values(MetadataProvider),
+            provider: this.providers,
             title: book.metadata?.title || null,
             author: book.metadata?.authors?.length ? book.metadata.authors[0] : ''
           });
@@ -111,9 +117,7 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.form.valid) {
-      const providerKeys = Object.keys(MetadataProvider).filter(key =>
-        (this.form.get('provider')?.value as string[]).includes(MetadataProvider[key as keyof typeof MetadataProvider])
-      );
+      const providerKeys = this.form.get('provider')?.value;
       if (!providerKeys) {
         return;
       }
@@ -155,6 +159,8 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
         return `<a href="https://www.goodreads.com/book/show/${metadata.providerBookId}" target="_blank">Goodreads</a>`;
       case "Google":
         return `<a href="https://books.google.com/books?id=${metadata.providerBookId}" target="_blank">Google</a>`;
+      case "Hardcover":
+        return `<a href="https://hardcover.app/books/${metadata.providerBookId}" target="_blank">Hardcover</a>`;
       default:
         throw new Error(`Unsupported provider: ${metadata.provider}`);
     }

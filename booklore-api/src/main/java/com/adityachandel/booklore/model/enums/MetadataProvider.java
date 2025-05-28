@@ -1,5 +1,5 @@
 package com.adityachandel.booklore.model.enums;
 
 public enum MetadataProvider {
-    Amazon, GoodReads, Google
+    Amazon, GoodReads, Google, Hardcover
 }

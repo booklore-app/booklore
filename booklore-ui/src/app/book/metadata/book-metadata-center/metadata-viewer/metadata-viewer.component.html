@@ -41,28 +41,32 @@
           </div>
 
           <div class="flex items-center gap-2 pt-2">
-            <ng-container *ngIf="metadata.amazonRating || metadata.goodreadsRating; else legacyRating">
-              <p *ngIf="metadata.amazonRating" class="font-semibold">Amazon: {{ metadata.amazonRating }}</p>
-              <p-rating
-                *ngIf="metadata.amazonRating"
-                [(ngModel)]="metadata.amazonRating"
-                readonly
-                stars="5"
-                [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
-              </p-rating>
-              <p *ngIf="metadata.amazonRating" class="font-semibold"> ({{ metadata.amazonReviewCount | number:'1.0-0' }})</p>
+            <ng-container *ngIf="metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating; else legacyRating">
+              <ng-container *ngIf="metadata.amazonRating">
+                <p class="font-semibold">Amazon: {{ metadata.amazonRating }}</p>
+                <p-rating [ngModel]="metadata.amazonRating" readonly stars="5"
+                          [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
+                </p-rating>
+                <p class="font-semibold">({{ metadata.amazonReviewCount | number:'1.0-0' }})</p>
+                <span *ngIf="metadata.goodreadsRating || metadata.hardcoverRating">|</span>
+              </ng-container>
 
-              <p *ngIf="metadata.amazonRating && metadata.goodreadsRating">|</p>
+              <ng-container *ngIf="metadata.goodreadsRating">
+                <p class="font-semibold">Goodreads: {{ metadata.goodreadsRating }}</p>
+                <p-rating [ngModel]="metadata.goodreadsRating" readonly stars="5"
+                          [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
+                </p-rating>
+                <p class="font-semibold">({{ metadata.goodreadsReviewCount | number:'1.0-0' }})</p>
+                <span *ngIf="metadata.hardcoverRating">|</span>
+              </ng-container>
 
-              <p *ngIf="metadata.goodreadsRating" class="font-semibold">Goodreads: {{ metadata.goodreadsRating }}</p>
-              <p-rating
-                *ngIf="metadata.goodreadsRating"
-                [(ngModel)]="metadata.goodreadsRating"
-                readonly
-                stars="5"
-                [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
-              </p-rating>
-              <p *ngIf="metadata.goodreadsRating" class="font-semibold"> ({{ metadata.goodreadsReviewCount | number:'1.0-0' }})</p>
+              <ng-container *ngIf="metadata.hardcoverRating">
+                <p class="font-semibold">Hardcover: {{ metadata.hardcoverRating }}</p>
+                <p-rating [ngModel]="metadata.hardcoverRating" readonly stars="5"
+                          [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
+                </p-rating>
+                <p class="font-semibold">({{ metadata.hardcoverReviewCount | number:'1.0-0' }})</p>
+              </ng-container>
             </ng-container>
 
             <ng-template #legacyRating>

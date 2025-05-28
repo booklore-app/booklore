@@ -16,7 +16,7 @@ export enum SettingsTab {
   ViewPreferences = 'view-settings',
   UserManagement = 'user-management',
   EmailSettings = 'email-settings',
-  GlobalSettings = 'global-settings',
+  AdminSettings = 'admin-settings',
   AuthenticationSettings = 'auth-settings'
 }
 

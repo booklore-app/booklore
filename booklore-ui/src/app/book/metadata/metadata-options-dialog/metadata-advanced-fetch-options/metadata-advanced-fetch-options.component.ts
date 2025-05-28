@@ -18,7 +18,7 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
 
   @Output() metadataOptionsSubmitted: EventEmitter<MetadataRefreshOptions> = new EventEmitter<MetadataRefreshOptions>();
   fields: (keyof FieldOptions)[] = ['title', 'description', 'authors', 'categories', 'cover'];
-  providers: string[] = ['Amazon', 'Google', 'GoodReads'];
+  providers: string[] = ['Amazon', 'Google', 'GoodReads', 'Hardcover'];
   refreshCovers: boolean = false;
   mergeCategories: boolean = false;
 

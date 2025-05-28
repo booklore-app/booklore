@@ -5,7 +5,7 @@
         <p-tab [value]="SettingsTab.ReaderSettings">Reader Preferences</p-tab>
         <p-tab [value]="SettingsTab.ViewPreferences">View Preferences</p-tab>
         <ng-container *ngIf="userData.permissions.admin">
-          <p-tab [value]="SettingsTab.GlobalSettings">Global Settings</p-tab>
+          <p-tab [value]="SettingsTab.AdminSettings">Admin Settings</p-tab>
           <p-tab [value]="SettingsTab.UserManagement">User Management</p-tab>
           <p-tab [value]="SettingsTab.EmailSettings">Email Setting</p-tab>
           <p-tab [value]="SettingsTab.AuthenticationSettings">Authentication Settings</p-tab>
@@ -20,7 +20,7 @@
           <app-view-preferences-parent></app-view-preferences-parent>
         </p-tabpanel>
         <ng-container *ngIf="userData.permissions.admin">
-          <p-tabpanel [value]="SettingsTab.GlobalSettings">
+          <p-tabpanel [value]="SettingsTab.AdminSettings">
             <app-global-preferences></app-global-preferences>
           </p-tabpanel>
           <p-tabpanel [value]="SettingsTab.UserManagement">

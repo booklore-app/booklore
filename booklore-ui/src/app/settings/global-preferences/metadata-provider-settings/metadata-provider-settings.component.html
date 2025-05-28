@@ -1,0 +1,51 @@
+<p class="text-lg flex items-center gap-2">
+ Enabled Metadata Providers:
+  <i
+    class="pi pi-info-circle"
+    pTooltip="Enable or configure third-party metadata sources for enhanced book information."
+    tooltipPosition="right"
+    style="cursor: pointer;">
+  </i>
+</p>
+
+<div class="flex flex-col gap-4 p-4">
+
+  <div class="flex items-center gap-4">
+    <p-checkbox [(ngModel)]="amazonEnabled" [binary]="true"></p-checkbox>
+    <label>Amazon</label>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <p-checkbox [(ngModel)]="goodreadsEnabled" [binary]="true"></p-checkbox>
+    <label>Goodreads</label>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <p-checkbox [(ngModel)]="googleEnabled" [binary]="true"></p-checkbox>
+    <label>Google</label>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center gap-4">
+      <p-checkbox
+        [binary]="true"
+        [(ngModel)]="hardcoverEnabled"
+        [disabled]="!hardcoverToken">
+      </p-checkbox>
+      <label>Hardcover</label>
+    </div>
+    <div class="flex items-center gap-4 pl-6">
+      <input
+        type="text"
+        pInputText
+        placeholder="API Token"
+        class="w-full max-w-sm"
+        [(ngModel)]="hardcoverToken"
+        (ngModelChange)="onTokenChange($event)" />
+    </div>
+  </div>
+
+</div>
+<div class="flex justify-start px-4 pb-4">
+  <p-button label="Save" icon="pi pi-save" [outlined]="true" (click)="saveSettings()"></p-button>
+</div>
