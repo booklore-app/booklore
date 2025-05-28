@@ -22,9 +22,6 @@ public class LibraryPathEntity {
     @JoinColumn(name = "library_id", nullable = false)
     private LibraryEntity library;
 
-    @OneToMany(mappedBy = "libraryPath", fetch = FetchType.LAZY)
-    private List<BookEntity> books;
-
     @Column(nullable = false)
     private String path;
 }
