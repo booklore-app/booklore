@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -36,6 +37,11 @@ public class FileUploadService {
     private static final String CBZ_MIME_TYPE = "application/x-cbz";
     private static final String CBR_MIME_TYPE = "application/x-cbr";
     private static final String CB7_MIME_TYPE = "application/x-cb7";
+    private static final Set<String> SUPPORTED_MIME_TYPES = Set.of(
+            PDF_MIME_TYPE, EPUB_MIME_TYPE,
+            CBZ_MIME_TYPE, CBR_MIME_TYPE, CB7_MIME_TYPE,
+            "application/octet-stream"
+    );
 
     private final LibraryRepository libraryRepository;
     private final PdfProcessor pdfProcessor;
@@ -47,8 +53,7 @@ public class FileUploadService {
     private final EpubMetadataExtractor epubMetadataExtractor;
 
     public Book uploadFile(MultipartFile file, long libraryId, long pathId) throws IOException {
-        Integer uploadSizeInMb = appSettingService.getAppSettings().getMaxFileUploadSizeInMb();
-        validateFile(file, uploadSizeInMb);
+        validateFile(file);
 
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId)
                 .orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
@@ -60,12 +65,10 @@ public class FileUploadService {
                 .orElseThrow(() -> ApiError.INVALID_LIBRARY_PATH.createException(libraryId));
 
         Path tempPath = Files.createTempFile("upload-", Objects.requireNonNull(file.getOriginalFilename()));
-        UploadedFileMetadata metadata;
-
         try {
             file.transferTo(tempPath);
 
-            metadata = extractMetadata(file, tempPath);
+            UploadedFileMetadata metadata = extractMetadata(file.getContentType(), tempPath);
 
             String title = Optional.ofNullable(metadata.getTitle()).orElse("").trim();
             String authors = metadata.getAuthors() != null ? String.join(", ", metadata.getAuthors()) : "";
@@ -97,35 +100,26 @@ public class FileUploadService {
         }
     }
 
-    private UploadedFileMetadata extractMetadata(MultipartFile file, Path tempPath) throws IOException {
-        String fileType = Objects.requireNonNull(file.getContentType());
-        return switch (fileType.toLowerCase()) {
+    private UploadedFileMetadata extractMetadata(String contentType, Path tempPath) throws IOException {
+        if (contentType == null) {
+            throw ApiError.INVALID_FILE_FORMAT.createException("Content type is null.");
+        }
+        return switch (contentType.toLowerCase()) {
             case PDF_MIME_TYPE -> pdfMetadataExtractor.extractMetadata(tempPath.toString());
             case EPUB_MIME_TYPE -> epubMetadataExtractor.extractMetadata(tempPath.toString());
-            case CBZ_MIME_TYPE, CBR_MIME_TYPE, CB7_MIME_TYPE -> new UploadedFileMetadata();
+            case CBZ_MIME_TYPE, CBR_MIME_TYPE, CB7_MIME_TYPE, "application/octet-stream" -> new UploadedFileMetadata();
             default -> throw ApiError.INVALID_FILE_FORMAT.createException("Unsupported file type.");
         };
     }
 
-    private boolean isSupportedContentType(String fileType) {
-        return PDF_MIME_TYPE.equals(fileType)
-            || EPUB_MIME_TYPE.equals(fileType)
-            || CBZ_MIME_TYPE.equals(fileType)
-            || CBR_MIME_TYPE.equals(fileType)
-            || CB7_MIME_TYPE.equals(fileType);
-    }
-
-    private boolean isFileTooLarge(MultipartFile file, int uploadSizeInMb) {
-        return file.getSize() > uploadSizeInMb * 1024L * 1024L;
-    }
-
-    private void validateFile(MultipartFile file, int uploadSizeInMb) {
+    private void validateFile(MultipartFile file) {
         String fileType = file.getContentType();
-        if (!isSupportedContentType(fileType)) {
+        if (!SUPPORTED_MIME_TYPES.contains(fileType)) {
             throw ApiError.INVALID_FILE_FORMAT.createException();
         }
-        if (isFileTooLarge(file, uploadSizeInMb)) {
-            throw ApiError.FILE_TOO_LARGE.createException(uploadSizeInMb);
+        int maxSizeMb = appSettingService.getAppSettings().getMaxFileUploadSizeInMb();
+        if (file.getSize() > maxSizeMb * 1024L * 1024L) {
+            throw ApiError.FILE_TOO_LARGE.createException(maxSizeMb);
         }
     }
 
@@ -180,7 +174,7 @@ public class FileUploadService {
         return switch (fileType.toLowerCase()) {
             case PDF_MIME_TYPE -> BookFileType.PDF;
             case EPUB_MIME_TYPE -> BookFileType.EPUB;
-            case CBZ_MIME_TYPE, CBR_MIME_TYPE, CB7_MIME_TYPE -> BookFileType.CBX;
+            case CBZ_MIME_TYPE, CBR_MIME_TYPE, CB7_MIME_TYPE, "application/octet-stream" -> BookFileType.CBX;
             default -> null;
         };
     }
