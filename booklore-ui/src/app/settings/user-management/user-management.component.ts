@@ -13,6 +13,7 @@ import {Library} from '../../book/model/library.model';
 import {LibraryService} from '../../book/service/library.service';
 import {Dialog} from 'primeng/dialog';
 import {Password} from 'primeng/password';
+import {filter, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-management',
@@ -52,35 +53,16 @@ export class UserManagementComponent implements OnInit {
 
   ngOnInit() {
     this.loadUsers();
-    this.loadMyself();
-    this.libraryService.getAllLibrariesFromAPI().subscribe({
-      next: (libraries) => {
-        this.allLibraries = libraries;
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load libraries',
-        });
-      },
-    });
+
+    this.userService.userState$
+      .pipe(filter(user => !!user), take(1))
+      .subscribe(user => this.currentUser = user);
+
+    this.libraryService.libraryState$
+      .pipe(filter(state => !!state?.loaded), take(1))
+      .subscribe(libraries => this.allLibraries = libraries.libraries ?? []);
   }
 
-  loadMyself() {
-    this.userService.getMyself().subscribe({
-      next: (user) => {
-        this.currentUser = user;
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to fetch current user',
-        });
-      }
-    })
-  }
 
   loadUsers() {
     this.userService.getUsers().subscribe({

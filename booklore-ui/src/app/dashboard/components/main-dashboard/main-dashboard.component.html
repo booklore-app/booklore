@@ -3,7 +3,7 @@
   <div class="dashboard" *ngIf="(bookState$ | async)?.loaded === true">
     <div>
       <div class="dashboard-no-library" *ngIf="isLibrariesEmpty$ | async; else dashboardScroller">
-        <div *ngIf="(userService.userData$ | async)?.permissions as permissions">
+        <div *ngIf="(userService.userState$ | async)?.permissions as permissions">
           <div *ngIf="permissions.admin || permissions.canManipulateLibrary">
             <h1 class="no-library-header">Looks like you haven't added a library yet. Let's add one!</h1>
             <p-button

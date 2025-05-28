@@ -46,7 +46,7 @@ export class AppMenuComponent implements OnInit {
       this.versionInfo = data;
     });
 
-    this.userService.userData$.pipe(
+    this.userService.userState$.pipe(
       filter(settings => !!settings))
       .subscribe(user => {
         if (user?.userSettings.sidebarLibrarySorting) {

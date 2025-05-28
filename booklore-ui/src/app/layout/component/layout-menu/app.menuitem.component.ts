@@ -55,7 +55,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
   menuResetSubscription: Subscription;
 
   constructor(public router: Router, private menuService: MenuService, private userService: UserService) {
-    this.userService.userData$.subscribe(userData => {
+    this.userService.userState$.subscribe(userData => {
       if (userData) {
         this.canManipulateLibrary = userData.permissions.canManipulateLibrary;
         this.admin = userData.permissions.admin;

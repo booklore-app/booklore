@@ -84,7 +84,7 @@ export class ReaderPreferences implements OnInit, OnDestroy {
   private readonly userService = inject(UserService);
   private readonly messageService = inject(MessageService);
 
-  userData$: Observable<User | null> = this.userService.userData$;
+  userData$: Observable<User | null> = this.userService.userState$;
   private subscription?: Subscription;
   private currentUser: User | null = null;
 

@@ -1,4 +1,4 @@
-<div *ngIf="userService.userData$ | async as userData">
+<div *ngIf="userService.userState$ | async as userData">
   <div class="rounded-xl overflow-hidden">
     <p-tabs [(value)]="activeTab" scrollable>
       <p-tablist>

@@ -77,7 +77,7 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
       this.fetchBookRecommendationsIfNeeded(book.metadata!.bookId);
     });
 
-    this.userSubscription = this.userService.userData$.subscribe(userData => {
+    this.userSubscription = this.userService.userState$.subscribe(userData => {
       const userPermissions = userData?.permissions;
       this.canEditMetadata = userPermissions?.canEditMetadata ?? false;
       this.admin = userPermissions?.admin ?? false;

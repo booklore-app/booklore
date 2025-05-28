@@ -52,7 +52,7 @@ export class UserProfileDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.userSubscription = this.userService.userData$.subscribe(user => {
+    this.userSubscription = this.userService.userState$.subscribe(user => {
       this.currentUser = user;
       this.resetEditForm();
     });

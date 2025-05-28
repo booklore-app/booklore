@@ -11,6 +11,7 @@ import {ShelfService} from '../../../book/service/shelf.service';
 import {combineLatest} from 'rxjs';
 import {FormsModule} from '@angular/forms';
 import {ToastModule} from 'primeng/toast';
+import {filter, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-view-preferences',
@@ -84,13 +85,13 @@ export class ViewPreferencesComponent implements OnInit {
 
   ngOnInit(): void {
     combineLatest([
-      this.userService.getMyself(),
-      this.libraryService.getAllLibrariesFromAPI(),
-      this.shelfService.shelfState$
-    ]).subscribe(([user, libraries, shelfState]) => {
-      this.user = user;
+      this.userService.userState$.pipe(filter(user => !!user), take(1)),
+      this.libraryService.libraryState$.pipe(filter(libraryState => !!libraryState?.libraries && libraryState.loaded), take(1)),
+      this.shelfService.shelfState$.pipe(filter(shelfState => !!shelfState?.shelves && shelfState.loaded), take(1)),
+    ]).subscribe(([userState, librariesState, shelfState]) => {
 
-      const prefs = user.userSettings?.entityViewPreferences;
+      this.user = userState;
+      const prefs = userState?.userSettings?.entityViewPreferences;
       const global = prefs?.global;
       this.selectedSort = global?.sortKey ?? 'title';
       this.selectedSortDir = global?.sortDir ?? 'ASC';
@@ -104,7 +105,7 @@ export class ViewPreferencesComponent implements OnInit {
         view: o.preferences.view ?? 'GRID'
       }));
 
-      this.libraryOptions = (libraries ?? []).filter(lib => lib.id !== undefined).map(lib => ({
+      this.libraryOptions = (librariesState.libraries ?? []).filter(lib => lib.id !== undefined).map(lib => ({
         label: lib.name,
         value: lib.id!
       }));
@@ -170,6 +171,6 @@ export class ViewPreferencesComponent implements OnInit {
     };
 
     this.userService.updateUserSetting(this.user.id, 'entityViewPreferences', payload);
-    this.messageService.add({ severity: 'success', summary: 'Preferences Saved', detail: 'Your sorting and view preferences were saved successfully.' });
+    this.messageService.add({severity: 'success', summary: 'Preferences Saved', detail: 'Your sorting and view preferences were saved successfully.'});
   }
 }

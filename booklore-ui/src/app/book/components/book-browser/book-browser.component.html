@@ -12,7 +12,7 @@
           <p *ngIf="entityType === EntityType.UNSHELVED" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
             Unshelved Books
           </p>
-          <div *ngIf="userService.userData$ | async as userData">
+          <div *ngIf="userService.userState$ | async as userData">
             <div *ngIf="entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED && (userData.permissions.admin || userData.permissions.canManipulateLibrary) ">
               <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"></p-button>
               <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
@@ -149,7 +149,7 @@
                 pTooltip="Remove from shelf"
                 tooltipPosition="top">
               </p-button>
-              <div *ngIf="userService.userData$ | async as userData">
+              <div *ngIf="userService.userState$ | async as userData">
                 <p-button
                   *ngIf="userData.permissions.canEditMetadata"
                   icon="pi pi-database"

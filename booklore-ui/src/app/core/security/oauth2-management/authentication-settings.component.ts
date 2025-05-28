@@ -74,14 +74,11 @@ export class AuthenticationSettingsComponent implements OnInit {
       take(1)
     ).subscribe(settings => this.loadSettings(settings));
 
-    this.libraryService.getAllLibrariesFromAPI().subscribe({
-      next: (libraries) => {
-        this.allLibraries = libraries;
-      },
-      error: () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to load libraries'});
-      },
-    });
+    this.libraryService.libraryState$
+      .pipe(
+        filter(state => !!state?.loaded),
+        take(1)
+      ).subscribe(state => this.allLibraries = state.libraries ?? []);
   }
 
   loadSettings(settings: AppSettings): void {

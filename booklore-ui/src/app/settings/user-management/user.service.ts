@@ -100,12 +100,12 @@ export class UserService {
 
   private rxStompService?: RxStompService;
 
-  private userDataSubject = new BehaviorSubject<User | null>(null);
-  userData$ = this.userDataSubject.asObservable();
+  private userStateSubject = new BehaviorSubject<User | null>(null);
+  userState$ = this.userStateSubject.asObservable();
 
   constructor() {
     this.getMyself().subscribe(user => {
-      this.userDataSubject.next(user);
+      this.userStateSubject.next(user);
       this.startWebSocket();
     });
   }
@@ -165,11 +165,11 @@ export class UserService {
       headers: {'Content-Type': 'application/json'},
       responseType: 'text' as 'json'
     }).subscribe(() => {
-      const currentUser = this.userDataSubject.getValue();
+      const currentUser = this.userStateSubject.getValue();
       if (currentUser) {
         const updatedSettings = {...currentUser.userSettings, [key]: value};
         const updatedUser = {...currentUser, settings: updatedSettings};
-        this.userDataSubject.next(updatedUser);
+        this.userStateSubject.next(updatedUser);
       }
     });
   }

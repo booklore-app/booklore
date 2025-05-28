@@ -52,7 +52,7 @@ export class BookCardComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.userService.userData$
+    this.userService.userState$
       .pipe(filter(userData => !!userData))
       .subscribe((userData) => {
         this.userPermissions = userData.permissions;
