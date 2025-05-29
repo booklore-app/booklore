@@ -36,6 +36,7 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
 
   private messageService = inject(MessageService);
   @Input() currentMetadataOptions!: MetadataRefreshOptions;
+  @Input() submitButtonLabel!: string;
 
 
   ngOnChanges(changes: SimpleChanges): void {

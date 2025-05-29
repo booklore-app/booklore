@@ -24,6 +24,9 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Editor} from 'primeng/editor';
 import {ProgressBar} from 'primeng/progressbar';
 import {ToggleButton} from 'primeng/togglebutton';
+import {MetadataFetchOptionsComponent} from '../../metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
+import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -50,13 +53,14 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   private destroyRef = inject(DestroyRef);
 
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
-  items: MenuItem[] | undefined;
+  emailMenuItems: MenuItem[] | undefined;
+  refreshMenuItems: MenuItem[] | undefined;
   bookInSeries: Book[] = [];
   isExpanded = false;
   showFilePath = false;
 
   ngOnInit(): void {
-    this.items = [
+    this.emailMenuItems = [
       {
         label: 'Custom Send',
         command: () => {
@@ -77,6 +81,24 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
             }
           });
         }
+      }
+    ];
+
+    this.refreshMenuItems = [
+      {
+        label: 'Granular Refresh',
+        icon: 'pi pi-database',
+        command: () => {
+          this.dialogService.open(MetadataFetchOptionsComponent, {
+            header: 'Metadata Refresh Options',
+            modal: true,
+            closable: true,
+            data: {
+              bookIds: [this.book!.id],
+              metadataRefreshType: MetadataRefreshType.BOOKS,
+            },
+          });
+        },
       }
     ];
 
@@ -132,6 +154,15 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
 
   download(bookId: number) {
     this.bookService.downloadFile(bookId);
+  }
+
+  quickRefresh(bookId: number) {
+    const metadataRefreshRequest: MetadataRefreshRequest = {
+      quick: true,
+      refreshType: MetadataRefreshType.BOOKS,
+      bookIds: [bookId],
+    };
+    this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
   }
 
   quickSend(bookId: number) {
@@ -191,7 +222,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   getProgressPercent(): number | undefined {
     if (this.book?.bookType === 'PDF') {
       return this.book.pdfProgress?.percentage;
-    } else if(this.book?.bookType === 'CBX') {
+    } else if (this.book?.bookType === 'CBX') {
       return this.book?.cbxProgress?.percentage;
     } else {
       return this.book?.epubProgress?.percentage;
@@ -201,9 +232,9 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   copyFilePath() {
     if (this.book?.filePath) {
       navigator.clipboard.writeText(this.book.filePath).then(() => {
-        this.messageService.add({ severity: 'success', summary: 'Copied', detail: 'File path copied to clipboard.' });
+        this.messageService.add({severity: 'success', summary: 'Copied', detail: 'File path copied to clipboard.'});
       }, () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to copy file path.' });
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to copy file path.'});
       });
     }
   }
@@ -219,12 +250,18 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     if (!fileType) return 'bg-gray-500 text-white';
 
     switch (fileType.toLowerCase()) {
-      case 'pdf': return 'bg-red-700 text-white';
-      case 'epub': return 'bg-yellow-600 text-gray-900';
-      case 'cbz': return 'bg-green-700 text-white';
-      case 'cbr': return 'bg-purple-700 text-white';
-      case 'cb7': return 'bg-blue-700 text-white';
-      default: return 'bg-gray-600 text-white';
+      case 'pdf':
+        return 'bg-red-700 text-white';
+      case 'epub':
+        return 'bg-yellow-600 text-gray-900';
+      case 'cbz':
+        return 'bg-green-700 text-white';
+      case 'cbr':
+        return 'bg-purple-700 text-white';
+      case 'cb7':
+        return 'bg-blue-700 text-white';
+      default:
+        return 'bg-gray-600 text-white';
     }
   }
 

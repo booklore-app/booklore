@@ -457,9 +457,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         bookIds: this.selectedBooks
       },
     });
-    this.dynamicDialogRef.onClose.subscribe(() => {
-      this.selectedBooks.clear();
-    });
   }
 
   updateMetadata() {

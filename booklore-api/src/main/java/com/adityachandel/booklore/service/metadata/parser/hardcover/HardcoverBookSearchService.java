@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,14 +52,25 @@ public class HardcoverBookSearchService {
         body.setQuery(graphqlQuery);
         body.setOperationName("SearchBooks");
 
-        GraphQLResponse response = restClient.post()
-                .uri("")
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken)
-                .body(body)
-                .retrieve()
-                .body(GraphQLResponse.class);
+        try {
+            GraphQLResponse response = restClient.post()
+                    .uri("")
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken)
+                    .body(body)
+                    .retrieve()
+                    .body(GraphQLResponse.class);
 
-        return response.getData().getSearch().getResults().getHits();
+            if (response == null || response.getData() == null || response.getData().getSearch() == null || response.getData().getSearch().getResults() == null) {
+                log.warn("Empty or malformed response from Hardcover API");
+                return Collections.emptyList();
+            }
+
+            return response.getData().getSearch().getResults().getHits();
+
+        } catch (RestClientException e) {
+            log.error("Failed to fetch data from Hardcover API, Error: {}", e.getMessage());
+            return Collections.emptyList();
+        }
     }
 }

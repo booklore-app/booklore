@@ -293,7 +293,7 @@ public class AmazonBookParser implements BookParser {
             if (seriesNameElement != null) {
                 return seriesNameElement.text();
             } else {
-                log.warn("Failed to parse seriesName: Element not found.");
+                log.debug("Failed to parse seriesName: Element not found.");
             }
         } catch (Exception e) {
             log.warn("Failed to parse seriesName: {}", e.getMessage());
@@ -311,7 +311,7 @@ public class AmazonBookParser implements BookParser {
                     return Float.parseFloat(parts[1]);
                 }
             } else {
-                log.warn("Failed to parse seriesNumber: Element not found.");
+                log.debug("Failed to parse seriesNumber: Element not found.");
             }
         } catch (Exception e) {
             log.warn("Failed to parse seriesNumber: {}", e.getMessage());
@@ -329,7 +329,7 @@ public class AmazonBookParser implements BookParser {
                     return Integer.parseInt(parts[3]);
                 }
             } else {
-                log.warn("Failed to parse seriesTotal: Element not found.");
+                log.debug("Failed to parse seriesTotal: Element not found.");
             }
         } catch (Exception e) {
             log.warn("Failed to parse seriesTotal: {}", e.getMessage());
@@ -343,7 +343,7 @@ public class AmazonBookParser implements BookParser {
             if (languageElement != null) {
                 return languageElement.text();
             }
-            log.warn("Failed to parse language: Element not found.");
+            log.debug("Failed to parse language: Element not found.");
         } catch (Exception e) {
             log.warn("Failed to parse language: {}", e.getMessage());
         }

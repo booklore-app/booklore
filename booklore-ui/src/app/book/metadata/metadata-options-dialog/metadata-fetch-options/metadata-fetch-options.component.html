@@ -1,5 +1,7 @@
 <div class="flex flex-col space-y-6">
-
-  <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)"></app-metadata-advanced-fetch-options>
-
+  <app-metadata-advanced-fetch-options
+    (metadataOptionsSubmitted)="onMetadataSubmit($event)"
+    [currentMetadataOptions]="currentMetadataOptions"
+    [submitButtonLabel]="'Start Refresh'">
+  </app-metadata-advanced-fetch-options>
 </div>

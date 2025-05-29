@@ -203,9 +203,12 @@ public class BookMetadataService {
             metadataCombined.setAsin(metadata.getAsin() != null ? metadata.getAsin() : metadataCombined.getAsin());
             metadataCombined.setPageCount(metadata.getPageCount() != null ? metadata.getPageCount() : metadataCombined.getPageCount());
             metadataCombined.setLanguage(metadata.getLanguage() != null ? metadata.getLanguage() : metadataCombined.getLanguage());
-            metadataCombined.setRating(metadata.getRating() != null ? metadata.getRating() : metadataCombined.getRating());
-            metadataCombined.setRatingCount(metadata.getRatingCount() != null ? metadata.getRatingCount() : metadataCombined.getRatingCount());
-            metadataCombined.setReviewCount(metadata.getReviewCount() != null ? metadata.getReviewCount() : metadataCombined.getReviewCount());
+            metadataCombined.setGoodreadsRating(metadata.getGoodreadsRating() != null ? metadata.getGoodreadsRating() : metadataCombined.getGoodreadsRating());
+            metadataCombined.setGoodreadsReviewCount(metadata.getGoodreadsReviewCount() != null ? metadata.getGoodreadsReviewCount() : metadataCombined.getGoodreadsReviewCount());
+            metadataCombined.setAmazonRating(metadata.getAmazonRating() != null ? metadata.getAmazonRating() : metadataCombined.getAmazonRating());
+            metadataCombined.setAmazonReviewCount(metadata.getAmazonReviewCount() != null ? metadata.getAmazonReviewCount() : metadataCombined.getAmazonReviewCount());
+            metadataCombined.setHardcoverRating(metadata.getHardcoverRating() != null ? metadata.getHardcoverRating() : metadataCombined.getHardcoverRating());
+            metadataCombined.setHardcoverReviewCount(metadata.getHardcoverReviewCount() != null ? metadata.getHardcoverReviewCount() : metadataCombined.getHardcoverReviewCount());
             metadataCombined.setAwards(metadata.getAwards() != null ? metadata.getAwards() : metadataCombined.getAwards());
             metadataCombined.setSeriesName(metadata.getSeriesName() != null ? metadata.getSeriesName() : metadataCombined.getSeriesName());
             metadataCombined.setSeriesNumber(metadata.getSeriesNumber() != null ? metadata.getSeriesNumber() : metadataCombined.getSeriesNumber());
@@ -389,11 +392,23 @@ public class BookMetadataService {
             case "language":
                 existingMetadata.setLanguageLocked(isLocked);
                 break;
-            case "rating":
-                existingMetadata.setRatingLocked(isLocked);
+            case "amazonRating":
+                existingMetadata.setAmazonRatingLocked(isLocked);
                 break;
-            case "reviewCount":
-                existingMetadata.setReviewCountLocked(isLocked);
+            case "amazonReviewCount":
+                existingMetadata.setAmazonReviewCountLocked(isLocked);
+                break;
+            case "goodreadsRating":
+                existingMetadata.setGoodreadsRatingLocked(isLocked);
+                break;
+            case "goodreadsReviewCount":
+                existingMetadata.setGoodreadsReviewCountLocked(isLocked);
+                break;
+            case "hardcoverRating":
+                existingMetadata.setHardcoverRatingLocked(isLocked);
+                break;
+            case "hardcoverReviewCount":
+                existingMetadata.setHardcoverReviewCountLocked(isLocked);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + field);
@@ -460,6 +475,6 @@ public class BookMetadataService {
                 .peek(book -> book.getMetadata().applyLockToAllFields(lock))
                 .toList();
         bookRepository.saveAll(books);
-        return books.stream().map(b ->bookMetadataMapper.toBookMetadata(b.getMetadata(), false)).collect(Collectors.toList());
+        return books.stream().map(b -> bookMetadataMapper.toBookMetadata(b.getMetadata(), false)).collect(Collectors.toList());
     }
 }

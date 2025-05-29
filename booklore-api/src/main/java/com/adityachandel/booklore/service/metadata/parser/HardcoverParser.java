@@ -24,6 +24,8 @@ public class HardcoverParser implements BookParser {
 
     @Override
     public List<BookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+        log.info("Hardcover: Fetching metadata for book {}", fetchMetadataRequest.getTitle());
+
         List<GraphQLResponse.Hit> hits = hardcoverBookSearchService.searchBooks(fetchMetadataRequest.getTitle());
 
         return hits.stream().map(hit -> {
@@ -78,6 +80,6 @@ public class HardcoverParser implements BookParser {
     @Override
     public BookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
         List<BookMetadata> bookMetadata = fetchMetadata(book, fetchMetadataRequest);
-        return bookMetadata.getFirst();
+        return bookMetadata.isEmpty() ? null : bookMetadata.getFirst();
     }
 }

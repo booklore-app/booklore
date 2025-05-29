@@ -170,7 +170,11 @@
          style="cursor: pointer;">
       </i>
     </p>
-    <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)" [currentMetadataOptions]="currentMetadataOptions"></app-metadata-advanced-fetch-options>
+    <app-metadata-advanced-fetch-options
+      (metadataOptionsSubmitted)="onMetadataSubmit($event)"
+      [currentMetadataOptions]="currentMetadataOptions"
+      [submitButtonLabel]="'Save'">
+    </app-metadata-advanced-fetch-options>
   </div>
 
 </div>

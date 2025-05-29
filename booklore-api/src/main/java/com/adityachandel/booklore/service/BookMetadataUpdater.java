@@ -47,27 +47,21 @@ public class BookMetadataUpdater {
         if ((metadata.getTitleLocked() == null || !metadata.getTitleLocked()) && newMetadata.getTitle() != null) {
             metadata.setTitle(newMetadata.getTitle().isEmpty() ? null : newMetadata.getTitle());
         }
-
         if ((metadata.getSubtitleLocked() == null || !metadata.getSubtitleLocked()) && newMetadata.getSubtitle() != null) {
             metadata.setSubtitle(newMetadata.getSubtitle().isBlank() ? null : newMetadata.getSubtitle());
         }
-
         if ((metadata.getPublisherLocked() == null || !metadata.getPublisherLocked()) && newMetadata.getPublisher() != null) {
             metadata.setPublisher(newMetadata.getPublisher().isBlank() ? null : newMetadata.getPublisher());
         }
-
         if ((metadata.getPublishedDateLocked() == null || !metadata.getPublishedDateLocked()) && newMetadata.getPublishedDate() != null) {
             metadata.setPublishedDate(newMetadata.getPublishedDate());
         }
-
         if ((metadata.getLanguageLocked() == null || !metadata.getLanguageLocked()) && newMetadata.getLanguage() != null) {
             metadata.setLanguage(newMetadata.getLanguage().isBlank() ? null : newMetadata.getLanguage());
         }
-
         if ((metadata.getIsbn10Locked() == null || !metadata.getIsbn10Locked()) && newMetadata.getIsbn10() != null) {
             metadata.setIsbn10(newMetadata.getIsbn10().isBlank() ? null : newMetadata.getIsbn10());
         }
-
         if ((metadata.getIsbn13Locked() == null || !metadata.getIsbn13Locked()) && newMetadata.getIsbn13() != null) {
             metadata.setIsbn13(newMetadata.getIsbn13().isBlank() ? null : newMetadata.getIsbn13());
         }
@@ -77,47 +71,36 @@ public class BookMetadataUpdater {
         if ((metadata.getDescriptionLocked() == null || !metadata.getDescriptionLocked()) && newMetadata.getDescription() != null) {
             metadata.setDescription(newMetadata.getDescription().isBlank() ? null : newMetadata.getDescription());
         }
-
         if ((metadata.getPageCountLocked() == null || !metadata.getPageCountLocked()) && newMetadata.getPageCount() != null) {
             metadata.setPageCount(newMetadata.getPageCount());
         }
-
         if ((metadata.getAmazonRatingLocked() == null || !metadata.getAmazonRatingLocked()) && newMetadata.getAmazonRating() != null) {
             metadata.setAmazonRating(newMetadata.getAmazonRating());
         }
-
         if ((metadata.getAmazonReviewCountLocked() == null || !metadata.getAmazonReviewCountLocked()) && newMetadata.getAmazonReviewCount() != null) {
             metadata.setAmazonReviewCount(newMetadata.getAmazonReviewCount());
         }
-
         if ((metadata.getGoodreadsRatingLocked() == null || !metadata.getGoodreadsRatingLocked()) && newMetadata.getGoodreadsRating() != null) {
             metadata.setGoodreadsRating(newMetadata.getGoodreadsRating());
         }
-
         if ((metadata.getGoodreadsReviewCountLocked() == null || !metadata.getGoodreadsReviewCountLocked()) && newMetadata.getGoodreadsReviewCount() != null) {
             metadata.setGoodreadsReviewCount(newMetadata.getGoodreadsReviewCount());
         }
-
         if ((metadata.getHardcoverRatingLocked() == null || !metadata.getHardcoverRatingLocked()) && newMetadata.getHardcoverRating() != null) {
             metadata.setHardcoverRating(newMetadata.getHardcoverRating());
         }
-
         if ((metadata.getHardcoverReviewCountLocked() == null || !metadata.getHardcoverReviewCountLocked()) && newMetadata.getHardcoverReviewCount() != null) {
             metadata.setHardcoverReviewCount(newMetadata.getHardcoverReviewCount());
         }
-
         if ((metadata.getSeriesNameLocked() == null || !metadata.getSeriesNameLocked()) && newMetadata.getSeriesName() != null) {
             metadata.setSeriesName(newMetadata.getSeriesName());
         }
-
         if ((metadata.getSeriesNumberLocked() == null || !metadata.getSeriesNumberLocked()) && newMetadata.getSeriesNumber() != null) {
             metadata.setSeriesNumber(newMetadata.getSeriesNumber());
         }
-
         if ((metadata.getSeriesTotalLocked() == null || !metadata.getSeriesTotalLocked()) && newMetadata.getSeriesTotal() != null) {
             metadata.setSeriesTotal(newMetadata.getSeriesTotal());
         }
-
         if (newMetadata.getAwards() != null && !newMetadata.getAwards().isEmpty()) {
             HashSet<BookAwardEntity> newAwards = new HashSet<>();
             newMetadata.getAwards()
