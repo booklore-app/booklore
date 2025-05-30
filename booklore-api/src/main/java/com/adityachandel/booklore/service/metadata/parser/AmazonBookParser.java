@@ -4,6 +4,7 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
+import com.adityachandel.booklore.service.AppSettingService;
 import com.adityachandel.booklore.util.BookUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,8 @@ import java.util.stream.Collectors;
 public class AmazonBookParser implements BookParser {
 
     private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
-    private static final String BASE_SEARCH_URL = "https://www.amazon.com/s/?search-alias=stripbooks&unfiltered=1&sort=relevanceexprank";
     private static final String BASE_BOOK_URL = "https://www.amazon.com/dp/";
+    private final AppSettingService appSettingService;
 
     @Override
     public BookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
@@ -75,6 +76,18 @@ public class AmazonBookParser implements BookParser {
                 log.error("No items found in the search results.");
             } else {
                 for (Element item : items) {
+                    if (item.text().contains("Collects books from")) {
+                        log.debug("Skipping box set item (collects books): {}", extractAmazonBookId(item));
+                        continue;
+                    }
+                    Element titleDiv = item.selectFirst("div[data-cy=title-recipe]");
+                    if (titleDiv != null) {
+                        String titleText = titleDiv.text();
+                        if (titleText.contains("Books Set")) {
+                            log.debug("Skipping box set item (Books Set in title): {}", extractAmazonBookId(item));
+                            continue;
+                        }
+                    }
                     bookIds.add(extractAmazonBookId(item));
                 }
             }
@@ -138,40 +151,35 @@ public class AmazonBookParser implements BookParser {
     }
 
     private String buildQueryUrl(FetchMetadataRequest fetchMetadataRequest, Book book) {
-        StringBuilder queryBuilder = new StringBuilder(BASE_SEARCH_URL);
+        StringBuilder searchTerm = new StringBuilder();
 
-        /*// Always add ISBN if present
-        if (fetchMetadataRequest.getIsbn() != null && !fetchMetadataRequest.getIsbn().isEmpty()) {
-            queryBuilder.append("&field-isbn=").append(fetchMetadataRequest.getIsbn());
-        }*/
-
-        // Add title if present, otherwise check filename if title is absent
         String title = fetchMetadataRequest.getTitle();
         if (title != null && !title.isEmpty()) {
-            title = BookUtils.cleanAndTruncateSearchTerm(title);
-            queryBuilder.append("&field-title=").append(title.replace(" ", "%20"));
+            searchTerm.append(title.trim());
         } else {
             String filename = BookUtils.cleanAndTruncateSearchTerm(BookUtils.cleanFileName(book.getFileName()));
-            if (filename != null && !filename.isEmpty()) {
-                queryBuilder.append("&field-title=").append(filename.replace(" ", "%20"));
+            if (!filename.isEmpty()) {
+                searchTerm.append(filename.trim());
             }
         }
 
-        // Add author only if title or filename is present
-        if ((title != null && !title.isEmpty()) || (fetchMetadataRequest.getIsbn() != null && !fetchMetadataRequest.getIsbn().isEmpty())) {
-            String author = fetchMetadataRequest.getAuthor();
-            if (author != null && !author.isEmpty()) {
-                queryBuilder.append("&field-author=").append(author.replace(" ", "%20"));
+        String author = fetchMetadataRequest.getAuthor();
+        if (author != null && !author.isEmpty()) {
+            if (!searchTerm.isEmpty()) {
+                searchTerm.append(" ");
             }
+            searchTerm.append(author.trim());
         }
 
-        // If ISBN, Title, or Filename is missing, return null
-        if (fetchMetadataRequest.getIsbn() == null && (title == null || title.isEmpty()) && (book.getFileName() == null || book.getFileName().isEmpty())) {
+        if (searchTerm.isEmpty()) {
             return null;
         }
 
-        log.info("Query URL: {}", queryBuilder.toString());
-        return queryBuilder.toString();
+        String encodedSearchTerm = searchTerm.toString().replace(" ", "+");
+        String url = "https://www.amazon.com/s?k=" + encodedSearchTerm;
+
+        log.info("Query URL: {}", url);
+        return url;
     }
 
     private String getTitle(Document doc) {
@@ -370,11 +378,11 @@ public class AmazonBookParser implements BookParser {
 
     private Double getRating(Document doc) {
         try {
-            Element reviewDiv = doc.select("div#averageCustomerReviews_feature_div").first();
+            Element reviewDiv = doc.selectFirst("div#averageCustomerReviews_feature_div");
             if (reviewDiv != null) {
-                Elements ratingElements = reviewDiv.select("span#acrPopover span.a-size-base.a-color-base");
-                if (!ratingElements.isEmpty()) {
-                    String text = Objects.requireNonNull(ratingElements.first()).text();
+                Element ratingSpan = reviewDiv.selectFirst("span#acrPopover span.a-size-small.a-color-base");
+                if (ratingSpan != null) {
+                    String text = ratingSpan.text().trim();
                     if (!text.isEmpty()) {
                         return Double.parseDouble(text);
                     }
@@ -392,10 +400,10 @@ public class AmazonBookParser implements BookParser {
             if (reviewDiv != null) {
                 Element reviewCountElement = reviewDiv.getElementById("acrCustomerReviewText");
                 if (reviewCountElement != null) {
-                    String reviewCount = Objects.requireNonNull(reviewCountElement).text().split(" ")[0];
-                    if (!reviewCount.isEmpty()) {
-                        reviewCount = reviewCount.replace(",", "");
-                        return Integer.parseInt(reviewCount);
+                    String reviewCountRaw = reviewCountElement.text().split(" ")[0];
+                    String reviewCountClean = reviewCountRaw.replaceAll("[^\\d]", "");
+                    if (!reviewCountClean.isEmpty()) {
+                        return Integer.parseInt(reviewCountClean);
                     }
                 }
             }
@@ -436,7 +444,8 @@ public class AmazonBookParser implements BookParser {
 
     private Document fetchDocument(String url) {
         try {
-            Connection.Response response = Jsoup.connect(url)
+            String amazonCookie = appSettingService.getAppSettings().getMetadataProviderSettings().getAmazon().getCookie();
+            Connection connection = Jsoup.connect(url)
                     .header("accept", "text/html, application/json")
                     .header("accept-language", "en-US,en;q=0.9")
                     .header("content-type", "application/json")
@@ -449,19 +458,24 @@ public class AmazonBookParser implements BookParser {
                     .header("rtt", "50")
                     .header("sec-ch-device-memory", "8")
                     .header("sec-ch-dpr", "2")
-                    .header("sec-ch-ua", "\"Google Chrome\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"")
+                    .header("sec-ch-ua", "\"Google Chrome\";v=\"137\", \"Chromium\";v=\"137\", \"Not_A Brand\";v=\"24\"")
                     .header("sec-ch-ua-mobile", "?0")
                     .header("sec-ch-ua-platform", "\"macOS\"")
                     .header("sec-ch-viewport-width", "1170")
                     .header("sec-fetch-dest", "empty")
                     .header("sec-fetch-mode", "cors")
                     .header("sec-fetch-site", "same-origin")
-                    .header("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+                    .header("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36")
                     .header("viewport-width", "1170")
                     .header("x-amz-amabot-click-attributes", "disable")
                     .header("x-requested-with", "XMLHttpRequest")
-                    .method(Connection.Method.GET)
-                    .execute();
+                    .method(Connection.Method.GET);
+
+            if (amazonCookie != null && !amazonCookie.isBlank()) {
+                connection.header("cookie", amazonCookie);
+            }
+
+            Connection.Response response = connection.execute();
             return response.parse();
         } catch (IOException e) {
             log.error("Error parsing url: {}", url, e);

@@ -128,6 +128,7 @@ public class AppSettingService {
 
         MetadataProviderSettings.Amazon defaultAmazon = new MetadataProviderSettings.Amazon();
         defaultAmazon.setEnabled(true);
+        defaultAmazon.setCookie(null);
         MetadataProviderSettings.Google defaultGoogle = new MetadataProviderSettings.Google();
         defaultGoogle.setEnabled(true);
         MetadataProviderSettings.Goodreads defaultGoodreads = new MetadataProviderSettings.Goodreads();

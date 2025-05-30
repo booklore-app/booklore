@@ -12,6 +12,7 @@ public class MetadataProviderSettings {
     @Data
     public static class Amazon {
         private boolean enabled;
+        private String cookie;
     }
 
     @Data

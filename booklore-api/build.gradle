@@ -69,6 +69,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
     implementation 'org.apache.commons:commons-compress:1.27.1'
     implementation 'com.github.junrar:junrar:7.5.5'
+    implementation 'org.apache.commons:commons-text:1.13.1'
 }
 
 hibernate {

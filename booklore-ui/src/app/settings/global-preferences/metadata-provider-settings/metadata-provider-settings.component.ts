@@ -26,6 +26,7 @@ import {AppSettingKey} from '../../../core/model/app-settings.model';
 })
 export class MetadataProviderSettingsComponent implements OnInit {
   hardcoverToken: string = '';
+  amazonCookie: string = '';
   hardcoverEnabled: boolean = false;
   amazonEnabled: boolean = false;
   goodreadsEnabled: boolean = false;
@@ -45,6 +46,7 @@ export class MetadataProviderSettingsComponent implements OnInit {
       .subscribe(settings => {
         const metadataProviderSettings = settings!.metadataProviderSettings;
         this.amazonEnabled = metadataProviderSettings?.amazon?.enabled ?? false;
+        this.amazonCookie = metadataProviderSettings?.amazon?.cookie ?? "";
         this.goodreadsEnabled = metadataProviderSettings?.goodReads?.enabled ?? false;
         this.googleEnabled = metadataProviderSettings?.google?.enabled ?? false;
         this.hardcoverToken = metadataProviderSettings?.hardcover?.apiKey ?? '';
@@ -64,7 +66,10 @@ export class MetadataProviderSettingsComponent implements OnInit {
       {
         key: AppSettingKey.METADATA_PROVIDER_SETTINGS,
         newValue: {
-          amazon: {enabled: this.amazonEnabled},
+          amazon: {
+            enabled: this.amazonEnabled,
+            cookie: this.amazonCookie
+          },
           goodReads: {enabled: this.goodreadsEnabled},
           google: {enabled: this.googleEnabled},
           hardcover: {

@@ -1,5 +1,7 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
+import org.apache.commons.text.similarity.FuzzyScore;
+
 import com.adityachandel.booklore.model.dto.Award;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
@@ -335,11 +337,22 @@ public class GoodReadsParser implements BookParser {
                 String searchUrl = generateSearchUrl(searchTerm);
                 Elements previewBooks = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");
                 List<BookMetadata> metadataPreviews = new ArrayList<>();
+                FuzzyScore fuzzyScore = new FuzzyScore(Locale.ENGLISH);
+                String queryAuthor = request.getAuthor();
                 for (Element previewBook : previewBooks) {
+                    List<String> authors = extractAuthorsPreview(previewBook);
+                    if (queryAuthor != null && !queryAuthor.isEmpty()) {
+                        boolean matches = authors.stream().anyMatch(author ->
+                            (double) fuzzyScore.fuzzyScore(author, queryAuthor) / Math.max(author.length(), queryAuthor.length()) >= 0.8
+                        );
+                        if (!matches) {
+                            continue;
+                        }
+                    }
                     BookMetadata previewMetadata = BookMetadata.builder()
                             .providerBookId(String.valueOf(extractGoodReadsIdPreview(previewBook)))
                             .title(extractTitlePreview(previewBook))
-                            .authors(extractAuthorsPreview(previewBook))
+                            .authors(authors)
                             .build();
                     metadataPreviews.add(previewMetadata);
                 }
