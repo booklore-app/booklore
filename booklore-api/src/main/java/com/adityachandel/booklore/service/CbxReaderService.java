@@ -176,7 +176,7 @@ public class CbxReaderService {
 
     private boolean isImageFile(String name) {
         String lower = name.toLowerCase().replace("\\", "/");
-        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png");
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp");
     }
 
     private int extractPageNumber(String filename) {

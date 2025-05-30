@@ -237,11 +237,11 @@ export class BookService {
     return this.http.post<BookMetadata[]>(`${this.url}/${bookId}/metadata/prospective`, request);
   }
 
-  updateBookMetadata(bookId: number, bookMetadata: BookMetadata, mergeCategories: boolean): Observable<BookMetadata> {
+  updateBookMetadata(bookId: number | undefined, bookMetadata: BookMetadata, mergeCategories: boolean): Observable<BookMetadata> {
     const params = new HttpParams().set('mergeCategories', mergeCategories.toString());
     return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata, {params}).pipe(
       map(updatedMetadata => {
-        this.handleBookMetadataUpdate(bookId, updatedMetadata);
+        this.handleBookMetadataUpdate(bookId!, updatedMetadata);
         return updatedMetadata;
       })
     );
