@@ -219,34 +219,6 @@ public class BookMetadataEntity {
         this.hardcoverReviewCountLocked = lock;
     }
 
-    public boolean isAnyFieldLocked() {
-        return Boolean.TRUE.equals(this.titleLocked)
-                || Boolean.TRUE.equals(this.subtitleLocked)
-                || Boolean.TRUE.equals(this.publisherLocked)
-                || Boolean.TRUE.equals(this.publishedDateLocked)
-                || Boolean.TRUE.equals(this.descriptionLocked)
-                || Boolean.TRUE.equals(this.isbn13Locked)
-                || Boolean.TRUE.equals(this.isbn10Locked)
-                || Boolean.TRUE.equals(this.asinLocked)
-                || Boolean.TRUE.equals(this.pageCountLocked)
-                || Boolean.TRUE.equals(this.thumbnailLocked)
-                || Boolean.TRUE.equals(this.languageLocked)
-                || Boolean.TRUE.equals(this.ratingLocked)
-                || Boolean.TRUE.equals(this.reviewCountLocked)
-                || Boolean.TRUE.equals(this.coverLocked)
-                || Boolean.TRUE.equals(this.seriesNameLocked)
-                || Boolean.TRUE.equals(this.seriesNumberLocked)
-                || Boolean.TRUE.equals(this.seriesTotalLocked)
-                || Boolean.TRUE.equals(this.authorsLocked)
-                || Boolean.TRUE.equals(this.categoriesLocked)
-                || Boolean.TRUE.equals(this.amazonRatingLocked)
-                || Boolean.TRUE.equals(this.amazonReviewCountLocked)
-                || Boolean.TRUE.equals(this.goodreadsRatingLocked)
-                || Boolean.TRUE.equals(this.goodreadsReviewCountLocked)
-                || Boolean.TRUE.equals(this.hardcoverRatingLocked)
-                || Boolean.TRUE.equals(this.hardcoverReviewCountLocked);
-    }
-
     public boolean areAllFieldsLocked() {
         return Boolean.TRUE.equals(this.titleLocked)
                 && Boolean.TRUE.equals(this.subtitleLocked)
@@ -257,10 +229,7 @@ public class BookMetadataEntity {
                 && Boolean.TRUE.equals(this.isbn10Locked)
                 && Boolean.TRUE.equals(this.asinLocked)
                 && Boolean.TRUE.equals(this.pageCountLocked)
-                && Boolean.TRUE.equals(this.thumbnailLocked)
                 && Boolean.TRUE.equals(this.languageLocked)
-                && Boolean.TRUE.equals(this.ratingLocked)
-                && Boolean.TRUE.equals(this.reviewCountLocked)
                 && Boolean.TRUE.equals(this.coverLocked)
                 && Boolean.TRUE.equals(this.seriesNameLocked)
                 && Boolean.TRUE.equals(this.seriesNumberLocked)

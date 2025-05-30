@@ -111,6 +111,7 @@ public class BookMetadataService {
             try {
                 if (bookEntity.getMetadata().areAllFieldsLocked()) {
                     log.info("Skipping metadata refresh for fully locked book: {}", bookEntity.getFileName());
+                    notificationService.sendMessage(Topic.LOG, createLogNotification("Book '" + bookEntity.getMetadata().getTitle() + "' is locked. Please unlock it before updating metadata."));
                     continue;
                 }
                 Map<MetadataProvider, BookMetadata> metadataMap = fetchMetadataForBook(providers, bookEntity);
