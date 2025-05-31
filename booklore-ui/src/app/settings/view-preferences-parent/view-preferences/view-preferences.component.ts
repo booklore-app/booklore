@@ -43,6 +43,8 @@ export class ViewPreferencesComponent implements OnInit {
     {label: 'Amazon #', field: 'amazonReviewCount'},
     {label: 'Goodreads Rating', field: 'goodreadsRating'},
     {label: 'Goodreads #', field: 'goodreadsReviewCount'},
+    {label: 'Hardcover Rating', field: 'hardcoverRating'},
+    {label: 'Hardcover #', field: 'hardcoverReviewCount'},
     {label: 'Pages', field: 'pageCount'}
   ];
 

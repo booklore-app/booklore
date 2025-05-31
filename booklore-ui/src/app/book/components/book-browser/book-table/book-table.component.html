@@ -34,8 +34,8 @@
       <th>Amz #</th>
       <th>Goodreads</th>
       <th>GR #</th>
-      <th>Rating (L)</th>
-      <th>Reviews (L)</th>
+      <th>Hardcover</th>
+      <th>HC #</th>
     </tr>
   </ng-template>
   <ng-template #body let-book>
@@ -109,15 +109,15 @@
       <td class="min-w-[10rem] max-w-[10rem] overflow-hidden truncate">
         <span class="flex items-center gap-1">
           <p-rating
-            [(ngModel)]="metadata.rating"
+            [(ngModel)]="metadata.hardcoverRating"
             readonly
             stars="5"
-            [style.--p-rating-icon-active-color]="getStarColor(metadata.rating)">
+            [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
           </p-rating>
-        <span *ngIf="metadata.rating != null">({{ metadata.rating?.toFixed(1) }})</span>
+        <span *ngIf="metadata.hardcoverRating != null">({{ metadata.hardcoverRating?.toFixed(1) }})</span>
         </span>
       </td>
-      <td class="min-w-[3rem] max-w-[3rem] overflow-hidden truncate">{{ metadata.reviewCount }}</td>
+      <td class="min-w-[6rem] max-w-[6rem] overflow-hidden truncate">{{ metadata.hardcoverReviewCount }}</td>
     </tr>
   </ng-template>
 </p-table>
