@@ -614,8 +614,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   lockUnlockMetadata() {
+    const count = this.selectedBooks.size;
     this.dynamicDialogRef = this.dialogService.open(LockUnlockMetadataDialogComponent, {
-      header: 'Toggle Metadata Lock',
+      header: `Lock or Unlock Metadata for ${count} Selected Book${count > 1 ? 's' : ''}`,
       modal: true,
       closable: true,
       data: {

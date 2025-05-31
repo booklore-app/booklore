@@ -75,8 +75,6 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
         distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
       ).subscribe(([book, settings]) => {
 
-        console.log(settings!.metadataProviderSettings)
-
         this.providers = Object.entries(settings!.metadataProviderSettings)
           .filter(([key, value]) => value.enabled)
           .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));

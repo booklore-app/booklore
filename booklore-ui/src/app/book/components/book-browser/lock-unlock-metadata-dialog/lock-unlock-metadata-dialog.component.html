@@ -1,7 +1,27 @@
-<div class="flex flex-col items-center text-center space-y-6">
-  <p class="pt-6 px-4">Lock or unlock all metadata for all the selected books</p>
-  <div class="flex gap-4 justify-center">
-    <p-button icon="pi pi-lock" label="Lock" outlined="true" severity="danger" (onClick)="toggleLock('LOCK')"></p-button>
-    <p-button icon="pi pi-lock-open" label="Unlock" outlined="true" severity="success" (onClick)="toggleLock('UNLOCK')"></p-button>
+<div class="p-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-24 gap-y-4">
+    <div *ngFor="let field of lockableFields" class="flex items-center justify-between">
+      <label class="capitalize">{{ fieldLabels[field] || field }}</label>
+      <p-button
+        [outlined]="true"
+        [label]="getLockLabel(field)"
+        [icon]="getLockIcon(field)"
+        [severity]="fieldLocks[field] === true ? 'danger' : fieldLocks[field] === false ? 'success' : 'secondary'"
+        (click)="cycleLockState(field)"
+      ></p-button>
+    </div>
   </div>
+</div>
+
+<p-divider></p-divider>
+
+<div class="flex justify-end px-4">
+  <p-button icon="pi pi-refresh" label="Reset" outlined="true" severity="warn" (onClick)="resetFieldLocks()"></p-button>
+  <p-divider layout="vertical"></p-divider>
+  <div class="flex gap-4 justify-center">
+    <p-button icon="pi pi-lock" label="Lock All" outlined="true" severity="danger" (onClick)="toggleLockAll('LOCK')"></p-button>
+    <p-button icon="pi pi-lock-open" label="Unlock All" outlined="true" severity="success" (onClick)="toggleLockAll('UNLOCK')"></p-button>
+  </div>
+  <p-divider layout="vertical"></p-divider>
+  <p-button [label]="isSaving ? 'Saving...' : 'Save'" [outlined]="true" icon="pi pi-check" severity="info" (onClick)="applyFieldLocks()" [disabled]="bookIds.size === 0 || isSaving"></p-button>
 </div>

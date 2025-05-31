@@ -2,13 +2,10 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
-import com.adityachandel.booklore.model.dto.request.FieldLockRequest;
-import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
-import com.adityachandel.booklore.model.dto.request.ToggleAllLockRequest;
+import com.adityachandel.booklore.model.dto.request.*;
 import com.adityachandel.booklore.quartz.JobSchedulerService;
 import com.adityachandel.booklore.service.BookMetadataService;
 import com.adityachandel.booklore.service.BookMetadataUpdater;
-import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,6 +68,13 @@ public class MetadataController {
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
     public ResponseEntity<List<BookMetadata>> toggleAllMetadata(@RequestBody ToggleAllLockRequest request) {
         return ResponseEntity.ok(bookMetadataService.toggleAllLock(request));
+    }
+
+    @PutMapping("/metadata/toggle-field-locks")
+    @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
+    public ResponseEntity<List<BookMetadata>> toggleFieldLocks(@RequestBody ToggleFieldLocksRequest request) {
+        List<BookMetadata> updated = bookMetadataService.toggleFieldLocks(request.getBookIds(), request.getFieldActions());
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/regenerate-covers")

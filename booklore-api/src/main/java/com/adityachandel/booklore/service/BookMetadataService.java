@@ -31,6 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -415,6 +417,27 @@ public class BookMetadataService {
                 throw new IllegalArgumentException("Invalid field name: " + field);
         }
         return bookMetadataMapper.toBookMetadata(bookMetadataRepository.save(existingMetadata), true);
+    }
+
+    public List<BookMetadata> toggleFieldLocks(List<Long> bookIds, Map<String, String> fieldActions) {
+        List<BookMetadataEntity> entitiesToUpdate = new ArrayList<>();
+        for (Long bookId : bookIds) {
+            BookMetadataEntity metadataEntity = bookMetadataRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Book metadata not found for bookId: " + bookId));
+            fieldActions.forEach((field, action) -> {
+                try {
+                    String setterName = "set" + Character.toUpperCase(field.charAt(0)) + field.substring(1);
+                    Method setter = BookMetadataEntity.class.getMethod(setterName, Boolean.class);
+                    setter.invoke(metadataEntity, "LOCK".equalsIgnoreCase(action));
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to invoke setter for field: " + field + " on bookId: " + bookId, e);
+                }
+            });
+            entitiesToUpdate.add(metadataEntity);
+        }
+        List<BookMetadataEntity> savedEntities = bookMetadataRepository.saveAll(entitiesToUpdate);
+        return savedEntities.stream()
+                .map(entity -> bookMetadataMapper.toBookMetadata(entity, true))
+                .toList();
     }
 
     public BookMetadata handleCoverUpload(Long bookId, MultipartFile file) {

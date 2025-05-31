@@ -347,7 +347,7 @@ export class BookService {
 
   handleRemovedBookIds(removedBookIds: number[]): void {
     const currentState = this.bookStateSubject.value;
-    const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.includes(book.id)); // Check using includes() method
+    const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.includes(book.id));
     this.bookStateSubject.next({...currentState, books: filteredBooks});
   }
 
@@ -365,5 +365,31 @@ export class BookService {
       return book.id == bookId ? {...book, metadata: updatedMetadata} : book
     });
     this.bookStateSubject.next({...currentState, books: updatedBooks})
+  }
+
+  toggleFieldLocks(bookIds: Set<number>, fieldActions: Record<string, 'LOCK' | 'UNLOCK'>): Observable<void> {
+    const requestBody = {
+      bookIds: Array.from(bookIds),
+      fieldActions: fieldActions
+    };
+    return this.http.put<BookMetadata[]>(`${this.url}/metadata/toggle-field-locks`, requestBody).pipe(
+      tap((updatedMetadataList) => {
+        const currentState = this.bookStateSubject.value;
+        const updatedBooks = (currentState.books || []).map(book => {
+          const updatedMetadata = updatedMetadataList.find(meta => meta.bookId === book.id);
+          return updatedMetadata ? { ...book, metadata: updatedMetadata } : book;
+        });
+        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
+      }),
+      map(() => void 0),
+      catchError((error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Field Lock Update Failed',
+          detail: 'Failed to update metadata field locks. Please try again.',
+        });
+        throw error;
+      })
+    );
   }
 }

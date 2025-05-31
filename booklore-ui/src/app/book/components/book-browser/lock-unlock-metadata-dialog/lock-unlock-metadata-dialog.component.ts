@@ -1,41 +1,138 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
+import {FormsModule} from '@angular/forms';
+import {NgForOf} from '@angular/common';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
 import {BookService} from '../../../service/book.service';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-lock-unlock-metadata-dialog',
+  standalone: true,
   imports: [
-    Button
+    Button,
+    FormsModule,
+    NgForOf,
+    Divider
   ],
   templateUrl: './lock-unlock-metadata-dialog.component.html',
   styleUrl: './lock-unlock-metadata-dialog.component.scss'
 })
-export class LockUnlockMetadataDialogComponent {
+export class LockUnlockMetadataDialogComponent implements OnInit {
   private bookService = inject(BookService);
   private dynamicDialogConfig = inject(DynamicDialogConfig);
   private dialogRef = inject(DynamicDialogRef);
   private messageService = inject(MessageService);
+  fieldLocks: Record<string, boolean | undefined> = {};
 
   bookIds: Set<number> = this.dynamicDialogConfig.data.bookIds;
 
-  toggleLock(action: 'LOCK' | 'UNLOCK'): void {
-    this.bookService.toggleAllLock(this.bookIds, action).subscribe({
+  lockableFields: string[] = [
+    'titleLocked', 'subtitleLocked', 'publisherLocked', 'publishedDateLocked', 'descriptionLocked',
+    'isbn13Locked', 'isbn10Locked', 'asinLocked', 'pageCountLocked', 'thumbnailLocked', 'languageLocked',
+    'ratingLocked', 'reviewCountLocked', 'coverLocked',
+    'seriesNameLocked', 'seriesNumberLocked', 'seriesTotalLocked',
+    'authorsLocked', 'categoriesLocked',
+    'amazonRatingLocked', 'amazonReviewCountLocked',
+    'goodreadsRatingLocked', 'goodreadsReviewCountLocked',
+    'hardcoverRatingLocked', 'hardcoverReviewCountLocked'
+  ];
+
+  fieldLabels: Record<string, string> = {
+    titleLocked: 'Title',
+    subtitleLocked: 'Subtitle',
+    publisherLocked: 'Publisher',
+    publishedDateLocked: 'Published Date',
+    descriptionLocked: 'Description',
+    isbn13Locked: 'ISBN-13',
+    isbn10Locked: 'ISBN-10',
+    asinLocked: 'ASIN',
+    pageCountLocked: 'Page Count',
+    thumbnailLocked: 'Thumbnail',
+    languageLocked: 'Language',
+    ratingLocked: 'Rating',
+    reviewCountLocked: 'Review Count',
+    coverLocked: 'Cover',
+    seriesNameLocked: 'Series Name',
+    seriesNumberLocked: 'Series Number',
+    seriesTotalLocked: 'Series Total',
+    authorsLocked: 'Authors',
+    categoriesLocked: 'Categories',
+    amazonRatingLocked: 'Amazon Rating',
+    amazonReviewCountLocked: 'Amazon Rating Count',
+    goodreadsRatingLocked: 'Goodreads Rating',
+    goodreadsReviewCountLocked: 'Goodreads Rating Count',
+    hardcoverRatingLocked: 'Hardcover Rating',
+    hardcoverReviewCountLocked: 'Hardcover Rating Count'
+  };
+
+  isSaving = false;
+
+  ngOnInit(): void {
+    this.lockableFields.forEach(field => this.fieldLocks[field] = undefined);
+  }
+
+  toggleLockAll(action: 'LOCK' | 'UNLOCK'): void {
+    const lockState = action === 'LOCK' ? true : false;
+    this.lockableFields.forEach(field => {
+      this.fieldLocks[field] = lockState;
+    });
+  }
+
+  getLockLabel(field: string): string {
+    const state = this.fieldLocks[field];
+    if (state === undefined) return 'Unselected';
+    return state ? 'Locked' : 'Unlocked';
+  }
+
+  getLockIcon(field: string): string {
+    const state = this.fieldLocks[field];
+    return state === undefined ? '' : state ? 'pi pi-lock' : 'pi pi-lock-open';
+  }
+
+  resetFieldLocks(): void {
+    this.lockableFields.forEach(field => {
+      this.fieldLocks[field] = undefined;
+    });
+  }
+
+  cycleLockState(field: string): void {
+    const current = this.fieldLocks[field];
+    if (current === undefined) {
+      this.fieldLocks[field] = true;
+    } else if (current) {
+      this.fieldLocks[field] = false;
+    } else {
+      this.fieldLocks[field] = undefined;
+    }
+  }
+
+  applyFieldLocks(): void {
+    const fieldActions: Record<string, 'LOCK' | 'UNLOCK'> = {};
+    for (const [field, locked] of Object.entries(this.fieldLocks)) {
+      if (locked !== undefined) {
+        fieldActions[field] = locked ? 'LOCK' : 'UNLOCK';
+      }
+    }
+
+    this.isSaving = true;
+    this.bookService.toggleFieldLocks(this.bookIds, fieldActions).subscribe({
       next: () => {
-        const isLock = action === 'LOCK';
+        this.isSaving = false;
         this.messageService.add({
           severity: 'success',
-          summary: `Metadata ${isLock ? 'Locked' : 'Unlocked'}`,
-          detail: `All selected books have been ${isLock ? 'locked' : 'unlocked'} successfully.`,
+          summary: 'Field Locks Updated',
+          detail: 'Selected metadata fields have been updated successfully.'
         });
-        this.dialogRef.close(action.toLowerCase());
+        this.dialogRef.close('fields-updated');
       },
       error: () => {
+        this.isSaving = false;
         this.messageService.add({
           severity: 'error',
-          summary: `Failed to ${action === 'LOCK' ? 'Lock' : 'Unlock'}`,
-          detail: `An error occurred while ${action === 'LOCK' ? 'locking' : 'unlocking'} metadata.`,
+          summary: 'Failed to Update Field Locks',
+          detail: 'An error occurred while updating field lock statuses.'
         });
       }
     });
