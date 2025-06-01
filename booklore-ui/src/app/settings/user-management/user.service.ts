@@ -5,7 +5,7 @@ import {API_CONFIG} from '../../config/api-config';
 import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {Library} from '../../book/model/library.model';
 import {catchError} from 'rxjs/operators';
-import {CbxPageSpread, CbxPageViewMode} from '../../book/model/book.model';
+import {CbxPageSpread, CbxPageViewMode, PdfPageSpread, PdfPageViewMode} from '../../book/model/book.model';
 
 export interface EntityViewPreferences {
   global: EntityViewPreference;
@@ -60,11 +60,17 @@ export interface CbxReaderSetting {
   pageViewMode: CbxPageViewMode;
 }
 
+export interface NewPdfReaderSetting {
+  pageSpread: PdfPageSpread;
+  pageViewMode: PdfPageViewMode;
+}
+
 export interface UserSettings {
   perBookSetting: PerBookSetting;
   pdfReaderSetting: PdfReaderSetting;
   epubReaderSetting: EpubReaderSetting;
   cbxReaderSetting: CbxReaderSetting;
+  newPdfReaderSetting: NewPdfReaderSetting;
   sidebarLibrarySorting: SidebarLibrarySorting;
   sidebarShelfSorting: SidebarShelfSorting;
   entityViewPreferences: EntityViewPreferences;

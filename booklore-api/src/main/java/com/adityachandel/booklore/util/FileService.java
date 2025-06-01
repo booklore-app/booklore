@@ -122,6 +122,10 @@ public class FileService {
         return appProperties.getPathConfig() + "/cbx_cache";
     }
 
+    public String getPdfCachePath() {
+        return appProperties.getPathConfig() + "/pdf_cache";
+    }
+
     public String getMissingThumbnailPath() {
         return appProperties.getPathConfig() + "/thumbs/missing/m.jpg";
     }

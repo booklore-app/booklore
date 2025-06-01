@@ -1,4 +1,5 @@
 import {Shelf} from './shelf.model';
+import {NewPdfReaderSetting} from '../../settings/user-management/user.service';
 
 export type BookType = "PDF" | "EPUB" | "CBX";
 
@@ -121,6 +122,7 @@ export interface BookSetting {
   pdfSettings?: PdfViewerSetting;
   epubSettings?: EpubViewerSetting;
   cbxSettings?: CbxViewerSetting;
+  newPdfSettings?: NewPdfReaderSetting;
 
   [key: string]: any;
 }
@@ -136,6 +138,16 @@ export const enum CbxPageViewMode {
 }
 
 export const enum CbxPageSpread {
+  EVEN = 'EVEN',
+  ODD = 'ODD',
+}
+
+export const enum PdfPageViewMode {
+  SINGLE_PAGE = 'SINGLE_PAGE',
+  TWO_PAGE = 'TWO_PAGE',
+}
+
+export const enum PdfPageSpread {
   EVEN = 'EVEN',
   ODD = 'ODD',
 }

@@ -40,6 +40,7 @@ public class BooksService {
     private final PdfViewerPreferencesRepository pdfViewerPreferencesRepository;
     private final EpubViewerPreferencesRepository epubViewerPreferencesRepository;
     private final CbxViewerPreferencesRepository cbxViewerPreferencesRepository;
+    private final NewPdfViewerPreferencesRepository newPdfViewerPreferencesRepository;
     private final ShelfRepository shelfRepository;
     private final FileService fileService;
     private final BookMapper bookMapper;
@@ -68,6 +69,12 @@ public class BooksService {
                             .zoom(pdfPref.getZoom())
                             .spread(pdfPref.getSpread())
                             .build()));
+            newPdfViewerPreferencesRepository.findByBookIdAndUserId(bookId, user.getId())
+                    .ifPresent(pdfPref -> settingsBuilder.newPdfSettings(NewPdfViewerPreferences.builder()
+                            .bookId(bookId)
+                            .pageViewMode(pdfPref.getPageViewMode())
+                            .pageSpread(pdfPref.getPageSpread())
+                            .build()));
         } else if (bookEntity.getBookType() == BookFileType.CBX) {
             cbxViewerPreferencesRepository.findByBookIdAndUserId(bookId, user.getId())
                     .ifPresent(cbxPref -> settingsBuilder.cbxSettings(CbxViewerPreferences.builder()
@@ -86,21 +93,35 @@ public class BooksService {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
 
         if (bookEntity.getBookType() == BookFileType.PDF) {
-            PdfViewerPreferencesEntity pdfPrefs = pdfViewerPreferencesRepository
-                    .findByBookIdAndUserId(bookId, user.getId())
-                    .orElseGet(() -> {
-                        PdfViewerPreferencesEntity newPrefs = PdfViewerPreferencesEntity.builder()
-                                .bookId(bookId)
-                                .userId(user.getId())
-                                .build();
-                        return pdfViewerPreferencesRepository.save(newPrefs);
-                    });
-
-            PdfViewerPreferences pdfSettings = bookViewerSettings.getPdfSettings();
-            pdfPrefs.setZoom(pdfSettings.getZoom());
-            pdfPrefs.setSpread(pdfSettings.getSpread());
-            pdfViewerPreferencesRepository.save(pdfPrefs);
-
+            if (bookViewerSettings.getPdfSettings() != null) {
+                PdfViewerPreferencesEntity pdfPrefs = pdfViewerPreferencesRepository
+                        .findByBookIdAndUserId(bookId, user.getId())
+                        .orElseGet(() -> {
+                            PdfViewerPreferencesEntity newPrefs = PdfViewerPreferencesEntity.builder()
+                                    .bookId(bookId)
+                                    .userId(user.getId())
+                                    .build();
+                            return pdfViewerPreferencesRepository.save(newPrefs);
+                        });
+                PdfViewerPreferences pdfSettings = bookViewerSettings.getPdfSettings();
+                pdfPrefs.setZoom(pdfSettings.getZoom());
+                pdfPrefs.setSpread(pdfSettings.getSpread());
+                pdfViewerPreferencesRepository.save(pdfPrefs);
+            }
+            if (bookViewerSettings.getNewPdfSettings() != null) {
+                NewPdfViewerPreferencesEntity pdfPrefs = newPdfViewerPreferencesRepository.findByBookIdAndUserId(bookId, user.getId())
+                        .orElseGet(() -> {
+                            NewPdfViewerPreferencesEntity entity = NewPdfViewerPreferencesEntity.builder()
+                                    .bookId(bookId)
+                                    .userId(user.getId())
+                                    .build();
+                            return newPdfViewerPreferencesRepository.save(entity);
+                        });
+                NewPdfViewerPreferences pdfSettings = bookViewerSettings.getNewPdfSettings();
+                pdfPrefs.setPageSpread(pdfSettings.getPageSpread());
+                pdfPrefs.setPageViewMode(pdfSettings.getPageViewMode());
+                newPdfViewerPreferencesRepository.save(pdfPrefs);
+            }
         } else if (bookEntity.getBookType() == BookFileType.EPUB) {
             EpubViewerPreferencesEntity epubPrefs = epubViewerPreferencesRepository
                     .findByBookIdAndUserId(bookId, user.getId())

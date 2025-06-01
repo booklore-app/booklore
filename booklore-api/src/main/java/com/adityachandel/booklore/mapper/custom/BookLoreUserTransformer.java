@@ -64,6 +64,10 @@ public class BookLoreUserTransformer {
                         var value = objectMapper.readValue(jsonValue, BookLoreUser.UserSettings.CbxReaderSetting.class);
                         userSettings.setCbxReaderSetting(value);
                     }
+                    case NEW_PDF_READER_SETTING -> {
+                        var value = objectMapper.readValue(jsonValue, BookLoreUser.UserSettings.NewPdfReaderSetting.class);
+                        userSettings.setNewPdfReaderSetting(value);
+                    }
                     case SIDEBAR_LIBRARY_SORTING -> {
                         var value = objectMapper.readValue(jsonValue, SidebarSortOption.class);
                         userSettings.setSidebarLibrarySorting(value);

@@ -6,9 +6,10 @@ import {BookService} from '../../service/book.service';
 import {UserService} from '../../../settings/user-management/user.service';
 import {MessageService} from 'primeng/api';
 import {forkJoin} from 'rxjs';
-import {BookSetting, CbxPageSpread, CbxPageViewMode} from '../../model/book.model';
+import {BookSetting, BookType, CbxPageSpread, CbxPageViewMode, PdfPageSpread, PdfPageViewMode} from '../../model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {FormsModule} from "@angular/forms";
+import {NewPdfReaderService} from '../../service/new-pdf-reader.service';
 
 @Component({
   selector: 'app-cbx-reader',
@@ -18,20 +19,24 @@ import {FormsModule} from "@angular/forms";
   styleUrl: './cbx-reader.component.scss'
 })
 export class CbxReaderComponent implements OnInit {
+
+  bookType!: BookType;
+
   goToPageInput: number | null = null;
   bookId!: number;
   pages: number[] = [];
   currentPage = 0;
   isLoading = true;
 
-  pageSpread: CbxPageSpread = CbxPageSpread.ODD;
-  pageViewMode: CbxPageViewMode = CbxPageViewMode.SINGLE_PAGE;
+  pageSpread: CbxPageSpread | PdfPageSpread = CbxPageSpread.ODD;
+  pageViewMode: CbxPageViewMode | PdfPageViewMode = CbxPageViewMode.SINGLE_PAGE;
 
   private touchStartX = 0;
   private touchEndX = 0;
 
   private route = inject(ActivatedRoute);
   private cbxReaderService = inject(CbxReaderService);
+  private pdfReaderService = inject(NewPdfReaderService);
   private bookService = inject(BookService);
   private userService = inject(UserService);
   private messageService = inject(MessageService);
@@ -44,25 +49,54 @@ export class CbxReaderComponent implements OnInit {
       forkJoin([
         this.bookService.getBookByIdFromAPI(this.bookId, false),
         this.bookService.getBookSetting(this.bookId),
-        this.userService.getMyself(),
-        this.cbxReaderService.getAvailablePages(this.bookId)
+        this.userService.getMyself()
       ]).subscribe({
-        next: ([cbxMeta, bookSettings, myself, pages]) => {
+        next: ([book, bookSettings, myself]) => {
           const userSettings = myself.userSettings;
-          const global = userSettings.perBookSetting.cbx === 'Global';
+          this.bookType = book.bookType;
 
-          this.pageViewMode = global
-            ? userSettings.cbxReaderSetting.pageViewMode || CbxPageViewMode.SINGLE_PAGE
-            : bookSettings.cbxSettings?.pageViewMode || userSettings.cbxReaderSetting.pageViewMode || CbxPageViewMode.SINGLE_PAGE;
+          const pagesObservable = this.bookType === 'PDF'
+            ? this.pdfReaderService.getAvailablePages(this.bookId)
+            : this.cbxReaderService.getAvailablePages(this.bookId);
 
-          this.pageSpread = global
-            ? userSettings.cbxReaderSetting.pageSpread || CbxPageSpread.ODD
-            : bookSettings.cbxSettings?.pageSpread || userSettings.cbxReaderSetting.pageSpread || CbxPageSpread.ODD;
+          pagesObservable.subscribe({
+            next: (pages) => {
 
-          this.pages = pages;
-          this.currentPage = (cbxMeta.cbxProgress?.page || 1) - 1;
-          this.alignCurrentPageToParity();
-          this.isLoading = false;
+              this.pages = pages;
+              if (this.bookType === 'CBX') {
+                const global = userSettings.perBookSetting.cbx === 'Global';
+                this.pageViewMode = global
+                  ? userSettings.cbxReaderSetting.pageViewMode || CbxPageViewMode.SINGLE_PAGE
+                  : bookSettings.cbxSettings?.pageViewMode || userSettings.cbxReaderSetting.pageViewMode || CbxPageViewMode.SINGLE_PAGE;
+
+                this.pageSpread = global
+                  ? userSettings.cbxReaderSetting.pageSpread || CbxPageSpread.ODD
+                  : bookSettings.cbxSettings?.pageSpread || userSettings.cbxReaderSetting.pageSpread || CbxPageSpread.ODD;
+
+                this.currentPage = (book.cbxProgress?.page || 1) - 1;
+              }
+
+              if (this.bookType === 'PDF') {
+                const global = userSettings.perBookSetting.pdf === 'Global';
+                this.pageViewMode = global
+                  ? userSettings.newPdfReaderSetting.pageViewMode || PdfPageViewMode.SINGLE_PAGE
+                  : bookSettings.newPdfSettings?.pageViewMode || userSettings.newPdfReaderSetting.pageViewMode || PdfPageViewMode.SINGLE_PAGE;
+
+                this.pageSpread = global
+                  ? userSettings.newPdfReaderSetting.pageSpread || PdfPageSpread.ODD
+                  : bookSettings.newPdfSettings?.pageSpread || userSettings.newPdfReaderSetting.pageSpread || PdfPageSpread.ODD;
+
+                this.currentPage = (book.pdfProgress?.page || 1) - 1;
+              }
+              this.alignCurrentPageToParity();
+              this.isLoading = false;
+            },
+            error: (err) => {
+              const errorMessage = err?.error?.message || 'Failed to load pages';
+              this.messageService.add({severity: 'error', summary: 'Error', detail: errorMessage});
+              this.isLoading = false;
+            }
+          });
         },
         error: (err) => {
           const errorMessage = err?.error?.message || 'Failed to load the book';
@@ -74,18 +108,22 @@ export class CbxReaderComponent implements OnInit {
   }
 
   get isTwoPageView(): boolean {
-    return this.pageViewMode === CbxPageViewMode.TWO_PAGE;
+    return this.pageViewMode === CbxPageViewMode.TWO_PAGE || this.pageViewMode === PdfPageViewMode.TWO_PAGE;
   }
 
   toggleView() {
     if (!this.isTwoPageView && this.isPhonePortrait()) return;
-    this.pageViewMode = this.isTwoPageView ? CbxPageViewMode.SINGLE_PAGE : CbxPageViewMode.TWO_PAGE;
+    this.pageViewMode = this.isTwoPageView ? (this.bookType === "CBX" ? CbxPageViewMode.SINGLE_PAGE : PdfPageViewMode.SINGLE_PAGE) : (this.bookType === "CBX" ? CbxPageViewMode.TWO_PAGE : PdfPageViewMode.TWO_PAGE);
     this.alignCurrentPageToParity();
     this.updateViewerSetting();
   }
 
   toggleSpreadDirection() {
-    this.pageSpread = this.pageSpread === CbxPageSpread.ODD ? CbxPageSpread.EVEN : CbxPageSpread.ODD;
+    if (this.pageSpread === CbxPageSpread.ODD || this.pageSpread === PdfPageSpread.ODD) {
+      this.pageSpread = this.bookType === "CBX" ? CbxPageSpread.EVEN : PdfPageSpread.EVEN;
+    } else {
+      this.pageSpread = this.bookType === "CBX" ? CbxPageSpread.ODD : PdfPageSpread.ODD;
+    }
     this.alignCurrentPageToParity();
     this.updateViewerSetting();
   }
@@ -120,7 +158,7 @@ export class CbxReaderComponent implements OnInit {
   private alignCurrentPageToParity() {
     if (!this.pages.length || !this.isTwoPageView) return;
 
-    const desiredOdd = this.pageSpread === CbxPageSpread.ODD;
+    const desiredOdd = this.pageSpread === CbxPageSpread.ODD || this.pageSpread === PdfPageSpread.ODD;
     for (let i = this.currentPage; i >= 0; i--) {
       if ((this.pages[i] % 2 === 1) === desiredOdd) {
         this.currentPage = i;
@@ -166,7 +204,7 @@ export class CbxReaderComponent implements OnInit {
 
   private enforcePortraitSinglePageView() {
     if (this.isPhonePortrait() && this.isTwoPageView) {
-      this.pageViewMode = CbxPageViewMode.SINGLE_PAGE;
+      this.pageViewMode = this.bookType === "CBX" ? CbxPageViewMode.SINGLE_PAGE : PdfPageViewMode.SINGLE_PAGE;
       this.updateViewerSetting();
     }
   }
@@ -175,24 +213,37 @@ export class CbxReaderComponent implements OnInit {
     return window.innerWidth < 768 && window.innerHeight > window.innerWidth;
   }
 
+  private getPageImageUrl(pageIndex: number): string {
+    return this.bookType === 'PDF'
+      ? this.pdfReaderService.getPageImageUrl(this.bookId, this.pages[pageIndex])
+      : this.cbxReaderService.getPageImageUrl(this.bookId, this.pages[pageIndex]);
+  }
+
   get imageUrls(): string[] {
     if (!this.pages.length) return [];
 
-    const urls = [this.cbxReaderService.getPageImageUrl(this.bookId, this.pages[this.currentPage])];
+    const urls = [this.getPageImageUrl(this.currentPage)];
     if (this.isTwoPageView && this.currentPage + 1 < this.pages.length) {
-      urls.push(this.cbxReaderService.getPageImageUrl(this.bookId, this.pages[this.currentPage + 1]));
+      urls.push(this.getPageImageUrl(this.currentPage + 1));
     }
 
     return urls;
   }
 
   private updateViewerSetting(): void {
-    const bookSetting: BookSetting = {
-      cbxSettings: {
-        pageSpread: this.pageSpread,
-        pageViewMode: this.pageViewMode,
-      }
-    }
+    const bookSetting: BookSetting = this.bookType === "CBX"
+      ? {
+          cbxSettings: {
+            pageSpread: this.pageSpread as CbxPageSpread,
+            pageViewMode: this.pageViewMode as CbxPageViewMode,
+          }
+        }
+      : {
+          newPdfSettings: {
+            pageSpread: this.pageSpread as PdfPageSpread,
+            pageViewMode: this.pageViewMode as PdfPageViewMode,
+          }
+        };
     this.bookService.updateViewerSetting(bookSetting, this.bookId).subscribe();
   }
 
@@ -201,7 +252,12 @@ export class CbxReaderComponent implements OnInit {
       ? Math.round(((this.currentPage + 1) / this.pages.length) * 1000) / 10
       : 0;
 
-    this.bookService.saveCbxProgress(this.bookId, this.currentPage + 1, percentage).subscribe();
+    if(this.bookType === 'CBX') {
+      this.bookService.saveCbxProgress(this.bookId, this.currentPage + 1, percentage).subscribe();
+    }
+    if(this.bookType === 'PDF') {
+      this.bookService.savePdfProgress(this.bookId, this.currentPage + 1, percentage).subscribe();
+    }
   }
   goToPage(page: number): void {
     if (page < 1 || page > this.pages.length) return;

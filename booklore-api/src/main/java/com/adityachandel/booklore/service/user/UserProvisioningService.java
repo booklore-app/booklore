@@ -9,9 +9,7 @@ import com.adityachandel.booklore.model.dto.settings.OidcAutoProvisionDetails;
 import com.adityachandel.booklore.model.dto.settings.SidebarSortOption;
 import com.adityachandel.booklore.model.dto.settings.UserSettingKey;
 import com.adityachandel.booklore.model.entity.*;
-import com.adityachandel.booklore.model.enums.CbxPageSpread;
-import com.adityachandel.booklore.model.enums.CbxPageViewMode;
-import com.adityachandel.booklore.model.enums.ProvisioningMethod;
+import com.adityachandel.booklore.model.enums.*;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.repository.UserRepository;
@@ -182,6 +180,7 @@ public class UserProvisioningService {
         addUserSetting(user, UserSettingKey.PDF_READER_SETTING, buildDefaultPdfReaderSetting());
         addUserSetting(user, UserSettingKey.EPUB_READER_SETTING, buildDefaultEpubReaderSetting());
         addUserSetting(user, UserSettingKey.CBX_READER_SETTING, buildDefaultCbxReaderSetting());
+        addUserSetting(user, UserSettingKey.NEW_PDF_READER_SETTING, buildDefaultNewPdfReaderSetting());
         addUserSetting(user, UserSettingKey.SIDEBAR_LIBRARY_SORTING, buildDefaultSidebarLibrarySorting());
         addUserSetting(user, UserSettingKey.SIDEBAR_SHELF_SORTING, buildDefaultSidebarShelfSorting());
 
@@ -232,6 +231,14 @@ public class UserProvisioningService {
                 .pageSpread(CbxPageSpread.ODD)
                 .build();
     }
+
+    public BookLoreUser.UserSettings.NewPdfReaderSetting buildDefaultNewPdfReaderSetting() {
+        return BookLoreUser.UserSettings.NewPdfReaderSetting.builder()
+                .pageViewMode(NewPdfPageViewMode.SINGLE_PAGE)
+                .pageSpread(NewPdfPageSpread.ODD)
+                .build();
+    }
+
 
     private Object buildDefaultSidebarLibrarySorting() {
         return SidebarSortOption.builder()

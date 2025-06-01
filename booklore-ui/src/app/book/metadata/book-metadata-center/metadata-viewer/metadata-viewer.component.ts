@@ -54,6 +54,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
 
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   emailMenuItems: MenuItem[] | undefined;
+  readMenuItems: MenuItem[] | undefined;
   refreshMenuItems: MenuItem[] | undefined;
   bookInSeries: Book[] = [];
   isExpanded = false;
@@ -102,6 +103,15 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
       }
     ];
 
+    this.readMenuItems = [
+      {
+        label: 'Streaming Reader',
+        command: () => {
+          this.read(this.book?.id, "streaming")
+        },
+      }
+    ];
+
     this.metadata$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((metadata) => {
@@ -144,8 +154,8 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     this.isExpanded = !this.isExpanded;
   }
 
-  read(bookId: number): void {
-    this.bookService.readBook(bookId);
+  read(bookId: number | undefined, reader: "ngx" | "streaming"): void {
+    this.bookService.readPdf(bookId!, reader);
   }
 
   getAuthorNames(authors: string[]): string {

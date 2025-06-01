@@ -1,7 +1,13 @@
 <div class="comic-reader-container">
   <div class="navigation">
     <div class="goto-page-controls" style="display: flex; align-items: center; margin-right: auto;">
-      <input type="number" [(ngModel)]="goToPageInput" [min]="1" [max]="pages.length" placeholder="Page">
+      <input
+        type="number"
+        [(ngModel)]="goToPageInput"
+        [min]="1"
+        [max]="pages.length"
+        placeholder="Page"
+      />
       <button
         (click)="goToPageInput !== null && goToPage(goToPageInput)"
         [disabled]="goToPageInput === null || goToPageInput < 1 || goToPageInput > pages.length">
@@ -13,7 +19,8 @@
       <button class="mr-2" (click)="goToPage(1)" [disabled]="currentPage === 0">&lt;&lt;</button>
       <button (click)="previousPage()" [disabled]="currentPage === 0">&lt;</button>
       <span>
-        Page {{ currentPage + 1 }}{{ isTwoPageView && imageUrls.length > 1 ? '-' + (currentPage + 2) : '' }} of {{ pages.length }}
+        Page {{ currentPage + 1 }}
+        {{ isTwoPageView && imageUrls.length > 1 ? '-' + (currentPage + 2) : '' }} of {{ pages.length }}
       </span>
       <button (click)="nextPage()" [disabled]="currentPage >= pages.length - 1">&gt;</button>
       <button class="ml-2" (click)="goToPage(pages.length)" [disabled]="currentPage >= pages.length - 1">&gt;&gt;</button>
@@ -32,15 +39,16 @@
   <div class="image-container" [class.two-page-view]="isTwoPageView">
     <ng-container *ngIf="!isLoading; else loading">
       <ng-container *ngIf="pages.length > 0; else noPages">
-        <img *ngFor="let url of imageUrls" [src]="url" alt="Comic Page"/>
+        <img *ngFor="let url of imageUrls" [src]="url" alt="Page Image"/>
       </ng-container>
     </ng-container>
     <ng-template #noPages>
       <p>No pages available.</p>
     </ng-template>
     <ng-template #loading>
-      <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+      <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
         <p-progressSpinner></p-progressSpinner>
+        <p style="margin-top: 1rem; color: #ccc;">Processing pages... This may take a few seconds on first load. Future loads will be significantly faster.</p>
       </div>
     </ng-template>
   </div>

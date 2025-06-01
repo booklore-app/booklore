@@ -19,5 +19,6 @@ public class AppMigrationStartup {
     public void runMigrationsOnce() {
         appMigrationService.populateMissingFileSizesOnce();
         appMigrationService.addCbxReaderSettingToExistingUsers(userRepository, objectMapper);
+        appMigrationService.addNewPdfReaderSettingToExistingUsers(userRepository, objectMapper);
     }
 }

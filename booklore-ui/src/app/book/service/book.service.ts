@@ -116,6 +116,25 @@ export class BookService {
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
+  readPdf(bookId: number, reader: "ngx" | "streaming") {
+    const currentBooks = this.bookStateSubject.value.books;
+    const book = currentBooks?.find(book => book.id === bookId);
+    if (book) {
+      if (book.bookType === "PDF") {
+        if (reader === "ngx") {
+          const url = `/pdf-viewer/book/${book.id}`;
+          window.open(url, '_blank');
+        } else {
+          const url = `/cbx-viewer/book/${book.id}`;
+          window.open(url, '_blank');
+        }
+        this.updateLastReadTime(book.id);
+      }
+    } else {
+      console.error('Book not found');
+    }
+  }
+
   readBook(bookId: number): void {
     const currentBooks = this.bookStateSubject.value.books;
     const book = currentBooks?.find(book => book.id === bookId);
@@ -377,9 +396,9 @@ export class BookService {
         const currentState = this.bookStateSubject.value;
         const updatedBooks = (currentState.books || []).map(book => {
           const updatedMetadata = updatedMetadataList.find(meta => meta.bookId === book.id);
-          return updatedMetadata ? { ...book, metadata: updatedMetadata } : book;
+          return updatedMetadata ? {...book, metadata: updatedMetadata} : book;
         });
-        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
+        this.bookStateSubject.next({...currentState, books: updatedBooks});
       }),
       map(() => void 0),
       catchError((error) => {

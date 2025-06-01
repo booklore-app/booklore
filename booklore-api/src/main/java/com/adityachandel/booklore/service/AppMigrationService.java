@@ -110,4 +110,46 @@ public class AppMigrationService {
 
         log.info("Migration '{}' completed. Added CBX setting to {} users and updated PER_BOOK_SETTING for {} users.", migrationKey, updatedCount, perBookUpdatedCount);
     }
+
+
+    @Transactional
+    public void addNewPdfReaderSettingToExistingUsers(UserRepository userRepository, ObjectMapper objectMapper) {
+        final String migrationKey = "addNewPdfReaderSetting";
+
+        if (migrationRepository.existsById(migrationKey)) {
+            return;
+        }
+
+        List<BookLoreUserEntity> users = userRepository.findAll();
+        int updatedCount = 0;
+        AtomicInteger perBookUpdatedCount = new AtomicInteger();
+
+        for (BookLoreUserEntity user : users) {
+            boolean hasNewPdfSetting = user.getSettings().stream().anyMatch(s -> s.getSettingKey().equals(UserSettingKey.NEW_PDF_READER_SETTING.getDbKey()));
+
+            if (!hasNewPdfSetting) {
+                try {
+                    UserSettingEntity setting = UserSettingEntity.builder()
+                            .user(user)
+                            .settingKey(UserSettingKey.NEW_PDF_READER_SETTING.getDbKey())
+                            .settingValue(objectMapper.writeValueAsString(userProvisioningService.buildDefaultNewPdfReaderSetting()))
+                            .build();
+                    user.getSettings().add(setting);
+                    updatedCount++;
+                } catch (Exception e) {
+                    log.error("Failed to create New PDF setting for user {}", user.getUsername(), e);
+                }
+            }
+        }
+
+        userRepository.saveAll(users);
+
+        AppMigrationEntity migration = new AppMigrationEntity();
+        migration.setKey(migrationKey);
+        migration.setExecutedAt(LocalDateTime.now());
+        migration.setDescription("Add New PDF reader setting and update PER_BOOK_SETTING to include CBX for existing users");
+        migrationRepository.save(migration);
+
+        log.info("Migration '{}' completed. Added New PDF setting to {} users and updated PER_BOOK_SETTING for {} users.", migrationKey, updatedCount, perBookUpdatedCount);
+    }
 }

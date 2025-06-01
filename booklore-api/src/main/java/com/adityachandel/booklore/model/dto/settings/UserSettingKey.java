@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum UserSettingKey {
     PER_BOOK_SETTING("perBookSetting", true),
     PDF_READER_SETTING("pdfReaderSetting", true),
+    NEW_PDF_READER_SETTING("newPdfReaderSetting", true),
     EPUB_READER_SETTING("epubReaderSetting", true),
     CBX_READER_SETTING("cbxReaderSetting", true),
     SIDEBAR_LIBRARY_SORTING("sidebarLibrarySorting", true),
