@@ -97,6 +97,8 @@
             <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
             <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
             <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
+            <p class="whitespace-nowrap"><span class="font-bold">Series:</span> {{ metadata.seriesName || '-' }}</p>
+            <p class="whitespace-nowrap"><span class="font-bold">Book Number:</span> {{ metadata.seriesNumber || '-' }}</p>            
             <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB() }}</p>
             <p class="whitespace-nowrap"><span class="font-bold">Progress:</span> {{ getProgressPercent() !== null ? getProgressPercent() + '%' : '-' }}</p>
           </div>
