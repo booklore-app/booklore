@@ -1,27 +1,36 @@
 <div *ngIf="showFilters" class="w-[225px] ml-4 h-[calc(100vh-6.5rem)] rounded-xl bg-[var(--card-background)] overflow-hidden">
+  <p class="text-lg p-4">Filters</p>
   <p-accordion [value]="0">
     <p-accordion-panel *ngFor="let filterType of filterTypes; let i = index" [value]="i">
       <p-accordion-header>
         <span class="inline-flex items-center gap-1">
-          {{ filterType | titlecase }}
+          {{ filterLabels[filterType] || (filterType | titlecase) }}
           <span *ngIf="activeFilters[filterType]?.length" class="text-sm text-[var(--primary-color)]">
             ({{ activeFilters[filterType].length }})
           </span>
         </span>
       </p-accordion-header>
-      <p-accordion-content class="h-[40rem] !overflow-y-auto">
+      <p-accordion-content class="h-[31rem] !overflow-y-auto">
         <div *ngIf="filterStreams[filterType] | async as filters">
           <div *ngFor="let filter of filters">
-            <p
-              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
+            <div
+              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1 flex items-center gap-2"
               [ngClass]="{
                 'text-[var(--primary-color)]':
                   activeFilters[filterType]?.includes(filter.value?.id || filter.value)
               }"
               (click)="handleFilterClick(filterType, filter.value?.id || filter.value)">
+
               <p-badge [value]="filter.bookCount"></p-badge>
-              {{ filter.value.name || filter.value }}
-            </p>
+              <ng-container *ngIf="filterType === 'amazonRating'; else defaultLabel">
+                <ng-container *ngIf="filterType === 'amazonRating'; else defaultLabel">
+                  <span>{{ filter.value.name }}</span>
+                </ng-container>
+              </ng-container>
+              <ng-template #defaultLabel>
+                {{ filter.value.name || filter.value }}
+              </ng-template>
+            </div>
           </div>
         </div>
       </p-accordion-content>

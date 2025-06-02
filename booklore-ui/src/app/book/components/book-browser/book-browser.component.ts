@@ -28,7 +28,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {Menu} from 'primeng/menu';
 import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
-import {BookFilterComponent} from './book-filter/book-filter.component';
+import {BookFilterComponent, fileSizeRanges, isFileSizeInRange, isPageCountInRange, isRatingInRange, pageCountRanges, ratingRanges} from './book-filter/book-filter.component';
 import {Tooltip} from 'primeng/tooltip';
 import {Fluid} from 'primeng/fluid';
 import {UserService} from '../../../settings/user-management/user.service';
@@ -283,7 +283,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         if (!activeFilters) {
           return bookState;
         }
-
         const filteredBooks = (bookState.books || []).filter(book => {
           return Object.entries(activeFilters).every(([filterType, filterValues]) => {
             if (!Array.isArray(filterValues) || filterValues.length === 0) return true;
@@ -297,13 +296,29 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
                 return filterValues.every(val => book.metadata?.publisher === val);
               case 'series':
                 return filterValues.every(val => book.metadata?.seriesName === val);
+              case 'amazonRating':
+                return filterValues.some(range => isRatingInRange(book.metadata?.amazonRating, range));
+              case 'goodreadsRating':
+                return filterValues.some(range => isRatingInRange(book.metadata?.goodreadsRating, range));
+              case 'hardcoverRating':
+                return filterValues.some(range => isRatingInRange(book.metadata?.hardcoverRating, range));
+              case 'publishedDate':
+                return filterValues.includes(new Date(book.metadata?.publishedDate || '').getFullYear());
+              case 'fileSize':
+                return filterValues.some(range => isFileSizeInRange(book.fileSizeKb, range));
+              case 'shelfStatus':
+                const shelved = book.shelves && book.shelves.length > 0 ? 'shelved' : 'unshelved';
+                return filterValues.includes(shelved);
+              case 'pageCount':
+                return filterValues.some(range => isPageCountInRange(book.metadata?.pageCount!, range));
+              case 'language':
+                return filterValues.includes(book.metadata?.language);
               default:
                 return true;
             }
           });
         });
-
-        return {...bookState, books: filteredBooks};
+        return { ...bookState, books: filteredBooks };
       })
     );
   }
