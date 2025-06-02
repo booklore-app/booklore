@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.email;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.request.SendBookByEmailRequest;
@@ -9,6 +9,7 @@ import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.EmailProviderRepository;
 import com.adityachandel.booklore.repository.EmailRecipientRepository;
+import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.util.FileUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

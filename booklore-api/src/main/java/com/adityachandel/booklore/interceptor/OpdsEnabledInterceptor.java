@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.interceptor;
 
-import com.adityachandel.booklore.service.AppSettingService;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

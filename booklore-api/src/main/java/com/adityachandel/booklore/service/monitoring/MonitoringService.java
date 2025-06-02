@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.service.monitoring;
 
 import com.adityachandel.booklore.model.dto.Library;
-import com.adityachandel.booklore.service.LibraryProcessingService;
+import com.adityachandel.booklore.service.library.LibraryProcessingService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;

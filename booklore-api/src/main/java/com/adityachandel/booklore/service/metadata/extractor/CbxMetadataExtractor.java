@@ -1,6 +1,7 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.metadata.extractor;
 
 import com.adityachandel.booklore.model.UploadedFileMetadata;
+import com.adityachandel.booklore.service.upload.UploadedFileMetadataExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;

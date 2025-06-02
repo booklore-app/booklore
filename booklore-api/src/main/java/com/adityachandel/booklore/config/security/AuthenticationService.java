@@ -8,8 +8,10 @@ import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.RefreshTokenEntity;
 import com.adityachandel.booklore.repository.RefreshTokenRepository;
 import com.adityachandel.booklore.repository.UserRepository;
+import com.adityachandel.booklore.service.user.DefaultSettingInitializer;
 import com.adityachandel.booklore.service.user.UserProvisioningService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +22,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class AuthenticationService {
@@ -30,19 +33,20 @@ public class AuthenticationService {
     private final UserProvisioningService userProvisioningService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final DefaultSettingInitializer defaultSettingInitializer;
 
     public BookLoreUser getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
         if (principal instanceof BookLoreUser) {
+            defaultSettingInitializer.ensureDefaultSettings((BookLoreUser) principal);
             return (BookLoreUser) principal;
         }
         throw new IllegalStateException("Authenticated principal is not of type BookLoreUser");
     }
 
     public ResponseEntity<Map<String, String>> loginUser(UserLoginRequest loginRequest) {
-        BookLoreUserEntity user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(loginRequest.getUsername()));
+        BookLoreUserEntity user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(loginRequest.getUsername()));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
             throw ApiError.INVALID_CREDENTIALS.createException();

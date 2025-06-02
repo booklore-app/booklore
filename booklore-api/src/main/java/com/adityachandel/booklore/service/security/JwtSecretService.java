@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.security;
 
 import com.adityachandel.booklore.model.entity.JwtSecretEntity;
 import com.adityachandel.booklore.repository.JwtSecretRepository;

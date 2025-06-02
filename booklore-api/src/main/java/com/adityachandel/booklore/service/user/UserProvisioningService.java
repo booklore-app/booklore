@@ -2,19 +2,13 @@ package com.adityachandel.booklore.service.user;
 
 import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.UserCreateRequest;
 import com.adityachandel.booklore.model.dto.request.InitialUserRequest;
 import com.adityachandel.booklore.model.dto.settings.OidcAutoProvisionDetails;
-import com.adityachandel.booklore.model.dto.settings.SidebarSortOption;
-import com.adityachandel.booklore.model.dto.settings.UserSettingKey;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.*;
 import com.adityachandel.booklore.repository.LibraryRepository;
-import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.repository.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +26,8 @@ public class UserProvisioningService {
     private final AppProperties appProperties;
     private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
-    private final ShelfRepository shelfRepository;
-    private final ObjectMapper objectMapper;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final UserDefaultsService userDefaultsService;
 
     public boolean isInitialUserAlreadyProvisioned() {
         return userRepository.count() > 0;
@@ -163,94 +156,10 @@ public class UserProvisioningService {
         return createUser(user);
     }
 
-    @Transactional
     protected BookLoreUserEntity createUser(BookLoreUserEntity user) {
         user = userRepository.save(user);
-
-        if (user.getShelves() == null || user.getShelves().isEmpty()) {
-            ShelfEntity shelfEntity = ShelfEntity.builder()
-                    .user(user)
-                    .name("Favorites")
-                    .icon("heart")
-                    .build();
-            shelfRepository.save(shelfEntity);
-        }
-
-        addUserSetting(user, UserSettingKey.PER_BOOK_SETTING, buildDefaultPerBookSetting());
-        addUserSetting(user, UserSettingKey.PDF_READER_SETTING, buildDefaultPdfReaderSetting());
-        addUserSetting(user, UserSettingKey.EPUB_READER_SETTING, buildDefaultEpubReaderSetting());
-        addUserSetting(user, UserSettingKey.CBX_READER_SETTING, buildDefaultCbxReaderSetting());
-        addUserSetting(user, UserSettingKey.NEW_PDF_READER_SETTING, buildDefaultNewPdfReaderSetting());
-        addUserSetting(user, UserSettingKey.SIDEBAR_LIBRARY_SORTING, buildDefaultSidebarLibrarySorting());
-        addUserSetting(user, UserSettingKey.SIDEBAR_SHELF_SORTING, buildDefaultSidebarShelfSorting());
-
+        userDefaultsService.addDefaultShelves(user);
+        userDefaultsService.addDefaultSettings(user);
         return user;
-    }
-
-    private void addUserSetting(BookLoreUserEntity user, UserSettingKey key, Object value) {
-        try {
-            String json = objectMapper.writeValueAsString(value);
-            UserSettingEntity setting = UserSettingEntity.builder()
-                    .user(user)
-                    .settingKey(key.toString())
-                    .settingValue(json)
-                    .build();
-            user.getSettings().add(setting);
-        } catch (JsonProcessingException e) {
-            log.error("Failed to serialize setting {} for user {}", key, user.getUsername(), e);
-        }
-    }
-
-    private BookLoreUser.UserSettings.PerBookSetting buildDefaultPerBookSetting() {
-        return BookLoreUser.UserSettings.PerBookSetting.builder()
-                .epub(BookLoreUser.UserSettings.PerBookSetting.GlobalOrIndividual.Individual)
-                .pdf(BookLoreUser.UserSettings.PerBookSetting.GlobalOrIndividual.Individual)
-                .cbx(BookLoreUser.UserSettings.PerBookSetting.GlobalOrIndividual.Individual)
-                .build();
-    }
-
-    private BookLoreUser.UserSettings.PdfReaderSetting buildDefaultPdfReaderSetting() {
-        return BookLoreUser.UserSettings.PdfReaderSetting.builder()
-                .pageSpread("odd")
-                .pageZoom("page-fit")
-                .build();
-    }
-
-    private BookLoreUser.UserSettings.EpubReaderSetting buildDefaultEpubReaderSetting() {
-        return BookLoreUser.UserSettings.EpubReaderSetting.builder()
-                .theme("white")
-                .font("serif")
-                .fontSize(150)
-                .flow("paginated")
-                .build();
-    }
-
-    public BookLoreUser.UserSettings.CbxReaderSetting buildDefaultCbxReaderSetting() {
-        return BookLoreUser.UserSettings.CbxReaderSetting.builder()
-                .pageViewMode(CbxPageViewMode.SINGLE_PAGE)
-                .pageSpread(CbxPageSpread.ODD)
-                .build();
-    }
-
-    public BookLoreUser.UserSettings.NewPdfReaderSetting buildDefaultNewPdfReaderSetting() {
-        return BookLoreUser.UserSettings.NewPdfReaderSetting.builder()
-                .pageViewMode(NewPdfPageViewMode.SINGLE_PAGE)
-                .pageSpread(NewPdfPageSpread.ODD)
-                .build();
-    }
-
-
-    private Object buildDefaultSidebarLibrarySorting() {
-        return SidebarSortOption.builder()
-                .field("id")
-                .order("asc")
-                .build();
-    }
-
-    private Object buildDefaultSidebarShelfSorting() {
-        return SidebarSortOption.builder()
-                .field("id")
-                .order("asc")
-                .build();
     }
 }

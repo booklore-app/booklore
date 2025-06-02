@@ -1,7 +1,6 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.service.CbxReaderService;
-import com.adityachandel.booklore.service.PdfReaderService;
+import com.adityachandel.booklore.service.reader.PdfReaderService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

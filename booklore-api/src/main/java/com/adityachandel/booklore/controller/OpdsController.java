@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.service.BooksService;
-import com.adityachandel.booklore.service.OpdsService;
+import com.adityachandel.booklore.service.opds.OpdsService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;

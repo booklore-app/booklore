@@ -2,7 +2,7 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.EmailProvider;
 import com.adityachandel.booklore.model.dto.request.CreateEmailProviderRequest;
-import com.adityachandel.booklore.service.EmailProviderService;
+import com.adityachandel.booklore.service.email.EmailProviderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

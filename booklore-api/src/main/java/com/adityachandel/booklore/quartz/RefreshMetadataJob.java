@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.quartz;
 
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
-import com.adityachandel.booklore.service.BookMetadataService;
+import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;

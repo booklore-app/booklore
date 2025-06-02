@@ -3,7 +3,7 @@ package com.adityachandel.booklore.controller;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.Library;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
-import com.adityachandel.booklore.service.LibraryService;
+import com.adityachandel.booklore.service.library.LibraryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

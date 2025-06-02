@@ -1,6 +1,7 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.metadata.extractor;
 
 import com.adityachandel.booklore.model.UploadedFileMetadata;
+import com.adityachandel.booklore.service.upload.UploadedFileMetadataExtractor;
 import io.documentnode.epub4j.domain.Author;
 import io.documentnode.epub4j.domain.Book;
 import io.documentnode.epub4j.epub.EpubReader;

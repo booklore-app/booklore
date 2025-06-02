@@ -1,8 +1,9 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.reader;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.config.security;
 
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
-import com.adityachandel.booklore.service.JwtSecretService;
+import com.adityachandel.booklore.service.security.JwtSecretService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

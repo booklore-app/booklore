@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.file;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
