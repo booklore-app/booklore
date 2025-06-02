@@ -407,7 +407,10 @@ public class AmazonBookParser implements BookParser {
         try {
             Element reviewDiv = doc.selectFirst("div#averageCustomerReviews_feature_div");
             if (reviewDiv != null) {
-                Element ratingSpan = reviewDiv.selectFirst("span#acrPopover span.a-size-small.a-color-base");
+                Element ratingSpan = reviewDiv.selectFirst("span#acrPopover span.a-size-base.a-color-base");
+                if (ratingSpan == null) {
+                    ratingSpan = reviewDiv.selectFirst("span#acrPopover span.a-size-small.a-color-base");
+                }
                 if (ratingSpan != null) {
                     String text = ratingSpan.text().trim();
                     if (!text.isEmpty()) {

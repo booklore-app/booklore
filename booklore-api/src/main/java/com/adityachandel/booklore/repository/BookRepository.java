@@ -1,10 +1,6 @@
 package com.adityachandel.booklore.repository;
 
 import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.LibraryEntity;
-import com.adityachandel.booklore.model.entity.LibraryPathEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,6 +15,12 @@ import java.util.Set;
 
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpecificationExecutor<BookEntity> {
+
+    @Query("SELECT b FROM BookEntity b")
+    List<BookEntity> getAllBooks();
+
+    @Query("SELECT b FROM BookEntity b WHERE b.library.id IN :libraryIds")
+    List<BookEntity> getAllByLibraryIds(@Param("libraryIds") Set<Long> libraryIds);
 
     List<BookEntity> findAllByIdIn(Collection<Long> ids);
 
@@ -37,8 +39,6 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
     @Modifying
     @Query("DELETE FROM BookEntity b WHERE b.id IN (:ids)")
     void deleteByIdIn(Collection<Long> ids);
-
-    List<BookEntity> findByLibraryIdIn(Set<Long> userLibraryIds);
 
     List<BookEntity> findByFileSizeKbIsNull();
 }

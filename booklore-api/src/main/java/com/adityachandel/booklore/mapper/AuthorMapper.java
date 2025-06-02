@@ -2,7 +2,6 @@ package com.adityachandel.booklore.mapper;
 
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 

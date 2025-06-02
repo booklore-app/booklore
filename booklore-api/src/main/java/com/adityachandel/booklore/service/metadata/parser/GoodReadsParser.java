@@ -1,14 +1,12 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
-import org.apache.commons.text.similarity.FuzzyScore;
-
-import com.adityachandel.booklore.model.dto.Award;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.util.BookUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.similarity.FuzzyScore;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -160,11 +158,6 @@ public class GoodReadsParser implements BookParser {
                 }
 
                 JSONObject detailsJson = workJson.optJSONObject("details");
-                if (detailsJson != null) {
-                    JSONArray awardsWonArray = detailsJson.optJSONArray("awardsWon");
-                    List<Award> awards = getAwards(awardsWonArray);
-                    builder.awards(awards);
-                }
             }
         }
     }
@@ -236,25 +229,6 @@ public class GoodReadsParser implements BookParser {
             }
         }
         return null;
-    }
-
-    private List<Award> getAwards(JSONArray awardsWonArray) {
-        List<Award> awards = new ArrayList<>();
-        for (int i = 0; i < awardsWonArray.length(); i++) {
-            JSONObject awardsWon = awardsWonArray.optJSONObject(i);
-            String awardName = awardsWon.optString("name");
-            String awardCategory = awardsWon.optString("category");
-            String awardDesignation = awardsWon.optString("designation");
-            LocalDate awardedAt = awardsWon.isNull("awardedAt") ? null :
-                    Instant.ofEpochMilli(awardsWon.optLong("awardedAt")).atZone(ZoneId.systemDefault()).toLocalDate();
-            awards.add(Award.builder()
-                    .name(awardName)
-                    .category(awardCategory)
-                    .designation(awardDesignation)
-                    .awardedAt(awardedAt)
-                    .build());
-        }
-        return awards;
     }
 
     private String getSeriesName(JSONObject apolloStateJson, String seriesKey) {

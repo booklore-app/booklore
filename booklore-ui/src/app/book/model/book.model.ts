@@ -59,7 +59,6 @@ export interface BookMetadata {
   coverUpdatedOn?: string;
   authors: string[];
   categories: string[];
-  awards?: Award[];
   provider?: string;
   providerBookId?: string;
   thumbnailUrl?: string | null;
@@ -88,17 +87,9 @@ export interface BookMetadata {
   coverUpdatedOnLocked?: boolean;
   authorsLocked?: boolean;
   categoriesLocked?: boolean;
-  awardsLocked?: boolean;
   coverLocked?: boolean;
 
   [key: string]: any;
-}
-
-export interface Award {
-  name: string;
-  category: string;
-  designation: string;
-  awardedAt: string;
 }
 
 export interface PdfViewerSetting {

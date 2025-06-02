@@ -36,7 +36,7 @@ public class BookEntity {
     @Column(name = "file_size_kb")
     private Long fileSizeKb;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private BookMetadataEntity metadata;
 
     @ManyToOne

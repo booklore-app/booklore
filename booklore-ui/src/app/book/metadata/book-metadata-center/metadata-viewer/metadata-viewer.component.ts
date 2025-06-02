@@ -154,8 +154,8 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     this.isExpanded = !this.isExpanded;
   }
 
-  read(bookId: number | undefined, reader: "ngx" | "streaming"): void {
-    this.bookService.readPdf(bookId!, reader);
+  read(bookId: number | undefined, reader: "ngx" | "streaming" | undefined): void {
+    this.bookService.readBook(bookId!, reader);
   }
 
   getAuthorNames(authors: string[]): string {

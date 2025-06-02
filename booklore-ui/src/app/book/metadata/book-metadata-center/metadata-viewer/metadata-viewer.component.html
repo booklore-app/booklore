@@ -129,14 +129,57 @@
         </div>
 
         <div *ngIf="userService.userState$ | async as userData" class="pl-6 pt-4 flex flex-row w-full gap-4">
-          <p-splitbutton label="Read" icon="pi pi-book" [model]="readMenuItems" (onClick)="read(metadata.bookId, 'ngx')" severity="info"/>
-          <p-button label="Assign Shelf" icon="pi pi-folder" severity="info" outlined (onClick)="assignShelf(metadata.bookId)"></p-button>
-          <p-button *ngIf="userData.permissions.canDownload || userData.permissions.admin" label="Download" icon="pi pi-download" severity="info" outlined
-                    (onClick)="download(metadata.bookId)"></p-button>
-          <p-splitbutton *ngIf="userData.permissions.canEmailBook || userData.permissions.admin" label="Quick Send" icon="pi pi-send" [model]="emailMenuItems"
-                         (onClick)="quickSend(metadata.bookId)" outlined severity="info"/>
-          <p-splitbutton *ngIf="userData.permissions.canEditMetadata || userData.permissions.admin" label="Quick Refresh" icon="pi pi-bolt" [model]="refreshMenuItems"
-                         (onClick)="quickRefresh(metadata.bookId)" outlined severity="info"/>
+          <p-splitbutton
+            *ngIf="book!.bookType === 'PDF'"
+            label="Read"
+            icon="pi pi-book"
+            [model]="readMenuItems"
+            (onClick)="read(metadata.bookId, 'ngx')"
+            severity="info"/>
+
+          <p-button
+            *ngIf="book!.bookType !== 'PDF'"
+            label="Read"
+            icon="pi pi-book"
+            (onClick)="read(metadata.bookId, undefined)"
+            severity="info"/>
+
+          <p-button
+            label="Assign Shelf"
+            icon="pi pi-folder"
+            severity="info"
+            outlined
+            (onClick)="assignShelf(metadata.bookId)">
+          </p-button>
+
+          <p-button
+            *ngIf="userData.permissions.canDownload || userData.permissions.admin"
+            label="Download"
+            icon="pi pi-download"
+            severity="info"
+            outlined
+            (onClick)="download(metadata.bookId)">
+          </p-button>
+
+          <p-splitbutton
+            *ngIf="userData.permissions.canEmailBook || userData.permissions.admin"
+            label="Quick Send"
+            icon="pi pi-send"
+            [model]="emailMenuItems"
+            (onClick)="quickSend(metadata.bookId)"
+            outlined
+            severity="info">
+          </p-splitbutton>
+
+          <p-splitbutton
+            *ngIf="userData.permissions.canEditMetadata || userData.permissions.admin"
+            label="Quick Refresh"
+            icon="pi pi-bolt"
+            [model]="refreshMenuItems"
+            (onClick)="quickRefresh(metadata.bookId)"
+            outlined
+            severity="info">
+          </p-splitbutton>
         </div>
       </div>
     </div>

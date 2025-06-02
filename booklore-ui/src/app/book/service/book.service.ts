@@ -116,47 +116,32 @@ export class BookService {
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
-  readPdf(bookId: number, reader: "ngx" | "streaming") {
-    const currentBooks = this.bookStateSubject.value.books;
-    const book = currentBooks?.find(book => book.id === bookId);
-    if (book) {
-      if (book.bookType === "PDF") {
-        if (reader === "ngx") {
-          const url = `/pdf-viewer/book/${book.id}`;
-          window.open(url, '_blank');
-        } else {
-          const url = `/cbx-viewer/book/${book.id}`;
-          window.open(url, '_blank');
-        }
-        this.updateLastReadTime(book.id);
-      }
-    } else {
+  readBook(bookId: number, reader: "ngx" | "streaming" = "streaming"): void {
+    const book = this.bookStateSubject.value.books?.find(b => b.id === bookId);
+    if (!book) {
       console.error('Book not found');
+      return;
     }
-  }
-
-  readBook(bookId: number): void {
-    const currentBooks = this.bookStateSubject.value.books;
-    const book = currentBooks?.find(book => book.id === bookId);
-    if (book) {
-      if (book.bookType === "PDF") {
-        const url = `/pdf-viewer/book/${book.id}`;
-        window.open(url, '_blank');
-        this.updateLastReadTime(book.id);
-      } else if (book.bookType === "EPUB") {
-        const url = `/epub-viewer/book/${book.id}`;
-        window.open(url, '_blank');
-        this.updateLastReadTime(book.id);
-      } else if (book.bookType === "CBX") {
-        const url = `/cbx-viewer/book/${book.id}`;
-        window.open(url, '_blank');
-        this.updateLastReadTime(book.id);
-      } else {
+    let url: string | null = null;
+    switch (book.bookType) {
+      case "PDF":
+        url = reader === "ngx"
+          ? `/pdf-viewer/book/${book.id}`
+          : `/cbx-viewer/book/${book.id}`;
+        break;
+      case "EPUB":
+        url = `/epub-viewer/book/${book.id}`;
+        break;
+      case "CBX":
+        url = `/cbx-viewer/book/${book.id}`;
+        break;
+      default:
         console.error('Unsupported book type:', book.bookType);
-      }
-    } else {
-      console.error('Book not found');
+        return;
     }
+
+    window.open(url, '_blank');
+    this.updateLastReadTime(book.id);
   }
 
   searchBooks(query: string): Book[] {

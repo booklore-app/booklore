@@ -51,7 +51,6 @@ export class BookFilterComponent implements OnInit {
         author: this.getFilterStream((book: Book) => book.metadata?.authors.map((name) => ({id: name, name})) || [], 'id', 'name'),
         category: this.getFilterStream((book: Book) => book.metadata?.categories.map((name) => ({id: name, name})) || [], 'id', 'name'),
         series: this.getFilterStream((book) => (book.metadata?.seriesName ? [{id: book.metadata.seriesName, name: book.metadata.seriesName}] : []), 'id', 'name'),
-        award: this.getFilterStream((book) => book.metadata?.awards?.filter((award) => award.designation === 'WINNER'), 'name', 'name'),
         publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name'),
       };
       this.filterTypes = Object.keys(this.filterStreams);

@@ -24,6 +24,11 @@ public interface BookMapper {
     @Mapping(source = "shelves", target = "shelves")
     Book toBookWithDescription(BookEntity bookEntity, @Context boolean includeDescription);
 
+    @Mapping(source = "library.id", target = "libraryId")
+    @Mapping(target = "metadata", ignore = true)
+    @Mapping(target = "shelves", ignore = true)
+    Book toBookWithoutMetadataAndShelves(BookEntity bookEntity);
+
     default List<String> mapAuthors(List<AuthorEntity> authors) {
         if (authors == null) {
             return null;

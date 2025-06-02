@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ShelfRepository extends JpaRepository<ShelfEntity, Long> {
@@ -14,4 +15,6 @@ public interface ShelfRepository extends JpaRepository<ShelfEntity, Long> {
     boolean existsByUserIdAndName(Long id, String name);
 
     List<ShelfEntity> findByUserId(Long id);
+
+    List<ShelfEntity> findAllByIdIn(Set<Long> ids);
 }

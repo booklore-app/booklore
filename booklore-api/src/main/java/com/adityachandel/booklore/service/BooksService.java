@@ -2,7 +2,7 @@ package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.mapper.BookMapper;
+import com.adityachandel.booklore.mapper.*;
 import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.entity.*;
@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 public class BooksService {
 
     private final BookRepository bookRepository;
+    private final BookMetadataRepository bookMetadataRepository;
     private final PdfViewerPreferencesRepository pdfViewerPreferencesRepository;
     private final EpubViewerPreferencesRepository epubViewerPreferencesRepository;
     private final CbxViewerPreferencesRepository cbxViewerPreferencesRepository;
@@ -47,6 +49,15 @@ public class BooksService {
     private final UserRepository userRepository;
     private final UserBookProgressRepository userBookProgressRepository;
     private final AuthenticationService authenticationService;
+    private final AuthorRepository authorRepository;
+    private final CategoryRepository categoryRepository;
+    private final BookMetadataAuthorMappingRepository bookMetadataAuthorMappingRepository;
+    private final BookMetadataCategoryMappingRepository bookMetadataCategoryMappingRepository;
+    private final BookShelfMappingRepository bookShelfMappingRepository;
+    private final BookMetadataMapper bookMetadataMapper;
+    private final AuthorMapper authorMapper;
+    private final CategoryMapper categoryMapper;
+    private final ShelfMapper shelfMapper;
 
 
     public BookViewerSettings getBookViewerSetting(long bookId) {
@@ -199,49 +210,129 @@ public class BooksService {
 
     public List<Book> getBooks(boolean withDescription) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
-        BookLoreUserEntity userEntity = userRepository.findById(user.getId())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        List<BookEntity> books;
-        if (userEntity.getPermissions().isPermissionAdmin()) {
-            books = bookRepository.findAll();
-        } else {
-            Set<Long> userLibraryIds = userEntity.getLibraries().stream()
-                    .map(LibraryEntity::getId)
-                    .collect(Collectors.toSet());
-            books = bookRepository.findByLibraryIdIn(userLibraryIds);
+        Set<Long> bookIds;
+        List<BookEntity> bookEntities = user.getPermissions().isAdmin()
+                ? bookRepository.getAllBooks()
+                : bookRepository.getAllByLibraryIds(
+                user.getAssignedLibraries().stream()
+                        .map(Library::getId)
+                        .collect(Collectors.toSet())
+        );
+
+        List<Book> books = bookEntities.stream()
+                .map(bookMapper::toBookWithoutMetadataAndShelves)
+                .toList();
+
+        bookIds = bookEntities.stream()
+                .map(BookEntity::getId)
+                .collect(Collectors.toSet());
+
+        Map<Long, BookMetadata> metadataByBookId = fetchMetadata(bookIds, withDescription);
+        Map<Long, List<String>> authorsByBookId = fetchAuthors(bookIds);
+        Map<Long, List<String>> categoriesByBookId = fetchCategories(bookIds);
+        Map<Long, List<Shelf>> shelvesByBookId = fetchShelves(bookIds);
+        Map<Long, UserBookProgressEntity> progressByBookId = fetchUserProgress(user.getId(), bookIds);
+
+        for (Book book : books) {
+            Long bookId = book.getId();
+
+            var metadata = metadataByBookId.get(bookId);
+            if (metadata != null) {
+                metadata.setAuthors(authorsByBookId.getOrDefault(bookId, List.of()));
+                metadata.setCategories(categoriesByBookId.getOrDefault(bookId, List.of()));
+                book.setMetadata(metadata);
+            }
+
+            book.setShelves(shelvesByBookId.getOrDefault(bookId, List.of()));
+
+            var progress = progressByBookId.get(bookId);
+            if (progress != null) {
+                book.setLastReadTime(progress.getLastReadTime());
+                setBookProgress(book, progress);
+            }
         }
 
-        return books.stream()
-                .map(bookEntity -> {
-                    UserBookProgressEntity userProgress = userBookProgressRepository
-                            .findByUserIdAndBookId(user.getId(), bookEntity.getId())
-                            .orElse(new UserBookProgressEntity());
-                    Book book = bookMapper.toBookWithDescription(bookEntity, withDescription);
-                    book.setLastReadTime(userProgress.getLastReadTime());
-                    if (bookEntity.getBookType() == BookFileType.EPUB) {
-                        book.setEpubProgress(EpubProgress.builder()
-                                .cfi(userProgress.getEpubProgress())
-                                .percentage(userProgress.getEpubProgressPercent())
-                                .build());
-                    }
-                    if (bookEntity.getBookType() == BookFileType.PDF) {
-                        book.setPdfProgress(PdfProgress.builder()
-                                .page(userProgress.getPdfProgress())
-                                .percentage(userProgress.getPdfProgressPercent())
-                                .build());
-                    }
-                    if (bookEntity.getBookType() == BookFileType.CBX) {
-                        book.setCbxProgress(CbxProgress.builder()
-                                .page(userProgress.getCbxProgress())
-                                .percentage(userProgress.getCbxProgressPercent())
-                                .build());
-                    }
-                    book.setFilePath(FileUtils.getBookFullPath(bookEntity));
-                    return book;
-                })
-                .collect(Collectors.toList());
+        return books;
     }
+
+    private Map<Long, BookMetadata> fetchMetadata(Set<Long> bookIds, boolean withDescription) {
+        var metadataList = bookMetadataRepository.getMetadataForBookIds(bookIds);
+        return metadataList.stream()
+                .map(m -> bookMetadataMapper.toBookMetadataWithoutRelations(m, withDescription))
+                .collect(Collectors.toMap(BookMetadata::getBookId, m -> m));
+    }
+
+    private Map<Long, List<String>> fetchAuthors(Set<Long> bookIds) {
+        var mappings = bookMetadataAuthorMappingRepository.findAllByBookIdIn(bookIds);
+        var authorIds = mappings.stream()
+                .map(BookMetadataAuthorMapping::getAuthorId)
+                .collect(Collectors.toSet());
+        var authors = authorRepository.findAllByIdIn(authorIds);
+        var authorNamesById = authors.stream()
+                .collect(Collectors.toMap(AuthorEntity::getId, authorMapper::toAuthorEntityName));
+
+        return mappings.stream()
+                .collect(Collectors.groupingBy(
+                        BookMetadataAuthorMapping::getBookId,
+                        Collectors.mapping(m -> authorNamesById.get(m.getAuthorId()), Collectors.toList())
+                ));
+    }
+
+    private Map<Long, List<String>> fetchCategories(Set<Long> bookIds) {
+        var mappings = bookMetadataCategoryMappingRepository.findAllByBookIdIn(bookIds);
+        var categoryIds = mappings.stream()
+                .map(BookMetadataCategoryMapping::getCategoryId)
+                .collect(Collectors.toSet());
+        var categories = categoryRepository.findAllByIdIn(categoryIds);
+        var categoryNamesById = categories.stream()
+                .collect(Collectors.toMap(CategoryEntity::getId, categoryMapper::toCategoryName));
+
+        return mappings.stream()
+                .collect(Collectors.groupingBy(
+                        BookMetadataCategoryMapping::getBookId,
+                        Collectors.mapping(m -> categoryNamesById.get(m.getCategoryId()), Collectors.toList())
+                ));
+    }
+
+    private Map<Long, List<Shelf>> fetchShelves(Set<Long> bookIds) {
+        var shelfMappings = bookShelfMappingRepository.findAllByBookIdIn(bookIds);
+        var shelfIds = shelfMappings.stream()
+                .map(BookShelfMapping::getShelfId)
+                .collect(Collectors.toSet());
+        var shelves = shelfRepository.findAllByIdIn(shelfIds);
+        var shelfById = shelves.stream()
+                .collect(Collectors.toMap(ShelfEntity::getId, shelfMapper::toShelf));
+
+        return shelfMappings.stream()
+                .collect(Collectors.groupingBy(
+                        BookShelfMapping::getBookId,
+                        Collectors.mapping(m -> shelfById.get(m.getShelfId()), Collectors.toList())
+                ));
+    }
+
+    private Map<Long, UserBookProgressEntity> fetchUserProgress(Long userId, Set<Long> bookIds) {
+        return userBookProgressRepository.findByUserIdAndBookIdIn(userId, bookIds).stream()
+                .collect(Collectors.toMap(p -> p.getBook().getId(), p -> p));
+    }
+
+    private void setBookProgress(Book book, UserBookProgressEntity progress) {
+        switch (book.getBookType()) {
+            case EPUB -> book.setEpubProgress(EpubProgress.builder()
+                    .cfi(progress.getEpubProgress())
+                    .percentage(progress.getEpubProgressPercent())
+                    .build());
+            case PDF -> book.setPdfProgress(PdfProgress.builder()
+                    .page(progress.getPdfProgress())
+                    .percentage(progress.getPdfProgressPercent())
+                    .build());
+            case CBX -> book.setCbxProgress(CbxProgress.builder()
+                    .page(progress.getCbxProgress())
+                    .percentage(progress.getCbxProgressPercent())
+                    .build());
+        }
+    }
+
 
     @Transactional
     public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {

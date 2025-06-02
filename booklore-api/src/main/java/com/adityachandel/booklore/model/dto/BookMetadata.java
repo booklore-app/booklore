@@ -43,7 +43,6 @@ public class BookMetadata {
     private Instant coverUpdatedOn;
     private List<String> authors;
     private List<String> categories;
-    private List<Award> awards;
 
     private MetadataProvider provider;
     private String providerBookId;

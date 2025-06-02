@@ -4,11 +4,8 @@ import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {AuthorMapper.class, CategoryMapper.class, AwardMapper.class})
+@Mapper(componentModel = "spring", uses = {AuthorMapper.class, CategoryMapper.class})
 public interface BookMetadataMapper {
-
-    @Mapping(target = "description", ignore = true)
-    BookMetadata toBookMetadata(BookMetadataEntity bookMetadataEntity, @Context boolean includeDescription);
 
     @AfterMapping
     default void mapWithDescriptionCondition(BookMetadataEntity bookMetadataEntity, @MappingTarget BookMetadata bookMetadata, @Context boolean includeDescription) {
@@ -18,4 +15,15 @@ public interface BookMetadataMapper {
             bookMetadata.setDescription(null);
         }
     }
+
+    @Named("withRelations")
+    @Mapping(target = "description", ignore = true)
+    BookMetadata toBookMetadata(BookMetadataEntity bookMetadataEntity, @Context boolean includeDescription);
+
+    @Named("withoutRelations")
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "authors", ignore = true)
+    @Mapping(target = "categories", ignore = true)
+    BookMetadata toBookMetadataWithoutRelations(BookMetadataEntity bookMetadataEntity, @Context boolean includeDescription);
+
 }

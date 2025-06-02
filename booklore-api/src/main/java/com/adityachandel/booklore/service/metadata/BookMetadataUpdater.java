@@ -28,9 +28,7 @@ public class BookMetadataUpdater {
     private final AuthorRepository authorRepository;
     private final BookMetadataRepository bookMetadataRepository;
     private final CategoryRepository categoryRepository;
-    private final BookAwardRepository awardRepository;
     private final FileService fileService;
-    private final BookAwardRepository bookAwardRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BookMetadataEntity setBookMetadata(long bookId, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
@@ -101,34 +99,6 @@ public class BookMetadataUpdater {
         if ((metadata.getSeriesTotalLocked() == null || !metadata.getSeriesTotalLocked()) && newMetadata.getSeriesTotal() != null) {
             metadata.setSeriesTotal(newMetadata.getSeriesTotal());
         }
-        if (newMetadata.getAwards() != null && !newMetadata.getAwards().isEmpty()) {
-            HashSet<BookAwardEntity> newAwards = new HashSet<>();
-            newMetadata.getAwards()
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .forEach(award -> {
-                        boolean awardExists = bookMetadataRepository.findAwardByBookIdAndNameAndCategoryAndAwardedAt(
-                                metadata.getBookId(),
-                                award.getName(),
-                                award.getCategory(),
-                                award.getAwardedAt()) != null;
-
-                        if (!awardExists) {
-                            BookAwardEntity awardEntity = new BookAwardEntity();
-                            awardEntity.setBook(metadata);
-                            awardEntity.setName(award.getName());
-                            awardEntity.setCategory(award.getCategory());
-                            awardEntity.setDesignation(award.getDesignation());
-                            awardEntity.setAwardedAt(award.getAwardedAt() != null ? award.getAwardedAt() : Instant.now().atZone(ZoneId.systemDefault()).toLocalDate());
-
-                            newAwards.add(awardEntity);
-                        }
-                    });
-            if (!newAwards.isEmpty()) {
-                metadata.setAwards(new ArrayList<>(newAwards));
-                bookAwardRepository.saveAll(newAwards);
-            }
-        }
 
         if ((metadata.getAuthorsLocked() == null || !metadata.getAuthorsLocked()) && newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty()) {
             metadata.setAuthors(newMetadata.getAuthors()
@@ -179,9 +149,6 @@ public class BookMetadataUpdater {
         }
         if (!metadata.getCategories().isEmpty()) {
             categoryRepository.saveAll(metadata.getCategories());
-        }
-        if (!metadata.getAwards().isEmpty()) {
-            awardRepository.saveAll(metadata.getAwards());
         }
         bookMetadataRepository.save(metadata);
         return metadata;

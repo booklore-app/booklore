@@ -188,9 +188,6 @@ public class BookMetadataEntity {
     )
     private List<CategoryEntity> categories;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
-    private List<BookAwardEntity> awards;
-
     public void applyLockToAllFields(boolean lock) {
         this.titleLocked = lock;
         this.subtitleLocked = lock;

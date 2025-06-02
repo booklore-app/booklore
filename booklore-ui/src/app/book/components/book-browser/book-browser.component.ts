@@ -295,12 +295,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
                 return filterValues.every(val => book.metadata?.categories?.includes(val));
               case 'publisher':
                 return filterValues.every(val => book.metadata?.publisher === val);
-              case 'award':
-                return filterValues.every(val =>
-                  book.metadata?.awards?.some(
-                    award => award.name === val.name && award.designation === 'WINNER'
-                  )
-                );
               case 'series':
                 return filterValues.every(val => book.metadata?.seriesName === val);
               default:

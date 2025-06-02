@@ -4,6 +4,7 @@ import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.settings.SidebarSortOption;
 import com.adityachandel.booklore.model.dto.settings.UserSettingKey;
 import com.adityachandel.booklore.model.enums.*;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,8 @@ public class DefaultUserSettingsProvider {
 
     private final Map<UserSettingKey, Supplier<Object>> defaultSettings = new EnumMap<>(UserSettingKey.class);
 
-    public DefaultUserSettingsProvider(UserDefaultsService defaultsService) {
+    @PostConstruct
+    public void init() {
         defaultSettings.put(UserSettingKey.PER_BOOK_SETTING, this::buildDefaultPerBookSetting);
         defaultSettings.put(UserSettingKey.PDF_READER_SETTING, this::buildDefaultPdfReaderSetting);
         defaultSettings.put(UserSettingKey.EPUB_READER_SETTING, this::buildDefaultEpubReaderSetting);

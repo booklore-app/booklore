@@ -1,13 +1,14 @@
 package com.adityachandel.booklore.model.dto;
 
-import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
 import java.util.List;
 
+@Builder
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Book {
