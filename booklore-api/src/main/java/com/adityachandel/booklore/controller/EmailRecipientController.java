@@ -17,13 +17,13 @@ public class EmailRecipientController {
 
     private final EmailRecipientService emailRecipientService;
 
-    @PreAuthorize("@securityUtil.isAdmin()")
+    @PreAuthorize("@securityUtil.isAdmin() or @securityUtil.canEmailBook()")
     @GetMapping
     public ResponseEntity<List<EmailRecipient>> getEmailRecipients() {
         return ResponseEntity.ok(emailRecipientService.getEmailRecipients());
     }
 
-    @PreAuthorize("@securityUtil.isAdmin()")
+    @PreAuthorize("@securityUtil.isAdmin() or @securityUtil.canEmailBook()")
     @GetMapping("/{id}")
     public ResponseEntity<EmailRecipient> getEmailRecipient(@PathVariable Long id) {
         return ResponseEntity.ok(emailRecipientService.getEmailRecipient(id));
