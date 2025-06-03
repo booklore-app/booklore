@@ -33,6 +33,33 @@
           </a>
 
           <div>
+            <a
+              class="topbar-items topbar-item"
+              (click)="sizeOverlay.toggle($event)"
+              pTooltip="Adjust grid item scale"
+              tooltipPosition="top"
+            >
+              <i class="pi pi-th-large"></i>
+            </a>
+
+            <p-popover #sizeOverlay [dismissable]="true" appendTo="body">
+              <div style="width: 220px; padding: 8px;">
+                <p-slider
+                  [(ngModel)]="scaleFactor"
+                  [min]="0.5"
+                  [max]="1.5"
+                  [step]="0.01"
+                  [style]="{ width: '100%' }"
+                  (onChange)="updateScale()"
+                ></p-slider>
+                <div style="text-align: center; margin-top: 8px;">
+                  {{ scaleFactor.toFixed(2) }}x
+                </div>
+              </div>
+            </p-popover>
+          </div>
+
+          <div>
             <a class="topbar-items topbar-item" (click)="sortMenu.toggle($event)">
               <i
                 class="pi pi-sort"
@@ -112,11 +139,18 @@
         </div>
 
         <div class="book-card-container" *ngIf="bookState?.books as books">
-          <app-book-table *ngIf="currentViewMode === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)" [sortOption]="selectedSort!"></app-book-table>
+          <app-book-table *ngIf="currentViewMode === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
+                          [sortOption]="selectedSort!"></app-book-table>
 
           <virtual-scroller *ngIf="currentViewMode === 'grid'" class="virtual-scroller" #scroll [items]="books">
-            <div class="grid grid-cols-12 gap-4" #container>
-              <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
+            <div
+              class="grid"
+              #container
+              [ngStyle]="{'grid-template-columns': 'repeat(auto-fit, minmax(' + gridColumnMinWidth + ', 1fr))'}">
+              <div
+                class="virtual-scroller-item"
+                *ngFor="let book of scroll.viewPortItems"
+                [ngStyle]="{width: currentCardSize.width + 'px', height: currentCardSize.height + 'px'}">
                 <app-book-card
                   [book]="book"
                   [isCheckboxEnabled]="true"

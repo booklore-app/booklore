@@ -16,6 +16,7 @@ export interface EntityViewPreference {
   sortKey: string;
   sortDir: 'ASC' | 'DESC';
   view: 'GRID' | 'TABLE';
+  coverSize: number
 }
 
 export interface EntityViewPreferenceOverride {
@@ -114,6 +115,10 @@ export class UserService {
       this.userStateSubject.next(user);
       this.startWebSocket();
     });
+  }
+
+  getCurrentUser(): User | null {
+    return this.userStateSubject.getValue();
   }
 
   getMyself(): Observable<User> {

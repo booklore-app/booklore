@@ -18,17 +18,16 @@
   overflow-y: auto;
 }
 
-.virtual-scroller-item {
-  height: 220px;
-  width: 135px;
-}
-
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 1.3rem;
   overflow: hidden;
   align-items: start;
+}
+
+.virtual-scroller-item {
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
 .book-browser-footer {

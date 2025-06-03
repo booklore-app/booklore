@@ -95,6 +95,7 @@ public class DefaultUserSettingsProvider {
                         .sortKey("title")
                         .sortDir("ASC")
                         .view("GRID")
+                        .coverSize(1.0F)
                         .build())
                 .overrides(null)
                 .build();

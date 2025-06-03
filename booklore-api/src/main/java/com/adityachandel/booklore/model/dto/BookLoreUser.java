@@ -59,6 +59,7 @@ public class BookLoreUser {
             private String sortKey;
             private String sortDir;
             private String view;
+            private Float coverSize;
         }
 
         @Data
