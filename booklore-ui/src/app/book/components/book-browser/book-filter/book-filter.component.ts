@@ -10,7 +10,7 @@ import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'prim
 import {AsyncPipe, NgClass, NgForOf, NgIf, TitleCasePipe} from '@angular/common';
 import {Badge} from 'primeng/badge';
 import {FormsModule} from '@angular/forms';
-import {Divider} from 'primeng/divider';
+import {SelectButton} from 'primeng/selectbutton';
 
 type Filter<T> = { value: T; bookCount: number };
 
@@ -117,11 +117,12 @@ function getPageCountRangeFilters(pageCount?: number) {
     AsyncPipe,
     TitleCasePipe,
     FormsModule,
-    Divider
+    SelectButton
   ]
 })
 export class BookFilterComponent implements OnInit {
   @Output() filterSelected = new EventEmitter<Record<string, any> | null>();
+  @Output() filterModeChanged = new EventEmitter<'and' | 'or'>();
 
   @Input() showFilters: boolean = true;
   @Input() entity$!: Observable<Library | Shelf | null> | undefined;
@@ -131,6 +132,11 @@ export class BookFilterComponent implements OnInit {
   activeFilters: Record<string, any> = {};
   filterStreams: Record<string, Observable<Filter<any>[]>> = {};
   filterTypes: string[] = [];
+  filterModeOptions = [
+    { label: 'AND', value: 'and' },
+    { label: 'OR', value: 'or' }
+  ];
+  private _selectedFilterMode: 'and' | 'or' = 'and';
 
   readonly filterLabels: Record<string, string> = {
     author: 'Author',
@@ -198,6 +204,15 @@ export class BookFilterComponent implements OnInit {
         );
       })
     );
+  }
+
+  get selectedFilterMode(): 'and' | 'or' {
+    return this._selectedFilterMode;
+  }
+
+  set selectedFilterMode(mode: 'and' | 'or') {
+    this._selectedFilterMode = mode;
+    this.filterModeChanged.emit(mode);
   }
 
   private filterBooksByEntityType(books: Book[], entity: any, entityType: EntityType): Book[] {

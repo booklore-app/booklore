@@ -1,5 +1,15 @@
 <div *ngIf="showFilters" class="w-[225px] ml-4 h-[calc(100vh-6.5rem)] rounded-xl bg-[var(--card-background)] overflow-hidden">
-  <p class="text-lg p-4">Filters</p>
+  <div class="flex items-center justify-between px-4 py-4">
+    <span class="text font-semibold">Filter Mode</span>
+    <p-selectButton
+      [options]="filterModeOptions"
+      [(ngModel)]="selectedFilterMode"
+      optionLabel="label"
+      optionValue="value"
+      class="text-sm"
+      allowEmpty="false"
+      styleClass="h-8"></p-selectButton>
+  </div>
   <p-accordion [value]="0">
     <p-accordion-panel *ngFor="let filterType of filterTypes; let i = index" [value]="i">
       <p-accordion-header>

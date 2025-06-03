@@ -5,7 +5,7 @@ import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
 import {filter, take} from 'rxjs/operators';
-import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -100,6 +100,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
 
   selectedFilter = new BehaviorSubject<Record<string, any> | null>(null);
+  selectedFilterMode = new BehaviorSubject<'and' | 'or'>('and');
   protected resetFilterSubject = new Subject<void>();
 
   protected userService = inject(UserService);
@@ -278,24 +279,31 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   private sideBarFilter(bookState: BookState): Observable<BookState> {
-    return this.selectedFilter.pipe(
-      map((activeFilters: Record<string, any[]> | null) => {
-        if (!activeFilters) {
-          return bookState;
-        }
+    return combineLatest([this.selectedFilter, this.selectedFilterMode]).pipe(
+      map(([activeFilters, mode]) => {
+        if (!activeFilters) return bookState;
         const filteredBooks = (bookState.books || []).filter(book => {
-          return Object.entries(activeFilters).every(([filterType, filterValues]) => {
-            if (!Array.isArray(filterValues) || filterValues.length === 0) return true;
-
+          const matches = Object.entries(activeFilters).map(([filterType, filterValues]) => {
+            if (!Array.isArray(filterValues) || filterValues.length === 0) {
+              return mode === 'or';
+            }
             switch (filterType) {
               case 'author':
-                return filterValues.every(val => book.metadata?.authors?.includes(val));
+                return mode === 'and'
+                  ? filterValues.every(val => book.metadata?.authors?.includes(val))
+                  : filterValues.some(val => book.metadata?.authors?.includes(val));
               case 'category':
-                return filterValues.every(val => book.metadata?.categories?.includes(val));
+                return mode === 'and'
+                  ? filterValues.every(val => book.metadata?.categories?.includes(val))
+                  : filterValues.some(val => book.metadata?.categories?.includes(val));
               case 'publisher':
-                return filterValues.every(val => book.metadata?.publisher === val);
+                return mode === 'and'
+                  ? filterValues.every(val => book.metadata?.publisher === val)
+                  : filterValues.some(val => book.metadata?.publisher === val);
               case 'series':
-                return filterValues.every(val => book.metadata?.seriesName === val);
+                return mode === 'and'
+                  ? filterValues.every(val => book.metadata?.seriesName === val)
+                  : filterValues.some(val => book.metadata?.seriesName === val);
               case 'amazonRating':
                 return filterValues.some(range => isRatingInRange(book.metadata?.amazonRating, range));
               case 'goodreadsRating':
@@ -314,9 +322,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
               case 'language':
                 return filterValues.includes(book.metadata?.language);
               default:
-                return true;
+                return false;
             }
           });
+          return mode === 'and' ? matches.every(m => m) : matches.some(m => m);
         });
         return { ...bookState, books: filteredBooks };
       })
@@ -551,6 +560,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.bookFilterComponent.filterSelected.subscribe((filters: Record<string, any> | null) => {
       this.selectedFilter.next(filters);
+    });
+
+    this.bookFilterComponent.filterModeChanged.subscribe((mode: 'and' | 'or') => {
+      this.selectedFilterMode.next(mode);
     });
 
     this.activatedRoute.queryParamMap.subscribe(paramMap => {
