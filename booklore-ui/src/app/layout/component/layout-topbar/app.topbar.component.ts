@@ -19,6 +19,7 @@ import {BookUploaderComponent} from '../../../utilities/component/book-uploader/
 import {AuthService} from '../../../core/service/auth.service';
 import {UserService} from '../../../settings/user-management/user.service';
 import {UserProfileDialogComponent} from '../../../settings/global-preferences/user-profile-dialog/user-profile-dialog.component';
+import {GithubSupportDialog} from '../../../github-support-dialog/github-support-dialog';
 
 @Component({
   selector: 'app-topbar',
@@ -72,16 +73,16 @@ export class AppTopBarComponent implements OnDestroy {
     this.layoutService.onMenuToggle();
   }
 
-  onMouseEnter() {
-    this.showEvents = true;
-  }
-
-  onMouseLeave() {
-    this.showEvents = false;
-  }
-
-  toggleEventDisplay(): void {
-    this.showEvents = !this.showEvents;
+  openGithubSupportDialog(): void {
+    this.ref = this.dialogService.open(GithubSupportDialog, {
+      header: 'Support BookLore on GitHub',
+      modal: true,
+      closable: true,
+      style: {
+        position: 'absolute',
+        top: '25%',
+      },
+    });
   }
 
   openLibraryCreatorDialog(): void {
