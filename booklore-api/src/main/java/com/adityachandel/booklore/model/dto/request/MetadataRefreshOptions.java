@@ -16,6 +16,7 @@ public class MetadataRefreshOptions {
     private MetadataProvider allP1;
     private MetadataProvider allP2;
     private MetadataProvider allP3;
+    private MetadataProvider allP4;
     private boolean refreshCovers;
     private boolean mergeCategories;
     private FieldOptions fieldOptions;
@@ -46,6 +47,7 @@ public class MetadataRefreshOptions {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FieldProvider {
+        private MetadataProvider p4;
         private MetadataProvider p3;
         private MetadataProvider p2;
         private MetadataProvider p1;

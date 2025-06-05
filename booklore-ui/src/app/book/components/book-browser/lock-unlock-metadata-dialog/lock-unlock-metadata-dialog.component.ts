@@ -33,14 +33,14 @@ export class LockUnlockMetadataDialogComponent implements OnInit {
     'isbn13Locked', 'isbn10Locked', 'asinLocked', 'pageCountLocked', 'thumbnailLocked', 'languageLocked', 'coverLocked',
     'seriesNameLocked', 'seriesNumberLocked', 'seriesTotalLocked', 'authorsLocked', 'categoriesLocked',
     'amazonRatingLocked', 'amazonReviewCountLocked', 'goodreadsRatingLocked', 'goodreadsReviewCountLocked',
-    'hardcoverRatingLocked', 'hardcoverReviewCountLocked'
+    'hardcoverRatingLocked', 'hardcoverReviewCountLocked', 'goodreadsIdLocked', 'hardcoverIdLocked', 'googleIdLocked'
   ];
 
   fieldLabels: Record<string, string> = {
     titleLocked: 'Title',
     subtitleLocked: 'Subtitle',
     publisherLocked: 'Publisher',
-    publishedDateLocked: 'Published Date',
+    publishedDateLocked: 'Date',
     descriptionLocked: 'Description',
     isbn13Locked: 'ISBN-13',
     isbn10Locked: 'ISBN-10',
@@ -49,17 +49,20 @@ export class LockUnlockMetadataDialogComponent implements OnInit {
     thumbnailLocked: 'Thumbnail',
     languageLocked: 'Language',
     coverLocked: 'Cover',
-    seriesNameLocked: 'Series Name',
-    seriesNumberLocked: 'Series Number',
-    seriesTotalLocked: 'Series Total',
+    seriesNameLocked: 'Series',
+    seriesNumberLocked: 'Series #',
+    seriesTotalLocked: 'Series Total #',
     authorsLocked: 'Authors',
     categoriesLocked: 'Categories',
-    amazonRatingLocked: 'Amazon Rating',
-    amazonReviewCountLocked: 'Amazon Rating Count',
-    goodreadsRatingLocked: 'Goodreads Rating',
-    goodreadsReviewCountLocked: 'Goodreads Rating Count',
-    hardcoverRatingLocked: 'Hardcover Rating',
-    hardcoverReviewCountLocked: 'Hardcover Rating Count'
+    amazonRatingLocked: 'Amazon ★',
+    amazonReviewCountLocked: 'Amazon Reviews',
+    goodreadsRatingLocked: 'Goodreads ★',
+    goodreadsReviewCountLocked: 'Goodreads Reviews',
+    hardcoverRatingLocked: 'Hardcover ★',
+    hardcoverReviewCountLocked: 'Hardcover Reviews',
+    goodreadsIdLocked: 'Goodreads ID',
+    hardcoverIdLocked: 'Hardcover ID',
+    googleIdLocked: 'Google ID',
   };
 
   isSaving = false;

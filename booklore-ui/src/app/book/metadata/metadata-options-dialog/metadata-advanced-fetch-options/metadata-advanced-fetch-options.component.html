@@ -3,6 +3,7 @@
     <thead>
     <tr>
       <th class="px-4 py-2 text-left font-semibold text-gray-300">Book Field</th>
+      <th class="px-4 py-2 text-left font-semibold text-gray-300">4th Priority</th>
       <th class="px-4 py-2 text-left font-semibold text-gray-300">3rd Priority</th>
       <th class="px-4 py-2 text-left font-semibold text-gray-300">2nd Priority</th>
       <th class="px-4 py-2 text-left font-semibold text-gray-300">1st Priority</th>
@@ -12,6 +13,13 @@
 
     <tr>
       <td class="px-4 py-2 text-gray-300">All Other Fields</td>
+      <td class="px-4 py-2">
+        <p-select [options]="providers" [(ngModel)]="allP4.value"
+                  (onChange)="syncProvider($event, 'p4')"
+                  placeholder="Select All" appendTo="body"
+                  class="w-full">
+        </p-select>
+      </td>
       <td class="px-4 py-2">
         <p-select [options]="providers" [(ngModel)]="allP3.value"
                   (onChange)="syncProvider($event, 'p3')"
@@ -36,7 +44,13 @@
     </tr>
 
     <tr *ngFor="let field of fields" [hidden]="field === 'cover' && !refreshCovers">
-      <td class="px-4 py-2 text-gray-300">{{formatLabel(field) }}</td>
+      <td class="px-4 py-2 text-gray-300">{{ formatLabel(field) }}</td>
+      <td class="px-4 py-2">
+        <p-select [options]="providers" [(ngModel)]="fieldOptions[field].p4"
+                  placeholder="Unset" appendTo="body"
+                  class="w-full">
+        </p-select>
+      </td>
       <td class="px-4 py-2">
         <p-select [options]="providers" [(ngModel)]="fieldOptions[field].p3"
                   placeholder="Unset" appendTo="body"
@@ -75,5 +89,4 @@
       <p-button [label]="submitButtonLabel" outlined="true" (onClick)="submit()"></p-button>
     </div>
   </div>
-
 </div>

@@ -192,6 +192,9 @@ public class BookMetadataService {
         }
         metadata.setThumbnailUrl(resolveFieldAsString(metadataMap, fieldOptions.getCover(), BookMetadata::getThumbnailUrl));
 
+        if (request.getRefreshOptions().getAllP4() != null) {
+            setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP4());
+        }
         if (request.getRefreshOptions().getAllP3() != null) {
             setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP3());
         }
@@ -232,6 +235,12 @@ public class BookMetadataService {
     @Transactional
     protected String resolveFieldAsString(Map<MetadataProvider, BookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractor fieldValueExtractor) {
         String value = null;
+        if (fieldProvider.getP4() != null && metadataMap.containsKey(fieldProvider.getP4())) {
+            String newValue = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP4()));
+            if (newValue != null) {
+                value = newValue;
+            }
+        }
         if (fieldProvider.getP3() != null && metadataMap.containsKey(fieldProvider.getP3())) {
             String newValue = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP3()));
             if (newValue != null) {
@@ -255,6 +264,12 @@ public class BookMetadataService {
 
     List<String> getAllCategories(Map<MetadataProvider, BookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractorList fieldValueExtractor) {
         Set<String> uniqueCategories = new HashSet<>();
+        if (fieldProvider.getP4() != null && metadataMap.containsKey(fieldProvider.getP4())) {
+            List<String> extracted = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP4()));
+            if (extracted != null) {
+                uniqueCategories.addAll(extracted);
+            }
+        }
         if (fieldProvider.getP3() != null && metadataMap.containsKey(fieldProvider.getP3())) {
             List<String> extracted = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP3()));
             if (extracted != null) {
@@ -279,6 +294,12 @@ public class BookMetadataService {
     @Transactional
     protected List<String> resolveFieldAsList(Map<MetadataProvider, BookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractorList fieldValueExtractor) {
         List<String> values = new ArrayList<>();
+        if (fieldProvider.getP4() != null && metadataMap.containsKey(fieldProvider.getP4())) {
+            List<String> newValues = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP4()));
+            if (newValues != null && !newValues.isEmpty()) {
+                values = newValues;
+            }
+        }
         if (fieldProvider.getP3() != null && metadataMap.containsKey(fieldProvider.getP3())) {
             List<String> newValues = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP3()));
             if (newValues != null && !newValues.isEmpty()) {
@@ -336,6 +357,9 @@ public class BookMetadataService {
     @Transactional
     protected void addProviderToSet(MetadataRefreshOptions.FieldProvider fieldProvider, Set<MetadataProvider> providerSet) {
         if (fieldProvider != null) {
+            if (fieldProvider.getP4() != null) {
+                providerSet.add(fieldProvider.getP4());
+            }
             if (fieldProvider.getP3() != null) {
                 providerSet.add(fieldProvider.getP3());
             }
@@ -393,9 +417,6 @@ public class BookMetadataService {
             case "isbn13":
                 existingMetadata.setIsbn13Locked(isLocked);
                 break;
-            case "asin":
-                existingMetadata.setAsinLocked(isLocked);
-                break;
             case "description":
                 existingMetadata.setDescriptionLocked(isLocked);
                 break;
@@ -405,11 +426,17 @@ public class BookMetadataService {
             case "language":
                 existingMetadata.setLanguageLocked(isLocked);
                 break;
+            case "asin":
+                existingMetadata.setAsinLocked(isLocked);
+                break;
             case "amazonRating":
                 existingMetadata.setAmazonRatingLocked(isLocked);
                 break;
             case "amazonReviewCount":
                 existingMetadata.setAmazonReviewCountLocked(isLocked);
+                break;
+            case "goodreadsId":
+                existingMetadata.setGoodreadsIdLocked(isLocked);
                 break;
             case "goodreadsRating":
                 existingMetadata.setGoodreadsRatingLocked(isLocked);
@@ -417,11 +444,17 @@ public class BookMetadataService {
             case "goodreadsReviewCount":
                 existingMetadata.setGoodreadsReviewCountLocked(isLocked);
                 break;
+            case "hardcoverId":
+                existingMetadata.setHardcoverIdLocked(isLocked);
+                break;
             case "hardcoverRating":
                 existingMetadata.setHardcoverRatingLocked(isLocked);
                 break;
             case "hardcoverReviewCount":
                 existingMetadata.setHardcoverReviewCountLocked(isLocked);
+                break;
+            case "googleId":
+                existingMetadata.setGoogleIdLocked(isLocked);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid field name: " + field);
