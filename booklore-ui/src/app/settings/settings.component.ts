@@ -10,13 +10,15 @@ import {UserManagementComponent} from './user-management/user-management.compone
 import {AuthenticationSettingsComponent} from '../core/security/oauth2-management/authentication-settings.component';
 import {ViewPreferencesParentComponent} from './view-preferences-parent/view-preferences-parent.component';
 import {ReaderPreferences} from './reader-preferences/reader-preferences.component';
+import {MetadataSettingsComponent} from './metadata-settings-component/metadata-settings-component';
 
 export enum SettingsTab {
   ReaderSettings = 'reader-settings',
   ViewPreferences = 'view-settings',
   UserManagement = 'user-management',
   EmailSettings = 'email-settings',
-  AdminSettings = 'admin-settings',
+  MetadataSettings = 'metadata-settings',
+  ApplicationSettings = 'app-settings',
   AuthenticationSettings = 'auth-settings'
 }
 
@@ -35,7 +37,8 @@ export enum SettingsTab {
     UserManagementComponent,
     AuthenticationSettingsComponent,
     ViewPreferencesParentComponent,
-    ReaderPreferences
+    ReaderPreferences,
+    MetadataSettingsComponent
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'

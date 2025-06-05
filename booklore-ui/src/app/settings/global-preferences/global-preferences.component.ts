@@ -13,13 +13,10 @@ import {MessageService} from 'primeng/api';
 import {AppSettingsService} from '../../core/service/app-settings.service';
 import {BookService} from '../../book/service/book.service';
 import {AppSettingKey, AppSettings} from '../../core/model/app-settings.model';
-import {MetadataRefreshOptions} from '../../book/metadata/model/request/metadata-refresh-options.model';
-import {MetadataAdvancedFetchOptionsComponent} from '../../book/metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
 import {filter, take} from 'rxjs/operators';
 import {FileUploadPatternComponent} from './file-upload-pattern/file-upload-pattern.component';
 import {OpdsSettingsComponent} from './opds-settings/opds-settings.component';
 import {InputText} from 'primeng/inputtext';
-import {MetadataProviderSettingsComponent} from './metadata-provider-settings/metadata-provider-settings.component';
 
 @Component({
   selector: 'app-global-preferences',
@@ -32,11 +29,9 @@ import {MetadataProviderSettingsComponent} from './metadata-provider-settings/me
     Tooltip,
     ToggleSwitch,
     FormsModule,
-    MetadataAdvancedFetchOptionsComponent,
     FileUploadPatternComponent,
     OpdsSettingsComponent,
-    InputText,
-    MetadataProviderSettingsComponent
+    InputText
   ],
   templateUrl: './global-preferences.component.html',
   styleUrl: './global-preferences.component.scss'
@@ -56,8 +51,6 @@ export class GlobalPreferencesComponent implements OnInit {
     similarBookRecommendation: false,
   };
 
-  currentMetadataOptions!: MetadataRefreshOptions;
-
   private appSettingsService = inject(AppSettingsService);
   private bookService = inject(BookService);
   private messageService = inject(MessageService);
@@ -73,9 +66,6 @@ export class GlobalPreferencesComponent implements OnInit {
     ).subscribe(settings => {
       if (settings?.coverResolution) {
         this.selectedResolution = settings.coverResolution;
-      }
-      if (settings?.metadataRefreshOptions) {
-        this.currentMetadataOptions = settings.metadataRefreshOptions;
       }
       if (settings?.cbxCacheSizeInMb) {
         this.cbxCacheValue = settings.cbxCacheSizeInMb;
@@ -104,10 +94,6 @@ export class GlobalPreferencesComponent implements OnInit {
     } else {
       console.warn(`Unknown toggle key: ${settingKey}`);
     }
-  }
-
-  onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions): void {
-    this.saveSetting(AppSettingKey.QUICK_BOOK_MATCH, metadataRefreshOptions);
   }
 
   saveCacheSize(): void {
