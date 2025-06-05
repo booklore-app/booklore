@@ -174,6 +174,17 @@ public class BookMetadataService {
         metadata.setTitle(resolveFieldAsString(metadataMap, fieldOptions.getTitle(), BookMetadata::getTitle));
         metadata.setDescription(resolveFieldAsString(metadataMap, fieldOptions.getDescription(), BookMetadata::getDescription));
         metadata.setAuthors(resolveFieldAsList(metadataMap, fieldOptions.getAuthors(), BookMetadata::getAuthors));
+
+        if (metadataMap.containsKey(GoodReads)) {
+            metadata.setGoodreadsId(metadataMap.get(GoodReads).getGoodreadsId());
+        }
+        if (metadataMap.containsKey(Hardcover)) {
+            metadata.setHardcoverId(metadataMap.get(Hardcover).getHardcoverId());
+        }
+        if (metadataMap.containsKey(Google)) {
+            metadata.setGoogleId(metadataMap.get(Google).getGoogleId());
+        }
+
         if (request.getRefreshOptions().isMergeCategories()) {
             metadata.setCategories(getAllCategories(metadataMap, fieldOptions.getCategories(), BookMetadata::getCategories));
         } else {

@@ -46,6 +46,9 @@ export interface BookMetadata {
   isbn13?: string;
   isbn10?: string;
   asin?: string;
+  goodreadsId?: string;
+  hardcoverId?: string;
+  googleId?: string;
   pageCount?: number | null;
   language?: string;
   rating?: number | null;
@@ -74,6 +77,9 @@ export interface BookMetadata {
   isbn13Locked?: boolean;
   isbn10Locked?: boolean;
   asinLocked?: boolean;
+  goodreadsIdLocked?: boolean;
+  hardcoverIdLocked?: boolean;
+  googleIdLocked?: boolean;
   pageCountLocked?: boolean;
   languageLocked?: boolean;
   ratingLocked?: boolean;

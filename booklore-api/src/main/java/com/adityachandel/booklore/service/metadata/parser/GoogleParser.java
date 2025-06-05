@@ -88,7 +88,7 @@ public class GoogleParser implements BookParser {
 
         return BookMetadata.builder()
                 .provider(MetadataProvider.Google)
-                .providerBookId(item.getId())
+                .googleId(item.getId())
                 .title(volumeInfo.getTitle())
                 .subtitle(volumeInfo.getSubtitle())
                 .publisher(volumeInfo.getPublisher())

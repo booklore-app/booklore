@@ -57,7 +57,7 @@ public class HardcoverParser implements BookParser {
             .map(hit -> {
                 GraphQLResponse.Document doc = hit.getDocument();
                 BookMetadata metadata = new BookMetadata();
-                metadata.setProviderBookId(doc.getSlug());
+                metadata.setHardcoverId(doc.getSlug());
                 metadata.setTitle(doc.getTitle());
                 metadata.setDescription(doc.getDescription());
                 metadata.setAuthors(doc.getAuthorNames());

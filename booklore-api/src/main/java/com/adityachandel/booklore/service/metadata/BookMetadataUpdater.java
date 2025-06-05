@@ -42,6 +42,15 @@ public class BookMetadataUpdater {
             return metadata;
         }
 
+        if ((metadata.getGoodreadsIdLocked() == null || !metadata.getGoodreadsIdLocked()) && newMetadata.getGoodreadsId() != null) {
+            metadata.setGoodreadsId(newMetadata.getGoodreadsId().isBlank() ? null : newMetadata.getGoodreadsId());
+        }
+        if ((metadata.getHardcoverIdLocked() == null || !metadata.getHardcoverIdLocked()) && newMetadata.getHardcoverId() != null) {
+            metadata.setHardcoverId(newMetadata.getHardcoverId().isBlank() ? null : newMetadata.getHardcoverId());
+        }
+        if ((metadata.getGoogleIdLocked() == null || !metadata.getGoogleIdLocked()) && newMetadata.getGoogleId() != null) {
+            metadata.setGoogleId(newMetadata.getGoogleId().isBlank() ? null : newMetadata.getGoogleId());
+        }
         if ((metadata.getTitleLocked() == null || !metadata.getTitleLocked()) && newMetadata.getTitle() != null) {
             metadata.setTitle(newMetadata.getTitle().isEmpty() ? null : newMetadata.getTitle());
         }
@@ -178,6 +187,15 @@ public class BookMetadataUpdater {
         }
         if (newMetadata.getAsinLocked() != null) {
             metadata.setAsinLocked(newMetadata.getAsinLocked());
+        }
+        if (newMetadata.getGoodreadsIdLocked() != null) {
+            metadata.setGoodreadsIdLocked(newMetadata.getGoodreadsIdLocked());
+        }
+        if (newMetadata.getHardcoverIdLocked() != null) {
+            metadata.setHardcoverIdLocked(newMetadata.getHardcoverIdLocked());
+        }
+        if (newMetadata.getGoogleIdLocked() != null) {
+            metadata.setGoogleIdLocked(newMetadata.getGoogleIdLocked());
         }
         if (newMetadata.getPageCountLocked() != null) {
             metadata.setPageCountLocked(newMetadata.getPageCountLocked());

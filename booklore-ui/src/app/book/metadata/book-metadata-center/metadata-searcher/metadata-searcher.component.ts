@@ -147,21 +147,17 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
   }
 
   buildProviderLink(metadata: BookMetadata): string {
-    if (!metadata.provider || !metadata.providerBookId) {
-      throw new Error("Invalid metadata: 'provider' or 'providerBookId' is missing.");
+    if (metadata.asin) {
+      return `<a href="https://www.amazon.com/dp/${metadata.asin}" target="_blank">Amazon</a>`;
+    } else if (metadata.goodreadsId) {
+      return `<a href="https://www.goodreads.com/book/show/${metadata.goodreadsId}" target="_blank">Goodreads</a>`;
+    } else if (metadata.googleId) {
+      return `<a href="https://books.google.com/books?id=${metadata.googleId}" target="_blank">Google</a>`;
+    } else if (metadata.hardcoverId) {
+      return `<a href="https://hardcover.app/books/${metadata.hardcoverId}" target="_blank">Hardcover</a>`;
     }
-    switch (metadata.provider) {
-      case "Amazon":
-        return `<a href="https://www.amazon.com/dp/${metadata.providerBookId}" target="_blank">Amazon</a>`;
-      case "GoodReads":
-        return `<a href="https://www.goodreads.com/book/show/${metadata.providerBookId}" target="_blank">Goodreads</a>`;
-      case "Google":
-        return `<a href="https://books.google.com/books?id=${metadata.providerBookId}" target="_blank">Google</a>`;
-      case "Hardcover":
-        return `<a href="https://hardcover.app/books/${metadata.providerBookId}" target="_blank">Hardcover</a>`;
-      default:
-        throw new Error(`Unsupported provider: ${metadata.provider}`);
-    }
+
+    throw new Error("No provider ID found in metadata.");
   }
 
   truncateText(text: string | null, length: number): string {

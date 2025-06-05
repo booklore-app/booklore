@@ -142,7 +142,6 @@ public class AmazonBookParser implements BookParser {
         log.info("Amazon: Fetching metadata for: {}", amazonBookId);
         Document doc = fetchDocument(BASE_BOOK_URL + amazonBookId);
         return BookMetadata.builder()
-                .providerBookId(amazonBookId)
                 .provider(MetadataProvider.Amazon)
                 .title(getTitle(doc))
                 .subtitle(getSubtitle(doc))

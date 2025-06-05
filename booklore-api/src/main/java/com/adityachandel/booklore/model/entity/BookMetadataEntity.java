@@ -51,9 +51,6 @@ public class BookMetadataEntity {
     @Column(name = "isbn_10", length = 10)
     private String isbn10;
 
-    @Column(name = "asin", length = 10)
-    private String asin;
-
     @Column(name = "page_count")
     private Integer pageCount;
 
@@ -89,6 +86,18 @@ public class BookMetadataEntity {
 
     @Column(name = "hardcover_review_count")
     private Integer hardcoverReviewCount;
+
+    @Column(name = "asin", length = 10)
+    private String asin;
+
+    @Column(name = "goodreads_id", length = 100)
+    private String goodreadsId;
+
+    @Column(name = "hardcover_id", length = 100)
+    private String hardcoverId;
+
+    @Column(name = "google_id", length = 100)
+    private String googleId;
 
     // Locking fields
 
@@ -167,6 +176,15 @@ public class BookMetadataEntity {
     @Column(name = "categories_locked")
     private Boolean categoriesLocked = Boolean.FALSE;
 
+    @Column(name = "goodreads_id_locked")
+    private Boolean goodreadsIdLocked = Boolean.FALSE;
+
+    @Column(name = "hardcover_id_locked")
+    private Boolean hardcoverIdLocked = Boolean.FALSE;
+
+    @Column(name = "google_id_locked")
+    private Boolean googleIdLocked = Boolean.FALSE;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "book_id")
@@ -214,6 +232,9 @@ public class BookMetadataEntity {
         this.goodreadsReviewCountLocked = lock;
         this.hardcoverRatingLocked = lock;
         this.hardcoverReviewCountLocked = lock;
+        this.goodreadsIdLocked = lock;
+        this.hardcoverIdLocked = lock;
+        this.googleIdLocked = lock;
     }
 
     public boolean areAllFieldsLocked() {
@@ -239,6 +260,9 @@ public class BookMetadataEntity {
                 && Boolean.TRUE.equals(this.goodreadsReviewCountLocked)
                 && Boolean.TRUE.equals(this.hardcoverRatingLocked)
                 && Boolean.TRUE.equals(this.hardcoverReviewCountLocked)
+                && Boolean.TRUE.equals(this.goodreadsIdLocked)
+                && Boolean.TRUE.equals(this.hardcoverIdLocked)
+                && Boolean.TRUE.equals(this.googleIdLocked)
                 ;
     }
 }

@@ -58,21 +58,21 @@ public class GoodReadsParser implements BookParser {
         for (BookMetadata preview : previews) {
             log.info("GoodReads: Fetching metadata for: {}", preview.getTitle());
             try {
-                Document document = fetchDoc(BASE_BOOK_URL + preview.getProviderBookId());
-                BookMetadata detailedMetadata = parseBookDetails(document, preview.getProviderBookId());
+                Document document = fetchDoc(BASE_BOOK_URL + preview.getGoodreadsId());
+                BookMetadata detailedMetadata = parseBookDetails(document, preview.getGoodreadsId());
                 if (detailedMetadata != null) {
                     fetchedMetadata.add(detailedMetadata);
                 }
                 Thread.sleep(Duration.ofSeconds(1));
             } catch (Exception e) {
-                log.error("Error fetching metadata for book: {}", preview.getProviderBookId(), e);
+                log.error("Error fetching metadata for book: {}", preview.getGoodreadsId(), e);
             }
         }
         return fetchedMetadata;
     }
 
-    private BookMetadata parseBookDetails(Document document, String providerBookId) {
-        BookMetadata.BookMetadataBuilder builder = BookMetadata.builder().providerBookId(providerBookId);
+    private BookMetadata parseBookDetails(Document document, String goodreadsId) {
+        BookMetadata.BookMetadataBuilder builder = BookMetadata.builder().goodreadsId(goodreadsId);
         builder.provider(MetadataProvider.GoodReads);
         try {
             JSONObject apolloStateJson = getJson(document)
@@ -87,7 +87,7 @@ public class GoodReadsParser implements BookParser {
             extractBookDetails(apolloStateJson, keySet, builder);
             extractWorkDetails(apolloStateJson, keySet, builder);
         } catch (Exception e) {
-            log.error("Error parsing book details for providerBookId: {}", providerBookId, e);
+            log.error("Error parsing book details for providerBookId: {}", goodreadsId, e);
             return null;
         }
 
@@ -331,7 +331,7 @@ public class GoodReadsParser implements BookParser {
                         }
                     }
                     BookMetadata previewMetadata = BookMetadata.builder()
-                            .providerBookId(String.valueOf(extractGoodReadsIdPreview(previewBook)))
+                            .goodreadsId(String.valueOf(extractGoodReadsIdPreview(previewBook)))
                             .title(extractTitlePreview(previewBook))
                             .authors(authors)
                             .build();

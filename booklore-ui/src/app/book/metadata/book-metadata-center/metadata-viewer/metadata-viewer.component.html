@@ -43,7 +43,18 @@
           <div class="flex items-center gap-2 pt-2">
             <ng-container *ngIf="metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating; else legacyRating">
               <ng-container *ngIf="metadata.amazonRating">
-                <p class="font-semibold">Amazon: {{ metadata.amazonRating }}</p>
+                <ng-container *ngIf="metadata.asin; else amazonStatic">
+                  <a class="flex items-center gap-1" [href]="'https://www.amazon.com/dp/' + metadata.asin" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                    <p class="font-semibold">{{ metadata.amazonRating }}</p>
+                  </a>
+                </ng-container>
+                <ng-template #amazonStatic>
+                  <span class="flex items-center gap-1">
+                    <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain" />
+                    <p class="font-semibold">{{ metadata.amazonRating }}</p>
+                  </span>
+                </ng-template>
                 <p-rating [ngModel]="metadata.amazonRating" readonly stars="5"
                           [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
                 </p-rating>
@@ -52,7 +63,18 @@
               </ng-container>
 
               <ng-container *ngIf="metadata.goodreadsRating">
-                <p class="font-semibold">Goodreads: {{ metadata.goodreadsRating }}</p>
+                <ng-container *ngIf="metadata.goodreadsId; else goodreadsStatic">
+                  <a class="flex items-center gap-1" [href]="'https://www.goodreads.com/book/show/' + metadata.goodreadsId" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                    <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
+                  </a>
+                </ng-container>
+                <ng-template #goodreadsStatic>
+                  <span class="flex items-center gap-1">
+                    <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain" />
+                    <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
+                  </span>
+                </ng-template>
                 <p-rating [ngModel]="metadata.goodreadsRating" readonly stars="5"
                           [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
                 </p-rating>
@@ -61,11 +83,28 @@
               </ng-container>
 
               <ng-container *ngIf="metadata.hardcoverRating">
-                <p class="font-semibold">Hardcover: {{ metadata.hardcoverRating }}</p>
+                <ng-container *ngIf="metadata.hardcoverId; else hardcoverStatic">
+                  <a class="flex items-center gap-1" [href]="'https://hardcover.app/books/' + metadata.hardcoverId" target="_blank" rel="noopener noreferrer">
+                    <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                    <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
+                  </a>
+                </ng-container>
+                <ng-template #hardcoverStatic>
+                  <span class="flex items-center gap-1">
+                    <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain" />
+                    <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
+                  </span>
+                </ng-template>
                 <p-rating [ngModel]="metadata.hardcoverRating" readonly stars="5"
                           [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
                 </p-rating>
                 <p class="font-semibold">({{ metadata.hardcoverReviewCount | number:'1.0-0' }})</p>
+                <span *ngIf="(metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating) && metadata.googleId">|</span>
+              </ng-container>
+              <ng-container *ngIf="metadata.googleId">
+                <a class="flex items-center gap-1" [href]="'https://books.google.com/books?id=' + metadata.googleId" target="_blank" rel="noopener noreferrer">
+                  <img src="https://books.google.com/favicon.ico" alt="Google Books" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                </a>
               </ng-container>
             </ng-container>
 
