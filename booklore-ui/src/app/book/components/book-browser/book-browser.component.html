@@ -3,34 +3,30 @@
     <div class="flex justify-between items-center p-2 rounded-t-xl mb-4 bg-[var(--card-background)]">
       <div class="flex items-center pl-2">
         @if (entityType$ | async; as entityType) {
-          @if (entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED) {
-            <p class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
-              {{ entityType }}: {{ (entity$ | async)?.name }}
-            </p>
-          }
-          @if (entityType === EntityType.ALL_BOOKS) {
-            <p class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
-              @if (currentFilterLabel) {
+          <p class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
+            @if (entityType === EntityType.ALL_BOOKS) {
+              @if (currentFilterLabel && rawFilterParamFromUrl) {
                 {{ currentFilterLabel }}
+              } @else if (hasSidebarFilters || hasSearchTerm) {
+                All Books (Filtered)
               } @else {
                 All Books
               }
-            </p>
-          }
-          @if (entityType === EntityType.UNSHELVED) {
-            <p class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
-              Unshelved Books
-            </p>
-          }
+            } @else if (entityType === EntityType.UNSHELVED) {
+              {{ (hasSidebarFilters || hasSearchTerm) ? 'Unshelved Books (Filtered)' : 'Unshelved Books' }}
+            } @else {
+              {{ entityType }}: {{ (entity$ | async)?.name }}{{ (hasSidebarFilters || hasSearchTerm) ? ' (Filtered)' : '' }}
+            }
+          </p>
+
           @if (userService.userState$ | async; as userData) {
-            <div>
-              @if (entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED && (userData.permissions.admin || userData.permissions.canManipulateLibrary)) {
-                <div>
-                  <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"></p-button>
-                  <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
-                </div>
-              }
-            </div>
+            @if (entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED &&
+            (userData.permissions.admin || userData.permissions.canManipulateLibrary)) {
+              <div>
+                <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"></p-button>
+                <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
+              </div>
+            }
           }
         }
       </div>

@@ -20,7 +20,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
 import {Button} from 'primeng/button';
-import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
+import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {BookCardComponent} from './book-card/book-card.component';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -99,6 +99,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   dynamicDialogRef: DynamicDialogRef | undefined;
   EntityType = EntityType;
   currentFilterLabel: string | null = null;
+  rawFilterParamFromUrl: string | null = null;
+  hasSearchTerm: boolean = false;
 
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
   @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
@@ -577,7 +579,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.updateSortOptions();
     this.applySortOption(this.selectedSort);
 
-    this.router.navigate([], {
+    /*this.router.navigate([], {
       queryParams: {
         sort: this.selectedSort.field,
         direction: this.selectedSort.direction === SortDirection.ASCENDING
@@ -586,7 +588,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       },
       queryParamsHandling: 'merge',
       replaceUrl: true
-    });
+    });*/
   }
 
   updateSortOptions() {
@@ -597,14 +599,25 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     }));
   }
 
+  private settingFiltersFromUrl = false;
+
   ngAfterViewInit() {
     this.bookFilterComponent.filterSelected.subscribe((filters: Record<string, any> | null) => {
+      if (this.settingFiltersFromUrl) return;
+
       this.selectedFilter.next(filters);
-      this.currentFilterLabel = "All Books";
+      this.rawFilterParamFromUrl = null;
+
+      const hasSidebarFilters = !!filters && Object.keys(filters).length > 0;
+      this.currentFilterLabel = hasSidebarFilters ? 'All Books (Filtered)' : 'All Books';
     });
 
     this.bookFilterComponent.filterModeChanged.subscribe((mode: 'and' | 'or') => {
       this.selectedFilterMode.next(mode);
+    });
+
+    this.searchTerm$.subscribe(term => {
+      this.hasSearchTerm = !!term && term.trim().length > 0;
     });
 
     this.activatedRoute.queryParamMap.subscribe(paramMap => {
@@ -615,7 +628,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const rawFilterParam = paramMap.get(QUERY_PARAMS.FILTER);
 
       const parsedFilters: Record<string, string[]> = {};
+
       if (rawFilterParam) {
+        this.settingFiltersFromUrl = true;
+
         rawFilterParam.split(',').forEach(pair => {
           const [key, ...valueParts] = pair.split(':');
           const value = valueParts.join(':');
@@ -623,6 +639,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
             parsedFilters[key] = value.split('|').map(v => v.trim()).filter(Boolean);
           }
         });
+
         this.selectedFilter.next(parsedFilters);
         this.bookFilterComponent.setFilters?.(parsedFilters);
 
@@ -632,10 +649,14 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         if (key && firstValue) {
           this.currentFilterLabel = this.capitalize(key) + ': ' + firstValue;
         } else {
-          this.currentFilterLabel = null;
+          this.currentFilterLabel = 'All Books';
         }
+
+        this.rawFilterParamFromUrl = rawFilterParam;
+        this.settingFiltersFromUrl = false;
       } else {
-        this.currentFilterLabel = null;
+        this.rawFilterParamFromUrl = null;
+        this.currentFilterLabel = 'All Books';
       }
 
       this.userService.userState$
@@ -726,6 +747,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+
+  get hasSidebarFilters(): boolean {
+    return this.selectedFilter && Object.keys(this.selectedFilter.getValue() || {}).length > 0;
   }
 
   lockUnlockMetadata() {
