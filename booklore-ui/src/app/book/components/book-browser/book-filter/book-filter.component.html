@@ -9,9 +9,9 @@
         optionValue="value"
         class="text-sm"
         allowEmpty="false"
-      styleClass="h-8"></p-selectButton>
+        styleClass="h-8"></p-selectButton>
     </div>
-    <p-accordion [value]="0">
+    <p-accordion [value]="expandedPanels">
       @for (filterType of filterTypes; track filterType; let i = $index) {
         <p-accordion-panel [value]="i">
           <p-accordion-header>
@@ -31,10 +31,10 @@
                   <div>
                     <div
                       class="cursor-pointer transition-colors duration-200 ease-in-out pb-1 flex items-center gap-2"
-              [ngClass]="{
-                'text-[var(--primary-color)]':
-                  activeFilters[filterType]?.includes(filter.value?.id || filter.value)
-              }"
+                      [ngClass]="{
+                          'text-[var(--primary-color)]':
+                            activeFilters[filterType]?.includes(filter.value?.id || filter.value)
+                        }"
                       (click)="handleFilterClick(filterType, filter.value?.id || filter.value)">
                       <p-badge [value]="filter.bookCount"></p-badge>
                       @if (filterType === 'amazonRating') {

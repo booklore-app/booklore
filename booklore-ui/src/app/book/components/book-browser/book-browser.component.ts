@@ -635,6 +635,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
         this.selectedFilter.next(parsedFilters);
         this.bookFilterComponent.setFilters?.(parsedFilters);
+        this.bookFilterComponent.onFiltersChanged?.();
 
         const firstFilter = filterParams.split(',')[0];
         const [key, ...values] = firstFilter.split(':');
