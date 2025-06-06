@@ -20,7 +20,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgClass, NgForOf, NgIf, NgStyle} from '@angular/common';
+import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {BookCardComponent} from './book-card/book-card.component';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -65,7 +65,7 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, Slider, Popover],
+  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, Slider, Popover],
   animations: [
     trigger('slideInOut', [
       state('void', style({

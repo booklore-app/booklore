@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {Checkbox} from 'primeng/checkbox';
-import {NgIf} from '@angular/common';
+
 import {MessageService, PrimeTemplate} from 'primeng/api';
 import {RadioButton} from 'primeng/radiobutton';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -17,14 +17,13 @@ import {CreateEmailProviderDialogComponent} from '../create-email-provider-dialo
   imports: [
     Button,
     Checkbox,
-    NgIf,
     PrimeTemplate,
     RadioButton,
     ReactiveFormsModule,
     TableModule,
     Tooltip,
     FormsModule
-  ],
+],
   templateUrl: './email-provider.component.html',
   styleUrl: './email-provider.component.scss'
 })

@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Button } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { InputText } from 'primeng/inputtext';
-import { NgIf } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EmailProviderService } from '../email-provider/email-provider.service';
 import { MessageService } from 'primeng/api';
@@ -14,9 +14,8 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
     Button,
     Checkbox,
     InputText,
-    NgIf,
     ReactiveFormsModule
-  ],
+],
   templateUrl: './create-email-provider-dialog.component.html',
   styleUrl: './create-email-provider-dialog.component.scss'
 })

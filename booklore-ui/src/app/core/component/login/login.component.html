@@ -24,11 +24,15 @@
               icon="pi pi-sign-in"
               [disabled]="!loginForm.valid || !username || !password">
             </p-button>
-            <p-message *ngIf="errorMessage" severity="error" text="{{ errorMessage }}"></p-message>
-            <div *ngIf="oidcEnabled">
-              <p-divider></p-divider>
-              <p-button fluid severity="info" type="button" label="Login with OIDC" icon="pi pi-id-card" (click)="loginWithOidc()"></p-button>
-            </div>
+            @if (errorMessage) {
+              <p-message severity="error" text="{{ errorMessage }}"></p-message>
+            }
+            @if (oidcEnabled) {
+              <div>
+                <p-divider></p-divider>
+                <p-button fluid severity="info" type="button" label="Login with OIDC" icon="pi pi-id-card" (click)="loginWithOidc()"></p-button>
+              </div>
+            }
           </div>
         </form>
       </ng-template>

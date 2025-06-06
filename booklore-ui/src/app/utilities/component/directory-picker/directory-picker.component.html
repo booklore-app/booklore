@@ -7,7 +7,7 @@
       [value]="selectedProductName"
       [disabled]="true"
       class="w-full p-2 text-base"
-    />
+      />
     <p-button label="Select" severity="success" class="w-[100px]" (click)="onSelect()"></p-button>
   </div>
   <p-table [value]="paths" [tableStyle]="{ 'min-width': '50rem' }" class="flex-grow overflow-y-auto">
@@ -21,8 +21,12 @@
     <ng-template pTemplate="body" let-product>
       <tr class="cursor-pointer hover:bg-white/10" (click)="onRowClick(product)">
         <td>
-          <i *ngIf="product === '...'" class="pi pi-arrow-up"></i>
-          <i *ngIf="product !== '...'" class="pi pi-folder-open"></i>
+          @if (product === '...') {
+            <i class="pi pi-arrow-up"></i>
+          }
+          @if (product !== '...') {
+            <i class="pi pi-folder-open"></i>
+          }
         </td>
         <td>{{ product }}</td>
       </tr>

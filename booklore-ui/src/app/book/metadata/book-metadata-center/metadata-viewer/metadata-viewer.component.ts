@@ -1,6 +1,6 @@
 import {Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {Button, ButtonDirective} from 'primeng/button';
-import {AsyncPipe, DecimalPipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
 import {first, Observable} from 'rxjs';
 import {BookService} from '../../../service/book.service';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
@@ -33,7 +33,7 @@ import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-reque
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 

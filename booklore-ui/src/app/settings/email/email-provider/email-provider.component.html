@@ -2,9 +2,9 @@
   <h2 class="text-lg  flex items-center gap-2">
     Email Providers
     <i class="pi pi-info-circle text-sky-600"
-       pTooltip="Configure email-sending services like Gmail, Outlook, or custom SMTP servers for sending books via email. The default email provider will be used for 'Quick Book Send' located in the Book Card menu"
-       tooltipPosition="right"
-       style="cursor: pointer;"></i>
+      pTooltip="Configure email-sending services like Gmail, Outlook, or custom SMTP servers for sending books via email. The default email provider will be used for 'Quick Book Send' located in the Book Card menu"
+      tooltipPosition="right"
+    style="cursor: pointer;"></i>
   </h2>
   <p-button outlined="true" icon="pi pi-plus" label="Create New Provider" (onClick)="openCreateProviderDialog()"></p-button>
 </div>
@@ -38,33 +38,57 @@
       </td>
 
       <td>
-        <input *ngIf="provider.isEditing" type="text" [(ngModel)]="provider.name" class="p-inputtext w-full"/>
-        <span *ngIf="!provider.isEditing">{{ provider.name }}</span>
+        @if (provider.isEditing) {
+          <input type="text" [(ngModel)]="provider.name" class="p-inputtext w-full"/>
+        }
+        @if (!provider.isEditing) {
+          <span>{{ provider.name }}</span>
+        }
       </td>
 
       <td>
-        <input *ngIf="provider.isEditing" type="text" [(ngModel)]="provider.host" class="p-inputtext w-full"/>
-        <span *ngIf="!provider.isEditing">{{ provider.host }}</span>
+        @if (provider.isEditing) {
+          <input type="text" [(ngModel)]="provider.host" class="p-inputtext w-full"/>
+        }
+        @if (!provider.isEditing) {
+          <span>{{ provider.host }}</span>
+        }
       </td>
 
       <td>
-        <input *ngIf="provider.isEditing" type="number" [(ngModel)]="provider.port" class="p-inputtext w-full"/>
-        <span *ngIf="!provider.isEditing">{{ provider.port }}</span>
+        @if (provider.isEditing) {
+          <input type="number" [(ngModel)]="provider.port" class="p-inputtext w-full"/>
+        }
+        @if (!provider.isEditing) {
+          <span>{{ provider.port }}</span>
+        }
       </td>
 
       <td>
-        <input *ngIf="provider.isEditing" type="text" [(ngModel)]="provider.username" class="p-inputtext w-full"/>
-        <span *ngIf="!provider.isEditing">{{ provider.username }}</span>
+        @if (provider.isEditing) {
+          <input type="text" [(ngModel)]="provider.username" class="p-inputtext w-full"/>
+        }
+        @if (!provider.isEditing) {
+          <span>{{ provider.username }}</span>
+        }
       </td>
 
       <td>
-        <input *ngIf="provider.isEditing" [(ngModel)]="provider.password" class="p-inputtext w-full"/>
-        <span *ngIf="!provider.isEditing" class="text-gray-400 italic">Hidden</span>
+        @if (provider.isEditing) {
+          <input [(ngModel)]="provider.password" class="p-inputtext w-full"/>
+        }
+        @if (!provider.isEditing) {
+          <span class="text-gray-400 italic">Hidden</span>
+        }
       </td>
 
       <td>
-        <input *ngIf="provider.isEditing" type="text" [(ngModel)]="provider.fromAddress" class="p-inputtext w-full"/>
-        <span *ngIf="!provider.isEditing">{{ provider.fromAddress }}</span>
+        @if (provider.isEditing) {
+          <input type="text" [(ngModel)]="provider.fromAddress" class="p-inputtext w-full"/>
+        }
+        @if (!provider.isEditing) {
+          <span>{{ provider.fromAddress }}</span>
+        }
       </td>
 
       <td class="text-center">
@@ -84,9 +108,15 @@
       </td>
 
       <td class="text-center">
-        <p-button *ngIf="!provider.isEditing" icon="pi pi-pencil" outlined="true" severity="info" (onClick)="toggleEdit(provider)"></p-button>
-        <p-button *ngIf="provider.isEditing" icon="pi pi-check" outlined="true" severity="success" (onClick)="saveProvider(provider)"></p-button>
-        <p-button *ngIf="provider.isEditing" icon="pi pi-times" outlined="true" severity="danger" (onClick)="toggleEdit(provider)"></p-button>
+        @if (!provider.isEditing) {
+          <p-button icon="pi pi-pencil" outlined="true" severity="info" (onClick)="toggleEdit(provider)"></p-button>
+        }
+        @if (provider.isEditing) {
+          <p-button icon="pi pi-check" outlined="true" severity="success" (onClick)="saveProvider(provider)"></p-button>
+        }
+        @if (provider.isEditing) {
+          <p-button icon="pi pi-times" outlined="true" severity="danger" (onClick)="toggleEdit(provider)"></p-button>
+        }
       </td>
 
       <td class="text-center">

@@ -4,25 +4,31 @@
     <label class="w-40 text-right font-medium">Provider Name:</label>
     <input type="text" pInputText formControlName="name" placeholder="Enter provider name..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="emailProviderForm.get('name')?.invalid && (emailProviderForm.get('name')?.dirty || emailProviderForm.get('name')?.touched)">
-    Provider name is required.
-  </small>
+  @if (emailProviderForm.get('name')?.invalid && (emailProviderForm.get('name')?.dirty || emailProviderForm.get('name')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Provider name is required.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Host:</label>
     <input type="text" pInputText formControlName="host" placeholder="Enter host..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="emailProviderForm.get('host')?.invalid && (emailProviderForm.get('host')?.dirty || emailProviderForm.get('host')?.touched)">
-    Host is required.
-  </small>
+  @if (emailProviderForm.get('host')?.invalid && (emailProviderForm.get('host')?.dirty || emailProviderForm.get('host')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Host is required.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Port:</label>
     <input type="number" pInputText formControlName="port" placeholder="Enter port..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="emailProviderForm.get('port')?.invalid && (emailProviderForm.get('port')?.dirty || emailProviderForm.get('port')?.touched)">
-    Port is required and must be a number.
-  </small>
+  @if (emailProviderForm.get('port')?.invalid && (emailProviderForm.get('port')?.dirty || emailProviderForm.get('port')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Port is required and must be a number.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Username:</label>

@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
-import {NgIf} from '@angular/common';
+
 import {MessageService, PrimeTemplate} from 'primeng/api';
 import {RadioButton} from 'primeng/radiobutton';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -18,14 +18,13 @@ import {CreateEmailRecipientDialogComponent} from '../create-email-recipient-dia
   selector: 'app-email-recipient',
   imports: [
     Button,
-    NgIf,
     PrimeTemplate,
     RadioButton,
     ReactiveFormsModule,
     TableModule,
     Tooltip,
     FormsModule
-  ],
+],
   templateUrl: './email-recipient.component.html',
   styleUrl: './email-recipient.component.scss'
 })

@@ -4,7 +4,7 @@ import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
-import {AsyncPipe, NgClass, NgForOf, NgIf, NgStyle} from '@angular/common';
+import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
 import {Divider} from 'primeng/divider';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
@@ -22,16 +22,14 @@ import {Textarea} from 'primeng/textarea';
     Button,
     FormsModule,
     InputText,
-    NgIf,
     Divider,
     ReactiveFormsModule,
     NgClass,
     NgStyle,
     Tooltip,
     AsyncPipe,
-    NgForOf,
     Textarea
-  ]
+]
 })
 export class MetadataPickerComponent implements OnInit {
 

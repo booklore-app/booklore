@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {AppMenuitemComponent} from './app.menuitem.component';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {MenuModule} from 'primeng/menu';
 import {LibraryService} from '../../../book/service/library.service';
 import {Observable, of} from 'rxjs';
@@ -17,7 +17,7 @@ import {UserService} from '../../../settings/user-management/user.service';
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [AppMenuitemComponent, NgIf, NgForOf, MenuModule, AsyncPipe],
+  imports: [AppMenuitemComponent, MenuModule, AsyncPipe],
   templateUrl: './app.menu.component.html',
 })
 export class AppMenuComponent implements OnInit {

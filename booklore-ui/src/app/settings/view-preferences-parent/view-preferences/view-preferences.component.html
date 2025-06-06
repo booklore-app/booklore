@@ -2,20 +2,20 @@
   <p class="text-lg pb-6 pt-4">
     Library and Shelf View & Sort Preferences:
     <i class="pi pi-info-circle text-sky-600"
-       pTooltip="Configure default and per-library/shelf preferences for sorting and view mode (grid or table) in the browser."
-       tooltipPosition="right"
-       style="cursor: pointer;"></i>
+      pTooltip="Configure default and per-library/shelf preferences for sorting and view mode (grid or table) in the browser."
+      tooltipPosition="right"
+    style="cursor: pointer;"></i>
   </p>
 
   <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
     <p>Default:</p>
     <div class="flex gap-4 pl-4">
       <p-select size="small" [options]="sortOptions" optionLabel="label" optionValue="field"
-                [(ngModel)]="selectedSort" placeholder="Sort" class="w-full md:w-72"></p-select>
+      [(ngModel)]="selectedSort" placeholder="Sort" class="w-full md:w-72"></p-select>
       <p-select size="small" [options]="sortDirectionOptions" [(ngModel)]="selectedSortDir"
-                placeholder="Direction" class="w-full md:w-44"></p-select>
+      placeholder="Direction" class="w-full md:w-44"></p-select>
       <p-select size="small" [options]="viewModeOptions" [(ngModel)]="selectedView"
-                placeholder="View" class="w-full md:w-44"></p-select>
+      placeholder="View" class="w-full md:w-44"></p-select>
     </div>
   </div>
 
@@ -27,49 +27,45 @@
   </div>
 
   <div class="pl-2 pt-2 min-w-[400px] max-w-[1000px]">
-    <p-table *ngIf="overrides.length > 0" [value]="overrides" class="relative z-0" [responsiveLayout]="'scroll'">
-      <ng-template pTemplate="header">
-        <tr>
-          <th class="min-w-[150px] max-w-[220px]">Type</th>
-          <th class="min-w-[220px] max-w-[280px]">Name</th>
-          <th class="min-w-[190px] max-w-[250px]">Sort By</th>
-          <th class="min-w-[125px]">Sort Dir</th>
-          <th class="min-w-[125px]">View</th>
-          <th class="w-[75px] text-center"></th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-override let-rowIndex="rowIndex">
-        <tr>
-          <td><p-select size="small" [options]="entityTypeOptions" [(ngModel)]="override.entityType"
-                        class="w-full" appendTo="body"></p-select></td>
-
-          <td>
-            <ng-container *ngIf="override.entityType">
-              <p-select size="small"
-                        [options]="getAvailableEntities(rowIndex, override.entityType)"
-                        [(ngModel)]="override.library"
-                        optionLabel="label" optionValue="value"
-                        class="w-full" appendTo="body"></p-select>
-            </ng-container>
-          </td>
-
-          <td><p-select size="small" [options]="sortOptions" optionLabel="label" optionValue="field"
-                        [(ngModel)]="override.sort" class="w-full" appendTo="body"></p-select></td>
-
-          <td><p-select size="small" [options]="sortDirectionOptions" [(ngModel)]="override.sortDir"
-                        class="w-full" appendTo="body"></p-select></td>
-
-          <td><p-select size="small" [options]="viewModeOptions" [(ngModel)]="override.view"
-                        class="w-full" appendTo="body"></p-select></td>
-
-          <td class="text-center">
-            <p-button icon="pi pi-trash" severity="danger" class="p-button-sm" [outlined]="true"
-                      (onClick)="removeOverride(rowIndex)"></p-button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+    @if (overrides.length > 0) {
+      <p-table [value]="overrides" class="relative z-0" [responsiveLayout]="'scroll'">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="min-w-[150px] max-w-[220px]">Type</th>
+            <th class="min-w-[220px] max-w-[280px]">Name</th>
+            <th class="min-w-[190px] max-w-[250px]">Sort By</th>
+            <th class="min-w-[125px]">Sort Dir</th>
+            <th class="min-w-[125px]">View</th>
+            <th class="w-[75px] text-center"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-override let-rowIndex="rowIndex">
+          <tr>
+            <td><p-select size="small" [options]="entityTypeOptions" [(ngModel)]="override.entityType"
+            class="w-full" appendTo="body"></p-select></td>
+            <td>
+              @if (override.entityType) {
+                <p-select size="small"
+                  [options]="getAvailableEntities(rowIndex, override.entityType)"
+                  [(ngModel)]="override.library"
+                  optionLabel="label" optionValue="value"
+                class="w-full" appendTo="body"></p-select>
+              }
+            </td>
+            <td><p-select size="small" [options]="sortOptions" optionLabel="label" optionValue="field"
+            [(ngModel)]="override.sort" class="w-full" appendTo="body"></p-select></td>
+            <td><p-select size="small" [options]="sortDirectionOptions" [(ngModel)]="override.sortDir"
+            class="w-full" appendTo="body"></p-select></td>
+            <td><p-select size="small" [options]="viewModeOptions" [(ngModel)]="override.view"
+            class="w-full" appendTo="body"></p-select></td>
+            <td class="text-center">
+              <p-button icon="pi pi-trash" severity="danger" class="p-button-sm" [outlined]="true"
+              (onClick)="removeOverride(rowIndex)"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
   </div>
 
   <div class="flex justify-start px-6 pt-4">

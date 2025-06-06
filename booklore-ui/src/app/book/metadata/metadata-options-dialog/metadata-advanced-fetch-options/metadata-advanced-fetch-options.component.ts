@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import {Select, SelectChangeEvent} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
-import {NgForOf} from '@angular/common';
+
 import {Checkbox} from 'primeng/checkbox';
 import {Button} from 'primeng/button';
 import {MessageService} from 'primeng/api';
@@ -16,7 +16,7 @@ import {
 @Component({
   selector: 'app-metadata-advanced-fetch-options',
   templateUrl: './metadata-advanced-fetch-options.component.html',
-  imports: [Select, FormsModule, NgForOf, Checkbox, Button],
+  imports: [Select, FormsModule, Checkbox, Button],
   styleUrl: './metadata-advanced-fetch-options.component.scss',
   standalone: true
 })

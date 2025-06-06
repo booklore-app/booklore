@@ -5,7 +5,7 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { Checkbox } from 'primeng/checkbox';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { NgIf } from '@angular/common';
+
 import { EmailRecipientService } from '../email-recipient/email-recipient.service';
 
 @Component({
@@ -14,9 +14,8 @@ import { EmailRecipientService } from '../email-recipient/email-recipient.servic
     Checkbox,
     ReactiveFormsModule,
     Button,
-    InputText,
-    NgIf
-  ],
+    InputText
+],
   templateUrl: './create-email-recipient-dialog.component.html',
   styleUrls: ['./create-email-recipient-dialog.component.scss']
 })

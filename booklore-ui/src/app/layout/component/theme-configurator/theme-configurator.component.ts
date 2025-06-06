@@ -1,4 +1,4 @@
-import {CommonModule, isPlatformBrowser} from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {Component, computed, inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {$t, updatePreset, updateSurfacePalette} from '@primeng/themes';

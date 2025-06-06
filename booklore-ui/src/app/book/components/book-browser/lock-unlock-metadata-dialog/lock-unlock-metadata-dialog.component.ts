@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {FormsModule} from '@angular/forms';
-import {NgForOf} from '@angular/common';
+
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
 import {BookService} from '../../../service/book.service';
@@ -13,9 +13,8 @@ import {Divider} from 'primeng/divider';
   imports: [
     Button,
     FormsModule,
-    NgForOf,
     Divider
-  ],
+],
   templateUrl: './lock-unlock-metadata-dialog.component.html',
   styleUrl: './lock-unlock-metadata-dialog.component.scss'
 })

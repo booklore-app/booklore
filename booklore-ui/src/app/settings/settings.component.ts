@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {UserService} from './user-management/user.service';
-import {AsyncPipe, NgIf} from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {EmailComponent} from './email/email.component';
 import {GlobalPreferencesComponent} from './global-preferences/global-preferences.component';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -30,7 +30,6 @@ export enum SettingsTab {
     Tab,
     TabPanels,
     TabPanel,
-    NgIf,
     AsyncPipe,
     EmailComponent,
     GlobalPreferencesComponent,
@@ -39,7 +38,7 @@ export enum SettingsTab {
     ViewPreferencesParentComponent,
     ReaderPreferences,
     MetadataSettingsComponent
-  ],
+],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })

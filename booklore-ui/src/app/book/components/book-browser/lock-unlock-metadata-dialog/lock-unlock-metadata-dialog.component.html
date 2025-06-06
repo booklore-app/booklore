@@ -1,15 +1,17 @@
 <div class="p-4">
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-24 gap-y-4">
-    <div *ngFor="let field of lockableFields" class="flex items-center justify-between">
-      <label class="capitalize">{{ fieldLabels[field] || field }}</label>
-      <p-button
-        [outlined]="true"
-        [label]="getLockLabel(field)"
-        [icon]="getLockIcon(field)"
-        [severity]="fieldLocks[field] === true ? 'danger' : fieldLocks[field] === false ? 'success' : 'secondary'"
-        (click)="cycleLockState(field)"
-      ></p-button>
-    </div>
+    @for (field of lockableFields; track field) {
+      <div class="flex items-center justify-between">
+        <label class="capitalize">{{ fieldLabels[field] || field }}</label>
+        <p-button
+          [outlined]="true"
+          [label]="getLockLabel(field)"
+          [icon]="getLockIcon(field)"
+          [severity]="fieldLocks[field] === true ? 'danger' : fieldLocks[field] === false ? 'success' : 'secondary'"
+          (click)="cycleLockState(field)"
+        ></p-button>
+      </div>
+    }
   </div>
 </div>
 

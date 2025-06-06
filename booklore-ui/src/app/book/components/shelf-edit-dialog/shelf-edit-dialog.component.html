@@ -6,13 +6,17 @@
     </div>
     <div class="flex items-center gap-5">
       <p>Shelf Icon:</p>
-      <div *ngIf="!selectedIcon">
-        <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
-      </div>
-      <div *ngIf="selectedIcon">
-        <i [class]="selectedIcon" class="text-xl mr-3"></i>
-        <p-button icon="pi pi-times" (onClick)="clearSelectedIcon()" [rounded]="true" [text]="true" [outlined]="true" severity="danger"></p-button>
-      </div>
+      @if (!selectedIcon) {
+        <div>
+          <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
+        </div>
+      }
+      @if (selectedIcon) {
+        <div>
+          <i [class]="selectedIcon" class="text-xl mr-3"></i>
+          <p-button icon="pi pi-times" (onClick)="clearSelectedIcon()" [rounded]="true" [text]="true" [outlined]="true" severity="danger"></p-button>
+        </div>
+      }
     </div>
   </div>
   <div class="flex justify-end">

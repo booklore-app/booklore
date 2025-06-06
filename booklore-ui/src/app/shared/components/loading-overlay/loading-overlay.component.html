@@ -1,3 +1,5 @@
-<div *ngIf="loading" class="loading-overlay">
-  <p-progressSpinner></p-progressSpinner>
-</div>
+@if (loading) {
+  <div class="loading-overlay">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+}

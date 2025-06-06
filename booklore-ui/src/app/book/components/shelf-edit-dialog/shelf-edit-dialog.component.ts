@@ -4,7 +4,7 @@ import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Button} from 'primeng/button';
 import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
 import {InputText} from 'primeng/inputtext';
-import {NgIf} from '@angular/common';
+
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Shelf} from '../../model/shelf.model';
 import {MessageService} from 'primeng/api';
@@ -15,10 +15,9 @@ import {MessageService} from 'primeng/api';
     Button,
     IconPickerComponent,
     InputText,
-    NgIf,
     ReactiveFormsModule,
     FormsModule
-  ],
+],
   templateUrl: './shelf-edit-dialog.component.html',
   standalone: true,
   styleUrl: './shelf-edit-dialog.component.scss'

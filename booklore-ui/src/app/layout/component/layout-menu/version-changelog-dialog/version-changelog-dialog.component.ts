@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ReleaseNote, VersionService } from '../../../../core/service/version.service';
-import { NgForOf, NgIf } from '@angular/common';
+
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import showdown from 'showdown';
 
 @Component({
   selector: 'app-version-changelog-dialog',
   standalone: true,
-  imports: [NgIf, NgForOf],
+  imports: [],
   templateUrl: './version-changelog-dialog.component.html',
   styleUrl: './version-changelog-dialog.component.scss'
 })

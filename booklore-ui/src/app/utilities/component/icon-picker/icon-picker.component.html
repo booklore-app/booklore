@@ -6,12 +6,13 @@
   [style]="{ width: '500px', height: '500px' }">
   <input type="text" placeholder="Search icons..." [(ngModel)]="searchText" class="icon-search"/>
   <div class="icon-grid">
-    <div
-      *ngFor="let icon of filteredIcons()"
-      class="icon-item"
-      (click)="selectIcon(icon)"
-      [class.selected]="icon === selectedIcon">
-      <i [class]="icon"></i>
-    </div>
+    @for (icon of filteredIcons(); track icon) {
+      <div
+        class="icon-item"
+        (click)="selectIcon(icon)"
+        [class.selected]="icon === selectedIcon">
+        <i [class]="icon"></i>
+      </div>
+    }
   </div>
 </p-dialog>

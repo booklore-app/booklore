@@ -4,7 +4,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {MenuService} from './service/app.menu.service';
-import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import { AsyncPipe, NgClass } from '@angular/common';
 import {Ripple} from 'primeng/ripple';
 import {Button} from 'primeng/button';
 import {Menu} from 'primeng/menu';
@@ -19,13 +19,11 @@ import {UserService} from '../../../settings/user-management/user.service';
     RouterLink,
     RouterLinkActive,
     NgClass,
-    NgForOf,
     Ripple,
-    NgIf,
     AsyncPipe,
     Button,
     Menu
-  ],
+],
   animations: [
     trigger('children', [
       state('collapsed', style({

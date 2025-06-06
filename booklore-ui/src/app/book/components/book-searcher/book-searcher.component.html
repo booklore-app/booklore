@@ -9,32 +9,37 @@
       (input)="onSearchInputChange()"
       placeholder="Search books by title or author..."
       class="search-input"
-    />
-    <p-button *ngIf="searchQuery" icon="pi pi-times" (click)="clearSearch()" [text]="true" [rounded]="true" class="clear-btn" aria-label="Clear Search"></p-button>
+      />
+    @if (searchQuery) {
+      <p-button icon="pi pi-times" (click)="clearSearch()" [text]="true" [rounded]="true" class="clear-btn" aria-label="Clear Search"></p-button>
+    }
   </div>
 
   <div class="search-dropdown layout-menu pt-4" [class.show]="(books.length > 0)">
-    <ng-container *ngIf="books.length > 0; else noResults">
-      <div class="search-dropdown-item flex flex-col" *ngFor="let book of books" (click)="onBookClick(book)">
-        <div class="flex flex-row w-full px-2">
-          <img [attr.src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)" alt="Book Cover" class="search-book-cover"/>
-          <div class="search-book-details">
-            <div class="flex items-center">
-              <p class="search-book-name text-lg font-medium truncate">{{ book.metadata?.title | slice:0:70 }}</p>
-            </div>
-            <div *ngIf="book.metadata?.authors?.length ?? 0 > 0" class="search-book-authors">
-              <p class="italic">by: {{ getAuthorNames(book.metadata?.authors) }}</p>
+    @if (books.length > 0) {
+      @for (book of books; track book) {
+        <div class="search-dropdown-item flex flex-col" (click)="onBookClick(book)">
+          <div class="flex flex-row w-full px-2">
+            <img [attr.src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)" alt="Book Cover" class="search-book-cover"/>
+            <div class="search-book-details">
+              <div class="flex items-center">
+                <p class="search-book-name text-lg font-medium truncate">{{ book.metadata?.title | slice:0:70 }}</p>
+              </div>
+              @if (book.metadata?.authors?.length ?? 0 > 0) {
+                <div class="search-book-authors">
+                  <p class="italic">by: {{ getAuthorNames(book.metadata?.authors) }}</p>
+                </div>
+              }
             </div>
           </div>
+          <p-divider></p-divider>
         </div>
-        <p-divider></p-divider>
-      </div>
-    </ng-container>
-
-    <ng-template #noResults>
+      }
+    } @else {
       <div class="search-dropdown-item">
         <span>No results found</span>
       </div>
-    </ng-template>
+    }
+
   </div>
 </div>

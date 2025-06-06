@@ -5,7 +5,7 @@ import {LibraryService} from '../../../book/service/library.service';
 import {filter, Observable, take} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgIf} from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroller.component';
 import {BookService} from '../../../book/service/book.service';
 import {BookState} from '../../../book/model/state/book-state.model';
@@ -20,12 +20,11 @@ import {ProgressSpinner} from 'primeng/progressspinner';
   styleUrls: ['./main-dashboard.component.scss'],
   imports: [
     Button,
-    NgIf,
     DashboardScrollerComponent,
     AsyncPipe,
     Divider,
     ProgressSpinner
-  ],
+],
   providers: [DialogService],
   standalone: true
 })

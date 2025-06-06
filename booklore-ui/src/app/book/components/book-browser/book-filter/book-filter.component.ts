@@ -7,7 +7,7 @@ import {Shelf} from '../../../model/shelf.model';
 import {EntityType} from '../book-browser.component';
 import {Book} from '../../../model/book.model';
 import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
-import {AsyncPipe, NgClass, NgForOf, NgIf, TitleCasePipe} from '@angular/common';
+import { AsyncPipe, NgClass, TitleCasePipe } from '@angular/common';
 import {Badge} from 'primeng/badge';
 import {FormsModule} from '@angular/forms';
 import {SelectButton} from 'primeng/selectbutton';
@@ -110,15 +110,13 @@ function getPageCountRangeFilters(pageCount?: number) {
     AccordionPanel,
     AccordionHeader,
     AccordionContent,
-    NgIf,
-    NgForOf,
     NgClass,
     Badge,
     AsyncPipe,
     TitleCasePipe,
     FormsModule,
     SelectButton
-  ]
+]
 })
 export class BookFilterComponent implements OnInit {
   @Output() filterSelected = new EventEmitter<Record<string, any> | null>();

@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
-import {NgForOf, NgIf} from '@angular/common';
+
 import {FetchMetadataRequest} from '../../model/request/fetch-metadata-request.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
@@ -21,7 +21,7 @@ import {ActivatedRoute} from '@angular/router';
   selector: 'app-metadata-searcher',
   templateUrl: './metadata-searcher.component.html',
   styleUrls: ['./metadata-searcher.component.scss'],
-  imports: [ReactiveFormsModule, Button, InputText, Divider, NgForOf, NgIf, ProgressSpinner, MetadataPickerComponent, MultiSelect],
+  imports: [ReactiveFormsModule, Button, InputText, Divider, ProgressSpinner, MetadataPickerComponent, MultiSelect],
   standalone: true
 })
 export class MetadataSearcherComponent implements OnInit, OnDestroy {

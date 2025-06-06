@@ -1,57 +1,62 @@
-<form *ngIf="!selectedFetchedMetadata" class="flex flex-col w-full h-full pt-2" [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="flex w-full gap-x-4 items-end">
-    <div class="flex flex-col gap-1 w-3/12">
-      <label>Providers</label>
-      <p-multiselect id="provider" class="w-full" [filter]="false" showToggleAll="false" [options]="providers" formControlName="provider" placeholder="Select Providers"></p-multiselect>
-    </div>
-
-    <div class="flex flex-col gap-1 w-5/12">
-      <label for="title">Title</label>
-      <input pInputText formControlName="title" id="title" class="w-full"/>
-    </div>
-
-    <div class="flex flex-col gap-1 w-4/12">
-      <label for="author">Author</label>
-      <input pInputText formControlName="author" id="author" class="w-full"/>
-    </div>
-
-    <div>
-      <p-button label="Search" type="submit" outlined="true" [disabled]="!isSearchEnabled || loading"></p-button>
-    </div>
-  </div>
-
-  <div *ngIf="loading" class="flex justify-center items-center">
-    <p-progress-spinner ariaLabel="loading"/>
-  </div>
-
-  <div *ngIf="!loading" class="mt-8 flex-1 overflow-y-auto">
-    <div *ngFor="let metadata of allFetchedMetadata" class="book-item flex flex-col w-full">
-      <div class="flex w-full flex-row book-item-content" (click)="onBookClick(metadata)">
-        <img [src]="metadata.thumbnailUrl || 'assets/images/missing-cover.jpg'" alt="Image" class="img-fixed-dimensions pr-2"/>
-        <div class=" flex flex-col w-full m-2">
-          <div class="flex flex-row gap-4 justify-between">
-            <p class="font-bold">{{ truncateText(metadata['title'], 90) }}</p>
-            <div class="flex gap-2">
-              <p>ISBN: {{ metadata['isbn10'] || metadata['asin'] }}</p>
-              <p> | </p>
-              <p>Published: {{ metadata['publishedDate'] }}</p>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <p>by {{ truncateText(metadata['authors'].join(', '), 70) }}</p>
-            <p> | </p>
-            <p>Source: <span [innerHTML]="buildProviderLink(metadata)"></span></p>
-          </div>
-          <p class="mt-4 truncate-text p-secondary">
-            {{ sanitizeHtml(metadata['description']) }}
-          </p>
-        </div>
+@if (!selectedFetchedMetadata) {
+  <form class="flex flex-col w-full h-full pt-2" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="flex w-full gap-x-4 items-end">
+      <div class="flex flex-col gap-1 w-3/12">
+        <label>Providers</label>
+        <p-multiselect id="provider" class="w-full" [filter]="false" showToggleAll="false" [options]="providers" formControlName="provider" placeholder="Select Providers"></p-multiselect>
       </div>
-      <p-divider></p-divider>
+      <div class="flex flex-col gap-1 w-5/12">
+        <label for="title">Title</label>
+        <input pInputText formControlName="title" id="title" class="w-full"/>
+      </div>
+      <div class="flex flex-col gap-1 w-4/12">
+        <label for="author">Author</label>
+        <input pInputText formControlName="author" id="author" class="w-full"/>
+      </div>
+      <div>
+        <p-button label="Search" type="submit" outlined="true" [disabled]="!isSearchEnabled || loading"></p-button>
+      </div>
     </div>
-  </div>
-</form>
+    @if (loading) {
+      <div class="flex justify-center items-center">
+        <p-progress-spinner ariaLabel="loading"/>
+      </div>
+    }
+    @if (!loading) {
+      <div class="mt-8 flex-1 overflow-y-auto">
+        @for (metadata of allFetchedMetadata; track metadata) {
+          <div class="book-item flex flex-col w-full">
+            <div class="flex w-full flex-row book-item-content" (click)="onBookClick(metadata)">
+              <img [src]="metadata.thumbnailUrl || 'assets/images/missing-cover.jpg'" alt="Image" class="img-fixed-dimensions pr-2"/>
+              <div class=" flex flex-col w-full m-2">
+                <div class="flex flex-row gap-4 justify-between">
+                  <p class="font-bold">{{ truncateText(metadata['title'], 90) }}</p>
+                  <div class="flex gap-2">
+                    <p>ISBN: {{ metadata['isbn10'] || metadata['asin'] }}</p>
+                    <p> | </p>
+                    <p>Published: {{ metadata['publishedDate'] }}</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <p>by {{ truncateText(metadata['authors'].join(', '), 70) }}</p>
+                  <p> | </p>
+                  <p>Source: <span [innerHTML]="buildProviderLink(metadata)"></span></p>
+                </div>
+                <p class="mt-4 truncate-text p-secondary">
+                  {{ sanitizeHtml(metadata['description']) }}
+                </p>
+              </div>
+            </div>
+            <p-divider></p-divider>
+          </div>
+        }
+      </div>
+    }
+  </form>
+}
 
-<div *ngIf="selectedFetchedMetadata" class="h-full flex-auto">
-  <app-metadata-picker [fetchedMetadata]="selectedFetchedMetadata" (goBack)="onGoBack()"></app-metadata-picker>
-</div>
+@if (selectedFetchedMetadata) {
+  <div class="h-full flex-auto">
+    <app-metadata-picker [fetchedMetadata]="selectedFetchedMetadata" (goBack)="onGoBack()"></app-metadata-picker>
+  </div>
+}

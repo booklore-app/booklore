@@ -4,33 +4,41 @@
     <label class="w-40 text-right font-medium">Full Name:</label>
     <input type="text" pInputText formControlName="name" placeholder="Enter full name..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="userForm.get('name')?.invalid && (userForm.get('name')?.dirty || userForm.get('name')?.touched)">
-    Name is required and must be at least 3 characters.
-  </small>
+  @if (userForm.get('name')?.invalid && (userForm.get('name')?.dirty || userForm.get('name')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Name is required and must be at least 3 characters.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Email:</label>
     <input type="email" pInputText formControlName="email" placeholder="Enter email..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="userForm.get('email')?.invalid && (userForm.get('email')?.dirty || userForm.get('email')?.touched)">
-    Enter a valid email address.
-  </small>
+  @if (userForm.get('email')?.invalid && (userForm.get('email')?.dirty || userForm.get('email')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Enter a valid email address.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Username:</label>
     <input type="text" pInputText formControlName="username" placeholder="Enter username..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="userForm.get('username')?.invalid && (userForm.get('username')?.dirty || userForm.get('username')?.touched)">
-    Username is required.
-  </small>
+  @if (userForm.get('username')?.invalid && (userForm.get('username')?.dirty || userForm.get('username')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Username is required.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Password:</label>
     <input type="password" pInputText formControlName="password" placeholder="Enter password..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="userForm.get('password')?.invalid && (userForm.get('password')?.dirty || userForm.get('password')?.touched)">
-    Password must be at least 6 characters long.
-  </small>
+  @if (userForm.get('password')?.invalid && (userForm.get('password')?.dirty || userForm.get('password')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Password must be at least 6 characters long.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Accessible Libraries:</label>
@@ -44,9 +52,11 @@
       appendTo="body">
     </p-multiselect>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="userForm.get('selectedLibraries')?.invalid && (userForm.get('selectedLibraries')?.dirty || userForm.get('selectedLibraries')?.touched)">
-    At least one library must be selected.
-  </small>
+  @if (userForm.get('selectedLibraries')?.invalid && (userForm.get('selectedLibraries')?.dirty || userForm.get('selectedLibraries')?.touched)) {
+    <small class="text-red-500 pl-44">
+      At least one library must be selected.
+    </small>
+  }
 
   <div>
     <p class="text-right w-40 font-medium">Permissions:</p>

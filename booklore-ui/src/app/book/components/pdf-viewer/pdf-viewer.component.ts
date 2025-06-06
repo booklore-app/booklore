@@ -5,14 +5,14 @@ import {BookService} from '../../service/book.service';
 import {forkJoin, Subscription} from 'rxjs';
 import {BookSetting} from '../../model/book.model';
 import {UserService} from '../../../settings/user-management/user.service';
-import {NgIf} from '@angular/common';
+
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-pdf-viewer',
   standalone: true,
-  imports: [NgxExtendedPdfViewerModule, NgIf, ProgressSpinner],
+  imports: [NgxExtendedPdfViewerModule, ProgressSpinner],
   templateUrl: './pdf-viewer.component.html',
 })
 export class PdfViewerComponent implements OnInit, OnDestroy {

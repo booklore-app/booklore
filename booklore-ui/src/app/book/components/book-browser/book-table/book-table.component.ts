@@ -1,6 +1,6 @@
 import {Component, EventEmitter, inject, Input, OnChanges, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
-import {DatePipe, NgIf} from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Book, BookMetadata} from '../../../model/book.model';
@@ -17,12 +17,11 @@ import {Router} from '@angular/router';
   templateUrl: './book-table.component.html',
   imports: [
     TableModule,
-    NgIf,
     Rating,
     FormsModule,
     Button,
     DatePipe
-  ],
+],
   styleUrl: './book-table.component.scss'
 })
 export class BookTableComponent implements OnChanges {

@@ -2,12 +2,14 @@
 
   <div class="flex flex-col flex-grow">
     <!-- Dynamic shelves content -->
-    <div *ngFor="let shelf of (shelfState$ | async)?.shelves">
-      <div class="flex flex-row items-center gap-4 py-2">
-        <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves"></p-checkbox>
-        <label [for]="shelf.id">{{ shelf.name }}</label>
+    @for (shelf of (shelfState$ | async)?.shelves; track shelf) {
+      <div>
+        <div class="flex flex-row items-center gap-4 py-2">
+          <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves"></p-checkbox>
+          <label [for]="shelf.id">{{ shelf.name }}</label>
+        </div>
       </div>
-    </div>
+    }
 
     <!-- Button section, anchored to the bottom -->
     <div class="flex justify-between items-center pt-4 mt-auto">
@@ -30,13 +32,17 @@
     </div>
     <div class="py-4">
       <label>Shelf Icon</label>
-      <div *ngIf="!selectedIcon">
-        <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
-      </div>
-      <div *ngIf="selectedIcon" class="flex items-center gap-4">
-        <i [class]="selectedIcon"></i>
-        <p-button icon="pi pi-times" text="true" outlined="true" severity="warn" (onClick)="clearSelectedIcon()"></p-button>
-      </div>
+      @if (!selectedIcon) {
+        <div>
+          <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
+        </div>
+      }
+      @if (selectedIcon) {
+        <div class="flex items-center gap-4">
+          <i [class]="selectedIcon"></i>
+          <p-button icon="pi pi-times" text="true" outlined="true" severity="warn" (onClick)="clearSelectedIcon()"></p-button>
+        </div>
+      }
     </div>
     <ng-template pTemplate="footer">
       <p-button label="Cancel" severity="secondary" (onClick)="closeShelfDialog()" class="p-button-text"></p-button>

@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {NgIf} from '@angular/common';
+
 import {TableModule} from 'primeng/table';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
@@ -21,7 +21,6 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
   standalone: true,
   imports: [
     FormsModule,
-    NgIf,
     TableModule,
     Button,
     InputText,
@@ -29,7 +28,7 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
     Tooltip,
     Password,
     ToggleSwitch
-  ],
+],
   templateUrl: './opds-settings.component.html',
   styleUrl: './opds-settings.component.scss'
 })

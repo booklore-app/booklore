@@ -2,15 +2,14 @@ import {Component, OnInit, OnDestroy, inject} from '@angular/core';
 import { Subscription } from 'rxjs';
 import {LoadingService} from '../../../core/service/loading.service';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {NgIf} from '@angular/common';
+
 
 @Component({
   selector: 'app-loading-overlay',
   templateUrl: './loading-overlay.component.html',
   imports: [
-    ProgressSpinner,
-    NgIf
-  ],
+    ProgressSpinner
+],
   standalone: true,
   styleUrls: ['./loading-overlay.component.scss']
 })

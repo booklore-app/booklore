@@ -14,29 +14,37 @@
     [outlined]="true"
     (click)="toggleMenu()"
     [ngClass]="{ 'rotate-right': !isMenuVisible, 'rotate-left': isMenuVisible }"
-  >
+    >
   </p-button>
 
   <div class="topbar-right-items">
     <app-book-searcher></app-book-searcher>
     <ul class="topbar-items pl-6">
       <div class="flex gap-6">
-        <li *ngIf="userService.userState$ | async as userData">
-          <a class="topbar-item" *ngIf="userData.permissions.canManipulateLibrary || userData.permissions.admin">
-            <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
-               pTooltip="Create New Library" tooltipPosition="top"></i>
-          </a>
-        </li>
-        <li *ngIf="userService.userState$ | async as userData">
-          <a class="topbar-item" *ngIf="userData.permissions.canManipulateLibrary || userData.permissions.admin">
-            <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
-               pTooltip="Upload Book" tooltipPosition="top"></i>
-          </a>
-        </li>
+        @if (userService.userState$ | async; as userData) {
+          <li>
+            @if (userData.permissions.canManipulateLibrary || userData.permissions.admin) {
+              <a class="topbar-item">
+                <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
+                pTooltip="Create New Library" tooltipPosition="top"></i>
+              </a>
+            }
+          </li>
+        }
+        @if (userService.userState$ | async; as userData) {
+          <li>
+            @if (userData.permissions.canManipulateLibrary || userData.permissions.admin) {
+              <a class="topbar-item">
+                <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
+                pTooltip="Upload Book" tooltipPosition="top"></i>
+              </a>
+            }
+          </li>
+        }
         <li>
           <a class="topbar-item">
             <i class="pi pi-cog text-surface-700 dark:text-surface-100" (click)="navigateToSettings()"
-               pTooltip="Settings" tooltipPosition="top"></i>
+            pTooltip="Settings" tooltipPosition="top"></i>
           </a>
         </li>
       </div>
@@ -44,15 +52,17 @@
       <p-divider layout="vertical"/>
       <li class="relative" (mouseenter)="onHover(true)" (mouseleave)="onHover(false)">
         <button type="button" class="topbar-item"
-                enterActiveClass="animate-scalein"
-                enterFromClass="hidden"
-                leaveActiveClass="animate-fadeout"
-                leaveToClass="hidden"
-                pStyleClass="@next"
-                [hideOnOutsideClick]="true">
+          enterActiveClass="animate-scalein"
+          enterFromClass="hidden"
+          leaveActiveClass="animate-fadeout"
+          leaveToClass="hidden"
+          pStyleClass="@next"
+          [hideOnOutsideClick]="true">
           <i class="pi pi-wave-pulse" style="font-size: 1.5rem" [class.pulsating]="eventHighlight" [class.highlight]="eventHighlight"></i>
         </button>
-        <app-live-notification-box class="config-panel notification-box" *ngIf="isHovered"></app-live-notification-box>
+        @if (isHovered) {
+          <app-live-notification-box class="config-panel notification-box"></app-live-notification-box>
+        }
       </li>
 
       <p-divider layout="vertical"/>
@@ -68,12 +78,12 @@
         </li>
         <li class="relative">
           <button type="button"
-                  class="topbar-item config-item"
-                  enterActiveClass="animate-scalein"
-                  enterFromClass="hidden"
-                  leaveActiveClass="animate-fadeout"
-                  leaveToClass="hidden"
-                  pStyleClass="@next" [hideOnOutsideClick]="true">
+            class="topbar-item config-item"
+            enterActiveClass="animate-scalein"
+            enterFromClass="hidden"
+            leaveActiveClass="animate-fadeout"
+            leaveToClass="hidden"
+            pStyleClass="@next" [hideOnOutsideClick]="true">
             <i class="pi pi-palette"></i>
           </button>
           <app-theme-configurator></app-theme-configurator>

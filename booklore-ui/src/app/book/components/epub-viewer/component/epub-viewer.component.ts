@@ -2,7 +2,7 @@ import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angu
 import ePub, {EpubCFI} from 'epubjs';
 import {Drawer} from 'primeng/drawer';
 import {Button} from 'primeng/button';
-import {NgForOf, NgIf} from '@angular/common';
+
 import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
 import {ActivatedRoute} from '@angular/router';
@@ -66,7 +66,7 @@ export function getChapter(book: any, location: any) {
   selector: 'app-epub-viewer',
   templateUrl: './epub-viewer.component.html',
   styleUrls: ['./epub-viewer.component.scss'],
-  imports: [Drawer, Button, NgForOf, FormsModule, Divider, Select, ProgressSpinner, NgIf, Tooltip],
+  imports: [Drawer, Button, FormsModule, Divider, Select, ProgressSpinner, Tooltip],
   standalone: true
 })
 export class EpubViewerComponent implements OnInit, OnDestroy {

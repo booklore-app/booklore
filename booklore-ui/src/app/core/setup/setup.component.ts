@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SetupService } from './setup.service';
-import { NgIf } from '@angular/common';
+
 import { ReactiveFormsModule } from '@angular/forms';
 import { Card } from 'primeng/card';
 import { PrimeTemplate } from 'primeng/api';
@@ -18,14 +18,13 @@ import { Message } from 'primeng/message';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    NgIf,
     Card,
     PrimeTemplate,
     InputText,
     Password,
     Button,
     Message
-  ]
+]
 })
 export class SetupComponent {
   setupForm: FormGroup;

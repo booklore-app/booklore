@@ -7,7 +7,7 @@
         [min]="1"
         [max]="pages.length"
         placeholder="Page"
-      />
+        />
       <button
         (click)="goToPageInput !== null && goToPage(goToPageInput)"
         [disabled]="goToPageInput === null || goToPageInput < 1 || goToPageInput > pages.length">
@@ -27,9 +27,11 @@
     </div>
 
     <div class="spread-controls" style="display: flex; align-items: center; margin-left: auto;">
-      <button *ngIf="isTwoPageView" (click)="toggleSpreadDirection()" title="Toggle Spread Direction">
-        {{ pageSpread === 'ODD' ? '⬅️' : '➡️' }}
-      </button>
+      @if (isTwoPageView) {
+        <button (click)="toggleSpreadDirection()" title="Toggle Spread Direction">
+          {{ pageSpread === 'ODD' ? '⬅️' : '➡️' }}
+        </button>
+      }
       <button (click)="toggleView()" title="Toggle View">
         {{ isTwoPageView ? '1️⃣' : '2️⃣' }}
       </button>
@@ -37,19 +39,19 @@
   </div>
 
   <div class="image-container" [class.two-page-view]="isTwoPageView">
-    <ng-container *ngIf="!isLoading; else loading">
-      <ng-container *ngIf="pages.length > 0; else noPages">
-        <img *ngFor="let url of imageUrls" [src]="url" alt="Page Image"/>
-      </ng-container>
-    </ng-container>
-    <ng-template #noPages>
-      <p>No pages available.</p>
-    </ng-template>
-    <ng-template #loading>
+    @if (!isLoading) {
+      @if (pages.length > 0) {
+        @for (url of imageUrls; track url) {
+          <img [src]="url" alt="Page Image"/>
+        }
+      } @else {
+        <p>No pages available.</p>
+      }
+    } @else {
       <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
         <p-progressSpinner></p-progressSpinner>
         <p style="margin-top: 1rem; color: #ccc;">Processing pages... This may take a few seconds on first load. Future loads will be significantly faster.</p>
       </div>
-    </ng-template>
+    }
   </div>
 </div>

@@ -5,7 +5,7 @@ import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
-import {AsyncPipe, NgClass, NgIf} from '@angular/common';
+import { AsyncPipe, NgClass } from '@angular/common';
 import {MessageService} from 'primeng/api';
 import {BookMetadata} from '../../../model/book.model';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
@@ -29,7 +29,6 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
     Divider,
     FormsModule,
     AsyncPipe,
-    NgIf,
     ReactiveFormsModule,
     FileUpload,
     ProgressSpinner,
@@ -41,7 +40,7 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
     Tab,
     TabPanels,
     TabPanel
-  ]
+]
 })
 export class MetadataEditorComponent implements OnInit {
 

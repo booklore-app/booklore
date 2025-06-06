@@ -12,7 +12,7 @@ import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../../metadata/model/request/metadata-refresh-request.model';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
-import {NgClass, NgIf} from '@angular/common';
+import { NgClass } from '@angular/common';
 import {UserService} from '../../../../settings/user-management/user.service';
 import {filter} from 'rxjs';
 import {EmailService} from '../../../../settings/email/email.service';
@@ -25,7 +25,7 @@ import {ProgressBar} from 'primeng/progressbar';
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf, NgClass, TieredMenu, ProgressBar],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgClass, TieredMenu, ProgressBar],
   standalone: true
 })
 export class BookCardComponent implements OnInit {

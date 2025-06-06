@@ -6,7 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookService} from '../../service/book.service';
 import {Button} from 'primeng/button';
-import {NgForOf, NgIf, SlicePipe} from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {Router} from '@angular/router';
@@ -18,11 +18,9 @@ import {Router} from '@angular/router';
     FormsModule,
     InputTextModule,
     Button,
-    NgIf,
-    NgForOf,
     SlicePipe,
     Divider
-  ],
+],
   styleUrls: ['./book-searcher.component.scss'],
   standalone: true
 })

@@ -1,7 +1,7 @@
 import {Component, ElementRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {BookCardComponent} from '../../../book/components/book-browser/book-card/book-card.component';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
-import {NgForOf, NgIf} from '@angular/common';
+
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {Book} from '../../../book/model/book.model';
 
@@ -11,11 +11,9 @@ import {Book} from '../../../book/model/book.model';
   styleUrls: ['./dashboard-scroller.component.scss'],
   imports: [
     InfiniteScrollDirective,
-    NgForOf,
-    NgIf,
     BookCardComponent,
     ProgressSpinnerModule
-  ],
+],
   standalone: true
 })
 export class DashboardScrollerComponent {

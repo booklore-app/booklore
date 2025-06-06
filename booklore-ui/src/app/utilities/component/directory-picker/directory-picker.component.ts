@@ -3,7 +3,7 @@ import {DynamicDialogRef} from 'primeng/dynamicdialog';
 import {UtilityService} from './utility.service';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
-import {NgIf} from '@angular/common';
+
 import {InputText} from 'primeng/inputtext';
 
 @Component({
@@ -13,9 +13,8 @@ import {InputText} from 'primeng/inputtext';
   imports: [
     Button,
     TableModule,
-    InputText,
-    NgIf
-  ],
+    InputText
+],
   styleUrls: ['./directory-picker.component.scss']
 })
 export class DirectoryPickerComponent implements OnInit {

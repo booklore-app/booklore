@@ -3,7 +3,7 @@ import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
 import {FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
-import {NgIf} from '@angular/common';
+
 import {Password} from 'primeng/password';
 import {User, UserService} from '../../user-management/user.service';
 import {MessageService} from 'primeng/api';
@@ -18,10 +18,9 @@ import {Message} from 'primeng/message';
     FormsModule,
     ReactiveFormsModule,
     InputText,
-    NgIf,
     Password,
     Message
-  ],
+],
   templateUrl: './user-profile-dialog.component.html',
   styleUrls: ['./user-profile-dialog.component.scss']
 })

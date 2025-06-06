@@ -3,7 +3,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {DropdownModule} from 'primeng/dropdown';
-import {NgForOf, NgIf} from '@angular/common';
+
 import {Checkbox} from 'primeng/checkbox';
 import {ToggleSwitch} from 'primeng/toggleswitch';
 import {MessageService} from 'primeng/api';
@@ -24,15 +24,13 @@ import {LibraryService} from '../../../book/service/library.service';
     FormsModule,
     InputText,
     DropdownModule,
-    NgIf,
-    NgForOf,
     Checkbox,
     ToggleSwitch,
     Divider,
     Button,
     MultiSelect,
     ReactiveFormsModule
-  ],
+],
   styleUrls: ['./authentication-settings.component.scss']
 })
 export class AuthenticationSettingsComponent implements OnInit {

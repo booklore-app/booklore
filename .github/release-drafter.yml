@@ -10,10 +10,11 @@ categories:
     labels:
       - 'bug'
       - 'fix'
-  - title: '🛠️ Refactoring'
+  - title: '🛠️ Refactoring & Maintenance'
     labels:
       - 'refactor'
       - 'cleanup'
+      - 'chore'
   - title: '📖 Documentation'
     labels:
       - 'docs'

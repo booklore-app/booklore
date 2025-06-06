@@ -4,7 +4,7 @@ import {Button} from 'primeng/button';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {CreateUserDialogComponent} from './create-user-dialog/create-user-dialog.component';
 import {TableModule} from 'primeng/table';
-import {LowerCasePipe, NgIf, NgStyle, TitleCasePipe} from '@angular/common';
+import { LowerCasePipe, NgStyle, TitleCasePipe } from '@angular/common';
 import {User, UserService} from './user.service';
 import {MessageService} from 'primeng/api';
 import {Checkbox} from 'primeng/checkbox';
@@ -21,7 +21,6 @@ import {filter, take} from 'rxjs/operators';
     FormsModule,
     Button,
     TableModule,
-    NgIf,
     Checkbox,
     NgStyle,
     MultiSelect,
@@ -29,7 +28,7 @@ import {filter, take} from 'rxjs/operators';
     Password,
     LowerCasePipe,
     TitleCasePipe
-  ],
+],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })

@@ -1,5 +1,5 @@
 import {Component, HostListener, inject, OnInit} from '@angular/core';
-import {NgFor, NgIf} from '@angular/common';
+
 import {ActivatedRoute} from '@angular/router';
 import {CbxReaderService} from '../../service/cbx-reader.service';
 import {BookService} from '../../service/book.service';
@@ -14,7 +14,7 @@ import {NewPdfReaderService} from '../../service/new-pdf-reader.service';
 @Component({
   selector: 'app-cbx-reader',
   standalone: true,
-  imports: [NgIf, NgFor, ProgressSpinner, FormsModule],
+  imports: [ProgressSpinner, FormsModule],
   templateUrl: './cbx-reader.component.html',
   styleUrl: './cbx-reader.component.scss'
 })

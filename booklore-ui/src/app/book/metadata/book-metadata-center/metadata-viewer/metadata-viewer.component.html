@@ -1,114 +1,117 @@
 <div class="pt-2 flex flex-col h-full overflow-hidden">
-  <div *ngIf="metadata$ | async as metadata">
-    <div class="flex flex-row">
-      <div class="cover-wrapper relative">
-        <img
-          [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
-          class="book-cover placeholder"
-          alt="Cover of {{ metadata.title }}"
-          loading="lazy"
-          width="225"
-          style="min-width: 225px;"
-        />
-
-        <p-progressBar
-          *ngIf="getProgressPercent() !== null"
-          [value]="getProgressPercent()"
-          [showValue]="true"
-          [ngClass]="{ 'progress-complete': getProgressPercent() === 100, 'progress-incomplete': getProgressPercent()! < 100 }"
-          [style]="{ height: '10px' }">
-        </p-progressBar>
-      </div>
-
-      <div class="flex flex-col justify-between">
-        <div class="pl-6 flex flex-col w-full">
-          <div class="flex flex-row items-center justify-between">
-            <div>
-              <p *ngIf="metadata.seriesName" class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }}</p>
-              <div class="flex items-center gap-2">
-                <p class="text-2xl font-bold m-0">{{ metadata.title }}</p>
-                <i
-                  class="pi"
-                  [ngClass]="isMetadataFullyLocked(metadata) ? 'pi-lock text-red-500' : 'pi-lock-open text-green-500'"
-                  [title]="isMetadataFullyLocked(metadata) ? 'Metadata is locked' : 'Metadata is unlocked'"
-                  style="font-size: 1.25rem;"
-                  pTooltip="{{ isMetadataFullyLocked(metadata) ? 'This book metadata is locked.' : 'This book metadata is unlocked.' }}"
-                  tooltipPosition="top">
-                </i>
+  @if (metadata$ | async; as metadata) {
+    <div>
+      <div class="flex flex-row">
+        <div class="cover-wrapper relative">
+          <img
+            [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
+            class="book-cover placeholder"
+            alt="Cover of {{ metadata.title }}"
+            loading="lazy"
+            width="225"
+            style="min-width: 225px;"
+            />
+          @if (getProgressPercent() !== null) {
+            <p-progressBar
+              [value]="getProgressPercent()"
+              [showValue]="true"
+              [ngClass]="{ 'progress-complete': getProgressPercent() === 100, 'progress-incomplete': getProgressPercent()! < 100 }"
+              [style]="{ height: '10px' }">
+            </p-progressBar>
+          }
+        </div>
+        <div class="flex flex-col justify-between">
+          <div class="pl-6 flex flex-col w-full">
+            <div class="flex flex-row items-center justify-between">
+              <div>
+                @if (metadata.seriesName) {
+                  <p class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }}</p>
+                }
+                <div class="flex items-center gap-2">
+                  <p class="text-2xl font-bold m-0">{{ metadata.title }}</p>
+                  <i
+                    class="pi"
+                    [ngClass]="isMetadataFullyLocked(metadata) ? 'pi-lock text-red-500' : 'pi-lock-open text-green-500'"
+                    [title]="isMetadataFullyLocked(metadata) ? 'Metadata is locked' : 'Metadata is unlocked'"
+                    style="font-size: 1.25rem;"
+                    pTooltip="{{ isMetadataFullyLocked(metadata) ? 'This book metadata is locked.' : 'This book metadata is unlocked.' }}"
+                    tooltipPosition="top">
+                  </i>
+                </div>
+                <p class="text-xl">{{ getAuthorNames(metadata?.authors || []) }}</p>
               </div>
-              <p class="text-xl">{{ getAuthorNames(metadata?.authors || []) }}</p>
             </div>
-          </div>
-
-          <div class="flex items-center gap-2 pt-2">
-            <ng-container *ngIf="metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating; else legacyRating">
-              <ng-container *ngIf="metadata.amazonRating">
-                <ng-container *ngIf="metadata.asin; else amazonStatic">
-                  <a class="flex items-center gap-1" [href]="'https://www.amazon.com/dp/' + metadata.asin" target="_blank" rel="noopener noreferrer">
-                    <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
-                    <p class="font-semibold">{{ metadata.amazonRating }}</p>
-                  </a>
-                </ng-container>
-                <ng-template #amazonStatic>
-                  <span class="flex items-center gap-1">
-                    <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain" />
-                    <p class="font-semibold">{{ metadata.amazonRating }}</p>
-                  </span>
-                </ng-template>
-                <p-rating [ngModel]="metadata.amazonRating" readonly stars="5"
-                          [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
-                </p-rating>
-                <p class="font-semibold">({{ metadata.amazonReviewCount | number:'1.0-0' }})</p>
-                <span *ngIf="metadata.goodreadsRating || metadata.hardcoverRating">|</span>
-              </ng-container>
-
-              <ng-container *ngIf="metadata.goodreadsRating">
-                <ng-container *ngIf="metadata.goodreadsId; else goodreadsStatic">
-                  <a class="flex items-center gap-1" [href]="'https://www.goodreads.com/book/show/' + metadata.goodreadsId" target="_blank" rel="noopener noreferrer">
-                    <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
-                    <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
-                  </a>
-                </ng-container>
-                <ng-template #goodreadsStatic>
-                  <span class="flex items-center gap-1">
-                    <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain" />
-                    <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
-                  </span>
-                </ng-template>
-                <p-rating [ngModel]="metadata.goodreadsRating" readonly stars="5"
-                          [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
-                </p-rating>
-                <p class="font-semibold">({{ metadata.goodreadsReviewCount | number:'1.0-0' }})</p>
-                <span *ngIf="metadata.hardcoverRating">|</span>
-              </ng-container>
-
-              <ng-container *ngIf="metadata.hardcoverRating">
-                <ng-container *ngIf="metadata.hardcoverId; else hardcoverStatic">
-                  <a class="flex items-center gap-1" [href]="'https://hardcover.app/books/' + metadata.hardcoverId" target="_blank" rel="noopener noreferrer">
-                    <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
-                    <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
-                  </a>
-                </ng-container>
-                <ng-template #hardcoverStatic>
-                  <span class="flex items-center gap-1">
-                    <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain" />
-                    <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
-                  </span>
-                </ng-template>
-                <p-rating [ngModel]="metadata.hardcoverRating" readonly stars="5"
-                          [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
-                </p-rating>
-                <p class="font-semibold">({{ metadata.hardcoverReviewCount | number:'1.0-0' }})</p>
-                <span *ngIf="(metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating) && metadata.googleId">|</span>
-              </ng-container>
-              <ng-container *ngIf="metadata.googleId">
+            <div class="flex items-center gap-2 pt-2">
+              @if (metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating) {
+                @if (metadata.amazonRating) {
+                  @if (metadata.asin) {
+                    <a class="flex items-center gap-1" [href]="'https://www.amazon.com/dp/' + metadata.asin" target="_blank" rel="noopener noreferrer">
+                      <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                      <p class="font-semibold">{{ metadata.amazonRating }}</p>
+                    </a>
+                  } @else {
+                    <span class="flex items-center gap-1">
+                      <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain" />
+                      <p class="font-semibold">{{ metadata.amazonRating }}</p>
+                    </span>
+                  }
+                  <p-rating [ngModel]="metadata.amazonRating" readonly stars="5"
+                    [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
+                  </p-rating>
+                  <p class="font-semibold">({{ metadata.amazonReviewCount | number:'1.0-0' }})</p>
+                  @if (metadata.goodreadsRating || metadata.hardcoverRating) {
+                    <span>|</span>
+                  }
+                }
+                @if (metadata.goodreadsRating) {
+                  @if (metadata.goodreadsId) {
+                    <a class="flex items-center gap-1" [href]="'https://www.goodreads.com/book/show/' + metadata.goodreadsId" target="_blank" rel="noopener noreferrer">
+                      <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                      <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
+                    </a>
+                  } @else {
+                    <span class="flex items-center gap-1">
+                      <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain" />
+                      <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
+                    </span>
+                  }
+                  <p-rating [ngModel]="metadata.goodreadsRating" readonly stars="5"
+                    [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
+                  </p-rating>
+                  <p class="font-semibold">({{ metadata.goodreadsReviewCount | number:'1.0-0' }})</p>
+                  @if (metadata.hardcoverRating) {
+                    <span>|</span>
+                  }
+                }
+                @if (metadata.hardcoverRating) {
+                  @if (metadata.hardcoverId) {
+                    <a class="flex items-center gap-1" [href]="'https://hardcover.app/books/' + metadata.hardcoverId" target="_blank" rel="noopener noreferrer">
+                      <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                      <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
+                    </a>
+                  } @else {
+                    <span class="flex items-center gap-1">
+                      <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain" />
+                      <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
+                    </span>
+                  }
+                  <p-rating [ngModel]="metadata.hardcoverRating" readonly stars="5"
+                    [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
+                  </p-rating>
+                  <p class="font-semibold">({{ metadata.hardcoverReviewCount | number:'1.0-0' }})</p>
+                  @if ((metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating) && metadata.googleId) {
+                    <span>|</span>
+                  }
+                }
+                @if (metadata.googleId) {
                 <a class="flex items-center gap-1" [href]="'https://books.google.com/books?id=' + metadata.googleId" target="_blank" rel="noopener noreferrer">
                   <img src="https://books.google.com/favicon.ico" alt="Google Books" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
                 </a>
-              </ng-container>
-            </ng-container>
+              
+}
+            
+} @else {
 
-            <ng-template #legacyRating>
               <p-rating
                 [(ngModel)]="metadata.rating"
                 readonly
@@ -117,179 +120,184 @@
               </p-rating>
               <p class="font-semibold">
                 {{ metadata?.reviewCount ? '(' + (metadata?.reviewCount | number:'1.0-0') + ' Ratings)' : 'No Ratings' }}
+                </p>
+              }
+            </div>
+            <div class="flex gap-2 pt-4 overflow-x-auto scrollbar-hide">
+              @for (category of metadata.categories; track category) {
+                <p-tag [value]="category" class="shrink-0"></p-tag>
+              }
+            </div>
+            <div class="grid gap-x-20 gap-y-2 pt-6" style="grid-template-columns: repeat(5, max-content);">
+              <p class="whitespace-nowrap flex items-center gap-2">
+                <span class="font-bold">File Type:</span>
+                <span
+                  class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                  [ngClass]="getFileTypeColorClass(getFileExtension(book?.filePath))">
+                  {{ getFileExtension(book?.filePath) || '-' }}
+                </span>
               </p>
-            </ng-template>
-          </div>
-
-          <div class="flex gap-2 pt-4 overflow-x-auto scrollbar-hide">
-            <p-tag *ngFor="let category of metadata.categories" [value]="category" class="shrink-0"></p-tag>
-          </div>
-
-          <div class="grid gap-x-20 gap-y-2 pt-6" style="grid-template-columns: repeat(5, max-content);">
-            <p class="whitespace-nowrap flex items-center gap-2">
-              <span class="font-bold">File Type:</span>
-              <span
-                class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                [ngClass]="getFileTypeColorClass(getFileExtension(book?.filePath))">
-                {{ getFileExtension(book?.filePath) || '-' }}
-              </span>
-            </p>
-            <p class="whitespace-nowrap"><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
-            <p class="whitespace-nowrap"><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
-            <p class="whitespace-nowrap"><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
-            <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
-            <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
-            <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
-            <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB() }}</p>
-            <p class="whitespace-nowrap"><span class="font-bold">Progress:</span> {{ getProgressPercent() !== null ? getProgressPercent() + '%' : '-' }}</p>
-          </div>
-
-          <div class="pt-2 flex items-center gap-2 w-full">
-            <span class="font-semibold flex-shrink-0">File Path:</span>
-            <p-toggleButton
-              [(ngModel)]="showFilePath"
-              onIcon="pi pi-eye-slash"
-              offIcon="pi pi-eye"
-              onLabel=""
-              offLabel=""
-              size="small"
+              <p class="whitespace-nowrap"><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB() }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Progress:</span> {{ getProgressPercent() !== null ? getProgressPercent() + '%' : '-' }}</p>
+            </div>
+            <div class="pt-2 flex items-center gap-2 w-full">
+              <span class="font-semibold flex-shrink-0">File Path:</span>
+              <p-toggleButton
+                [(ngModel)]="showFilePath"
+                onIcon="pi pi-eye-slash"
+                offIcon="pi pi-eye"
+                onLabel=""
+                offLabel=""
+                size="small"
               class="flex-shrink-0"></p-toggleButton>
-            <div
-              class="flex items-center gap-4 flex-grow"
-              *ngIf="showFilePath"
-              style="min-width: 0;">
-              <p
-                class="font-mono text-sm text-gray-400 overflow-x-auto whitespace-nowrap flex-grow"
-                style="min-width: 0;">
-                {{ book?.filePath }}
-              </p>
+              @if (showFilePath) {
+                <div
+                  class="flex items-center gap-4 flex-grow"
+                  style="min-width: 0;">
+                  <p
+                    class="font-mono text-sm text-gray-400 overflow-x-auto whitespace-nowrap flex-grow"
+                    style="min-width: 0;">
+                    {{ book?.filePath }}
+                  </p>
+                </div>
+              }
             </div>
           </div>
-        </div>
-
-        <div *ngIf="userService.userState$ | async as userData" class="pl-6 pt-4 flex flex-row w-full gap-4">
-          <p-splitbutton
-            *ngIf="book!.bookType === 'PDF'"
-            label="Read"
-            icon="pi pi-book"
-            [model]="readMenuItems"
-            (onClick)="read(metadata.bookId, 'ngx')"
-            severity="info"/>
-
-          <p-button
-            *ngIf="book!.bookType !== 'PDF'"
-            label="Read"
-            icon="pi pi-book"
-            (onClick)="read(metadata.bookId, undefined)"
-            severity="info"/>
-
-          <p-button
-            label="Assign Shelf"
-            icon="pi pi-folder"
-            severity="info"
-            outlined
-            (onClick)="assignShelf(metadata.bookId)">
-          </p-button>
-
-          <p-button
-            *ngIf="userData.permissions.canDownload || userData.permissions.admin"
-            label="Download"
-            icon="pi pi-download"
-            severity="info"
-            outlined
-            (onClick)="download(metadata.bookId)">
-          </p-button>
-
-          <p-splitbutton
-            *ngIf="userData.permissions.canEmailBook || userData.permissions.admin"
-            label="Quick Send"
-            icon="pi pi-send"
-            [model]="emailMenuItems"
-            (onClick)="quickSend(metadata.bookId)"
-            outlined
-            severity="info">
-          </p-splitbutton>
-
-          <p-splitbutton
-            *ngIf="userData.permissions.canEditMetadata || userData.permissions.admin"
-            label="Quick Refresh"
-            icon="pi pi-bolt"
-            [model]="refreshMenuItems"
-            (onClick)="quickRefresh(metadata.bookId)"
-            outlined
-            severity="info">
-          </p-splitbutton>
+          @if (userService.userState$ | async; as userData) {
+            <div class="pl-6 pt-4 flex flex-row w-full gap-4">
+              @if (book!.bookType === 'PDF') {
+                <p-splitbutton
+                  label="Read"
+                  icon="pi pi-book"
+                  [model]="readMenuItems"
+                  (onClick)="read(metadata.bookId, 'ngx')"
+                  severity="info"/>
+              }
+              @if (book!.bookType !== 'PDF') {
+                <p-button
+                  label="Read"
+                  icon="pi pi-book"
+                  (onClick)="read(metadata.bookId, undefined)"
+                  severity="info"/>
+              }
+              <p-button
+                label="Assign Shelf"
+                icon="pi pi-folder"
+                severity="info"
+                outlined
+                (onClick)="assignShelf(metadata.bookId)">
+              </p-button>
+              @if (userData.permissions.canDownload || userData.permissions.admin) {
+                <p-button
+                  label="Download"
+                  icon="pi pi-download"
+                  severity="info"
+                  outlined
+                  (onClick)="download(metadata.bookId)">
+                </p-button>
+              }
+              @if (userData.permissions.canEmailBook || userData.permissions.admin) {
+                <p-splitbutton
+                  label="Quick Send"
+                  icon="pi pi-send"
+                  [model]="emailMenuItems"
+                  (onClick)="quickSend(metadata.bookId)"
+                  outlined
+                  severity="info">
+                </p-splitbutton>
+              }
+              @if (userData.permissions.canEditMetadata || userData.permissions.admin) {
+                <p-splitbutton
+                  label="Quick Refresh"
+                  icon="pi pi-bolt"
+                  [model]="refreshMenuItems"
+                  (onClick)="quickRefresh(metadata.bookId)"
+                  outlined
+                  severity="info">
+                </p-splitbutton>
+              }
+            </div>
+          }
         </div>
       </div>
     </div>
-  </div>
+  }
 
   <p-divider></p-divider>
 
-  <div *ngIf="metadata$ | async as metadata" class="flex-1 overflow-auto space-y-2 px-2">
-    <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }" class="transition-all duration-300 overflow-hidden description-container">
-      <div class="readonly-editor px-2">
-        <p-editor #quillEditor [readonly]="true" [style]="{height: '250px'}" [(ngModel)]="metadata.description">
-          <ng-template #header>
-          </ng-template>
-        </p-editor>
-      </div>
-    </div>
-
-    <div *ngIf="metadata.description && metadata.description.length > 100" class="text-left">
-      <button pButton
-              type="button"
-              [label]="isExpanded ? 'Show less' : 'Show more'"
-              [icon]="isExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-              iconPos="right"
-              class="p-button-text p-button-sm"
-              (click)="toggleExpand()">
-      </button>
-    </div>
-
-    <p-divider></p-divider>
-
-    <ng-container *ngIf="bookInSeries.length > 0">
-      <div>
-        <h3 class="text-xl font-semibold pt-2">More in the Series</h3>
-        <div class="dashboard-scroller-infinite"
-             infiniteScroll
-             [infiniteScrollDistance]="2"
-             [infiniteScrollThrottle]="50"
-             [horizontal]="true">
-          <div class="dashboard-scroller-card" *ngFor="let book of bookInSeries">
-            <app-book-card
-              [book]="book"
-              [isCheckboxEnabled]="false"
-              [readButtonHidden]="true"
-              [bottomBarHidden]="true">
-            </app-book-card>
-          </div>
+  @if (metadata$ | async; as metadata) {
+    <div class="flex-1 overflow-auto space-y-2 px-2">
+      <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }" class="transition-all duration-300 overflow-hidden description-container">
+        <div class="readonly-editor px-2">
+          <p-editor #quillEditor [readonly]="true" [style]="{height: '250px'}" [(ngModel)]="metadata.description">
+            <ng-template #header>
+            </ng-template>
+          </p-editor>
         </div>
       </div>
+      @if (metadata.description && metadata.description.length > 100) {
+        <div class="text-left">
+          <button pButton
+            type="button"
+            [label]="isExpanded ? 'Show less' : 'Show more'"
+            [icon]="isExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+            iconPos="right"
+            class="p-button-text p-button-sm"
+            (click)="toggleExpand()">
+          </button>
+        </div>
+      }
       <p-divider></p-divider>
-    </ng-container>
-
-    <ng-container *ngIf="recommendedBooks.length > 0">
-      <div>
-        <h3 class="text-xl font-semibold">Similar Books</h3>
-        <div class="dashboard-scroller-infinite"
-             infiniteScroll
-             [infiniteScrollDistance]="2"
-             [infiniteScrollThrottle]="50"
-             [horizontal]="true">
-          <div class="dashboard-scroller-card" *ngFor="let book of recommendedBooks">
-            <app-book-card
-              [book]="book.book"
-              [isCheckboxEnabled]="false"
-              [readButtonHidden]="true"
-              [bottomBarHidden]="true">
-            </app-book-card>
+      @if (bookInSeries.length > 0) {
+        <div>
+          <h3 class="text-xl font-semibold pt-2">More in the Series</h3>
+          <div class="dashboard-scroller-infinite"
+            infiniteScroll
+            [infiniteScrollDistance]="2"
+            [infiniteScrollThrottle]="50"
+            [horizontal]="true">
+            @for (book of bookInSeries; track book) {
+              <div class="dashboard-scroller-card">
+                <app-book-card
+                  [book]="book"
+                  [isCheckboxEnabled]="false"
+                  [readButtonHidden]="true"
+                  [bottomBarHidden]="true">
+                </app-book-card>
+              </div>
+            }
           </div>
         </div>
-      </div>
-      <p-divider></p-divider>
-    </ng-container>
-
-  </div>
+        <p-divider></p-divider>
+      }
+      @if (recommendedBooks.length > 0) {
+        <div>
+          <h3 class="text-xl font-semibold">Similar Books</h3>
+          <div class="dashboard-scroller-infinite"
+            infiniteScroll
+            [infiniteScrollDistance]="2"
+            [infiniteScrollThrottle]="50"
+            [horizontal]="true">
+            @for (book of recommendedBooks; track book) {
+              <div class="dashboard-scroller-card">
+                <app-book-card
+                  [book]="book.book"
+                  [isCheckboxEnabled]="false"
+                  [readButtonHidden]="true"
+                  [bottomBarHidden]="true">
+                </app-book-card>
+              </div>
+            }
+          </div>
+        </div>
+        <p-divider></p-divider>
+      }
+    </div>
+  }
 </div>

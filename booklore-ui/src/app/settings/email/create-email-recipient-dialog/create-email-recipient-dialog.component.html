@@ -4,17 +4,21 @@
     <label class="w-40 text-right font-medium">Recipient Name:</label>
     <input type="text" pInputText formControlName="name" placeholder="Enter recipient name..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="emailRecipientForm.get('name')?.invalid && (emailRecipientForm.get('name')?.dirty || emailRecipientForm.get('name')?.touched)">
-    Recipient name is required.
-  </small>
+  @if (emailRecipientForm.get('name')?.invalid && (emailRecipientForm.get('name')?.dirty || emailRecipientForm.get('name')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Recipient name is required.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Email Address:</label>
     <input type="email" pInputText formControlName="email" placeholder="Enter email address..." class="w-full md:w-80"/>
   </div>
-  <small class="text-red-500 pl-44" *ngIf="emailRecipientForm.get('email')?.invalid && (emailRecipientForm.get('email')?.dirty || emailRecipientForm.get('email')?.touched)">
-    Valid email is required.
-  </small>
+  @if (emailRecipientForm.get('email')?.invalid && (emailRecipientForm.get('email')?.dirty || emailRecipientForm.get('email')?.touched)) {
+    <small class="text-red-500 pl-44">
+      Valid email is required.
+    </small>
+  }
 
   <div class="flex items-center gap-4">
     <label class="w-40 text-right font-medium">Default Recipient:</label>

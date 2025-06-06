@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {FileSelectEvent, FileUpload, FileUploadHandlerEvent} from 'primeng/fileupload';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase} from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MessageService} from 'primeng/api';
 import {Select} from 'primeng/select';
@@ -32,14 +32,10 @@ interface UploadingFile {
     Button,
     AsyncPipe,
     FormsModule,
-    NgIf,
     Select,
     Badge,
-    NgForOf,
-    NgSwitchCase,
-    NgSwitch,
     Tooltip
-  ],
+],
   templateUrl: './book-uploader.component.html',
   styleUrl: './book-uploader.component.scss'
 })

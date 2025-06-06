@@ -9,7 +9,7 @@ import {LibraryService} from '../../../book/service/library.service';
 import {UserService} from '../user.service';
 import {MessageService} from 'primeng/api';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
-import {NgIf} from '@angular/common';
+
 
 @Component({
   selector: 'app-create-user-dialog',
@@ -20,9 +20,8 @@ import {NgIf} from '@angular/common';
     FormsModule,
     Checkbox,
     MultiSelectModule,
-    Button,
-    NgIf
-  ],
+    Button
+],
   templateUrl: './create-user-dialog.component.html',
   styleUrl: './create-user-dialog.component.scss'
 })

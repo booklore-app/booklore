@@ -34,56 +34,97 @@
         </td>
         <td>{{ user.username }}</td>
         <td>
-          <input *ngIf="user.isEditing" type="text" [(ngModel)]="user.name" class="p-inputtext w-full"/>
-          <span *ngIf="!user.isEditing">{{ user.name }}</span>
+          @if (user.isEditing) {
+            <input type="text" [(ngModel)]="user.name" class="p-inputtext w-full"/>
+          }
+          @if (!user.isEditing) {
+            <span>{{ user.name }}</span>
+          }
         </td>
         <td>
-          <input *ngIf="user.isEditing" type="email" [(ngModel)]="user.email" class="p-inputtext w-full"/>
-          <span *ngIf="!user.isEditing">{{ user.email }}</span>
+          @if (user.isEditing) {
+            <input type="email" [(ngModel)]="user.email" class="p-inputtext w-full"/>
+          }
+          @if (!user.isEditing) {
+            <span>{{ user.email }}</span>
+          }
         </td>
         <td>
-          <p-multiSelect
-            *ngIf="user.isEditing"
-            [options]="allLibraries"
-            optionLabel="name"
-            optionValue="id"
-            [(ngModel)]="editingLibraryIds"
-            placeholder="Select Libraries"
-            appendTo="body">
-          </p-multiSelect>
-          <span *ngIf="!user.isEditing">
-            {{ user.libraryNames }}
-          </span>
+          @if (user.isEditing) {
+            <p-multiSelect
+              [options]="allLibraries"
+              optionLabel="name"
+              optionValue="id"
+              [(ngModel)]="editingLibraryIds"
+              placeholder="Select Libraries"
+              appendTo="body">
+            </p-multiSelect>
+          }
+          @if (!user.isEditing) {
+            <span>
+              {{ user.libraryNames }}
+            </span>
+          }
         </td>
         <td class="text-center">
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.admin" *ngIf="user.isEditing"></p-checkbox>
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.admin" disabled *ngIf="!user.isEditing"></p-checkbox>
+          @if (user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.admin"></p-checkbox>
+          }
+          @if (!user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.admin" disabled></p-checkbox>
+          }
         </td>
         <td class="text-center">
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canUpload" *ngIf="user.isEditing"></p-checkbox>
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canUpload" disabled *ngIf="!user.isEditing"></p-checkbox>
+          @if (user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canUpload"></p-checkbox>
+          }
+          @if (!user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canUpload" disabled></p-checkbox>
+          }
         </td>
         <td class="text-center">
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canDownload" *ngIf="user.isEditing"></p-checkbox>
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canDownload" disabled *ngIf="!user.isEditing"></p-checkbox>
+          @if (user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canDownload"></p-checkbox>
+          }
+          @if (!user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canDownload" disabled></p-checkbox>
+          }
         </td>
         <td class="text-center">
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEditMetadata" *ngIf="user.isEditing"></p-checkbox>
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEditMetadata" disabled *ngIf="!user.isEditing"></p-checkbox>
+          @if (user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEditMetadata"></p-checkbox>
+          }
+          @if (!user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEditMetadata" disabled></p-checkbox>
+          }
         </td>
         <td class="text-center">
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canManipulateLibrary" *ngIf="user.isEditing"></p-checkbox>
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canManipulateLibrary" disabled *ngIf="!user.isEditing"></p-checkbox>
+          @if (user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canManipulateLibrary"></p-checkbox>
+          }
+          @if (!user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canManipulateLibrary" disabled></p-checkbox>
+          }
         </td>
         <td class="text-center">
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook" *ngIf="user.isEditing"></p-checkbox>
-          <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook" disabled *ngIf="!user.isEditing"></p-checkbox>
+          @if (user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook"></p-checkbox>
+          }
+          @if (!user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook" disabled></p-checkbox>
+          }
         </td>
         <td class="text-center">
           <ng-container>
-            <p-button *ngIf="!user.isEditing" icon="pi pi-pencil" outlined="true" severity="info" (onClick)="toggleEdit(user)"></p-button>
-            <p-button *ngIf="user.isEditing" icon="pi pi-check" outlined="true" severity="success" (onClick)="saveUser(user)"></p-button>
-            <p-button *ngIf="user.isEditing" icon="pi pi-times" outlined="true" severity="danger" (onClick)="toggleEdit(user)"></p-button>
+            @if (!user.isEditing) {
+              <p-button icon="pi pi-pencil" outlined="true" severity="info" (onClick)="toggleEdit(user)"></p-button>
+            }
+            @if (user.isEditing) {
+              <p-button icon="pi pi-check" outlined="true" severity="success" (onClick)="saveUser(user)"></p-button>
+            }
+            @if (user.isEditing) {
+              <p-button icon="pi pi-times" outlined="true" severity="danger" (onClick)="toggleEdit(user)"></p-button>
+            }
           </ng-container>
           <p-button
             icon="pi pi-pencil"
@@ -110,7 +151,9 @@
     <div class="flex flex-col gap-8 items-center">
       <p-password [(ngModel)]="newPassword" placeholder="New Password" [feedback]="false" class="w-full" fluid></p-password>
       <p-password [(ngModel)]="confirmNewPassword" placeholder="Confirm Password" [feedback]="false" class="w-full" fluid></p-password>
-      <p *ngIf="passwordError" class="p-error text-red-500 w-full text-left">{{ passwordError }}</p>
+      @if (passwordError) {
+        <p class="p-error text-red-500 w-full text-left">{{ passwordError }}</p>
+      }
       <div class="flex gap-4 w-full justify-end">
         <p-button label="Cancel" icon="pi pi-times" severity="secondary" (onClick)="isPasswordDialogVisible = false"></p-button>
         <p-button label="Change" icon="pi pi-check" severity="success" (onClick)="submitPasswordChange()"></p-button>

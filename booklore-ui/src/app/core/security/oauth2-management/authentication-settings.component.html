@@ -29,9 +29,11 @@
         [disabled]="!isOidcFormComplete()"
         (onChange)="toggleOidcEnabled()">
       </p-toggleswitch>
-      <div *ngIf="!isOidcFormComplete()" class="text-sm text-gray-400">
-        (Fill all required fields to enable)
-      </div>
+      @if (!isOidcFormComplete()) {
+        <div class="text-sm text-gray-400">
+          (Fill all required fields to enable)
+        </div>
+      }
     </div>
 
     <p class=" pt-8">OIDC Provider Settings:</p>
@@ -137,64 +139,67 @@
       </div>
     </div>
 
-    <div *ngIf="oidcEnabled">
-      <p class=" pt-6">OIDC User Provisioning:</p>
-      <div class="pl-6 space-y-6 p-4 m-4 custom-border">
-        <div>
-          <p class="text-lg pb-3">Automatic user provisioning:</p>
-          <div class="flex items-center gap-4 pl-6">
-            <label class="">Enabled</label>
-            <p-toggleswitch
-              [(ngModel)]="autoUserProvisioningEnabled"
-              inputId="autoProvision"
-              (onChange)="saveAutoProvision()">
-            </p-toggleswitch>
-            <div class="flex items-center gap-2 text-sm text-gray-400">
-              <i class="pi pi-info-circle text-blue-500"></i>
-              <span>
-                Enabling auto-provisioning ensures that new users are automatically created with the selected default permissions. If turned off, users must be manually created in Booklore before they can log in.
-              </span>
+    @if (oidcEnabled) {
+      <div>
+        <p class=" pt-6">OIDC User Provisioning:</p>
+        <div class="pl-6 space-y-6 p-4 m-4 custom-border">
+          <div>
+            <p class="text-lg pb-3">Automatic user provisioning:</p>
+            <div class="flex items-center gap-4 pl-6">
+              <label class="">Enabled</label>
+              <p-toggleswitch
+                [(ngModel)]="autoUserProvisioningEnabled"
+                inputId="autoProvision"
+                (onChange)="saveAutoProvision()">
+              </p-toggleswitch>
+              <div class="flex items-center gap-2 text-sm text-gray-400">
+                <i class="pi pi-info-circle text-blue-500"></i>
+                <span>
+                  Enabling auto-provisioning ensures that new users are automatically created with the selected default permissions. If turned off, users must be manually created in Booklore before they can log in.
+                </span>
+              </div>
             </div>
-          </div>
-
-          <div *ngIf="autoUserProvisioningEnabled">
-            <p class=" pt-8">Default permissions for auto-provisioned users:</p>
-            <div class="flex items-center gap-2 pl-6 pt-2">
-              <p-checkbox
-                [binary]="true"
-                [disabled]="true"
-                [ngModel]="true"
-                inputId="permissionRead">
-              </p-checkbox>
-              <label class="text-sm">Read Books</label>
-            </div>
-
-            <div *ngFor="let perm of availablePermissions" class="flex items-center gap-2 pl-6">
-              <p-checkbox
-                [(ngModel)]="perm.selected"
-                [binary]="true"
-                [inputId]="perm.value">
-              </p-checkbox>
-              <label [for]="perm.value" class="text-sm">{{ perm.label }}</label>
-            </div>
-
-            <p class=" pb-3 pt-6">Default libraries for auto-provisioned users:</p>
-            <div class="pl-6">
-              <p-multiSelect
-                [options]="allLibraries"
-                optionLabel="name"
-                optionValue="id"
-                [(ngModel)]="editingLibraryIds"
-                placeholder="Select Libraries"
-                appendTo="body">
-              </p-multiSelect>
-            </div>
-            <div class="mt-8">
-              <p-button label="Save Settings" [outlined]="true" (click)="saveAutoProvisioningSettings()"></p-button>
-            </div>
+            @if (autoUserProvisioningEnabled) {
+              <div>
+                <p class=" pt-8">Default permissions for auto-provisioned users:</p>
+                <div class="flex items-center gap-2 pl-6 pt-2">
+                  <p-checkbox
+                    [binary]="true"
+                    [disabled]="true"
+                    [ngModel]="true"
+                    inputId="permissionRead">
+                  </p-checkbox>
+                  <label class="text-sm">Read Books</label>
+                </div>
+                @for (perm of availablePermissions; track perm) {
+                  <div class="flex items-center gap-2 pl-6">
+                    <p-checkbox
+                      [(ngModel)]="perm.selected"
+                      [binary]="true"
+                      [inputId]="perm.value">
+                    </p-checkbox>
+                    <label [for]="perm.value" class="text-sm">{{ perm.label }}</label>
+                  </div>
+                }
+                <p class=" pb-3 pt-6">Default libraries for auto-provisioned users:</p>
+                <div class="pl-6">
+                  <p-multiSelect
+                    [options]="allLibraries"
+                    optionLabel="name"
+                    optionValue="id"
+                    [(ngModel)]="editingLibraryIds"
+                    placeholder="Select Libraries"
+                    appendTo="body">
+                  </p-multiSelect>
+                </div>
+                <div class="mt-8">
+                  <p-button label="Save Settings" [outlined]="true" (click)="saveAutoProvisioningSettings()"></p-button>
+                </div>
+              </div>
+            }
           </div>
         </div>
       </div>
-    </div>
+    }
   </div>
 </div>

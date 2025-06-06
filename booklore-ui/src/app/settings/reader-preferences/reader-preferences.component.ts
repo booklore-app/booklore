@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {NgForOf} from '@angular/common';
+
 import {Observable, Subscription} from 'rxjs';
 import {Select} from 'primeng/select';
 import {RadioButton} from 'primeng/radiobutton';
@@ -16,7 +16,7 @@ import {CbxPageSpread, CbxPageViewMode} from '../../book/model/book.model';
   templateUrl: './reader-preferences.component.html',
   standalone: true,
   styleUrls: ['./reader-preferences.component.scss'],
-  imports: [Select, FormsModule, NgForOf, RadioButton, Divider, Button, Tooltip]
+  imports: [Select, FormsModule, RadioButton, Divider, Button, Tooltip]
 })
 export class ReaderPreferences implements OnInit, OnDestroy {
 

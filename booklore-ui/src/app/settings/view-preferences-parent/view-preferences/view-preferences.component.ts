@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
-import {NgIf} from '@angular/common';
+
 import {MessageService} from 'primeng/api';
 import {Select} from 'primeng/select';
 import {TableModule} from 'primeng/table';
@@ -21,10 +21,9 @@ import {filter, take} from 'rxjs/operators';
     Tooltip,
     FormsModule,
     Button,
-    NgIf,
     TableModule,
     ToastModule
-  ],
+],
   templateUrl: './view-preferences.component.html',
   styleUrl: './view-preferences.component.scss'
 })

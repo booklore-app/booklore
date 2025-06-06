@@ -1,59 +1,65 @@
 <div #epubContainer class="epub-viewer-container">
-  <div *ngIf="isLoading" class="spinner-wrapper">
-    <p-progressSpinner></p-progressSpinner>
-  </div>
-  <div *ngIf="!isLoading">
-
-    <div class="epub-header">
-
-      <div>
-        <p-button size="small" class="menu-toggle-button" (click)="toggleDrawer()" icon="pi pi-bars" severity="secondary"></p-button>
-        <p-drawer [(visible)]="isDrawerVisible" [modal]="false" [position]="'left'" header="Chapters">
-          <ul class="chapter-list">
-            <li *ngFor="let chapter of chapters" (click)="navigateToChapter(chapter); $event.stopPropagation()" class="chapter-item">
-              {{ chapter.label }}
-            </li>
-          </ul>
-        </p-drawer>
-      </div>
-
-      <p>{{ currentChapter }}</p>
-
-      <div>
-        <div class="flex gap-4">
-          <div *ngIf="!locationsReady" class="location-indicator" pTooltip="Saving progress not ready yet">
-            <span class="dot"></span>
-          </div>
-          <div>
-            <p-button size="small" class="settings-toggle-button" (click)="toggleSettingsDrawer()" icon="pi pi-cog" severity="secondary"></p-button>
-            <p-drawer [(visible)]="isSettingsDrawerVisible" [modal]="false" [position]="'right'" header="Settings">
-              <div class="flex flex-col">
-                <div class="settings-content">
-                  <p>Font Size: {{ fontSize }}%</p>
-                  <div class="flex flex-row gap-4">
-                    <p-button icon="pi pi-minus" (click)="decreaseFontSize()" severity="info"></p-button>
-                    <p-button icon="pi pi-plus" (click)="increaseFontSize()" severity="info"></p-button>
-                  </div>
-                  <p-divider></p-divider>
-                  <label for="font-type">Font Type:</label>
-                  <p-select id="font-type" [options]="fontTypes" [(ngModel)]="selectedFontType" (onChange)="changeFontType()"></p-select>
-                  <p-divider></p-divider>
-                  <label for="theme">Theme:</label>
-                  <p-select id="theme" [options]="themes" [(ngModel)]="selectedTheme" (onChange)="changeThemes()"></p-select>
-                  <p-divider></p-divider>
-                  <label for="flow">Flow:</label>
-                  <p-select id="flow" [options]="flows" [(ngModel)]="selectedFlow" (onChange)="changeScrollMode()"></p-select>
-                </div>
+  @if (isLoading) {
+    <div class="spinner-wrapper">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  }
+  @if (!isLoading) {
+    <div>
+      <div class="epub-header">
+        <div>
+          <p-button size="small" class="menu-toggle-button" (click)="toggleDrawer()" icon="pi pi-bars" severity="secondary"></p-button>
+          <p-drawer [(visible)]="isDrawerVisible" [modal]="false" [position]="'left'" header="Chapters">
+            <ul class="chapter-list">
+              @for (chapter of chapters; track chapter) {
+                <li (click)="navigateToChapter(chapter); $event.stopPropagation()" class="chapter-item">
+                  {{ chapter.label }}
+                </li>
+              }
+            </ul>
+          </p-drawer>
+        </div>
+        <p>{{ currentChapter }}</p>
+        <div>
+          <div class="flex gap-4">
+            @if (!locationsReady) {
+              <div class="location-indicator" pTooltip="Saving progress not ready yet">
+                <span class="dot"></span>
               </div>
-            </p-drawer>
+            }
+            <div>
+              <p-button size="small" class="settings-toggle-button" (click)="toggleSettingsDrawer()" icon="pi pi-cog" severity="secondary"></p-button>
+              <p-drawer [(visible)]="isSettingsDrawerVisible" [modal]="false" [position]="'right'" header="Settings">
+                <div class="flex flex-col">
+                  <div class="settings-content">
+                    <p>Font Size: {{ fontSize }}%</p>
+                    <div class="flex flex-row gap-4">
+                      <p-button icon="pi pi-minus" (click)="decreaseFontSize()" severity="info"></p-button>
+                      <p-button icon="pi pi-plus" (click)="increaseFontSize()" severity="info"></p-button>
+                    </div>
+                    <p-divider></p-divider>
+                    <label for="font-type">Font Type:</label>
+                    <p-select id="font-type" [options]="fontTypes" [(ngModel)]="selectedFontType" (onChange)="changeFontType()"></p-select>
+                    <p-divider></p-divider>
+                    <label for="theme">Theme:</label>
+                    <p-select id="theme" [options]="themes" [(ngModel)]="selectedTheme" (onChange)="changeThemes()"></p-select>
+                    <p-divider></p-divider>
+                    <label for="flow">Flow:</label>
+                    <p-select id="flow" [options]="flows" [(ngModel)]="selectedFlow" (onChange)="changeScrollMode()"></p-select>
+                  </div>
+                </div>
+              </p-drawer>
+            </div>
           </div>
         </div>
       </div>
+      <div id="epubContainer" #epubContainer></div>
+      @if (selectedFlow !== 'scrolled') {
+        <button class="epub-controls-left" (click)="prevPage()">←</button>
+      }
+      @if (selectedFlow !== 'scrolled') {
+        <button class="epub-controls-right" (click)="nextPage()">→</button>
+      }
     </div>
-
-    <div id="epubContainer" #epubContainer></div>
-
-    <button *ngIf="selectedFlow !== 'scrolled'" class="epub-controls-left" (click)="prevPage()">←</button>
-    <button *ngIf="selectedFlow !== 'scrolled'" class="epub-controls-right" (click)="nextPage()">→</button>
-  </div>
+  }
 </div>

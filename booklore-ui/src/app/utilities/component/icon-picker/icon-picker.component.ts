@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DialogModule} from 'primeng/dialog';
-import {NgForOf} from '@angular/common';
+
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -9,9 +9,8 @@ import {FormsModule} from '@angular/forms';
   styleUrls: ['./icon-picker.component.scss'],
   imports: [
     DialogModule,
-    NgForOf,
     FormsModule
-  ],
+],
   standalone: true
 })
 export class IconPickerComponent {
