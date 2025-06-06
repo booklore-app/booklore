@@ -10,7 +10,11 @@
           }
           @if (entityType === EntityType.ALL_BOOKS) {
             <p class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
-              All Books
+              @if (currentFilterLabel) {
+                {{ currentFilterLabel }}
+              } @else {
+                All Books
+              }
             </p>
           }
           @if (entityType === EntityType.UNSHELVED) {

@@ -98,6 +98,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   isDrawerVisible: boolean = false;
   dynamicDialogRef: DynamicDialogRef | undefined;
   EntityType = EntityType;
+  currentFilterLabel: string | null = null;
 
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
   @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
@@ -599,6 +600,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.bookFilterComponent.filterSelected.subscribe((filters: Record<string, any> | null) => {
       this.selectedFilter.next(filters);
+      this.currentFilterLabel = "All Books";
     });
 
     this.bookFilterComponent.filterModeChanged.subscribe((mode: 'and' | 'or') => {
@@ -623,6 +625,17 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         });
         this.selectedFilter.next(parsedFilters);
         this.bookFilterComponent.setFilters?.(parsedFilters);
+
+        const firstFilter = rawFilterParam.split(',')[0];
+        const [key, ...values] = firstFilter.split(':');
+        const firstValue = values.join(':').split('|')[0];
+        if (key && firstValue) {
+          this.currentFilterLabel = this.capitalize(key) + ': ' + firstValue;
+        } else {
+          this.currentFilterLabel = null;
+        }
+      } else {
+        this.currentFilterLabel = null;
       }
 
       this.userService.userState$
@@ -687,7 +700,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           const queryParams: any = {
             [QUERY_PARAMS.VIEW]: this.currentViewMode,
             [QUERY_PARAMS.SORT]: this.selectedSort.field,
-            [QUERY_PARAMS.DIRECTION]: this.selectedSort.direction === SortDirection.ASCENDING ? SORT_DIRECTION.ASCENDING : SORT_DIRECTION.DESCENDING,
+            [QUERY_PARAMS.DIRECTION]: this.selectedSort.direction === SortDirection.ASCENDING
+              ? SORT_DIRECTION.ASCENDING
+              : SORT_DIRECTION.DESCENDING,
             [QUERY_PARAMS.SIDEBAR]: this.bookFilterComponent.showFilters.toString(),
             [QUERY_PARAMS.FILTER]: Object.entries(parsedFilters)
               .map(([k, v]) => `${k}:${v.join('|')}`)
@@ -707,6 +722,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           this.cdr.detectChanges();
         });
     });
+  }
+
+  capitalize(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   lockUnlockMetadata() {
