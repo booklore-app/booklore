@@ -38,7 +38,22 @@
                     tooltipPosition="top">
                   </i>
                 </div>
-                <p class="text-xl">{{ getAuthorNames(metadata?.authors || []) }}</p>
+                <p class="text-xl">
+                  @for (author of metadata?.authors; track author; let isLast = $last) {
+                    <a
+                      class="underline hover:opacity-80"
+                      [routerLink]="['/all-books']"
+                      [queryParams]="{
+                        view: 'grid',
+                        sort: 'title',
+                        direction: 'asc',
+                        sidebar: true,
+                        filter: 'author:' + author
+                      }"
+                    >{{ author }}</a>
+                    @if (!isLast) {<span>, </span>}
+                  }
+                </p>
               </div>
             </div>
             <div class="flex items-center gap-2 pt-2">
@@ -107,9 +122,9 @@
                 <a class="flex items-center gap-1" [href]="'https://books.google.com/books?id=' + metadata.googleId" target="_blank" rel="noopener noreferrer">
                   <img src="https://books.google.com/favicon.ico" alt="Google Books" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
                 </a>
-              
+
 }
-            
+
 } @else {
 
               <p-rating
@@ -125,7 +140,19 @@
             </div>
             <div class="flex gap-2 pt-4 overflow-x-auto scrollbar-hide">
               @for (category of metadata.categories; track category) {
-                <p-tag [value]="category" class="shrink-0"></p-tag>
+                <a
+                  [routerLink]="['/all-books']"
+                  [queryParams]="{
+                    view: 'grid',
+                    sort: 'title',
+                    direction: 'asc',
+                    sidebar: true,
+                    filter: 'category:' + category
+                  }"
+                  class="shrink-0 no-underline"
+                >
+                  <p-tag [value]="category"></p-tag>
+                </a>
               }
             </div>
             <div class="grid gap-x-20 gap-y-2 pt-6" style="grid-template-columns: repeat(5, max-content);">

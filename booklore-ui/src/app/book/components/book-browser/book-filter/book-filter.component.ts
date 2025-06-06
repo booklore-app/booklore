@@ -238,7 +238,25 @@ export class BookFilterComponent implements OnInit {
       this.activeFilters[filterType].push(value);
     }
 
-    this.filterSelected.emit({...this.activeFilters});
+    if (Object.keys(this.activeFilters).length === 0) {
+      this.filterSelected.emit(null);
+    } else {
+      this.filterSelected.emit({ ...this.activeFilters });
+    }
+  }
+
+  setFilters(filters: Record<string, any>) {
+    this.activeFilters = {};
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (Array.isArray(value)) {
+        this.activeFilters[key] = [...value];
+      } else {
+        this.activeFilters[key] = [value];
+      }
+    }
+
+    this.filterSelected.emit({ ...this.activeFilters });
   }
 
   clearActiveFilter() {

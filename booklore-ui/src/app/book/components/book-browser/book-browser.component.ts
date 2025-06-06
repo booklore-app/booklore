@@ -47,7 +47,8 @@ const QUERY_PARAMS = {
   VIEW: 'view',
   SORT: 'sort',
   DIRECTION: 'direction',
-  FILTER: 'filter'
+  FILTER: 'filter',
+  SIDEBAR: 'sidebar'
 };
 
 const VIEW_MODES = {
@@ -535,7 +536,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
     this.router.navigate([], {
       queryParams: {
-        [QUERY_PARAMS.FILTER]: this.bookFilterComponent.showFilters.toString()
+        [QUERY_PARAMS.SIDEBAR]: this.bookFilterComponent.showFilters.toString()
       },
       queryParamsHandling: 'merge',
       replaceUrl: true
@@ -608,7 +609,21 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const viewParam = paramMap.get(QUERY_PARAMS.VIEW);
       const sortParam = paramMap.get(QUERY_PARAMS.SORT);
       const directionParam = paramMap.get(QUERY_PARAMS.DIRECTION);
-      const filterParam = paramMap.get(QUERY_PARAMS.FILTER);
+      const sidebarParam = paramMap.get(QUERY_PARAMS.SIDEBAR);
+      const rawFilterParam = paramMap.get(QUERY_PARAMS.FILTER);
+
+      const parsedFilters: Record<string, string[]> = {};
+      if (rawFilterParam) {
+        rawFilterParam.split(',').forEach(pair => {
+          const [key, ...valueParts] = pair.split(':');
+          const value = valueParts.join(':');
+          if (key && value) {
+            parsedFilters[key] = value.split('|').map(v => v.trim()).filter(Boolean);
+          }
+        });
+        this.selectedFilter.next(parsedFilters);
+        this.bookFilterComponent.setFilters?.(parsedFilters);
+      }
 
       this.userService.userState$
         .pipe(
@@ -633,26 +648,39 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           };
 
           const userSortKey = effectivePrefs.sortKey;
-          const userSortDir = effectivePrefs.sortDir?.toUpperCase() === 'DESC' ? SortDirection.DESCENDING : SortDirection.ASCENDING;
+          const userSortDir = effectivePrefs.sortDir?.toUpperCase() === 'DESC'
+            ? SortDirection.DESCENDING
+            : SortDirection.ASCENDING;
 
-          const matchedSort = this.sortOptions.find(opt => opt.field === sortParam) || this.sortOptions.find(opt => opt.field === userSortKey);
+          const matchedSort = this.sortOptions.find(opt => opt.field === sortParam)
+            || this.sortOptions.find(opt => opt.field === userSortKey);
 
           this.selectedSort = matchedSort ? {
             label: matchedSort.label,
             field: matchedSort.field,
-            direction: directionParam ? (directionParam === SORT_DIRECTION.DESCENDING ? SortDirection.DESCENDING : SortDirection.ASCENDING) : userSortDir
+            direction: directionParam?.toUpperCase() === SORT_DIRECTION.DESCENDING
+              ? SortDirection.DESCENDING
+              : SortDirection.ASCENDING
           } : {
             label: 'Added On',
             field: 'addedOn',
             direction: SortDirection.DESCENDING
           };
 
-          this.currentViewMode = (viewParam === VIEW_MODES.TABLE || viewParam === VIEW_MODES.GRID) ? viewParam : effectivePrefs.view?.toLowerCase() ?? VIEW_MODES.GRID;
-          this.bookFilterComponent.showFilters = filterParam === 'true' || (filterParam === null && this.filterVisibility);
+          this.currentViewMode = (viewParam === VIEW_MODES.TABLE || viewParam === VIEW_MODES.GRID)
+            ? viewParam
+            : effectivePrefs.view?.toLowerCase() ?? VIEW_MODES.GRID;
+
+          this.bookFilterComponent.showFilters = sidebarParam === 'true'
+            || (sidebarParam === null && this.filterVisibility);
+
           this.updateSortOptions();
 
-          if (this.lastAppliedSort?.field !== this.selectedSort.field || this.lastAppliedSort?.direction !== this.selectedSort.direction) {
-            this.lastAppliedSort = {...this.selectedSort};
+          if (
+            this.lastAppliedSort?.field !== this.selectedSort.field ||
+            this.lastAppliedSort?.direction !== this.selectedSort.direction
+          ) {
+            this.lastAppliedSort = { ...this.selectedSort };
             this.applySortOption(this.selectedSort);
           }
 
@@ -660,17 +688,16 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
             [QUERY_PARAMS.VIEW]: this.currentViewMode,
             [QUERY_PARAMS.SORT]: this.selectedSort.field,
             [QUERY_PARAMS.DIRECTION]: this.selectedSort.direction === SortDirection.ASCENDING ? SORT_DIRECTION.ASCENDING : SORT_DIRECTION.DESCENDING,
-            [QUERY_PARAMS.FILTER]: this.bookFilterComponent.showFilters.toString()
+            [QUERY_PARAMS.SIDEBAR]: this.bookFilterComponent.showFilters.toString(),
+            [QUERY_PARAMS.FILTER]: Object.entries(parsedFilters)
+              .map(([k, v]) => `${k}:${v.join('|')}`)
+              .join(',')
           };
 
           const currentParams = this.activatedRoute.snapshot.queryParams;
+          const changed = Object.keys(queryParams).some(k => currentParams[k] !== queryParams[k]);
 
-          if (
-            currentParams[QUERY_PARAMS.VIEW] !== queryParams[QUERY_PARAMS.VIEW] ||
-            currentParams[QUERY_PARAMS.SORT] !== queryParams[QUERY_PARAMS.SORT] ||
-            currentParams[QUERY_PARAMS.DIRECTION] !== queryParams[QUERY_PARAMS.DIRECTION] ||
-            currentParams[QUERY_PARAMS.FILTER] !== queryParams[QUERY_PARAMS.FILTER]
-          ) {
+          if (changed) {
             this.router.navigate([], {
               queryParams,
               replaceUrl: true
