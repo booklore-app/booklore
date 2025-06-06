@@ -45,20 +45,32 @@ export class SortService {
     const {field, direction} = selectedSort;
     const extractor = this.fieldExtractors[field];
 
-    if (!extractor) return books;
+    if (!extractor) {
+      console.warn(`[SortService] No extractor for field: ${field}`);
+      return books;
+    }
 
-    return books.sort((a, b) => {
-      const valueA = extractor(a);
-      const valueB = extractor(b);
+    return books.slice().sort((a, b) => {
+      const aValue = extractor(a);
+      const bValue = extractor(b);
 
-      if (valueA === null || valueA === undefined) return 1;
-      if (valueB === null || valueB === undefined) return -1;
+      let result: number;
 
-      if (direction === SortDirection.ASCENDING) {
-        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+      if (Array.isArray(aValue) && Array.isArray(bValue)) {
+        const nameCompare = aValue[0]?.localeCompare?.(bValue[0]) ?? 0;
+        result = nameCompare !== 0 ? nameCompare : (aValue[1] - bValue[1]);
+      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+        result = aValue.localeCompare(bValue);
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        result = aValue - bValue;
       } else {
-        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+        // Handle nulls or mismatches
+        if (aValue == null && bValue != null) return 1;
+        if (aValue != null && bValue == null) return -1;
+        return 0;
       }
+
+      return direction === SortDirection.ASCENDING ? result : -result;
     });
   }
 }
