@@ -100,9 +100,9 @@ export class BookTableComponent implements OnChanges {
   }
 
   isMetadataFullyLocked(metadata: BookMetadata): boolean {
-    return Object.keys(metadata)
-      .filter(key => key.endsWith('Locked'))
-      .every(key => metadata[key] === true);
+    const lockedKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
+    if (lockedKeys.length === 0) return false;
+    return lockedKeys.every(key => metadata[key] === true);
   }
 
   formatFileSize(kb?: number): string {
