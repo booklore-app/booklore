@@ -136,6 +136,18 @@
   opacity: 0.8;
 }
 
+.series-number-overlay {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 0.75rem;
+  padding: 1px 3px;
+  border-radius: 3px;
+  z-index: 3;
+}
+
 ::ng-deep .progress-incomplete .p-progressbar-value {
   background-color: #3b82f6;
 }

@@ -10,7 +10,12 @@
             loading="lazy"
             width="225"
             style="min-width: 225px;"
-            />
+          />
+          @if (metadata?.seriesNumber != null) {
+            <div class="series-number-overlay">
+              #{{ metadata?.seriesNumber }}
+            </div>
+          }
           @if (getProgressPercent() !== null) {
             <p-progressBar
               [value]="getProgressPercent()"
@@ -51,7 +56,9 @@
                         filter: 'author:' + author
                       }"
                     >{{ author }}</a>
-                    @if (!isLast) {<span>, </span>}
+                    @if (!isLast) {
+                      <span>, </span>
+                    }
                   }
                 </p>
               </div>
@@ -61,17 +68,18 @@
                 @if (metadata.amazonRating) {
                   @if (metadata.asin) {
                     <a class="flex items-center gap-1" [href]="'https://www.amazon.com/dp/' + metadata.asin" target="_blank" rel="noopener noreferrer">
-                      <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                      <img src="https://www.amazon.com/favicon.ico" alt="Amazon"
+                           class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
                       <p class="font-semibold">{{ metadata.amazonRating }}</p>
                     </a>
                   } @else {
                     <span class="flex items-center gap-1">
-                      <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain" />
+                      <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain"/>
                       <p class="font-semibold">{{ metadata.amazonRating }}</p>
                     </span>
                   }
                   <p-rating [ngModel]="metadata.amazonRating" readonly stars="5"
-                    [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
+                            [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
                   </p-rating>
                   <p class="font-semibold">({{ metadata.amazonReviewCount | number:'1.0-0' }})</p>
                   @if (metadata.goodreadsRating || metadata.hardcoverRating) {
@@ -81,17 +89,18 @@
                 @if (metadata.goodreadsRating) {
                   @if (metadata.goodreadsId) {
                     <a class="flex items-center gap-1" [href]="'https://www.goodreads.com/book/show/' + metadata.goodreadsId" target="_blank" rel="noopener noreferrer">
-                      <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                      <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads"
+                           class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
                       <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
                     </a>
                   } @else {
                     <span class="flex items-center gap-1">
-                      <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain" />
+                      <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain"/>
                       <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
                     </span>
                   }
                   <p-rating [ngModel]="metadata.goodreadsRating" readonly stars="5"
-                    [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
+                            [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
                   </p-rating>
                   <p class="font-semibold">({{ metadata.goodreadsReviewCount | number:'1.0-0' }})</p>
                   @if (metadata.hardcoverRating) {
@@ -101,17 +110,18 @@
                 @if (metadata.hardcoverRating) {
                   @if (metadata.hardcoverId) {
                     <a class="flex items-center gap-1" [href]="'https://hardcover.app/books/' + metadata.hardcoverId" target="_blank" rel="noopener noreferrer">
-                      <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
+                      <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover"
+                           class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
                       <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
                     </a>
                   } @else {
                     <span class="flex items-center gap-1">
-                      <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain" />
+                      <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain"/>
                       <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
                     </span>
                   }
                   <p-rating [ngModel]="metadata.hardcoverRating" readonly stars="5"
-                    [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
+                            [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
                   </p-rating>
                   <p class="font-semibold">({{ metadata.hardcoverReviewCount | number:'1.0-0' }})</p>
                   @if ((metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating) && metadata.googleId) {
@@ -119,22 +129,23 @@
                   }
                 }
                 @if (metadata.googleId) {
-                <a class="flex items-center gap-1" [href]="'https://books.google.com/books?id=' + metadata.googleId" target="_blank" rel="noopener noreferrer">
-                  <img src="https://books.google.com/favicon.ico" alt="Google Books" class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg" />
-                </a>
+                  <a class="flex items-center gap-1" [href]="'https://books.google.com/books?id=' + metadata.googleId" target="_blank" rel="noopener noreferrer">
+                    <img src="https://books.google.com/favicon.ico" alt="Google Books"
+                         class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
+                  </a>
 
-}
+                }
 
-} @else {
+              } @else {
 
-              <p-rating
-                [(ngModel)]="metadata.rating"
-                readonly
-                stars="5"
-                [style.--p-rating-icon-active-color]="getStarColor(metadata.rating)">
-              </p-rating>
-              <p class="font-semibold">
-                {{ metadata?.reviewCount ? '(' + (metadata?.reviewCount | number:'1.0-0') + ' Ratings)' : 'No Ratings' }}
+                <p-rating
+                  [(ngModel)]="metadata.rating"
+                  readonly
+                  stars="5"
+                  [style.--p-rating-icon-active-color]="getStarColor(metadata.rating)">
+                </p-rating>
+                <p class="font-semibold">
+                  {{ metadata?.reviewCount ? '(' + (metadata?.reviewCount | number:'1.0-0') + ' Ratings)' : 'No Ratings' }}
                 </p>
               }
             </div>
@@ -182,7 +193,7 @@
                 onLabel=""
                 offLabel=""
                 size="small"
-              class="flex-shrink-0"></p-toggleButton>
+                class="flex-shrink-0"></p-toggleButton>
               @if (showFilePath) {
                 <div
                   class="flex items-center gap-4 flex-grow"
@@ -271,12 +282,12 @@
       @if (metadata.description && metadata.description.length > 100) {
         <div class="text-left">
           <button pButton
-            type="button"
-            [label]="isExpanded ? 'Show less' : 'Show more'"
-            [icon]="isExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-            iconPos="right"
-            class="p-button-text p-button-sm"
-            (click)="toggleExpand()">
+                  type="button"
+                  [label]="isExpanded ? 'Show less' : 'Show more'"
+                  [icon]="isExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                  iconPos="right"
+                  class="p-button-text p-button-sm"
+                  (click)="toggleExpand()">
           </button>
         </div>
       }
@@ -285,10 +296,10 @@
         <div>
           <h3 class="text-xl font-semibold pt-2">More in the Series</h3>
           <div class="dashboard-scroller-infinite"
-            infiniteScroll
-            [infiniteScrollDistance]="2"
-            [infiniteScrollThrottle]="50"
-            [horizontal]="true">
+               infiniteScroll
+               [infiniteScrollDistance]="2"
+               [infiniteScrollThrottle]="50"
+               [horizontal]="true">
             @for (book of bookInSeries; track book) {
               <div class="dashboard-scroller-card">
                 <app-book-card
@@ -307,10 +318,10 @@
         <div>
           <h3 class="text-xl font-semibold">Similar Books</h3>
           <div class="dashboard-scroller-infinite"
-            infiniteScroll
-            [infiniteScrollDistance]="2"
-            [infiniteScrollThrottle]="50"
-            [horizontal]="true">
+               infiniteScroll
+               [infiniteScrollDistance]="2"
+               [infiniteScrollThrottle]="50"
+               [horizontal]="true">
             @for (book of recommendedBooks; track book) {
               <div class="dashboard-scroller-card">
                 <app-book-card

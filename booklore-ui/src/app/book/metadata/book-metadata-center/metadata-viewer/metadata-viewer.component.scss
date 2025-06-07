@@ -63,3 +63,15 @@
   overflow: visible;
 }
 
+.series-number-overlay {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 1rem;
+  padding: 1px 3px;
+  border-radius: 3px;
+  z-index: 3;
+}
+
