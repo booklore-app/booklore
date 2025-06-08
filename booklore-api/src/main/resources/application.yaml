@@ -1,7 +1,8 @@
 app:
   path-config: '/app/data'
   version: 'v0.0.40'
-
+  swagger:
+    enabled: ${SWAGGER_ENABLED:false}
   remote-auth:
     enabled: ${REMOTE_AUTH_ENABLED:false}
     create-new-users: ${REMOTE_AUTH_CREATE_NEW_USERS:true}
@@ -44,6 +45,10 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+springdoc:
+  swagger-ui:
+    persist-authorization: true
 
 logging:
   level:

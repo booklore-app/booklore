@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class AppProperties {
     private String pathConfig;
     private String version;
-
     private RemoteAuth remoteAuth;
+    private Swagger swagger = new Swagger();
 
     @Getter
     @Setter
@@ -25,5 +25,11 @@ public class AppProperties {
         private String headerEmail;
         private String headerGroups;
         private String adminGroup;
+    }
+
+    @Getter
+    @Setter
+    public static class Swagger {
+        private boolean enabled = true;
     }
 }

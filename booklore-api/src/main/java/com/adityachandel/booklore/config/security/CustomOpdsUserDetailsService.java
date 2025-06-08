@@ -18,9 +18,7 @@ public class CustomOpdsUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        OpdsUserEntity user = opdsUserRepository.findByUsername(username)
-                .orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(username));
-
+        OpdsUserEntity user = opdsUserRepository.findByUsername(username).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(username));
         return User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())

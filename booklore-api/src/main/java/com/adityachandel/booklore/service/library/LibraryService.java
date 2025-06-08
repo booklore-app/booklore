@@ -127,7 +127,7 @@ public class LibraryService {
                 try {
                     libraryProcessingService.processLibrary(libraryId);
                 } catch (InvalidDataAccessApiUsageException e) {
-                    log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
+                    log.debug("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
                 } catch (IOException e) {
                     log.error("Error while parsing library books", e);
                 }
@@ -166,7 +166,7 @@ public class LibraryService {
             try {
                 libraryProcessingService.processLibrary(libraryId);
             } catch (InvalidDataAccessApiUsageException e) {
-                log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
+                log.debug("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
             } catch (IOException e) {
                 log.error("Error while parsing library books", e);
             }
@@ -182,7 +182,7 @@ public class LibraryService {
             try {
                 libraryProcessingService.rescanLibrary(libraryId);
             } catch (InvalidDataAccessApiUsageException e) {
-                log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
+                log.debug("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
             } catch (IOException e) {
                 log.error("Error while parsing library books", e);
             }

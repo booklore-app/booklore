@@ -52,6 +52,7 @@ services:
       - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore # Only modify this if you're familiar with JDBC and your database setup
       - DATABASE_USERNAME=booklore # Must match MYSQL_USER defined in the mariadb container
       - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
+      - SWAGGER_ENABLED=false # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
     depends_on:
       mariadb:
         condition: service_healthy

@@ -1,9 +1,12 @@
 package com.adityachandel.booklore.config.security;
 
+import com.adityachandel.booklore.config.AppProperties;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -20,7 +23,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @AllArgsConstructor
 @EnableMethodSecurity
@@ -29,6 +36,24 @@ public class SecurityConfig {
 
     private final CustomOpdsUserDetailsService customOpdsUserDetailsService;
     private final DualJwtAuthenticationFilter dualJwtAuthenticationFilter;
+    private final AppProperties appProperties;
+
+    private static final String[] SWAGGER_ENDPOINTS = {
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+    };
+
+    private static final String[] COMMON_PUBLIC_ENDPOINTS = {
+            "/ws/**",
+            "/api/v1/auth/**",
+            "/api/v1/settings",
+            "/api/v1/setup/**",
+            "/api/v1/books/*/cover",
+            "/api/v1/opds/*/cover.jpg",
+            "/api/v1/cbx/*/pages/*",
+            "/api/v1/pdf/*/pages/*"
+    };
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,32 +61,35 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain opdsBasicAuthSecurityChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/v1/opds/**")
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .httpBasic(basic -> basic.realmName("Booklore OPDS"))
+                .csrf(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain jwtApiSecurityChain(HttpSecurity http) throws Exception {
+        List<String> publicEndpoints = new ArrayList<>(Arrays.asList(COMMON_PUBLIC_ENDPOINTS));
+        if (appProperties.getSwagger().isEnabled()) {
+            publicEndpoints.addAll(Arrays.asList(SWAGGER_ENDPOINTS));
+        }
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/ws/**",
-                                "/api/v1/books/*/cover",
-                                "/api/v1/settings",
-                                "/api/v1/setup",
-                                "/api/v1/setup/**",
-                                "/api/v1/opds/*/cover.jpg",
-                                "/api/v1/cbx/*/pages/*",
-                                "/api/v1/pdf/*/pages/*"
-                        ).permitAll()
+                        .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(customizer -> customizer.realmName("Booklore OPDS"))
                 .addFilterBefore(dualJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
@@ -86,17 +114,10 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(List.of("Content-Disposition"));
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
-
-    @Bean
-    public FilterRegistrationBean<ImageCachingFilter> loggingFilter() {
-        FilterRegistrationBean<ImageCachingFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new ImageCachingFilter());
-        registrationBean.addUrlPatterns("/api/v1/books/*/cover");
-        return registrationBean;
-    }
-
 }
