@@ -175,7 +175,8 @@ export class ViewPreferencesComponent implements OnInit {
           sortKey: o.sort,
           sortDir: o.sortDir,
           view: o.view,
-          coverSize: existing?.coverSize ?? 1.0
+          coverSize: existing?.coverSize ?? 1.0,
+          seriesCollapsed: existing?.seriesCollapsed ?? false
         }
       };
     });

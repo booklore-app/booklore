@@ -16,6 +16,7 @@ export interface Book {
   cbxProgress?: CbxProgress;
   filePath?: string;
   fileSizeKb?: number;
+  seriesCount?: number | null;
 }
 
 export interface EpubProgress {

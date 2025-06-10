@@ -44,27 +44,6 @@ export const pageCountRanges = [
   {id: '1000plus', label: '1000+ pages', min: 1000, max: Infinity}
 ];
 
-export function isRatingInRange(rating: number | undefined | null, rangeId: string): boolean {
-  if (rating == null) return false;
-  const range = ratingRanges.find(r => r.id === rangeId);
-  if (!range) return false;
-  return rating >= range.min && rating < range.max;
-}
-
-export function isFileSizeInRange(fileSizeKb: number | undefined, rangeId: string): boolean {
-  if (fileSizeKb == null) return false;
-  const range = fileSizeRanges.find(r => r.id === rangeId);
-  if (!range) return false;
-  return fileSizeKb >= range.min && fileSizeKb < range.max;
-}
-
-export function isPageCountInRange(pageCount: number | undefined, rangeId: string): boolean {
-  if (pageCount == null) return false;
-  const range = pageCountRanges.find(r => r.id === rangeId);
-  if (!range) return false;
-  return pageCount >= range.min && pageCount < range.max;
-}
-
 const getLanguageFilter = (book: Book) => {
   const lang = book.metadata?.language;
   return lang ? [{id: lang, name: lang}] : [];

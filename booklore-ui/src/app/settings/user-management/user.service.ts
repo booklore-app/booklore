@@ -16,7 +16,8 @@ export interface EntityViewPreference {
   sortKey: string;
   sortDir: 'ASC' | 'DESC';
   view: 'GRID' | 'TABLE';
-  coverSize: number
+  coverSize: number;
+  seriesCollapsed: boolean;
 }
 
 export interface EntityViewPreferenceOverride {

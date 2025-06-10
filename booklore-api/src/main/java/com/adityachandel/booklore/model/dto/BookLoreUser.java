@@ -60,6 +60,7 @@ public class BookLoreUser {
             private String sortDir;
             private String view;
             private Float coverSize;
+            private Boolean seriesCollapsed;
         }
 
         @Data
@@ -80,6 +81,7 @@ public class BookLoreUser {
             private String sortKey;
             private String sortDir;
             private String view;
+            private Boolean seriesCollapse;
         }
 
         @Data

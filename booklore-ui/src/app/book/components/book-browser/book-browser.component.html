@@ -32,7 +32,6 @@
       </div>
 
       <div class="flex items-center gap-8">
-
         <div class="flex flex-row items-center gap-6">
           @if (isFilterActive) {
             <a class="topbar-items topbar-item" (click)="clearFilter()">
@@ -43,7 +42,28 @@
               </i>
             </a>
           }
-
+          <div>
+            <a
+              class="topbar-items topbar-item"
+              (click)="seriesCollapseOverlay.toggle($event)"
+              pTooltip="Series collapse settings"
+              tooltipPosition="top">
+              <i class="pi pi-cog"></i>
+            </a>
+            <p-popover #seriesCollapseOverlay [dismissable]="true" appendTo="body">
+              <div class="w-[220px] p-2">
+                <div class="flex items-center gap-2">
+                  <p-checkbox
+                    [binary]="true"
+                    [ngModel]="seriesCollapseFilter.isSeriesCollapsed"
+                    (onChange)="onSeriesCollapseCheckboxChange($event.checked)"
+                    inputId="collapse-series-checkbox">
+                  </p-checkbox>
+                  <label for="collapse-series-checkbox">Collapse series</label>
+                </div>
+              </div>
+            </p-popover>
+          </div>
           <div>
             <a
               class="topbar-items topbar-item"
@@ -52,11 +72,10 @@
               tooltipPosition="top">
               <i class="pi pi-th-large"></i>
             </a>
-
             <p-popover #sizeOverlay [dismissable]="true" appendTo="body">
               <div style="width: 220px; padding: 8px;">
                 <p-slider
-                  [(ngModel)]="scaleFactor"
+                  [(ngModel)]="coverScaleManager.scaleFactor"
                   [min]="0.5"
                   [max]="1.5"
                   [step]="0.01"
@@ -64,7 +83,7 @@
                   (onChange)="updateScale()"
                 ></p-slider>
                 <div style="text-align: center; margin-top: 8px;">
-                  {{ scaleFactor.toFixed(2) }}x
+                  {{ coverScaleManager.scaleFactor.toFixed(2) }}x
                 </div>
               </div>
             </p-popover>
@@ -78,9 +97,9 @@
                 tooltipPosition="top">
               </i>
             </a>
-            <p-menu #sortMenu [popup]="true" [model]="sortOptions" appendTo="body">
+            <p-menu #sortMenu [popup]="true" [model]="this.bookSorter.sortOptions" appendTo="body">
               <ng-template pTemplate="item" let-item>
-                <div class="flex justify-between items-center px-4 py-2 cursor-pointer" (click)="sortBooks(item.field)">
+                <div class="flex justify-between items-center px-4 py-2 cursor-pointer" (click)="this.bookSorter.sortBooks(item.field)">
                   <span>{{ item.label }}</span>
                   @if (item.icon) {
                     <i [class]="item.icon"></i>
@@ -108,7 +127,8 @@
               placeholder="Title, Series or Author..."
               [(ngModel)]="bookTitle"
               (ngModelChange)="onSearchTermChange($event)"
-              class="search-input"/>
+              class="search-input"
+            />
             @if (bookTitle) {
               <p-button
                 icon="pi pi-times"
@@ -130,7 +150,8 @@
           [rounded]="true"
           (click)="toggleFilterSidebar()"
           pTooltip="Toggle filter sidebar"
-          tooltipPosition="top"/>
+          tooltipPosition="top"
+        />
       </div>
     </div>
 
@@ -159,8 +180,11 @@
           @if (bookState?.books; as books) {
             <div class="book-card-container">
               @if (currentViewMode === 'table' && books.length > 0) {
-                <app-book-table [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
-                                [sortOption]="selectedSort!"></app-book-table>
+                <app-book-table
+                  [books]="books"
+                  (selectedBooksChange)="onSelectedBooksChange($event)"
+                  [sortOption]="this.bookSorter.selectedSort!"
+                ></app-book-table>
               }
               @if (currentViewMode === 'grid') {
                 <virtual-scroller class="virtual-scroller" #scroll [items]="books">
@@ -170,12 +194,13 @@
                     [ngStyle]="{'grid-template-columns': 'repeat(auto-fill, minmax(' + gridColumnMinWidth + ', 1fr))'}">
                     @for (book of scroll.viewPortItems; track book) {
                       <div
-                        class="virtual-scroller-item"
+                        class="virtual-scroller-item relative"
                         [ngStyle]="{width: currentCardSize.width + 'px', height: currentCardSize.height + 'px'}">
                         <app-book-card
                           [book]="book"
                           [isCheckboxEnabled]="true"
                           [onBookSelect]="handleBookSelect.bind(this)"
+                          [isSeriesCollapsed]="seriesCollapseFilter.isSeriesCollapsed"
                           [isSelected]="selectedBooks.has(book.id)">
                         </app-book-card>
                       </div>
@@ -249,5 +274,4 @@
   </div>
 
   <app-book-filter [entity$]="entity$" [entityType$]="entityType$" [resetFilter$]="resetFilterSubject"></app-book-filter>
-
 </div>

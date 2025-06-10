@@ -35,6 +35,7 @@ export class BookCardComponent implements OnInit {
   @Input() isSelected: boolean = false;
   @Input() bottomBarHidden: boolean = false;
   @Input() readButtonHidden: boolean = false;
+  @Input() isSeriesCollapsed: boolean = false;
 
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
