@@ -3,9 +3,11 @@ package com.adityachandel.booklore.controller;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.*;
+import com.adityachandel.booklore.model.dto.settings.MetadataMatchWeights;
 import com.adityachandel.booklore.quartz.JobSchedulerService;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import com.adityachandel.booklore.service.metadata.BookMetadataUpdater;
+import com.adityachandel.booklore.service.metadata.MetadataMatchService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +26,7 @@ public class MetadataController {
     private final BookMetadataUpdater bookMetadataUpdater;
     private final JobSchedulerService jobSchedulerService;
     private final BookMetadataMapper bookMetadataMapper;
+    private final MetadataMatchService metadataMatchService;
 
     @PostMapping("/{bookId}/metadata/prospective")
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
@@ -36,8 +39,7 @@ public class MetadataController {
     public ResponseEntity<BookMetadata> updateMetadata(
             @RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId,
             @RequestParam(defaultValue = "true") boolean mergeCategories) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(
-                bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, mergeCategories), true);
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, mergeCategories), true);
         return ResponseEntity.ok(bookMetadata);
     }
 
@@ -78,5 +80,12 @@ public class MetadataController {
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
     public void regenerateCovers(@PathVariable Long bookId) {
         bookMetadataService.regenerateCover(bookId);
+    }
+
+    @PostMapping("/metadata/recalculate-match-scores")
+    @PreAuthorize("@securityUtil.isAdmin()")
+    public ResponseEntity<Void> recalculateMatchScores() {
+        metadataMatchService.recalculateAllMatchScores();
+        return ResponseEntity.noContent().build();
     }
 }

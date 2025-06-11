@@ -32,6 +32,7 @@ public class BookMetadataUpdater {
     private final BookMetadataRepository bookMetadataRepository;
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
+    private final MetadataMatchService metadataMatchService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BookMetadataEntity setBookMetadata(long bookId, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
@@ -51,6 +52,11 @@ public class BookMetadataUpdater {
         updateThumbnailIfNeeded(bookId, newMetadata, metadata, setThumbnail);
 
         bookMetadataRepository.save(metadata);
+
+        Float score = metadataMatchService.calculateMatchScore(bookEntity);
+        bookEntity.setMetadataMatchScore(score);
+        bookRepository.save(bookEntity);
+
         return metadata;
     }
 

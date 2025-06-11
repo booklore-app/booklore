@@ -37,6 +37,9 @@ public class BookEntity {
     @Column(name = "file_size_kb")
     private Long fileSizeKb;
 
+    @Column(name = "metadata_match_score")
+    private Float metadataMatchScore;
+
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private BookMetadataEntity metadata;
 

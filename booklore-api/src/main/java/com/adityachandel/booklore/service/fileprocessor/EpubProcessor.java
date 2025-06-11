@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.service.metadata.MetadataMatchService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -60,6 +61,7 @@ public class EpubProcessor implements FileProcessor {
     private final BookMapper bookMapper;
     private final FileProcessingUtils fileProcessingUtils;
     private final BookMetadataRepository bookMetadataRepository;
+    private final MetadataMatchService metadataMatchService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
@@ -80,6 +82,8 @@ public class EpubProcessor implements FileProcessor {
     protected Book processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.EPUB);
         setBookMetadata(bookEntity);
+        Float score = metadataMatchService.calculateMatchScore(bookEntity);
+        bookEntity.setMetadataMatchScore(score);
         if (generateCover(bookEntity)) {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
@@ -104,7 +108,7 @@ public class EpubProcessor implements FileProcessor {
                     String href = res.getHref();
 
                     if ((id != null && id.toLowerCase().contains("cover")) ||
-                        (href != null && href.toLowerCase().contains("cover"))) {
+                            (href != null && href.toLowerCase().contains("cover"))) {
 
                         if (res.getMediaType() != null && res.getMediaType().getName().startsWith("image")) {
                             coverImage = res;
@@ -133,14 +137,12 @@ public class EpubProcessor implements FileProcessor {
 
     private void setBookMetadata(BookEntity bookEntity) {
         log.debug("***Setting metadata for book {}", bookEntity.getFileName());
-        try (FileInputStream fis =
-                new FileInputStream(FileUtils.getBookFullPath(bookEntity))) {
+        try (FileInputStream fis = new FileInputStream(FileUtils.getBookFullPath(bookEntity))) {
 
-            io.documentnode.epub4j.domain.Book book =
-                new EpubReader().readEpub(fis);
+            io.documentnode.epub4j.domain.Book book = new EpubReader().readEpub(fis);
 
             BookMetadataEntity bookMetadata = bookEntity.getMetadata();
-            Metadata            epubMetadata = book.getMetadata();
+            Metadata epubMetadata = book.getMetadata();
 
             if (epubMetadata != null) {
                 bookMetadata.setTitle(truncate(epubMetadata.getFirstTitle(), 1000));
@@ -207,7 +209,7 @@ public class EpubProcessor implements FileProcessor {
                                 }
                             });
                 }
-                
+
                 // Calibre (EPUB2) series tags
                 String seriesName = epubMetadata.getMetaAttribute("calibre:series");
                 if (seriesName != null && !seriesName.isEmpty()) {
@@ -228,18 +230,18 @@ public class EpubProcessor implements FileProcessor {
                 extractFromOpf(FileUtils.getBookFullPath(bookEntity), bookMetadata);
 
                 bookCreatorService.addAuthorsToBook(getAuthors(book), bookEntity);
-                
+
                 // Get subjects and filter out invalid ones
                 List<String> subjects = epubMetadata.getSubjects();
                 List<String> validSubjects = new ArrayList<>();
-                
+
                 if (subjects != null && !subjects.isEmpty()) {
                     for (String subject : subjects) {
                         // Skip null or empty subjects
                         if (subject == null || subject.trim().isEmpty()) {
                             continue;
                         }
-                        
+
                         // Skip subjects that are too long (likely not real categories)
                         // Real categories are typically short, descriptive terms
                         if (subject.length() > 100) {
@@ -248,7 +250,7 @@ public class EpubProcessor implements FileProcessor {
                                     subject.substring(0, Math.min(50, subject.length())) + "...");
                             continue;
                         }
-                        
+
                         // Skip subjects that contain newlines or excessive whitespace (likely descriptions)
                         if (subject.contains("\n") || subject.contains("\r") || subject.contains("  ")) {
                             log.warn("Skipping subject with newlines/whitespace in {}: '{}'",
@@ -260,7 +262,7 @@ public class EpubProcessor implements FileProcessor {
                         validSubjects.add(subject);
                     }
                 }
-                
+
                 bookCreatorService.addCategoriesToBook(validSubjects, bookEntity);
             }
         } catch (Exception e) {

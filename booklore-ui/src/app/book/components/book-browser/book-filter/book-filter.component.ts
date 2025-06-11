@@ -44,6 +44,16 @@ export const pageCountRanges = [
   {id: '1000plus', label: '1000+ pages', min: 1000, max: Infinity}
 ];
 
+export const matchScoreRanges = [
+  {id: '0.95-1.0', min: 0.95, max: 1.01, name: 'Outstanding (95–100%)', sortIndex: 0},
+  {id: '0.90-0.94', min: 0.90, max: 0.95, name: 'Excellent (90–94%)', sortIndex: 1},
+  {id: '0.80-0.89', min: 0.80, max: 0.90, name: 'Great (80–89%)', sortIndex: 2},
+  {id: '0.70-0.79', min: 0.70, max: 0.80, name: 'Good (70–79%)', sortIndex: 3},
+  {id: '0.50-0.69', min: 0.50, max: 0.70, name: 'Fair (50–69%)', sortIndex: 4},
+  {id: '0.30-0.49', min: 0.30, max: 0.50, name: 'Weak (30–49%)', sortIndex: 5},
+  {id: '0.00-0.29', min: 0.00, max: 0.30, name: 'Poor (0–29%)', sortIndex: 6}
+];
+
 const getLanguageFilter = (book: Book) => {
   const lang = book.metadata?.language;
   return lang ? [{id: lang, name: lang}] : [];
@@ -77,6 +87,12 @@ function getPageCountRangeFilters(pageCount?: number) {
   if (pageCount == null) return [];
   const match = pageCountRanges.find(r => pageCount >= r.min && pageCount < r.max);
   return match ? [{id: match.id, name: match.label}] : [];
+}
+
+export function getMatchScoreRangeFilters(score?: number | null): { id: string; name: string; sortIndex?: number }[] {
+  if (score == null) return [];
+  const match = matchScoreRanges.find(r => score >= r.min && score < r.max);
+  return match ? [{id: match.id, name: match.name, sortIndex: match.sortIndex}] : [];
 }
 
 @Component({
@@ -128,6 +144,7 @@ export class BookFilterComponent implements OnInit {
     shelfStatus: 'Shelf Status',
     pageCount: 'Page Count',
     language: 'Language',
+    matchScore: 'Metadata Match Score'
   };
 
   bookService = inject(BookService);
@@ -138,15 +155,16 @@ export class BookFilterComponent implements OnInit {
         author: this.getFilterStream((book: Book) => book.metadata?.authors.map(name => ({id: name, name})) || [], 'id', 'name'),
         category: this.getFilterStream((book: Book) => book.metadata?.categories.map(name => ({id: name, name})) || [], 'id', 'name'),
         series: this.getFilterStream((book) => (book.metadata?.seriesName ? [{id: book.metadata.seriesName, name: book.metadata.seriesName}] : []), 'id', 'name'),
+        matchScore: this.getFilterStream((book: Book) => getMatchScoreRangeFilters(book.metadataMatchScore), 'id', 'name', true),
         publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name'),
+        shelfStatus: this.getFilterStream(getShelfStatusFilter, 'id', 'name'),
+        publishedDate: this.getFilterStream(extractPublishedYearFilter, 'id', 'name'),
+        language: this.getFilterStream(getLanguageFilter, 'id', 'name'),
+        fileSize: this.getFilterStream((book: Book) => getFileSizeRangeFilters(book.fileSizeKb), 'id', 'name'),
         amazonRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.amazonRating!), 'id', 'name'),
         goodreadsRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.goodreadsRating!), 'id', 'name'),
         hardcoverRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.hardcoverRating!), 'id', 'name'),
-        publishedDate: this.getFilterStream(extractPublishedYearFilter, 'id', 'name'),
-        fileSize: this.getFilterStream((book: Book) => getFileSizeRangeFilters(book.fileSizeKb), 'id', 'name'),
         pageCount: this.getFilterStream((book: Book) => getPageCountRangeFilters(book.metadata?.pageCount!), 'id', 'name'),
-        language: this.getFilterStream(getLanguageFilter, 'id', 'name'),
-        shelfStatus: this.getFilterStream(getShelfStatusFilter, 'id', 'name')
       };
       this.filterTypes = Object.keys(this.filterStreams);
     }
@@ -161,12 +179,14 @@ export class BookFilterComponent implements OnInit {
   private getFilterStream<T>(
     extractor: (book: Book) => T[] | undefined,
     idKey: keyof T,
-    nameKey: keyof T
+    nameKey: keyof T,
+    sortByIndex = false
   ): Observable<Filter<T[keyof T]>[]> {
     return combineLatest([this.bookService.bookState$, this.entity$ ?? of(null), this.entityType$ ?? of(EntityType.ALL_BOOKS)]).pipe(
       map(([state, entity, entityType]) => {
         const filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
         const filterMap = new Map<any, Filter<any>>();
+
         filteredBooks.forEach((book) => {
           (extractor(book) || []).forEach((item) => {
             const id = item[idKey];
@@ -176,11 +196,19 @@ export class BookFilterComponent implements OnInit {
             filterMap.get(id)!.bookCount += 1;
           });
         });
-        return Array.from(filterMap.values()).sort(
-          (a, b) =>
-            b.bookCount - a.bookCount ||
-            a.value[nameKey].toString().localeCompare(b.value[nameKey].toString())
-        );
+
+        const result = Array.from(filterMap.values());
+
+        return result.sort((a, b) => {
+          if (sortByIndex) {
+            return (a.value.sortIndex ?? 999) - (b.value.sortIndex ?? 999);
+          } else {
+            return (
+              b.bookCount - a.bookCount ||
+              a.value[nameKey].toString().localeCompare(b.value[nameKey].toString())
+            );
+          }
+        });
       })
     );
   }

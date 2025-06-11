@@ -26,4 +26,5 @@ public class AppSettings {
     private OidcProviderDetails oidcProviderDetails;
     private OidcAutoProvisionDetails oidcAutoProvisionDetails;
     private MetadataProviderSettings metadataProviderSettings;
+    private MetadataMatchWeights metadataMatchWeights;
 }

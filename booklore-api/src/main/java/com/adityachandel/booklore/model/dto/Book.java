@@ -22,6 +22,7 @@ public class Book {
     private Instant lastReadTime;
     private Instant addedOn;
     private BookMetadata metadata;
+    private Float metadataMatchScore;
     private PdfProgress pdfProgress;
     private EpubProgress epubProgress;
     private CbxProgress cbxProgress;

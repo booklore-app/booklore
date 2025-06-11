@@ -2,6 +2,7 @@ package com.adityachandel.booklore.service.appsettings;
 
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.settings.AppSettingKey;
+import com.adityachandel.booklore.model.dto.settings.MetadataMatchWeights;
 import com.adityachandel.booklore.model.dto.settings.MetadataProviderSettings;
 import com.adityachandel.booklore.model.entity.AppSettingEntity;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
@@ -139,5 +140,31 @@ public class SettingPersistenceHelper {
                 true,
                 fieldOptions
         );
+    }
+
+    public MetadataMatchWeights getDefaultMetadataMatchWeights() {
+        return MetadataMatchWeights.builder()
+                .title(10)
+                .subtitle(1)
+                .description(10)
+                .authors(10)
+                .publisher(5)
+                .publishedDate(3)
+                .seriesName(2)
+                .seriesNumber(2)
+                .seriesTotal(1)
+                .isbn13(3)
+                .isbn10(5)
+                .language(2)
+                .pageCount(1)
+                .categories(10)
+                .amazonRating(3)
+                .amazonReviewCount(2)
+                .goodreadsRating(4)
+                .goodreadsReviewCount(2)
+                .hardcoverRating(2)
+                .hardcoverReviewCount(1)
+                .coverImage(5)
+                .build();
     }
 }

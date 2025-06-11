@@ -136,7 +136,6 @@ public class BookMetadataService {
         if (metadata != null) {
             BookMetadataEntity bookMetadata = bookMetadataUpdater.setBookMetadata(bookEntity.getId(), metadata, replaceCover, mergeCategories);
             bookEntity.setMetadata(bookMetadata);
-            bookRepository.save(bookEntity);
             Book book = bookMapper.toBook(bookEntity);
             notificationService.sendMessage(Topic.BOOK_METADATA_UPDATE, book);
             notificationService.sendMessage(Topic.LOG, createLogNotification("Book metadata updated: " + book.getMetadata().getTitle()));

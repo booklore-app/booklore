@@ -10,6 +10,7 @@ import {MessageService} from 'primeng/api';
 import {Observable} from 'rxjs';
 import {AppSettingKey, AppSettings} from '../../core/model/app-settings.model';
 import {filter, take} from 'rxjs/operators';
+import {MetadataMatchWeightsComponent} from '../global-preferences/metadata-match-weights-component/metadata-match-weights-component';
 
 @Component({
   selector: 'app-metadata-settings-component',
@@ -19,7 +20,8 @@ import {filter, take} from 'rxjs/operators';
     MetadataProviderSettingsComponent,
     ReactiveFormsModule,
     Tooltip,
-    FormsModule
+    FormsModule,
+    MetadataMatchWeightsComponent
   ],
   templateUrl: './metadata-settings-component.html',
   styleUrl: './metadata-settings-component.scss'

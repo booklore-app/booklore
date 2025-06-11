@@ -133,11 +133,9 @@
                     <img src="https://books.google.com/favicon.ico" alt="Google Books"
                          class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
                   </a>
-
                 }
 
               } @else {
-
                 <p-rating
                   [(ngModel)]="metadata.rating"
                   readonly
@@ -179,10 +177,22 @@
               <p class="whitespace-nowrap"><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
-              <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
+              <p class="whitespace-nowrap flex items-center gap-2">
+                <span class="font-bold">Match Score:</span>
+                @if (book?.metadataMatchScore != null) {
+                  <span
+                    class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white border"
+                    [ngClass]="getMatchScoreColorClass(book?.metadataMatchScore!)">
+                    {{ (book?.metadataMatchScore! * 100) | number:'1.0-0' }}%
+                  </span>
+                } @else {
+                  <span>-</span>
+                }
+              </p>
               <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB() }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">Progress:</span> {{ getProgressPercent() !== null ? getProgressPercent() + '%' : '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
             </div>
             <div class="pt-2 flex items-center gap-2 w-full">
               <span class="font-semibold flex-shrink-0">File Path:</span>

@@ -2,7 +2,7 @@ import {Observable, combineLatest, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BookFilter} from './BookFilter';
 import {BookState} from '../../../model/state/book-state.model';
-import {fileSizeRanges, pageCountRanges, ratingRanges} from '../book-filter/book-filter.component';
+import {fileSizeRanges, matchScoreRanges, pageCountRanges, ratingRanges} from '../book-filter/book-filter.component';
 
 export function isRatingInRange(rating: number | undefined | null, rangeId: string): boolean {
   if (rating == null) return false;
@@ -23,6 +23,13 @@ export function isPageCountInRange(pageCount: number | undefined, rangeId: strin
   const range = pageCountRanges.find(r => r.id === rangeId);
   if (!range) return false;
   return pageCount >= range.min && pageCount < range.max;
+}
+
+export function isMatchScoreInRange(score: number | undefined | null, rangeId: string): boolean {
+  if (score == null) return false;
+  const range = matchScoreRanges.find(r => r.id === rangeId);
+  if (!range) return false;
+  return score >= range.min && score < range.max;
 }
 
 export class SideBarFilter implements BookFilter {
@@ -73,6 +80,8 @@ export class SideBarFilter implements BookFilter {
                 return filterValues.some(range => isPageCountInRange(book.metadata?.pageCount!, range));
               case 'language':
                 return filterValues.includes(book.metadata?.language);
+              case 'matchScore':
+                return filterValues.some(range => isMatchScoreInRange(book.metadataMatchScore, range));
               default:
                 return false;
             }

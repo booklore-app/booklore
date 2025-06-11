@@ -17,6 +17,7 @@ export interface Book {
   filePath?: string;
   fileSizeKb?: number;
   seriesCount?: number | null;
+  metadataMatchScore?: number | null;
 }
 
 export interface EpubProgress {

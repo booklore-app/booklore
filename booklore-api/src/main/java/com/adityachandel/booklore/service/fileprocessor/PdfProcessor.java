@@ -8,6 +8,7 @@ import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookCreatorService;
+import com.adityachandel.booklore.service.metadata.MetadataMatchService;
 import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class PdfProcessor implements FileProcessor {
     private final BookMapper bookMapper;
     private final FileProcessingUtils fileProcessingUtils;
     private final BookMetadataRepository bookMetadataRepository;
+    private final MetadataMatchService metadataMatchService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
@@ -62,6 +64,8 @@ public class PdfProcessor implements FileProcessor {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
         setMetadata(bookEntity);
+        Float score = metadataMatchService.calculateMatchScore(bookEntity);
+        bookEntity.setMetadataMatchScore(score);
         bookCreatorService.saveConnections(bookEntity);
         bookEntity = bookRepository.save(bookEntity);
         bookRepository.flush();

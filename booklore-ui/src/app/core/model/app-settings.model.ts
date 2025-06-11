@@ -1,5 +1,29 @@
 import {MetadataRefreshOptions} from '../../book/metadata/model/request/metadata-refresh-options.model';
 
+export interface MetadataMatchWeights {
+  title: number;
+  subtitle: number;
+  description: number;
+  authors: number;
+  publisher: number;
+  publishedDate: number;
+  seriesName: number;
+  seriesNumber: number;
+  seriesTotal: number;
+  isbn13: number;
+  isbn10: number;
+  language: number;
+  pageCount: number;
+  categories: number;
+  amazonRating: number;
+  amazonReviewCount: number;
+  goodreadsRating: number;
+  goodreadsReviewCount: number;
+  hardcoverRating: number;
+  hardcoverReviewCount: number;
+  coverImage: number;
+}
+
 export interface OidcProviderDetails {
   providerName: string;
   clientId: string;
@@ -57,6 +81,7 @@ export interface AppSettings {
   cbxCacheSizeInMb: number;
   maxFileUploadSizeInMb: number;
   metadataProviderSettings: MetadataProviderSettings;
+  metadataMatchWeights: MetadataMatchWeights;
 }
 
 export enum AppSettingKey {
@@ -71,5 +96,6 @@ export enum AppSettingKey {
   OIDC_AUTO_PROVISION_DETAILS = 'OIDC_AUTO_PROVISION_DETAILS',
   CBX_CACHE_SIZE_IN_MB = 'CBX_CACHE_SIZE_IN_MB',
   MAX_FILE_UPLOAD_SIZE_IN_MB = 'MAX_FILE_UPLOAD_SIZE_IN_MB',
-  METADATA_PROVIDER_SETTINGS = 'METADATA_PROVIDER_SETTINGS'
+  METADATA_PROVIDER_SETTINGS = 'METADATA_PROVIDER_SETTINGS',
+  METADATA_MATCH_WEIGHTS = 'METADATA_MATCH_WEIGHTS'
 }

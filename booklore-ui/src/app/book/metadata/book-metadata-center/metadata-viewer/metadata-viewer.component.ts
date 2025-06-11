@@ -1,6 +1,6 @@
 import {Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {Button, ButtonDirective} from 'primeng/button';
-import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
+import {AsyncPipe, DecimalPipe, NgClass} from '@angular/common';
 import {first, Observable} from 'rxjs';
 import {BookService} from '../../../service/book.service';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
@@ -258,15 +258,14 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   }
 
   getFileTypeColorClass(fileType: string | null | undefined): string {
-    if (!fileType) return 'bg-gray-500 text-white';
-
+    if (!fileType) return 'bg-gray-600 text-white';
     switch (fileType.toLowerCase()) {
       case 'pdf':
-        return 'bg-red-700 text-white';
+        return 'bg-pink-700 text-white';
       case 'epub':
-        return 'bg-yellow-600 text-gray-900';
+        return 'bg-indigo-600 text-white';
       case 'cbz':
-        return 'bg-green-700 text-white';
+        return 'bg-teal-600 text-white';
       case 'cbr':
         return 'bg-purple-700 text-white';
       case 'cb7':
@@ -290,5 +289,15 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     } else {
       return 'rgb(239, 68, 68)';
     }
+  }
+
+  getMatchScoreColorClass(score: number): string {
+    if (score >= 0.95) return 'bg-green-600 border-green-700';
+    if (score >= 0.90) return 'bg-green-500 border-green-600';
+    if (score >= 0.80) return 'bg-green-400 border-green-500';
+    if (score >= 0.70) return 'bg-yellow-500 border-yellow-600';
+    if (score >= 0.50) return 'bg-yellow-400 border-yellow-500';
+    if (score >= 0.30) return 'bg-red-500 border-red-600';
+    return 'bg-red-600 border-red-700';
   }
 }

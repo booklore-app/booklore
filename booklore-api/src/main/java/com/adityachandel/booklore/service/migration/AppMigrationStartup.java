@@ -14,5 +14,6 @@ public class AppMigrationStartup {
     @EventListener(ApplicationReadyEvent.class)
     public void runMigrationsOnce() {
         appMigrationService.populateMissingFileSizesOnce();
+        appMigrationService.populateMetadataScoresOnce();
     }
 }
