@@ -3,11 +3,14 @@ import { ReleaseNote, VersionService } from '../../../../core/service/version.se
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import showdown from 'showdown';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-version-changelog-dialog',
   standalone: true,
-  imports: [],
+  imports: [
+    DatePipe
+  ],
   templateUrl: './version-changelog-dialog.component.html',
   styleUrl: './version-changelog-dialog.component.scss'
 })

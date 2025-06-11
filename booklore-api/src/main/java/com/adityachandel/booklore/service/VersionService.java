@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,11 +73,15 @@ public class VersionService {
                 String tag = release.get("tag_name").asText();
                 if (isVersionGreater(tag, currentVersion)) {
                     String url = "https://github.com/" + GITHUB_REPO + "/releases/tag/" + tag;
+                    String publishedAtStr = release.get("published_at").asText();
+                    LocalDateTime publishedAt = LocalDateTime.parse(publishedAtStr, DateTimeFormatter.ISO_DATE_TIME);
+
                     updates.add(new ReleaseNote(
                             tag,
                             release.get("name").asText(),
                             release.get("body").asText(),
-                            url
+                            url,
+                            publishedAt
                     ));
                 }
             }

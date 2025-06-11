@@ -13,6 +13,7 @@ export interface ReleaseNote {
   name: string;
   changelog: string;
   url: string;
+  publishedAt: string;
 }
 
 @Injectable({
