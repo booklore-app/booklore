@@ -1,13 +1,13 @@
-import { BookFilter } from './BookFilter';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { BookState } from '../../../model/state/book-state.model';
-import { map, debounceTime, filter, take } from 'rxjs/operators';
-import { Book } from '../../../model/book.model';
-import { inject, Injectable } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { UserService } from '../../../../settings/user-management/user.service';
+import {BookFilter} from './BookFilter';
+import {Observable, BehaviorSubject} from 'rxjs';
+import {BookState} from '../../../model/state/book-state.model';
+import {map, debounceTime, filter, take} from 'rxjs/operators';
+import {Book} from '../../../model/book.model';
+import {inject, Injectable} from '@angular/core';
+import {MessageService} from 'primeng/api';
+import {UserService} from '../../../../settings/user-management/user.service';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class SeriesCollapseFilter implements BookFilter {
   private readonly userService = inject(UserService);
   private readonly messageService = inject(MessageService);
@@ -66,7 +66,7 @@ export class SeriesCollapseFilter implements BookFilter {
           }
         }
 
-        return { ...bookState, books: collapsedBooks };
+        return {...bookState, books: collapsedBooks};
       })
     );
   }

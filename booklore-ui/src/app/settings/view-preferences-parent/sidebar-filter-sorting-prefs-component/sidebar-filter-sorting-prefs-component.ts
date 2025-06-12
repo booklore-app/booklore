@@ -46,7 +46,6 @@ export class SidebarFilterSortingPrefsComponent implements OnInit, OnDestroy {
   }
 
   private loadPreferences(settings: UserSettings): void {
-    console.log(settings.filterSortingMode)
     this.selectedFilterSorting = settings.filterSortingMode;
   }
 

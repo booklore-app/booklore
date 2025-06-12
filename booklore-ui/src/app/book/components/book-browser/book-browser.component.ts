@@ -29,15 +29,16 @@ import {Tooltip} from 'primeng/tooltip';
 import {Fluid} from 'primeng/fluid';
 import {EntityViewPreferences, UserService} from '../../../settings/user-management/user.service';
 import {OverlayPanelModule} from 'primeng/overlaypanel';
-import {Slider} from 'primeng/slider';
-import {Popover} from 'primeng/popover';
 import {SeriesCollapseFilter} from './filters/SeriesCollapseFilter';
 import {SideBarFilter} from './filters/SidebarFilter';
 import {HeaderFilter} from './filters/HeaderFilter';
 import {CoverScaleManager} from './CoverScaleManager';
 import {BookSorter} from './sorting/BookSorter';
 import {BookDialogHelperService} from './BookDialogHelperService';
+import {DropdownModule} from 'primeng/dropdown';
 import {Checkbox} from 'primeng/checkbox';
+import {Popover} from 'primeng/popover';
+import {Slider} from 'primeng/slider';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -70,7 +71,7 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, Slider, Popover, Checkbox],
+  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider],
   providers: [SeriesCollapseFilter],
   animations: [
     trigger('slideInOut', [
@@ -129,8 +130,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private router = inject(Router);
   private changeDetectorRef = inject(ChangeDetectorRef);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
+  protected seriesCollapseFilter = inject(SeriesCollapseFilter);
 
-  protected seriesCollapseFilter = new SeriesCollapseFilter();
   private sideBarFilter = new SideBarFilter(this.selectedFilter, this.selectedFilterMode);
   private headerFilter = new HeaderFilter(this.searchTerm$);
   protected bookSorter = new BookSorter((selectedSort) => this.applySortOption(selectedSort));
@@ -431,7 +432,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     }
     return bookState;
   }
-
 
   private fetchLibrary(libraryId: number): Observable<Library | null> {
     return this.libraryService.libraryState$.pipe(

@@ -46,44 +46,34 @@
             <a
               class="topbar-items topbar-item"
               (click)="seriesCollapseOverlay.toggle($event)"
-              pTooltip="Other settings"
+              pTooltip="Display settings"
               tooltipPosition="top">
               <i class="pi pi-cog"></i>
             </a>
             <p-popover #seriesCollapseOverlay [dismissable]="true" appendTo="body">
-              <div class="w-[220px] p-2">
-                <div class="flex items-center gap-2">
+              <div class="w-[220px] p-3 space-y-4 text-sm">
+                <div class="flex flex-col gap-2">
+                  <label for="collapse-series-checkbox" class="font-medium">Collapse series</label>
                   <p-checkbox
+                    inputId="collapse-series-checkbox"
                     [binary]="true"
                     [ngModel]="seriesCollapseFilter.isSeriesCollapsed"
-                    (onChange)="onSeriesCollapseCheckboxChange($event.checked)"
-                    inputId="collapse-series-checkbox">
+                    (onChange)="onSeriesCollapseCheckboxChange($event.checked)">
                   </p-checkbox>
-                  <label for="collapse-series-checkbox">Collapse series</label>
                 </div>
-              </div>
-            </p-popover>
-          </div>
-          <div>
-            <a
-              class="topbar-items topbar-item"
-              (click)="sizeOverlay.toggle($event)"
-              pTooltip="Adjust grid item scale"
-              tooltipPosition="top">
-              <i class="pi pi-th-large"></i>
-            </a>
-            <p-popover #sizeOverlay [dismissable]="true" appendTo="body">
-              <div style="width: 220px; padding: 8px;">
-                <p-slider
-                  [(ngModel)]="coverScaleManager.scaleFactor"
-                  [min]="0.5"
-                  [max]="1.5"
-                  [step]="0.01"
-                  [style]="{ width: '100%' }"
-                  (onChange)="updateScale()"
-                ></p-slider>
-                <div style="text-align: center; margin-top: 8px;">
-                  {{ coverScaleManager.scaleFactor.toFixed(2) }}x
+                <div class="flex flex-col gap-2">
+                  <label class="font-medium text-sm">Grid item size</label>
+                  <p-slider
+                    [(ngModel)]="coverScaleManager.scaleFactor"
+                    [min]="0.5"
+                    [max]="1.5"
+                    [step]="0.01"
+                    [style]="{ width: '100%' }"
+                    (onChange)="updateScale()">
+                  </p-slider>
+                  <div class="text-center">
+                    {{ coverScaleManager.scaleFactor.toFixed(2) }}x
+                  </div>
                 </div>
               </div>
             </p-popover>
