@@ -209,8 +209,7 @@ public class AmazonBookParser implements BookParser {
         }
 
         String encodedSearchTerm = searchTerm.toString().replace(" ", "+");
-        String url = "https://www.amazon.com/s?k=" + encodedSearchTerm;
-
+        String url = "https://www.amazon." + appSettingService.getAppSettings().getMetadataProviderSettings().getAmazon().getDomain() + "/s?k=" + encodedSearchTerm;
         log.info("Query URL: {}", url);
         return url;
     }

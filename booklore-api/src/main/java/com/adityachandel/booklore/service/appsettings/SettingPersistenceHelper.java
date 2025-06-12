@@ -65,6 +65,7 @@ public class SettingPersistenceHelper {
         MetadataProviderSettings.Amazon defaultAmazon = new MetadataProviderSettings.Amazon();
         defaultAmazon.setEnabled(true);
         defaultAmazon.setCookie(null);
+        defaultAmazon.setDomain("com");
 
         MetadataProviderSettings.Google defaultGoogle = new MetadataProviderSettings.Google();
         defaultGoogle.setEnabled(true);

@@ -1,5 +1,5 @@
 <p class="text-lg flex items-center gap-2">
- Enabled Metadata Providers:
+  Enabled Metadata Providers:
   <i
     class="pi pi-info-circle text-sky-600"
     pTooltip="Enable or configure third-party metadata sources for enhanced book information."
@@ -13,32 +13,44 @@
   <div class="flex flex-col gap-2">
     <div class="flex items-center gap-4">
       <p-checkbox [(ngModel)]="amazonEnabled" [binary]="true"></p-checkbox>
-      <label>Amazon</label>
+      <label class="font-medium">Amazon</label>
     </div>
-    <div class="flex items-center gap-4 pl-6">
-      <input
-        type="text"
-        pInputText
-        placeholder="Amazon Cookie (Optional)"
-        class="w-full max-w-3xl"
-        [(ngModel)]="amazonCookie" />
-      <i
-        class="pi pi-info-circle text-sky-600"
-        pTooltip="Providing your Amazon session cookie allows the app to access richer book metadata and bypass rate limits. Optional but recommended for best results."
-        tooltipPosition="right"
-        style="cursor: pointer;">
-      </i>
+
+    <div class="flex flex-col gap-2 pl-9 pt-1">
+      <label class="font-medium text-sm">Region</label>
+      <p-select
+        [options]="amazonDomains"
+        [(ngModel)]="selectedAmazonDomain"
+        placeholder="Select Domain"
+        class="w-full max-w-52">
+      </p-select>
+
+      <label class="font-medium text-sm">Cookie (Optional)</label>
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          pInputText
+          placeholder="Paste your Amazon cookie"
+          class="w-full max-w-3xl"
+          [(ngModel)]="amazonCookie" />
+        <i
+          class="pi pi-info-circle text-sky-600"
+          pTooltip="Providing your Amazon session cookie allows the app to access richer book metadata and bypass rate limits. Optional but recommended for best results."
+          tooltipPosition="right"
+          style="cursor: pointer;">
+        </i>
+      </div>
     </div>
   </div>
 
   <div class="flex items-center gap-4">
     <p-checkbox [(ngModel)]="goodreadsEnabled" [binary]="true"></p-checkbox>
-    <label>Goodreads</label>
+    <label class="font-medium">Goodreads</label>
   </div>
 
   <div class="flex items-center gap-4">
     <p-checkbox [(ngModel)]="googleEnabled" [binary]="true"></p-checkbox>
-    <label>Google</label>
+    <label class="font-medium">Google</label>
   </div>
 
   <div class="flex flex-col gap-2">
@@ -48,20 +60,21 @@
         [(ngModel)]="hardcoverEnabled"
         [disabled]="!hardcoverToken">
       </p-checkbox>
-      <label>Hardcover</label>
+      <label class="font-medium">Hardcover</label>
     </div>
-    <div class="flex items-center gap-4 pl-6">
+    <div class="flex flex-col gap-2 pl-9 pt-1">
+      <label class="font-medium text-sm">API Token</label>
       <input
         type="text"
         pInputText
-        placeholder="API Token"
+        placeholder="Enter Hardcover API token"
         class="w-full max-w-3xl"
         [(ngModel)]="hardcoverToken"
         (ngModelChange)="onTokenChange($event)" />
     </div>
   </div>
-
 </div>
+
 <div class="flex justify-start px-4">
   <p-button label="Save" icon="pi pi-save" [outlined]="true" (click)="saveSettings()"></p-button>
 </div>

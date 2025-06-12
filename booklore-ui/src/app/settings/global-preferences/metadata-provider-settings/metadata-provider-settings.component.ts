@@ -9,6 +9,7 @@ import {AppSettingsService} from '../../../core/service/app-settings.service';
 import {filter, take} from 'rxjs/operators';
 import {MessageService} from 'primeng/api';
 import {AppSettingKey} from '../../../core/model/app-settings.model';
+import {Select} from 'primeng/select';
 
 @Component({
   selector: 'app-metadata-provider-settings',
@@ -19,12 +20,38 @@ import {AppSettingKey} from '../../../core/model/app-settings.model';
     Checkbox,
     InputText,
     Button,
-    FormsModule
+    FormsModule,
+    Select
   ],
   templateUrl: './metadata-provider-settings.component.html',
   styleUrl: './metadata-provider-settings.component.scss'
 })
 export class MetadataProviderSettingsComponent implements OnInit {
+
+  amazonDomains = [
+    {label: 'amazon.com', value: 'com'},
+    {label: 'amazon.de', value: 'de'},
+    {label: 'amazon.co.uk', value: 'co.uk'},
+    {label: 'amazon.co.jp', value: 'co.jp'},
+    {label: 'amazon.ca', value: 'ca'},
+    {label: 'amazon.in', value: 'in'},
+    {label: 'amazon.com.au', value: 'com.au'},
+    {label: 'amazon.fr', value: 'fr'},
+    {label: 'amazon.it', value: 'it'},
+    {label: 'amazon.es', value: 'es'},
+    {label: 'amazon.nl', value: 'nl'},
+    {label: 'amazon.se', value: 'se'},
+    {label: 'amazon.com.br', value: 'com.br'},
+    {label: 'amazon.sg', value: 'sg'},
+    {label: 'amazon.com.mx', value: 'com.mx'},
+    {label: 'amazon.pl', value: 'pl'},
+    {label: 'amazon.ae', value: 'ae'},
+    {label: 'amazon.sa', value: 'sa'},
+    {label: 'amazon.tr', value: 'tr'}
+  ];
+
+  selectedAmazonDomain = 'com';
+
   hardcoverToken: string = '';
   amazonCookie: string = '';
   hardcoverEnabled: boolean = false;
@@ -47,6 +74,7 @@ export class MetadataProviderSettingsComponent implements OnInit {
         const metadataProviderSettings = settings!.metadataProviderSettings;
         this.amazonEnabled = metadataProviderSettings?.amazon?.enabled ?? false;
         this.amazonCookie = metadataProviderSettings?.amazon?.cookie ?? "";
+        this.selectedAmazonDomain = metadataProviderSettings?.amazon?.domain ?? 'com';
         this.goodreadsEnabled = metadataProviderSettings?.goodReads?.enabled ?? false;
         this.googleEnabled = metadataProviderSettings?.google?.enabled ?? false;
         this.hardcoverToken = metadataProviderSettings?.hardcover?.apiKey ?? '';
@@ -68,7 +96,8 @@ export class MetadataProviderSettingsComponent implements OnInit {
         newValue: {
           amazon: {
             enabled: this.amazonEnabled,
-            cookie: this.amazonCookie
+            cookie: this.amazonCookie,
+            domain: this.selectedAmazonDomain
           },
           goodReads: {enabled: this.goodreadsEnabled},
           google: {enabled: this.googleEnabled},

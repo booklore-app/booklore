@@ -52,6 +52,7 @@ export interface MetadataProviderSettings {
 export interface Amazon {
   enabled: boolean;
   cookie: string;
+  domain: string;
 }
 
 export interface Google {
