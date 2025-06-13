@@ -37,6 +37,10 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
     List<BookEntity> findAllWithMetadata();
 
     @EntityGraph(attributePaths = {"metadata", "shelves"})
+    @Query("SELECT b FROM BookEntity b WHERE b.library.id IN :libraryIds")
+    List<BookEntity> findAllWithMetadataByLibraryIds(@Param("libraryIds") Collection<Long> libraryIds);
+
+    @EntityGraph(attributePaths = {"metadata", "shelves"})
     @Query("SELECT b FROM BookEntity b WHERE b.id IN :bookIds")
     List<BookEntity> findAllWithMetadataByIds(@Param("bookIds") Set<Long> bookIds);
 

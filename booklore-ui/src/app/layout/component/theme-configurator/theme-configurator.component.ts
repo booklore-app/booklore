@@ -186,7 +186,7 @@ export class ThemeConfiguratorComponent implements OnInit {
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      this.onPresetChange(); // Ensures both primary and surface colors apply
+      this.onPresetChange();
     }
   }
 

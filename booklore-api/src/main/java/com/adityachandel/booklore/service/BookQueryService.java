@@ -31,6 +31,19 @@ public class BookQueryService {
                 .collect(Collectors.toList());
     }
 
+    public List<Book> getAllBooksByLibraryIds(Set<Long> libraryIds, boolean includeDescription) {
+        List<BookEntity> books = bookRepository.findAllWithMetadataByLibraryIds(libraryIds);
+        return books.stream()
+                .map(book -> {
+                    Book dto = bookMapperV2.toDTO(book);
+                    if (!includeDescription && dto.getMetadata() != null) {
+                        dto.getMetadata().setDescription(null);
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
     public List<BookEntity> findAllWithMetadataByIds(Set<Long> bookIds) {
         return bookRepository.findAllWithMetadataByIds(bookIds);
     }

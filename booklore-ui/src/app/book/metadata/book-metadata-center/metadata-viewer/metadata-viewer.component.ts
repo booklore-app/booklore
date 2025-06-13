@@ -288,12 +288,14 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   }
 
   getMatchScoreColorClass(score: number): string {
-    if (score >= 0.95) return 'bg-green-600 border-green-700';
-    if (score >= 0.90) return 'bg-green-500 border-green-600';
-    if (score >= 0.80) return 'bg-green-400 border-green-500';
-    if (score >= 0.70) return 'bg-yellow-500 border-yellow-600';
-    if (score >= 0.50) return 'bg-yellow-400 border-yellow-500';
-    if (score >= 0.30) return 'bg-red-500 border-red-600';
-    return 'bg-red-600 border-red-700';
+    if (score >= 0.95) return 'bg-green-900 border-green-950';
+    if (score >= 0.90) return 'bg-green-800 border-green-900';
+    if (score >= 0.80) return 'bg-green-700 border-green-800';
+    if (score >= 0.70) return 'bg-yellow-700 border-yellow-800';
+    if (score >= 0.60) return 'bg-yellow-600 border-yellow-700';
+    if (score >= 0.50) return 'bg-yellow-500 border-yellow-600';
+    if (score >= 0.40) return 'bg-red-500 border-red-600';
+    if (score >= 0.30) return 'bg-red-600 border-red-700';
+    return 'bg-red-700 border-red-800';
   }
 }
