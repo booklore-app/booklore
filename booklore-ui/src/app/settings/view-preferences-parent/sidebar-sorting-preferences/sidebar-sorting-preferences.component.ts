@@ -68,7 +68,7 @@ export class SidebarSortingPreferencesComponent implements OnInit, OnDestroy {
       severity: 'success',
       summary: 'Preferences Updated',
       detail: 'Your preferences have been saved successfully.',
-      life: 2000
+      life: 1500
     });
   }
 

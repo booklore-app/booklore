@@ -1,6 +1,6 @@
-import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {combineLatest, Observable, of, Subject} from 'rxjs';
-import {filter, map, take} from 'rxjs/operators';
+import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {BehaviorSubject, combineLatest, Observable, of, Subject, takeUntil} from 'rxjs';
+import {distinctUntilChanged, filter, map, take} from 'rxjs/operators';
 import {BookService} from '../../../service/book.service';
 import {Library} from '../../../model/library.model';
 import {Shelf} from '../../../model/shelf.model';
@@ -12,6 +12,7 @@ import {Badge} from 'primeng/badge';
 import {FormsModule} from '@angular/forms';
 import {SelectButton} from 'primeng/selectbutton';
 import {UserService} from '../../../../settings/user-management/user.service';
+import {FilterSortPreferenceService} from '../filters/filter-sorting-preferences.service';
 
 type Filter<T> = { value: T; bookCount: number };
 
@@ -114,7 +115,7 @@ export function getMatchScoreRangeFilters(score?: number | null): { id: string; 
     SelectButton
   ]
 })
-export class BookFilterComponent implements OnInit {
+export class BookFilterComponent implements OnInit, OnDestroy {
   @Output() filterSelected = new EventEmitter<Record<string, any> | null>();
   @Output() filterModeChanged = new EventEmitter<'and' | 'or'>();
 
@@ -148,41 +149,42 @@ export class BookFilterComponent implements OnInit {
     matchScore: 'Metadata Match Score'
   };
 
+  private destroy$ = new Subject<void>();
+
   bookService = inject(BookService);
   userService = inject(UserService);
+  sidebarFilterSortingManager = inject(FilterSortPreferenceService);
 
   ngOnInit(): void {
     combineLatest([
-      this.userService.userState$.pipe(
-        filter((u): u is NonNullable<typeof u> => !!u),
-        take(1)
-      ),
+      this.sidebarFilterSortingManager.sortMode$.pipe(distinctUntilChanged()),
       this.entity$ ?? of(null),
       this.entityType$ ?? of(EntityType.ALL_BOOKS)
-    ]).subscribe(([user]) => {
-      const sortMode = user.userSettings?.filterSortingMode ?? 'count';
-      this.filterStreams = {
-        author: this.getFilterStream((book: Book) => book.metadata?.authors.map(name => ({id: name, name})) || [], 'id', 'name', sortMode),
-        category: this.getFilterStream((book: Book) => book.metadata?.categories.map(name => ({id: name, name})) || [], 'id', 'name', sortMode),
-        series: this.getFilterStream((book) => (book.metadata?.seriesName ? [{id: book.metadata.seriesName, name: book.metadata.seriesName}] : []), 'id', 'name', sortMode),
-        matchScore: this.getFilterStream((book: Book) => getMatchScoreRangeFilters(book.metadataMatchScore), 'id', 'name', 'sortIndex'),
-        publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name', sortMode),
-        shelfStatus: this.getFilterStream(getShelfStatusFilter, 'id', 'name', sortMode),
-        publishedDate: this.getFilterStream(extractPublishedYearFilter, 'id', 'name', sortMode),
-        language: this.getFilterStream(getLanguageFilter, 'id', 'name', sortMode),
-        fileSize: this.getFilterStream((book: Book) => getFileSizeRangeFilters(book.fileSizeKb), 'id', 'name', sortMode),
-        amazonRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.amazonRating!), 'id', 'name', sortMode),
-        goodreadsRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.goodreadsRating!), 'id', 'name', sortMode),
-        hardcoverRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.hardcoverRating!), 'id', 'name', sortMode),
-        pageCount: this.getFilterStream((book: Book) => getPageCountRangeFilters(book.metadata?.pageCount!), 'id', 'name', sortMode),
-      };
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([sortMode]) => {
+        this.filterStreams = {
+          author: this.getFilterStream((book: Book) => book.metadata?.authors.map(name => ({id: name, name})) || [], 'id', 'name', sortMode),
+          category: this.getFilterStream((book: Book) => book.metadata?.categories.map(name => ({id: name, name})) || [], 'id', 'name', sortMode),
+          series: this.getFilterStream((book) => (book.metadata?.seriesName ? [{id: book.metadata.seriesName, name: book.metadata.seriesName}] : []), 'id', 'name', sortMode),
+          matchScore: this.getFilterStream((book: Book) => getMatchScoreRangeFilters(book.metadataMatchScore), 'id', 'name', 'sortIndex'),
+          publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name', sortMode),
+          shelfStatus: this.getFilterStream(getShelfStatusFilter, 'id', 'name', sortMode),
+          publishedDate: this.getFilterStream(extractPublishedYearFilter, 'id', 'name', sortMode),
+          language: this.getFilterStream(getLanguageFilter, 'id', 'name', sortMode),
+          fileSize: this.getFilterStream((book: Book) => getFileSizeRangeFilters(book.fileSizeKb), 'id', 'name', sortMode),
+          amazonRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.amazonRating!), 'id', 'name', sortMode),
+          goodreadsRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.goodreadsRating!), 'id', 'name', sortMode),
+          hardcoverRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.hardcoverRating!), 'id', 'name', sortMode),
+          pageCount: this.getFilterStream((book: Book) => getPageCountRangeFilters(book.metadata?.pageCount!), 'id', 'name', sortMode),
+        };
 
-      this.filterTypes = Object.keys(this.filterStreams);
-      this.setExpandedPanels();
-    });
+        this.filterTypes = Object.keys(this.filterStreams);
+        this.setExpandedPanels();
+      });
 
     if (this.resetFilter$) {
-      this.resetFilter$.subscribe(() => this.clearActiveFilter());
+      this.resetFilter$.pipe(takeUntil(this.destroy$)).subscribe(() => this.clearActiveFilter());
     }
   }
 
@@ -297,5 +299,10 @@ export class BookFilterComponent implements OnInit {
 
   onFiltersChanged(): void {
     this.setExpandedPanels();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

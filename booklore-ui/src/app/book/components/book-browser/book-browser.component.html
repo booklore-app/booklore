@@ -51,7 +51,7 @@
               <i class="pi pi-cog"></i>
             </a>
             <p-popover #seriesCollapseOverlay [dismissable]="true" appendTo="body">
-              <div class="w-[220px] p-3 space-y-4 text-sm">
+              <div class="w-[220px] p-2 space-y-4 text-sm">
                 <div class="flex flex-col gap-2">
                   <label for="collapse-series-checkbox" class="font-medium">Collapse series</label>
                   <p-checkbox
@@ -64,7 +64,7 @@
                 <div class="flex flex-col gap-2">
                   <label class="font-medium text-sm">Grid item size</label>
                   <p-slider
-                    [(ngModel)]="coverScaleManager.scaleFactor"
+                    [(ngModel)]="coverScalePreferenceService.scaleFactor"
                     [min]="0.5"
                     [max]="1.5"
                     [step]="0.01"
@@ -72,7 +72,18 @@
                     (onChange)="updateScale()">
                   </p-slider>
                   <div class="text-center">
-                    {{ coverScaleManager.scaleFactor.toFixed(2) }}x
+                    {{ coverScalePreferenceService.scaleFactor.toFixed(2) }}x
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="font-medium text-sm">Sidbar Filter Sort:</label>
+                  <div class="flex gap-4 justify-start">
+                    <p-select
+                      size="small"
+                      [options]="filterSortPreferenceService.filterSortingOptions"
+                      [(ngModel)]="filterSortPreferenceService.selectedFilterSorting"
+                      placeholder="Select Sorting">
+                    </p-select>
                   </div>
                 </div>
               </div>

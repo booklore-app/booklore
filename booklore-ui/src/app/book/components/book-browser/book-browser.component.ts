@@ -32,13 +32,15 @@ import {OverlayPanelModule} from 'primeng/overlaypanel';
 import {SeriesCollapseFilter} from './filters/SeriesCollapseFilter';
 import {SideBarFilter} from './filters/SidebarFilter';
 import {HeaderFilter} from './filters/HeaderFilter';
-import {CoverScaleManager} from './CoverScaleManager';
+import {CoverScalePreferenceService} from './cover-scale-preference.service';
 import {BookSorter} from './sorting/BookSorter';
 import {BookDialogHelperService} from './BookDialogHelperService';
 import {DropdownModule} from 'primeng/dropdown';
 import {Checkbox} from 'primeng/checkbox';
 import {Popover} from 'primeng/popover';
 import {Slider} from 'primeng/slider';
+import {Select} from 'primeng/select';
+import {FilterSortPreferenceService} from './filters/filter-sorting-preferences.service';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -71,7 +73,7 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider],
+  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select],
   providers: [SeriesCollapseFilter],
   animations: [
     trigger('slideInOut', [
@@ -118,7 +120,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   entityViewPreferences!: EntityViewPreferences;
 
   protected userService = inject(UserService);
-  protected coverScaleManager = inject(CoverScaleManager);
+  protected coverScalePreferenceService = inject(CoverScalePreferenceService);
+  protected filterSortPreferenceService = inject(FilterSortPreferenceService);
 
   private activatedRoute = inject(ActivatedRoute);
   private messageService = inject(MessageService);
@@ -142,19 +145,19 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private settingFiltersFromUrl = false;
 
   get currentCardSize() {
-    return this.coverScaleManager.currentCardSize;
+    return this.coverScalePreferenceService.currentCardSize;
   }
 
   get gridColumnMinWidth(): string {
-    return this.coverScaleManager.gridColumnMinWidth;
+    return this.coverScalePreferenceService.gridColumnMinWidth;
   }
 
   updateScale(): void {
-    this.coverScaleManager.setScale(this.coverScaleManager.scaleFactor);
+    this.coverScalePreferenceService.setScale(this.coverScalePreferenceService.scaleFactor);
   }
 
   ngOnInit(): void {
-    this.coverScaleManager.scaleChange$.pipe(debounceTime(1000)).subscribe();
+    this.coverScalePreferenceService.scaleChange$.pipe(debounceTime(1000)).subscribe();
 
     this.bookService.loadBooks();
 
@@ -239,11 +242,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         this.currentFilterLabel = 'All Books';
       }
 
-
       this.entityViewPreferences = user.userSettings?.entityViewPreferences;
       const globalPrefs = this.entityViewPreferences?.global;
       const currentEntityTypeStr = this.entityType ? this.entityType.toString().toUpperCase() : undefined;
-      this.coverScaleManager.scaleFactor = user.userSettings.entityViewPreferences?.global?.coverSize ?? 1.0;
+      this.coverScalePreferenceService.initScaleValue(user?.userSettings?.entityViewPreferences?.global?.coverSize);
+      this.filterSortPreferenceService.initValue(user?.userSettings?.filterSortingMode);
 
       const override = this.entityViewPreferences?.overrides?.find(o =>
         o.entityType?.toUpperCase() === currentEntityTypeStr &&

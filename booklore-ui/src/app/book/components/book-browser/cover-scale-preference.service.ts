@@ -1,15 +1,17 @@
+import {Injectable, inject} from '@angular/core';
 import {Subject} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
-import {inject, Injectable} from '@angular/core';
 import {MessageService} from 'primeng/api';
 import {UserService} from '../../../settings/user-management/user.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CoverScaleManager {
-  private readonly baseWidth = 135;
-  private readonly baseHeight = 220;
+export class CoverScalePreferenceService {
+
+  private readonly BASE_WIDTH = 135;
+  private readonly BASE_HEIGHT = 220;
+  private readonly DEBOUNCE_MS = 1000;
 
   private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
@@ -21,8 +23,12 @@ export class CoverScaleManager {
 
   constructor() {
     this.scaleChange$
-      .pipe(debounceTime(1000))
-      .subscribe(scale => this.persistScale(scale));
+      .pipe(debounceTime(this.DEBOUNCE_MS))
+      .subscribe(scale => this.saveScalePreference(scale));
+  }
+
+  initScaleValue(scale: number | undefined): void {
+    this.scaleFactor = scale ?? 1.0;
   }
 
   setScale(scale: number): void {
@@ -32,8 +38,8 @@ export class CoverScaleManager {
 
   get currentCardSize(): { width: number; height: number } {
     return {
-      width: Math.round(this.baseWidth * this.scaleFactor),
-      height: Math.round(this.baseHeight * this.scaleFactor),
+      width: Math.round(this.BASE_WIDTH * this.scaleFactor),
+      height: Math.round(this.BASE_HEIGHT * this.scaleFactor),
     };
   }
 
@@ -41,19 +47,20 @@ export class CoverScaleManager {
     return `${this.currentCardSize.width}px`;
   }
 
-  private persistScale(scale: number): void {
+  private saveScalePreference(scale: number): void {
     const user = this.userService.getCurrentUser();
-    const entityViewPreferences = user?.userSettings?.entityViewPreferences;
-    if (!user || !entityViewPreferences) {
-      return;
-    }
-    entityViewPreferences.global = entityViewPreferences.global ?? {};
-    entityViewPreferences.global.coverSize = scale;
-    this.userService.updateUserSetting(user.id, 'entityViewPreferences', entityViewPreferences);
+    const prefs = user?.userSettings?.entityViewPreferences;
+
+    if (!user || !prefs) return;
+
+    prefs.global = {...prefs.global, coverSize: scale};
+    this.userService.updateUserSetting(user.id, 'entityViewPreferences', prefs);
+
     this.messageService.add({
       severity: 'success',
       summary: 'Cover Size Saved',
-      detail: `Cover size set to ${scale.toFixed(2)}x.`
+      detail: `Cover size set to ${scale.toFixed(2)}x.`,
+      life: 1500
     });
   }
 }

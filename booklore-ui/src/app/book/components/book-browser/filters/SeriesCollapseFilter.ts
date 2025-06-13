@@ -84,7 +84,8 @@ export class SeriesCollapseFilter implements BookFilter {
     this.messageService.add({
       severity: 'success',
       summary: 'Preference Saved',
-      detail: `Series collapse set to ${isCollapsed ? 'enabled' : 'disabled'}.`
+      detail: `Series collapse set to ${isCollapsed ? 'enabled' : 'disabled'}.`,
+      life: 1500
     });
   }
 }
