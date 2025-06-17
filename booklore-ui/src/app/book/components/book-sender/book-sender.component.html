@@ -5,6 +5,7 @@
     optionLabel="label"
     placeholder="Select Email Provider"
     [(ngModel)]="selectedProvider"
+    appendTo="body"
     class="w-full">
   </p-select>
 
@@ -14,6 +15,7 @@
     placeholder="Select Book Recipient"
     [(ngModel)]="selectedRecipient"
     [disabled]="!selectedProvider"
+    appendTo="body"
     class="w-full">
   </p-select>
 
