@@ -450,11 +450,18 @@ public class AmazonBookParser implements BookParser {
 
     private String getThumbnail(Document doc) {
         try {
-            Element imageElement = doc.select("#landingImage").first();
+            Element imageElement = doc.selectFirst("#landingImage");
             if (imageElement != null) {
-                return imageElement.attr("src");
+                String highRes = imageElement.attr("data-old-hires");
+                if (!highRes.isBlank()) {
+                    return highRes;
+                }
+                String fallback = imageElement.attr("src");
+                if (!fallback.isBlank()) {
+                    return fallback;
+                }
             }
-            log.warn("Failed to parse thumbnail: Image element not found.");
+            log.warn("Failed to parse thumbnail: No suitable image URL found.");
         } catch (Exception e) {
             log.warn("Failed to parse thumbnail: {}", e.getMessage());
         }

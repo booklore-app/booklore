@@ -3,6 +3,7 @@ package com.adityachandel.booklore.service.appsettings;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.settings.AppSettingKey;
 import com.adityachandel.booklore.model.dto.settings.MetadataMatchWeights;
+import com.adityachandel.booklore.model.dto.settings.MetadataPersistenceSettings;
 import com.adityachandel.booklore.model.dto.settings.MetadataProviderSettings;
 import com.adityachandel.booklore.model.entity.AppSettingEntity;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
@@ -166,6 +167,14 @@ public class SettingPersistenceHelper {
                 .hardcoverRating(2)
                 .hardcoverReviewCount(1)
                 .coverImage(5)
+                .build();
+    }
+
+    public MetadataPersistenceSettings getDefaultMetadataPersistenceSettings() {
+        return MetadataPersistenceSettings.builder()
+                .saveToOriginalFile(false)
+                .backupMetadata(false)
+                .backupCover(false)
                 .build();
     }
 }

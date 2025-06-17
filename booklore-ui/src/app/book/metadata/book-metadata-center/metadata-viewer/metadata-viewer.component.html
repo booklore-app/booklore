@@ -191,7 +191,14 @@
               </p>
               <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB() }}</p>
-              <p class="whitespace-nowrap"><span class="font-bold">Progress:</span> {{ getProgressPercent() !== null ? getProgressPercent() + '%' : '-' }}</p>
+              <p class="whitespace-nowrap flex items-center gap-2">
+                <span class="font-bold">Progress:</span>
+                <span
+                  class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                  [ngClass]="getProgressColorClass(getProgressPercent())">
+                  {{ getProgressPercent() !== null ? getProgressPercent() + '%' : 'N/A' }}
+                </span>
+              </p>
               <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
             </div>
             <div class="pt-2 flex items-center gap-2 w-full">
@@ -203,7 +210,7 @@
                 onLabel=""
                 offLabel=""
                 size="small"
-                class="flex-shrink-0"></p-toggleButton>
+                class="flex-shrink-0 my-visibility-toggle"></p-toggleButton>
               @if (showFilePath) {
                 <div
                   class="flex items-center gap-4 flex-grow"
@@ -235,7 +242,7 @@
                   severity="info"/>
               }
               <p-button
-                label="Assign Shelf"
+                label="Shelf"
                 icon="pi pi-folder"
                 severity="info"
                 outlined
@@ -269,6 +276,14 @@
                   outlined
                   severity="info">
                 </p-splitbutton>
+                <p-button
+                  outlined
+                  label="More"
+                  severity="info"
+                  (click)="menu.toggle($event)"
+                  icon="pi pi-plus">
+                </p-button>
+                <p-tieredmenu #menu [model]="moreItems" [popup]="true" appendTo="body"></p-tieredmenu>
               }
             </div>
           }

@@ -52,7 +52,7 @@ export class BookService {
 
   getBookByIdFromState(bookId: number): Book | undefined {
     const currentState = this.bookStateSubject.value;
-    return currentState.books?.find(book => book.id === bookId);
+    return currentState.books?.find(book => +book.id === +bookId);
   }
 
   updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
@@ -413,4 +413,16 @@ export class BookService {
     );
   }
 
+  restoreMetadata(bookId: number) {
+    return this.http.post<BookMetadata>(`${this.url}/${bookId}/metadata/restore`, null).pipe(
+      map(updatedMetadata => {
+        this.handleBookMetadataUpdate(bookId, updatedMetadata);
+        return updatedMetadata;
+      })
+    );
+  }
+
+  getBackupMetadata(bookId: number) {
+    return this.http.get<any>(`${this.url}/${bookId}/metadata/restore`);
+  }
 }

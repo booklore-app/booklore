@@ -5,6 +5,7 @@ import com.adityachandel.booklore.model.dto.BookRecommendation;
 import com.adityachandel.booklore.model.dto.BookViewerSettings;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
+import com.adityachandel.booklore.service.metadata.MetadataBackupRestoreService;
 import com.adityachandel.booklore.service.recommender.BookRecommendationService;
 import com.adityachandel.booklore.service.BookService;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ public class BookController {
 
     private final BookService bookService;
     private final BookRecommendationService bookRecommendationService;
+    private final MetadataBackupRestoreService metadataBackupRestoreService;
 
     @GetMapping
     public ResponseEntity<List<Book>> getBooks(@RequestParam(required = false, defaultValue = "false") boolean withDescription) {
@@ -40,6 +42,15 @@ public class BookController {
     @GetMapping("/{bookId}/cover")
     public ResponseEntity<Resource> getBookCover(@PathVariable long bookId) {
         return ResponseEntity.ok(bookService.getBookCover(bookId));
+    }
+
+    @GetMapping("/{bookId}/backup-cover")
+    public ResponseEntity<Resource> getBackupBookCover(@PathVariable long bookId) {
+        Resource file = metadataBackupRestoreService.getBackupCover(bookId);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "inline; filename=cover.jpg")
+                .contentType(org.springframework.http.MediaType.IMAGE_JPEG)
+                .body(file);
     }
 
     @GetMapping("/{bookId}/content")

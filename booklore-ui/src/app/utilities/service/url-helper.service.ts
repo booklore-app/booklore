@@ -13,4 +13,8 @@ export class UrlHelperService {
     }
     return `${this.baseUrl}/api/v1/books/${bookId}/cover?${coverUpdatedOn}`;
   }
+
+  getBackupCoverUrl(bookId: number): string {
+    return `${this.baseUrl}/api/v1/books/${bookId}/backup-cover`;
+  }
 }

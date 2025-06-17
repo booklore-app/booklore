@@ -20,6 +20,11 @@
   font-size: 14px !important;
 }
 
+::ng-deep p-togglebutton.my-visibility-toggle span[data-pc-section="label"] {
+  display: none;
+  padding: 0px !important;
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

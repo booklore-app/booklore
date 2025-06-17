@@ -32,6 +32,7 @@
         [(ngModel)]="isSelected"
         binary="true"
         id="select-checkbox-{{book.id}}"
+        name="select-checkbox-{{book.id}}"
         class="select-checkbox"
         (ngModelChange)="toggleSelection(isSelected || false)">
       </p-checkbox>

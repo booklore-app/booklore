@@ -28,13 +28,15 @@ import {MetadataFetchOptionsComponent} from '../../metadata-options-dialog/metad
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {RouterLink} from '@angular/router';
+import {TieredMenu} from 'primeng/tieredmenu';
+import {MetadataRestoreDialogComponent} from '../../../components/book-browser/metadata-restore-dialog-component/metadata-restore-dialog-component';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton, RouterLink]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton, RouterLink, TieredMenu]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 
@@ -57,6 +59,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   emailMenuItems: MenuItem[] | undefined;
   readMenuItems: MenuItem[] | undefined;
   refreshMenuItems: MenuItem[] | undefined;
+  moreItems: MenuItem[] | undefined;
   bookInSeries: Book[] = [];
   isExpanded = false;
   showFilePath = false;
@@ -112,6 +115,22 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
         },
       }
     ];
+
+    this.moreItems = [
+      {
+        label: 'Restore Metadata',
+        command: () => {
+          this.dialogService.open(MetadataRestoreDialogComponent, {
+            header: 'Restore Metadata from Backup',
+            modal: true,
+            closable: true,
+            data: {
+              bookId: [this.book!.id]
+            }
+          });
+        }
+      }
+    ]
 
     this.metadata$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -288,14 +307,19 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   }
 
   getMatchScoreColorClass(score: number): string {
-    if (score >= 0.95) return 'bg-green-900 border-green-950';
-    if (score >= 0.90) return 'bg-green-800 border-green-900';
-    if (score >= 0.80) return 'bg-green-700 border-green-800';
-    if (score >= 0.70) return 'bg-yellow-700 border-yellow-800';
-    if (score >= 0.60) return 'bg-yellow-600 border-yellow-700';
-    if (score >= 0.50) return 'bg-yellow-500 border-yellow-600';
-    if (score >= 0.40) return 'bg-red-500 border-red-600';
-    if (score >= 0.30) return 'bg-red-600 border-red-700';
-    return 'bg-red-700 border-red-800';
+    if (score >= 0.95) return 'bg-green-800 border-green-900';
+    if (score >= 0.90) return 'bg-green-700 border-green-800';
+    if (score >= 0.80) return 'bg-green-600 border-green-700';
+    if (score >= 0.70) return 'bg-yellow-600 border-yellow-700';
+    if (score >= 0.60) return 'bg-yellow-500 border-yellow-600';
+    if (score >= 0.50) return 'bg-yellow-400 border-yellow-500';
+    if (score >= 0.40) return 'bg-red-400 border-red-500';
+    if (score >= 0.30) return 'bg-red-500 border-red-600';
+    return 'bg-red-600 border-red-700';
+  }
+
+  getProgressColorClass(progress: number | null | undefined): string {
+    if (progress == null) return 'bg-gray-600';
+    return 'bg-blue-500';
   }
 }

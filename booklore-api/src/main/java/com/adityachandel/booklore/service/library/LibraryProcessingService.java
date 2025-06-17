@@ -10,26 +10,27 @@ import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.fileprocessor.CbxProcessor;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
+import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
 
@@ -46,6 +47,8 @@ public class LibraryProcessingService {
     private final BookRepository bookRepository;
     private final EntityManager entityManager;
     private final TransactionTemplate transactionTemplate;
+    private final FileService fileService;
+    private final BookQueryService bookQueryService;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Map<String, ScheduledFuture<?>> deletionTasks = new ConcurrentHashMap<>();
@@ -212,10 +215,40 @@ public class LibraryProcessingService {
 
     @Transactional
     protected void deleteRemovedBooks(List<Long> bookIds) {
-        bookRepository.deleteByIdIn(bookIds);
+        List<BookEntity> books = bookRepository.findAllById(bookIds);
+        for (BookEntity book : books) {
+            try {
+                if (book.getMetadata() != null && StringUtils.isNotBlank(book.getMetadata().getThumbnail())) {
+                    Path thumbnailPath = Path.of(fileService.getThumbnailPath(book.getId()));
+                    deleteDirectoryRecursively(thumbnailPath);
+                }
+                Path backupDir = Path.of(fileService.getBookMetadataBackupPath(book.getId()));
+                if (Files.exists(backupDir)) {
+                    deleteDirectoryRecursively(backupDir);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to clean up files for book ID {}: {}", book.getId(), e.getMessage());
+            }
+        }
+        bookRepository.deleteAll(books);
         notificationService.sendMessage(Topic.BOOKS_REMOVE, bookIds);
         if (bookIds.size() > 1) {
             log.info("Books removed: {}", bookIds);
+        }
+    }
+
+    private void deleteDirectoryRecursively(Path path) throws IOException {
+        if (Files.exists(path)) {
+            try (Stream<Path> walk = Files.walk(path)) {
+                walk.sorted(Comparator.reverseOrder())
+                        .forEach(p -> {
+                            try {
+                                Files.deleteIfExists(p);
+                            } catch (IOException e) {
+                                log.warn("Failed to delete file or directory: {}", p, e);
+                            }
+                        });
+            }
         }
     }
 

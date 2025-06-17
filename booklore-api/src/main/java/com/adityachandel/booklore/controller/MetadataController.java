@@ -1,10 +1,14 @@
 package com.adityachandel.booklore.controller;
 
+import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
+import com.adityachandel.booklore.model.dto.EpubMetadata;
 import com.adityachandel.booklore.model.dto.request.*;
 import com.adityachandel.booklore.model.dto.settings.MetadataMatchWeights;
+import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.quartz.JobSchedulerService;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import com.adityachandel.booklore.service.metadata.BookMetadataUpdater;
 import com.adityachandel.booklore.service.metadata.MetadataMatchService;
@@ -15,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -27,6 +32,7 @@ public class MetadataController {
     private final JobSchedulerService jobSchedulerService;
     private final BookMetadataMapper bookMetadataMapper;
     private final MetadataMatchService metadataMatchService;
+    private final BookRepository bookRepository;
 
     @PostMapping("/{bookId}/metadata/prospective")
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
@@ -39,7 +45,8 @@ public class MetadataController {
     public ResponseEntity<BookMetadata> updateMetadata(
             @RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId,
             @RequestParam(defaultValue = "true") boolean mergeCategories) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, mergeCategories), true);
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookEntity, setMetadataRequest, true, mergeCategories), true);
         return ResponseEntity.ok(bookMetadata);
     }
 
@@ -87,5 +94,19 @@ public class MetadataController {
     public ResponseEntity<Void> recalculateMatchScores() {
         metadataMatchService.recalculateAllMatchScores();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{bookId}/metadata/restore")
+    @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
+    public ResponseEntity<EpubMetadata> getBackedUpMetadata(@PathVariable Long bookId) throws IOException {
+        EpubMetadata restoredMetadata = bookMetadataService.getBackedUpMetadata(bookId);
+        return ResponseEntity.ok(restoredMetadata);
+    }
+
+    @PostMapping("/{bookId}/metadata/restore")
+    @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
+    public ResponseEntity<BookMetadata> restoreMetadata(@PathVariable Long bookId) throws IOException {
+        BookMetadata restoredMetadata = bookMetadataService.restoreMetadataFromBackup(bookId);
+        return ResponseEntity.ok(restoredMetadata);
     }
 }

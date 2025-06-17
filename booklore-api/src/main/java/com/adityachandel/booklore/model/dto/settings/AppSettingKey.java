@@ -11,6 +11,7 @@ public enum AppSettingKey {
     SIDEBAR_SHELF_SORTING("sidebar_shelf_sorting", true),
     METADATA_PROVIDER_SETTINGS("metadata_provider_settings", true),
     METADATA_MATCH_WEIGHTS("metadata_match_weights", true),
+    METADATA_PERSISTENCE_SETTINGS("metadata_persistence_settings", true),
 
     AUTO_BOOK_SEARCH("auto_book_search", false),
     COVER_IMAGE_RESOLUTION("cover_image_resolution", false),

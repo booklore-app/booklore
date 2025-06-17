@@ -68,6 +68,12 @@ export interface Hardcover {
   apiKey: string;
 }
 
+export interface MetadataPersistenceSettings {
+  saveToOriginalFile: boolean;
+  backupMetadata: boolean;
+  backupCover: boolean;
+}
+
 export interface AppSettings {
   autoBookSearch: boolean;
   similarBookRecommendation: boolean;
@@ -83,6 +89,7 @@ export interface AppSettings {
   maxFileUploadSizeInMb: number;
   metadataProviderSettings: MetadataProviderSettings;
   metadataMatchWeights: MetadataMatchWeights;
+  metadataPersistenceSettings: MetadataPersistenceSettings;
 }
 
 export enum AppSettingKey {
@@ -98,5 +105,6 @@ export enum AppSettingKey {
   CBX_CACHE_SIZE_IN_MB = 'CBX_CACHE_SIZE_IN_MB',
   MAX_FILE_UPLOAD_SIZE_IN_MB = 'MAX_FILE_UPLOAD_SIZE_IN_MB',
   METADATA_PROVIDER_SETTINGS = 'METADATA_PROVIDER_SETTINGS',
-  METADATA_MATCH_WEIGHTS = 'METADATA_MATCH_WEIGHTS'
+  METADATA_MATCH_WEIGHTS = 'METADATA_MATCH_WEIGHTS',
+  METADATA_PERSISTENCE_SETTINGS = 'METADATA_PERSISTENCE_SETTINGS'
 }

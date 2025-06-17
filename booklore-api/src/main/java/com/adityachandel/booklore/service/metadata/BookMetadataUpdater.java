@@ -2,8 +2,16 @@ package com.adityachandel.booklore.service.metadata;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.BookMetadata;
-import com.adityachandel.booklore.model.entity.*;
-import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.model.dto.settings.MetadataPersistenceSettings;
+import com.adityachandel.booklore.model.entity.AuthorEntity;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.BookMetadataEntity;
+import com.adityachandel.booklore.model.entity.CategoryEntity;
+import com.adityachandel.booklore.repository.AuthorRepository;
+import com.adityachandel.booklore.repository.BookMetadataRepository;
+import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.repository.CategoryRepository;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +21,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,29 +41,58 @@ public class BookMetadataUpdater {
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
     private final MetadataMatchService metadataMatchService;
+    private final AppSettingService appSettingService;
+    private final MetadataBackupRestoreService metadataBackupRestoreService;
+    private final EpubMetadataWriter epubMetadataWriter;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public BookMetadataEntity setBookMetadata(long bookId, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+    public BookMetadataEntity setBookMetadata(BookEntity bookEntity, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
         BookMetadataEntity metadata = bookEntity.getMetadata();
 
         updateLocks(newMetadata, metadata);
 
         if (metadata.areAllFieldsLocked()) {
-            log.warn("Attempted to update metadata for book with ID {}, but all fields are locked. No update performed.", bookId);
+            log.warn("Attempted to update metadata for book with ID {}, but all fields are locked. No update performed.", bookEntity.getId());
             return metadata;
+        }
+
+        MetadataPersistenceSettings settings = appSettingService.getAppSettings().getMetadataPersistenceSettings();
+        boolean writeToFile = settings.isSaveToOriginalFile();
+        boolean backupEnabled = settings.isBackupMetadata();
+        boolean backupCover = settings.isBackupCover();
+
+        if (writeToFile && backupEnabled) {
+            try {
+                metadataBackupRestoreService.backupEmbeddedMetadataIfNotExists(bookEntity, backupCover);
+            } catch (Exception e) {
+                log.warn("Failed to backup metadata for book ID {}: {}", bookEntity.getId(), e.getMessage());
+            }
         }
 
         updateBasicFields(newMetadata, metadata);
         updateAuthorsIfNeeded(newMetadata, metadata);
         updateCategoriesIfNeeded(newMetadata, metadata, mergeCategories);
-        updateThumbnailIfNeeded(bookId, newMetadata, metadata, setThumbnail);
+        updateThumbnailIfNeeded(bookEntity.getId(), newMetadata, metadata, setThumbnail);
 
         bookMetadataRepository.save(metadata);
 
-        Float score = metadataMatchService.calculateMatchScore(bookEntity);
-        bookEntity.setMetadataMatchScore(score);
-        bookRepository.save(bookEntity);
+        try {
+            Float score = metadataMatchService.calculateMatchScore(bookEntity);
+            bookEntity.setMetadataMatchScore(score);
+            bookRepository.save(bookEntity);
+        } catch (Exception e) {
+            log.warn("Failed to calculate/save metadata match score for book ID {}: {}", bookEntity.getId(), e.getMessage());
+        }
+
+        if (writeToFile) {
+            try {
+                File bookFile = new File(bookEntity.getFullFilePath().toUri());
+                epubMetadataWriter.writeMetadataToFile(bookFile, metadata);
+                log.info("Embedded metadata written to EPUB for book ID {}", bookEntity.getId());
+            } catch (Exception e) {
+                log.warn("Failed to write metadata to EPUB for book ID {}: {}", bookEntity.getId(), e.getMessage());
+            }
+        }
 
         return metadata;
     }
@@ -88,10 +125,10 @@ public class BookMetadataUpdater {
     private void updateAuthorsIfNeeded(BookMetadata newMetadata, BookMetadataEntity metadata) {
         if (shouldUpdateField(metadata.getAuthorsLocked(), newMetadata.getAuthors()) && newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty()) {
             metadata.setAuthors(newMetadata.getAuthors().stream()
-                .filter(a -> a != null && !a.isBlank())
-                .map(authorName -> authorRepository.findByName(authorName)
-                    .orElseGet(() -> authorRepository.save(AuthorEntity.builder().name(authorName).build())))
-                .collect(Collectors.toSet()));
+                    .filter(a -> a != null && !a.isBlank())
+                    .map(authorName -> authorRepository.findByName(authorName)
+                            .orElseGet(() -> authorRepository.save(AuthorEntity.builder().name(authorName).build())))
+                    .collect(Collectors.toSet()));
         }
     }
 
@@ -100,19 +137,19 @@ public class BookMetadataUpdater {
             if (mergeCategories) {
                 HashSet<CategoryEntity> existingCategories = new HashSet<>(metadata.getCategories());
                 newMetadata.getCategories().stream()
-                    .filter(c -> c != null && !c.isBlank())
-                    .forEach(categoryName -> {
-                        CategoryEntity categoryEntity = categoryRepository.findByName(categoryName)
-                            .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build()));
-                        existingCategories.add(categoryEntity);
-                    });
+                        .filter(c -> c != null && !c.isBlank())
+                        .forEach(categoryName -> {
+                            CategoryEntity categoryEntity = categoryRepository.findByName(categoryName)
+                                    .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build()));
+                            existingCategories.add(categoryEntity);
+                        });
                 metadata.setCategories(new HashSet<>(existingCategories));
             } else if (!newMetadata.getCategories().isEmpty()) {
                 metadata.setCategories(newMetadata.getCategories().stream()
-                    .filter(c -> c != null && !c.isBlank())
-                    .map(categoryName -> categoryRepository.findByName(categoryName)
-                        .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build())))
-                    .collect(Collectors.toSet()));
+                        .filter(c -> c != null && !c.isBlank())
+                        .map(categoryName -> categoryRepository.findByName(categoryName)
+                                .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build())))
+                        .collect(Collectors.toSet()));
             }
         }
     }
@@ -146,31 +183,31 @@ public class BookMetadataUpdater {
 
     private void updateLocks(BookMetadata newMetadata, BookMetadataEntity metadata) {
         List<Pair<Boolean, Consumer<Boolean>>> lockMappings = List.of(
-            Pair.of(newMetadata.getTitleLocked(), metadata::setTitleLocked),
-            Pair.of(newMetadata.getSubtitleLocked(), metadata::setSubtitleLocked),
-            Pair.of(newMetadata.getPublisherLocked(), metadata::setPublisherLocked),
-            Pair.of(newMetadata.getPublishedDateLocked(), metadata::setPublishedDateLocked),
-            Pair.of(newMetadata.getDescriptionLocked(), metadata::setDescriptionLocked),
-            Pair.of(newMetadata.getIsbn13Locked(), metadata::setIsbn13Locked),
-            Pair.of(newMetadata.getIsbn10Locked(), metadata::setIsbn10Locked),
-            Pair.of(newMetadata.getAsinLocked(), metadata::setAsinLocked),
-            Pair.of(newMetadata.getGoodreadsIdLocked(), metadata::setGoodreadsIdLocked),
-            Pair.of(newMetadata.getHardcoverIdLocked(), metadata::setHardcoverIdLocked),
-            Pair.of(newMetadata.getGoogleIdLocked(), metadata::setGoogleIdLocked),
-            Pair.of(newMetadata.getPageCountLocked(), metadata::setPageCountLocked),
-            Pair.of(newMetadata.getLanguageLocked(), metadata::setLanguageLocked),
-            Pair.of(newMetadata.getAmazonRatingLocked(), metadata::setAmazonRatingLocked),
-            Pair.of(newMetadata.getAmazonReviewCountLocked(), metadata::setAmazonReviewCountLocked),
-            Pair.of(newMetadata.getGoodreadsRatingLocked(), metadata::setGoodreadsRatingLocked),
-            Pair.of(newMetadata.getGoodreadsReviewCountLocked(), metadata::setGoodreadsReviewCountLocked),
-            Pair.of(newMetadata.getHardcoverRatingLocked(), metadata::setHardcoverRatingLocked),
-            Pair.of(newMetadata.getHardcoverReviewCountLocked(), metadata::setHardcoverReviewCountLocked),
-            Pair.of(newMetadata.getSeriesNameLocked(), metadata::setSeriesNameLocked),
-            Pair.of(newMetadata.getSeriesNumberLocked(), metadata::setSeriesNumberLocked),
-            Pair.of(newMetadata.getSeriesTotalLocked(), metadata::setSeriesTotalLocked),
-            Pair.of(newMetadata.getAuthorsLocked(), metadata::setAuthorsLocked),
-            Pair.of(newMetadata.getCategoriesLocked(), metadata::setCategoriesLocked),
-            Pair.of(newMetadata.getCoverLocked(), metadata::setCoverLocked)
+                Pair.of(newMetadata.getTitleLocked(), metadata::setTitleLocked),
+                Pair.of(newMetadata.getSubtitleLocked(), metadata::setSubtitleLocked),
+                Pair.of(newMetadata.getPublisherLocked(), metadata::setPublisherLocked),
+                Pair.of(newMetadata.getPublishedDateLocked(), metadata::setPublishedDateLocked),
+                Pair.of(newMetadata.getDescriptionLocked(), metadata::setDescriptionLocked),
+                Pair.of(newMetadata.getIsbn13Locked(), metadata::setIsbn13Locked),
+                Pair.of(newMetadata.getIsbn10Locked(), metadata::setIsbn10Locked),
+                Pair.of(newMetadata.getAsinLocked(), metadata::setAsinLocked),
+                Pair.of(newMetadata.getGoodreadsIdLocked(), metadata::setGoodreadsIdLocked),
+                Pair.of(newMetadata.getHardcoverIdLocked(), metadata::setHardcoverIdLocked),
+                Pair.of(newMetadata.getGoogleIdLocked(), metadata::setGoogleIdLocked),
+                Pair.of(newMetadata.getPageCountLocked(), metadata::setPageCountLocked),
+                Pair.of(newMetadata.getLanguageLocked(), metadata::setLanguageLocked),
+                Pair.of(newMetadata.getAmazonRatingLocked(), metadata::setAmazonRatingLocked),
+                Pair.of(newMetadata.getAmazonReviewCountLocked(), metadata::setAmazonReviewCountLocked),
+                Pair.of(newMetadata.getGoodreadsRatingLocked(), metadata::setGoodreadsRatingLocked),
+                Pair.of(newMetadata.getGoodreadsReviewCountLocked(), metadata::setGoodreadsReviewCountLocked),
+                Pair.of(newMetadata.getHardcoverRatingLocked(), metadata::setHardcoverRatingLocked),
+                Pair.of(newMetadata.getHardcoverReviewCountLocked(), metadata::setHardcoverReviewCountLocked),
+                Pair.of(newMetadata.getSeriesNameLocked(), metadata::setSeriesNameLocked),
+                Pair.of(newMetadata.getSeriesNumberLocked(), metadata::setSeriesNumberLocked),
+                Pair.of(newMetadata.getSeriesTotalLocked(), metadata::setSeriesTotalLocked),
+                Pair.of(newMetadata.getAuthorsLocked(), metadata::setAuthorsLocked),
+                Pair.of(newMetadata.getCategoriesLocked(), metadata::setCategoriesLocked),
+                Pair.of(newMetadata.getCoverLocked(), metadata::setCoverLocked)
         );
         lockMappings.forEach(pair -> applyLock(pair.getLeft(), pair.getRight()));
     }

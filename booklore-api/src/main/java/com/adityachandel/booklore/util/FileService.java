@@ -2,7 +2,7 @@ package com.adityachandel.booklore.util;
 
 import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,6 +27,7 @@ import java.nio.file.Paths;
 public class FileService {
 
     private final AppProperties appProperties;
+    private final AppSettingService appSettingService;
 
     public void createThumbnailFromFile(long bookId, MultipartFile file) {
         try {
@@ -82,19 +84,45 @@ public class FileService {
         }
     }
 
+    public Resource getBackupBookCover(String thumbnailPath) {
+        Path thumbPath;
+        if (thumbnailPath == null || thumbnailPath.isEmpty()) {
+            thumbPath = Paths.get(getMissingThumbnailPath());
+        } else {
+            thumbPath = Paths.get(thumbnailPath);
+        }
+        try {
+            Resource resource = new UrlResource(thumbPath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
+            }
+        } catch (IOException e) {
+            throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
+        }
+    }
+
     public String createThumbnail(long bookId, String thumbnailUrl) throws IOException {
         String newFilename = "f.jpg";
         resizeAndSaveImage(thumbnailUrl, new File(getThumbnailPath(bookId)), newFilename);
         return getThumbnailPath(bookId) + newFilename;
     }
 
-    private void resizeAndSaveImage(String imageUrl, File outputFolder, String outputFileName) throws IOException {
+    private void resizeAndSaveImage(String imageSource, File outputFolder, String outputFileName) throws IOException {
         BufferedImage originalImage;
-        try (InputStream inputStream = new URL(imageUrl).openStream()) {
-            originalImage = ImageIO.read(inputStream);
+        File file = new File(imageSource);
+        if (file.exists()) {
+            try (InputStream inputStream = new FileInputStream(file)) {
+                originalImage = ImageIO.read(inputStream);
+            }
+        } else {
+            try (InputStream inputStream = new URL(imageSource).openStream()) {
+                originalImage = ImageIO.read(inputStream);
+            }
         }
         if (originalImage == null) {
-            throw new IOException("Failed to read image from URL: " + imageUrl);
+            throw new IOException("Failed to read image from: " + imageSource);
         }
         BufferedImage resizedImage = resizeImage(originalImage);
         if (!outputFolder.exists() && !outputFolder.mkdirs()) {
@@ -106,16 +134,29 @@ public class FileService {
     }
 
     private BufferedImage resizeImage(BufferedImage originalImage) {
-        BufferedImage resizedImage = new BufferedImage(250, 350, BufferedImage.TYPE_INT_RGB);
+        String resolution = appSettingService.getAppSettings().getCoverResolution();
+        String[] split = resolution.split("x");
+        int x = Integer.parseInt(split[0]);
+        int y = Integer.parseInt(split[1]);
+
+        BufferedImage resizedImage = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = resizedImage.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2d.drawImage(originalImage, 0, 0, 250, 350, null);
+        g2d.drawImage(originalImage, 0, 0, x, y, null);
         g2d.dispose();
         return resizedImage;
     }
 
     public String getThumbnailPath(long bookId) {
         return appProperties.getPathConfig() + "/thumbs/" + bookId + "/";
+    }
+
+    public String getMetadataBackupPath() {
+        return appProperties.getPathConfig() + "/metadata_backup/";
+    }
+
+    public String getBookMetadataBackupPath(long bookId) {
+        return appProperties.getPathConfig() + "/metadata_backup/" + bookId + "/";
     }
 
     public String getCbxCachePath() {
@@ -129,5 +170,4 @@ public class FileService {
     public String getMissingThumbnailPath() {
         return appProperties.getPathConfig() + "/thumbs/missing/m.jpg";
     }
-
 }

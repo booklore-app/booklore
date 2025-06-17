@@ -50,6 +50,7 @@ public class SecurityConfig {
             "/api/v1/settings",
             "/api/v1/setup/**",
             "/api/v1/books/*/cover",
+            "/api/v1/books/*/backup-cover",
             "/api/v1/opds/*/cover.jpg",
             "/api/v1/cbx/*/pages/*",
             "/api/v1/pdf/*/pages/*"
