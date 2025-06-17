@@ -157,7 +157,7 @@ public class BookMetadataUpdater {
     }
 
     private void updateThumbnailIfNeeded(long bookId, BookMetadata newMetadata, BookMetadataEntity metadata, boolean setThumbnail) {
-        if (setThumbnail && shouldUpdateField(metadata.getThumbnailLocked(), newMetadata.getThumbnailUrl()) && !newMetadata.getThumbnailUrl().isEmpty()) {
+        if (setThumbnail && shouldUpdateField(metadata.getCoverLocked(), newMetadata.getThumbnailUrl()) && !newMetadata.getThumbnailUrl().isEmpty()) {
             String thumbnailPath = null;
             try {
                 thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnailUrl());

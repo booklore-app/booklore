@@ -131,9 +131,6 @@ public class BookMetadataEntity {
     @Column(name = "page_count_locked")
     private Boolean pageCountLocked = Boolean.FALSE;
 
-    @Column(name = "thumbnail_locked")
-    private Boolean thumbnailLocked = Boolean.FALSE;
-
     @Column(name = "language_locked")
     private Boolean languageLocked = Boolean.FALSE;
 
@@ -215,7 +212,6 @@ public class BookMetadataEntity {
         this.isbn10Locked = lock;
         this.asinLocked = lock;
         this.pageCountLocked = lock;
-        this.thumbnailLocked = lock;
         this.languageLocked = lock;
         this.coverLocked = lock;
         this.seriesNameLocked = lock;
