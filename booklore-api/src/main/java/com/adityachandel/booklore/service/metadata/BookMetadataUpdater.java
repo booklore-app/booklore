@@ -36,9 +36,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class BookMetadataUpdater {
 
-    private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
-    private final BookMetadataRepository bookMetadataRepository;
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
     private final MetadataMatchService metadataMatchService;
@@ -47,14 +45,14 @@ public class BookMetadataUpdater {
     private final EpubMetadataWriter epubMetadataWriter;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public BookMetadataEntity setBookMetadata(BookEntity bookEntity, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
+    public void setBookMetadata(BookEntity bookEntity, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
         BookMetadataEntity metadata = bookEntity.getMetadata();
 
         updateLocks(newMetadata, metadata);
 
         if (metadata.areAllFieldsLocked()) {
             log.warn("Attempted to update metadata for book with ID {}, but all fields are locked. No update performed.", bookEntity.getId());
-            return metadata;
+            return;
         }
 
         MetadataPersistenceSettings settings = appSettingService.getAppSettings().getMetadataPersistenceSettings();
@@ -76,12 +74,9 @@ public class BookMetadataUpdater {
         updateCategoriesIfNeeded(newMetadata, metadata, mergeCategories);
         updateThumbnailIfNeeded(bookEntity.getId(), newMetadata, metadata, setThumbnail);
 
-        bookMetadataRepository.save(metadata);
-
         try {
             Float score = metadataMatchService.calculateMatchScore(bookEntity);
             bookEntity.setMetadataMatchScore(score);
-            bookRepository.save(bookEntity);
         } catch (Exception e) {
             log.warn("Failed to calculate/save metadata match score for book ID {}: {}", bookEntity.getId(), e.getMessage());
         }
@@ -95,8 +90,6 @@ public class BookMetadataUpdater {
                 log.warn("Failed to write metadata to EPUB for book ID {}: {}", bookEntity.getId(), e.getMessage());
             }
         }
-
-        return metadata;
     }
 
     private void updateBasicFields(BookMetadata newMetadata, BookMetadataEntity metadata) {

@@ -28,19 +28,14 @@ import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.util.FileService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -140,17 +135,13 @@ public class BookMetadataService {
     }
 
     @Transactional
-    protected BookMetadataEntity updateBookMetadata(BookEntity bookEntity, BookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
+    protected void updateBookMetadata(BookEntity bookEntity, BookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
         if (metadata != null) {
-            BookMetadataEntity bookMetadata = bookMetadataUpdater.setBookMetadata(bookEntity, metadata, replaceCover, mergeCategories);
-            bookEntity.setMetadata(bookMetadata);
-            bookRepository.save(bookEntity);
+            bookMetadataUpdater.setBookMetadata(bookEntity, metadata, replaceCover, mergeCategories);
             Book book = bookMapper.toBook(bookEntity);
             notificationService.sendMessage(Topic.BOOK_METADATA_UPDATE, book);
             notificationService.sendMessage(Topic.LOG, createLogNotification("Book metadata updated: " + book.getMetadata().getTitle()));
-            return bookMetadata;
         }
-        return bookEntity.getMetadata();
     }
 
     @Transactional

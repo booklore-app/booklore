@@ -42,11 +42,11 @@ public class MetadataController {
 
     @PutMapping("/{bookId}/metadata")
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
-    public ResponseEntity<BookMetadata> updateMetadata(
-            @RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId,
-            @RequestParam(defaultValue = "true") boolean mergeCategories) {
+    public ResponseEntity<BookMetadata> updateMetadata(@RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId, @RequestParam(defaultValue = "true") boolean mergeCategories) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookEntity, setMetadataRequest, true, mergeCategories), true);
+        bookMetadataUpdater.setBookMetadata(bookEntity, setMetadataRequest, true, mergeCategories);
+        bookRepository.save(bookEntity);
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookEntity.getMetadata(), true);
         return ResponseEntity.ok(bookMetadata);
     }
 
