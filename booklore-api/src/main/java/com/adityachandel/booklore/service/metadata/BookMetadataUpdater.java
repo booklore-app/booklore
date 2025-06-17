@@ -7,6 +7,7 @@ import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.CategoryEntity;
+import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
@@ -60,8 +61,9 @@ public class BookMetadataUpdater {
         boolean writeToFile = settings.isSaveToOriginalFile();
         boolean backupEnabled = settings.isBackupMetadata();
         boolean backupCover = settings.isBackupCover();
+        BookFileType bookType = bookEntity.getBookType();
 
-        if (writeToFile && backupEnabled) {
+        if (writeToFile && backupEnabled && bookType == BookFileType.EPUB) {
             try {
                 metadataBackupRestoreService.backupEmbeddedMetadataIfNotExists(bookEntity, backupCover);
             } catch (Exception e) {
@@ -84,7 +86,7 @@ public class BookMetadataUpdater {
             log.warn("Failed to calculate/save metadata match score for book ID {}: {}", bookEntity.getId(), e.getMessage());
         }
 
-        if (writeToFile) {
+        if (writeToFile && bookType == BookFileType.EPUB) {
             try {
                 File bookFile = new File(bookEntity.getFullFilePath().toUri());
                 epubMetadataWriter.writeMetadataToFile(bookFile, metadata);

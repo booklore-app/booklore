@@ -150,6 +150,7 @@ export class AppMenuComponent implements OnInit {
         top: '10%',
         bottom: '10%',
         minWidth: '800px',
+        maxWidth: '800px',
       },
     });
   }
