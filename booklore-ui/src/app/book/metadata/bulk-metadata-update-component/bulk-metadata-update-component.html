@@ -1,0 +1,131 @@
+<div class="relative">
+  @if (loading) {
+    <div class="absolute inset-0 z-50 flex items-center justify-center bg-black/60">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  }
+  <div class="p-4 border border-gray-700 rounded-md mb-4 bg-gray-900 text-gray-200">
+    <div class="flex justify-between items-center mb-2">
+      <p class="text-base font-semibold">
+        Editing {{ books.length }} Book{{ books.length !== 1 ? 's' : '' }}
+      </p>
+      <button
+        type="button"
+        (click)="showBookList = !showBookList"
+        class="text-sm text-sky-400 hover:underline"
+      >
+        {{ showBookList ? 'Hide' : 'Show' }} Titles
+      </button>
+    </div>
+
+    @if (showBookList) {
+      <div
+        class="max-h-48 overflow-y-auto border-t border-gray-700 pt-2 pl-1 text-sm text-gray-300"
+      >
+        <ul class="list-disc pl-5 space-y-1">
+          @for (book of books; track book) {
+            <li>{{ book.metadata?.title || 'Untitled Book' }}</li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+
+  <form [formGroup]="metadataForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 w-full p-4">
+    <div class="flex flex-col gap-2">
+      <label for="authors" class="flex items-center gap-2">
+        Author(s)
+        <i
+          class="pi pi-info-circle text-sky-600"
+          pTooltip="Enter multiple authors. Press Enter after typing each name."
+          tooltipPosition="right"
+          style="cursor: pointer"
+        ></i>
+      </label>
+
+      <div class="w-full">
+        <p-chips
+          formControlName="authors"
+          addOnBlur="true"
+        ></p-chips>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="publisher">Publisher</label>
+      <input pInputText id="publisher" formControlName="publisher" class="w-full"/>
+    </div>
+
+    <div class="flex flex-row flex-wrap gap-4">
+      <div class="flex flex-col gap-2 w-1/3">
+        <label for="language">Language</label>
+        <input pInputText id="language" formControlName="language" fluid/>
+      </div>
+
+      <div class="flex flex-col gap-2 w-1/3">
+        <label for="seriesTotal">Total Books in Series</label>
+        <input
+          pInputText
+          id="seriesTotal"
+          type="number"
+          min="1"
+          formControlName="seriesTotal"
+          fluid
+        />
+      </div>
+
+      <div class="flex flex-col gap-2 w-1/4">
+        <label for="publishedDate">Published Date</label>
+        <p-datepicker
+          id="publishedDate"
+          formControlName="publishedDate"
+          dateFormat="yy-mm-dd"
+          showIcon
+          appendTo="body"
+          fluid></p-datepicker>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="seriesName">Series Name</label>
+      <input pInputText id="seriesName" formControlName="seriesName" class="w-full"/>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="genres" class="flex items-center gap-2">
+        Genre(s)
+        <i
+          class="pi pi-info-circle text-sky-600"
+          pTooltip="Enter multiple genres. Press Enter after typing each genre."
+          tooltipPosition="right"
+          style="cursor: pointer"
+        ></i>
+      </label>
+
+      <div class="w-full">
+        <p-chips
+          formControlName="genres"
+          addOnBlur="true"
+        ></p-chips>
+      </div>
+
+      <div class="flex items-center gap-2 mt-2">
+        <p-checkbox
+          inputId="mergeCategories"
+          name="mergeCategories"
+          [(ngModel)]="mergeCategories"
+          [ngModelOptions]="{ standalone: true }"
+          binary="true"
+          class="text-sm"
+        />
+        <label for="mergeCategories" class="text-sm text-gray-300 cursor-pointer">
+          Keep existing categories and add new ones (uncheck to remove all existing categories)
+        </label>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button type="submit" label="Apply to Selected" [disabled]="loading"/>
+    </div>
+  </form>
+</div>

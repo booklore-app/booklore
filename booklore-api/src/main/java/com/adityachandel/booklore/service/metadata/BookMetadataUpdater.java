@@ -131,21 +131,26 @@ public class BookMetadataUpdater {
     private void updateCategoriesIfNeeded(BookMetadata newMetadata, BookMetadataEntity metadata, boolean mergeCategories) {
         if (shouldUpdateField(metadata.getCategoriesLocked(), newMetadata.getCategories()) && newMetadata.getCategories() != null) {
             if (mergeCategories) {
-                HashSet<CategoryEntity> existingCategories = new HashSet<>(metadata.getCategories());
-                newMetadata.getCategories().stream()
-                        .filter(c -> c != null && !c.isBlank())
-                        .forEach(categoryName -> {
-                            CategoryEntity categoryEntity = categoryRepository.findByName(categoryName)
-                                    .orElseGet(() -> CategoryEntity.builder().name(categoryName).build());
-                            existingCategories.add(categoryEntity);
-                        });
+                Set<CategoryEntity> existingCategories = new HashSet<>(metadata.getCategories());
+                for (String categoryName : newMetadata.getCategories()) {
+                    if (categoryName == null || categoryName.isBlank()) continue;
+
+                    CategoryEntity categoryEntity = categoryRepository.findByName(categoryName)
+                            .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build()));
+
+                    existingCategories.add(categoryEntity);
+                }
                 metadata.setCategories(existingCategories);
             } else if (!newMetadata.getCategories().isEmpty()) {
-                Set<CategoryEntity> newCategoryEntities = newMetadata.getCategories().stream()
-                        .filter(c -> c != null && !c.isBlank())
-                        .map(categoryName -> categoryRepository.findByName(categoryName)
-                                .orElseGet(() -> CategoryEntity.builder().name(categoryName).build()))
-                        .collect(Collectors.toSet());
+                Set<CategoryEntity> newCategoryEntities = new HashSet<>();
+                for (String categoryName : newMetadata.getCategories()) {
+                    if (categoryName == null || categoryName.isBlank()) continue;
+
+                    CategoryEntity categoryEntity = categoryRepository.findByName(categoryName)
+                            .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build()));
+
+                    newCategoryEntities.add(categoryEntity);
+                }
                 metadata.setCategories(newCategoryEntities);
             }
         }

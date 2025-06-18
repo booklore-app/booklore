@@ -41,6 +41,7 @@ import {Popover} from 'primeng/popover';
 import {Slider} from 'primeng/slider';
 import {Select} from 'primeng/select';
 import {FilterSortPreferenceService} from './filters/filter-sorting-preferences.service';
+import {TieredMenu} from 'primeng/tieredmenu';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -73,7 +74,7 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select],
+  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, TieredMenu],
   providers: [SeriesCollapseFilter],
   animations: [
     trigger('slideInOut', [
@@ -143,6 +144,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   lastAppliedSort: SortOption | null = null;
   filterVisibility = true;
   private settingFiltersFromUrl = false;
+  protected metadataMenuItems: MenuItem[] | undefined;
 
   get currentCardSize() {
     return this.coverScalePreferenceService.currentCardSize;
@@ -192,6 +194,19 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.deselectAllBooks();
       this.clearFilter();
     });
+
+    this.metadataMenuItems = [
+      {
+        label: 'Refresh Metadata',
+        icon: 'pi pi-refresh',
+        command: () => this.updateMetadata()
+      },
+      {
+        label: 'Bulk Edit Metadata',
+        icon: 'pi pi-pencil',
+        command: () => this.bulkEditMetadata()
+      }
+    ];
   }
 
   ngAfterViewInit() {
@@ -576,5 +591,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   updateMetadata(): void {
     this.dialogHelperService.openMetadataRefreshDialog(this.selectedBooks);
+  }
+
+  bulkEditMetadata(): void {
+    this.dialogHelperService.openBulkMetadataEditDialog(this.selectedBooks);
   }
 }

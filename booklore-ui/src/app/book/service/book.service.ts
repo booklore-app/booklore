@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, first, Observable, of} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {catchError, filter, map, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookRecommendation, BookSetting} from '../model/book.model';
+import {Book, BookMetadata, BookRecommendation, BookSetting, BulkMetadataUpdateRequest} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
 import {FetchMetadataRequest} from '../metadata/model/request/fetch-metadata-request.model';
@@ -53,6 +53,14 @@ export class BookService {
   getBookByIdFromState(bookId: number): Book | undefined {
     const currentState = this.bookStateSubject.value;
     return currentState.books?.find(book => +book.id === +bookId);
+  }
+
+  getBooksByIdsFromState(bookIds: number[]): Book[] {
+    const currentState = this.bookStateSubject.value;
+    if (!currentState.books || bookIds.length === 0) return [];
+
+    const idSet = new Set(bookIds.map(id => +id));
+    return currentState.books.filter(book => idSet.has(+book.id));
   }
 
   updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
@@ -248,6 +256,18 @@ export class BookService {
       map(updatedMetadata => {
         this.handleBookMetadataUpdate(bookId!, updatedMetadata);
         return updatedMetadata;
+      })
+    );
+  }
+
+  updateBooksMetadata(request: BulkMetadataUpdateRequest, mergeCategories: boolean): Observable<BookMetadata[]> {
+    const params = new HttpParams().set('mergeCategories', mergeCategories.toString());
+    return this.http.put<BookMetadata[]>(`${this.url}/bulk-edit-metadata`, request, {params}).pipe(
+      map(updatedMetadataList => {
+        request.bookIds.forEach((id, index) => {
+          this.handleBookMetadataUpdate(id, updatedMetadataList[index]);
+        });
+        return updatedMetadataList;
       })
     );
   }

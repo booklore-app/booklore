@@ -46,7 +46,6 @@ public class MetadataBackupRestoreService {
 
         try {
             if (Files.exists(metadataFile)) {
-                log.info("Backup already exists for book ID {}", bookEntity.getId());
                 return;
             }
 

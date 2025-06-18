@@ -215,40 +215,40 @@
             <div class="book-browser-footer bg-[var(--card-background)] bg-opacity-10" [@slideInOut]>
               <div class="flex justify-between gap-8">
                 @if (entityType$ | async; as entityType) {
-                  @if (entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS || entityType === EntityType.UNSHELVED) {
-                    <p-button
-                      icon="pi pi-bookmark-fill"
-                      outlined="true"
-                      severity="info"
-                      (onClick)="openShelfAssigner()"
-                      pTooltip="Assign to shelf"
-                      tooltipPosition="top">
-                    </p-button>
-                  }
-                  @if (entityType === EntityType.SHELF) {
-                    <p-button
-                      icon="pi pi-bookmark"
-                      outlined="true"
-                      severity="info"
-                      (click)="unshelfBooks()"
-                      pTooltip="Remove from shelf"
-                      tooltipPosition="top">
-                    </p-button>
-                  }
                   @if (userService.userState$ | async; as userData) {
-                    <div>
-                      @if (userData.permissions.canEditMetadata) {
-                        <p-button
-                          icon="pi pi-database"
-                          outlined="true"
-                          severity="info"
-                          (click)="updateMetadata()"
-                          pTooltip="Update metadata"
-                          tooltipPosition="top">
-                        </p-button>
-                      }
-                    </div>
+                    @if (userData.permissions.canEditMetadata) {
+                      <p-tieredmenu #menu [model]="metadataMenuItems" [popup]="true" appendTo="body"/>
+                      <p-button
+                        (click)="menu.toggle($event)"
+                        tooltip="Metadata actions"
+                        tooltipPosition="top"
+                        outlined="true"
+                        severity="info"
+                        icon="pi pi-database">
+                      </p-button>
+                    }
+                    @if (entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS || entityType === EntityType.UNSHELVED) {
+                      <p-button
+                        icon="pi pi-bookmark-fill"
+                        outlined="true"
+                        severity="info"
+                        (onClick)="openShelfAssigner()"
+                        pTooltip="Assign to shelf"
+                        tooltipPosition="top">
+                      </p-button>
+                    }
+                    @if (entityType === EntityType.SHELF) {
+                      <p-button
+                        icon="pi pi-bookmark"
+                        outlined="true"
+                        severity="info"
+                        (click)="unshelfBooks()"
+                        pTooltip="Remove from shelf"
+                        tooltipPosition="top">
+                      </p-button>
+                    }
                   }
+
                   <p-button
                     outlined="true"
                     icon="pi pi-lock"

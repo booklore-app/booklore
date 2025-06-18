@@ -6,10 +6,7 @@ import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.EpubMetadata;
-import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
-import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
-import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
-import com.adityachandel.booklore.model.dto.request.ToggleAllLockRequest;
+import com.adityachandel.booklore.model.dto.request.*;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
@@ -393,6 +390,9 @@ public class BookMetadataService {
     }
 
     public void toggleFieldLocks(List<Long> bookIds, Map<String, String> fieldActions) {
+        Map<String, String> fieldMapping = Map.of(
+                "thumbnailLocked", "coverLocked"
+        );
         List<BookMetadataEntity> metadataEntities = bookMetadataRepository
                 .getMetadataForBookIds(bookIds)
                 .stream()
@@ -401,12 +401,13 @@ public class BookMetadataService {
 
         for (BookMetadataEntity metadataEntity : metadataEntities) {
             fieldActions.forEach((field, action) -> {
+                String entityField = fieldMapping.getOrDefault(field, field);
                 try {
-                    String setterName = "set" + Character.toUpperCase(field.charAt(0)) + field.substring(1);
+                    String setterName = "set" + Character.toUpperCase(entityField.charAt(0)) + entityField.substring(1);
                     Method setter = BookMetadataEntity.class.getMethod(setterName, Boolean.class);
                     setter.invoke(metadataEntity, "LOCK".equalsIgnoreCase(action));
                 } catch (Exception e) {
-                    throw new RuntimeException("Failed to invoke setter for field: " + field + " on bookId: " + metadataEntity.getBookId(), e);
+                    throw new RuntimeException("Failed to invoke setter for field: " + entityField + " on bookId: " + metadataEntity.getBookId(), e);
                 }
             });
         }
@@ -486,5 +487,26 @@ public class BookMetadataService {
 
     public EpubMetadata getBackedUpMetadata(Long bookId) {
         return metadataBackupRestoreService.getBackedUpMetadata(bookId);
+    }
+
+    @Transactional
+    public List<BookMetadata> bulkUpdateMetadata(BulkMetadataUpdateRequest request, boolean mergeCategories) {
+        List<BookEntity> books = bookRepository.findAllWithMetadataByIds(request.getBookIds());
+        for (BookEntity book : books) {
+            BookMetadata bookMetadata = BookMetadata.builder()
+                    .authors(request.getAuthors())
+                    .publisher(request.getPublisher())
+                    .language(request.getLanguage())
+                    .seriesName(request.getSeriesName())
+                    .seriesTotal(request.getSeriesTotal())
+                    .publishedDate(request.getPublishedDate())
+                    .categories(request.getGenres())
+                    .build();
+            bookMetadataUpdater.setBookMetadata(book, bookMetadata, false, mergeCategories);
+        }
+        return books.stream()
+                .map(BookEntity::getMetadata)
+                .map(m -> bookMetadataMapper.toBookMetadata(m, false))
+                .toList();
     }
 }

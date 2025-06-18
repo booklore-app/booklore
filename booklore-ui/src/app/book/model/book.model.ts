@@ -148,3 +148,14 @@ export const enum PdfPageSpread {
   EVEN = 'EVEN',
   ODD = 'ODD',
 }
+
+export interface BulkMetadataUpdateRequest {
+  bookIds: number[];
+  authors?: string[];
+  publisher?: string;
+  language?: string;
+  seriesName?: string;
+  seriesTotal?: number;
+  publishedDate?: string;
+  genres?: string[];
+}

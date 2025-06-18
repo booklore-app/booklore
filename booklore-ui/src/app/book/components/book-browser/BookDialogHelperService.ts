@@ -4,6 +4,7 @@ import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component
 import {LockUnlockMetadataDialogComponent} from './lock-unlock-metadata-dialog/lock-unlock-metadata-dialog.component';
 import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
+import {BulkMetadataUpdateComponent} from '../../metadata/bulk-metadata-update-component/bulk-metadata-update-component';
 
 @Injectable({providedIn: 'root'})
 export class BookDialogHelperService {
@@ -48,6 +49,22 @@ export class BookDialogHelperService {
       data: {
         bookIds: Array.from(bookIds),
         metadataRefreshType: MetadataRefreshType.BOOKS,
+      },
+    });
+  }
+
+  openBulkMetadataEditDialog(bookIds: Set<number>): DynamicDialogRef {
+    return this.dialogService.open(BulkMetadataUpdateComponent, {
+      header: 'Bulk Edit Metadata',
+      modal: true,
+      closable: true,
+      style: {
+        width: '90vw',
+        maxWidth: '1200px',
+        position: 'absolute'
+      },
+      data: {
+        bookIds: Array.from(bookIds)
       },
     });
   }
