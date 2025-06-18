@@ -292,6 +292,9 @@ public class LibraryProcessingService {
             stream.filter(Files::isRegularFile)
                     .filter(file -> {
                         String fileName = file.getFileName().toString().toLowerCase();
+                        if (fileName.startsWith(".")) {
+                            return false;
+                        }
                         return fileName.endsWith(".pdf") ||
                                 fileName.endsWith(".epub") ||
                                 fileName.endsWith(".cbz") ||
