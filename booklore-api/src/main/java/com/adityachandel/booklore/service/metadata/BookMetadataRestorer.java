@@ -96,7 +96,7 @@ public class BookMetadataRestorer {
 
         try {
             File bookFile = new File(bookEntity.getFullFilePath().toUri());
-            epubMetadataWriter.writeMetadataToFile(bookFile, metadata);
+            epubMetadataWriter.writeMetadataToFile(bookFile, metadata, metadata.getThumbnail());
             log.info("Embedded metadata written to EPUB for book ID {}", bookEntity.getId());
         } catch (Exception e) {
             log.warn("Failed to write metadata to EPUB for book ID {}: {}", bookEntity.getId(), e.getMessage());

@@ -1,21 +1,20 @@
 package com.adityachandel.booklore.service.metadata;
 
-import com.adityachandel.booklore.model.entity.AuthorEntity;
-import com.adityachandel.booklore.model.entity.BookMetadataEntity;
-import com.adityachandel.booklore.model.entity.CategoryEntity;
+import com.adityachandel.booklore.model.entity.*;
 import io.documentnode.epub4j.domain.*;
+import io.documentnode.epub4j.domain.Date;
 import io.documentnode.epub4j.epub.EpubReader;
 import io.documentnode.epub4j.epub.EpubWriter;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.namespace.QName;
 import java.io.*;
+import java.net.URL;
 import java.util.*;
-import java.util.Date;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -24,7 +23,7 @@ public class EpubMetadataWriter {
     private static final String OPF_NS = "http://www.idpf.org/2007/opf";
 
     @Transactional
-    public void writeMetadataToFile(File epubFile, BookMetadataEntity metadata) {
+    public void writeMetadataToFile(File epubFile, BookMetadataEntity metadata, String thumbnailUrl) {
         try {
             Book book = new EpubReader().readEpub(new FileInputStream(epubFile));
             Metadata meta = book.getMetadata();
@@ -61,7 +60,7 @@ public class EpubMetadataWriter {
 
             if (metadata.getPublishedDate() != null) {
                 meta.getDates().clear();
-                meta.addDate(new io.documentnode.epub4j.domain.Date(metadata.getPublishedDate().toString()));
+                meta.addDate(new Date(metadata.getPublishedDate().toString()));
             }
 
             meta.getIdentifiers().removeIf(id -> {
@@ -77,14 +76,17 @@ public class EpubMetadataWriter {
                 meta.addIdentifier(new Identifier("ASIN", metadata.getAsin()));
             }
 
-            var categories = metadata.getCategories();
+            Set<CategoryEntity> categories = metadata.getCategories();
             if (categories != null && !categories.isEmpty()) {
                 meta.getSubjects().clear();
-                meta.getSubjects().addAll(categories.stream().map(CategoryEntity::getName).distinct().toList());
+                meta.getSubjects().addAll(categories.stream()
+                        .map(CategoryEntity::getName)
+                        .filter(StringUtils::isNotBlank)
+                        .distinct()
+                        .toList());
             }
 
             Map<QName, String> otherProps = new HashMap<>();
-
             putIfValid(otherProps, "calibre:series", metadata.getSeriesName());
             putIfValid(otherProps, "calibre:series_index", toStringSafe(metadata.getSeriesNumber()));
             putIfValid(otherProps, "booklore:series", metadata.getSeriesName());
@@ -100,48 +102,78 @@ public class EpubMetadataWriter {
             putIfValid(otherProps, "booklore:hardcover_rating_count", toStringSafe(metadata.getHardcoverReviewCount()));
             putIfValid(otherProps, "booklore:google_books_id", metadata.getGoogleId());
             putIfValid(otherProps, "booklore:page_count", toStringSafe(metadata.getPageCount()));
-
             meta.setOtherProperties(otherProps);
 
-            if (StringUtils.isNotBlank(metadata.getThumbnail())) {
-                File coverFile = new File(metadata.getThumbnail());
-                if (coverFile.exists()) {
-                    try (FileInputStream coverStream = new FileInputStream(coverFile)) {
-                        byte[] coverData = coverStream.readAllBytes();
-                        String coverId = "cover-image";
-
-                        Resource cover = new Resource(coverData, "images/cover.jpg");
-                        cover.setId(coverId);
-
-                        book.getResources().remove("images/cover.jpg");
-                        book.getResources().add(cover);
-                        book.setCoverImage(cover);
-
-                        log.info("Cover image replaced for EPUB: {}", coverFile.getName());
-                    } catch (IOException e) {
-                        log.warn("Failed to read new cover image: {}", e.getMessage());
-                    }
-                } else {
-                    log.warn("Cover path set but file not found: {}", metadata.getThumbnail());
+            if (StringUtils.isNotBlank(thumbnailUrl)) {
+                byte[] coverData = loadImage(thumbnailUrl);
+                if (coverData != null) {
+                    replaceCover(book, coverData, thumbnailUrl);
                 }
             }
 
-            File tempFile = new File(epubFile.getParentFile(), epubFile.getName() + ".tmp");
-            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                new EpubWriter().write(book, fos);
-            }
-
-            if (!epubFile.delete()) {
-                throw new IOException("Could not delete original EPUB file");
-            }
-            if (!tempFile.renameTo(epubFile)) {
-                throw new IOException("Could not rename temp EPUB file");
-            }
-
-            log.info("Successfully wrote embedded metadata to EPUB: {}", epubFile.getName());
+            writeBackToFile(epubFile, book);
 
         } catch (Exception e) {
             log.warn("Failed to write metadata to EPUB file {}: {}", epubFile.getName(), e.getMessage(), e);
+        }
+    }
+
+    public void replaceCoverImageFromUpload(BookEntity bookEntity, MultipartFile multipartFile) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            log.warn("Cover upload failed: empty or null file.");
+            return;
+        }
+
+        try {
+            File epubFile = new File(bookEntity.getFullFilePath().toUri());
+            Book book = new EpubReader().readEpub(new FileInputStream(epubFile));
+
+            byte[] coverData = multipartFile.getBytes();
+            replaceCover(book, coverData, multipartFile.getOriginalFilename());
+
+            writeBackToFile(epubFile, book);
+        } catch (IOException e) {
+            log.warn("Failed to update EPUB with uploaded cover image: {}", e.getMessage());
+        }
+    }
+
+    private byte[] loadImage(String pathOrUrl) {
+        try (InputStream stream = pathOrUrl.startsWith("http") ? new URL(pathOrUrl).openStream() : new FileInputStream(pathOrUrl)) {
+            return stream.readAllBytes();
+        } catch (IOException e) {
+            log.warn("Failed to load image from {}: {}", pathOrUrl, e.getMessage());
+            return null;
+        }
+    }
+
+    private void replaceCover(Book book, byte[] coverData, String source) {
+        try {
+            Resource cover = new Resource(coverData, "images/cover.jpg");
+            cover.setId("cover-image");
+
+            book.getResources().remove("images/cover.jpg");
+            book.getResources().add(cover);
+            book.setCoverImage(cover);
+
+            log.info("Cover image replaced from source: {}", source);
+        } catch (Exception e) {
+            log.warn("Failed to replace cover image: {}", e.getMessage());
+        }
+    }
+
+    private void writeBackToFile(File originalFile, Book book) throws IOException {
+        File tempFile = new File(originalFile.getParentFile(), originalFile.getName() + ".tmp");
+
+        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+            new EpubWriter().write(book, fos);
+        }
+
+        if (!originalFile.delete()) {
+            throw new IOException("Could not delete original EPUB file");
+        }
+
+        if (!tempFile.renameTo(originalFile)) {
+            throw new IOException("Could not rename temp EPUB file");
         }
     }
 

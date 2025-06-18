@@ -6,6 +6,7 @@ import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.EpubMetadata;
+import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.request.ToggleAllLockRequest;
@@ -14,19 +15,18 @@ import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.enums.Lock;
+import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
-import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
-import com.adityachandel.booklore.model.enums.MetadataProvider;
-import com.adityachandel.booklore.service.appsettings.AppSettingService;
+import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.fileprocessor.CbxProcessor;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
-import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +42,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
 import static com.adityachandel.booklore.model.enums.MetadataProvider.*;
+import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
 
 @Slf4j
 @Service
@@ -65,6 +65,7 @@ public class BookMetadataService {
     private final BookQueryService bookQueryService;
     private final Map<MetadataProvider, BookParser> parserMap;
     private final MetadataBackupRestoreService metadataBackupRestoreService;
+    private final EpubMetadataWriter epubMetadataWriter;
 
     public List<BookMetadata> getProspectiveMetadataListForBookId(long bookId, FetchMetadataRequest request) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
@@ -424,12 +425,13 @@ public class BookMetadataService {
         return books.stream().map(b -> bookMetadataMapper.toBookMetadata(b.getMetadata(), false)).collect(Collectors.toList());
     }
 
+    @Transactional
     public BookMetadata handleCoverUpload(Long bookId, MultipartFile file) {
         fileService.createThumbnailFromFile(bookId, file);
-        BookMetadataEntity metadata = bookMetadataRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
-        metadata.setCoverUpdatedOn(Instant.now());
-        bookMetadataRepository.save(metadata);
-        return bookMetadataMapper.toBookMetadata(metadata, true);
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        bookEntity.getMetadata().setCoverUpdatedOn(Instant.now());
+        epubMetadataWriter.replaceCoverImageFromUpload(bookEntity, file);
+        return bookMetadataMapper.toBookMetadata(bookEntity.getMetadata(), true);
     }
 
     public void regenerateCover(long bookId) {
