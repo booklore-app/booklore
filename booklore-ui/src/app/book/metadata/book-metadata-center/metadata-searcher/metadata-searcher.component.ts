@@ -1,39 +1,72 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {Button} from 'primeng/button';
-import {InputText} from 'primeng/inputtext';
-import {Divider} from 'primeng/divider';
+import {
+  Component,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { Divider } from 'primeng/divider';
+import { MultiSelect } from 'primeng/multiselect';
+import { ProgressSpinner } from 'primeng/progressspinner';
 
-import {FetchMetadataRequest} from '../../model/request/fetch-metadata-request.model';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
-import {BookMetadataCenterService} from '../book-metadata-center.service';
-import {MultiSelect} from 'primeng/multiselect';
-import {Book, BookMetadata} from '../../../model/book.model';
-import {BookService} from '../../../service/book.service';
-import {combineLatest, Observable, Subject, Subscription, takeUntil} from 'rxjs';
-import {AppSettings} from '../../../../core/model/app-settings.model';
-import {AppSettingsService} from '../../../../core/service/app-settings.service';
-import {distinctUntilChanged, filter, switchMap} from 'rxjs/operators';
-import {ActivatedRoute} from '@angular/router';
+import { FetchMetadataRequest } from '../../model/request/fetch-metadata-request.model';
+import { MetadataPickerComponent } from '../metadata-picker/metadata-picker.component';
+import { Book, BookMetadata } from '../../../model/book.model';
+import { BookService } from '../../../service/book.service';
+import { AppSettings } from '../../../../core/model/app-settings.model';
+import { AppSettingsService } from '../../../../core/service/app-settings.service';
+
+import {
+  combineLatest,
+  Observable,
+  Subject,
+  Subscription,
+  takeUntil,
+  BehaviorSubject
+} from 'rxjs';
+import {
+  distinctUntilChanged,
+  filter,
+  switchMap
+} from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'app-metadata-searcher',
   templateUrl: './metadata-searcher.component.html',
   styleUrls: ['./metadata-searcher.component.scss'],
-  imports: [ReactiveFormsModule, Button, InputText, Divider, ProgressSpinner, MetadataPickerComponent, MultiSelect],
+  imports: [
+    ReactiveFormsModule,
+    Button,
+    InputText,
+    Divider,
+    ProgressSpinner,
+    MetadataPickerComponent,
+    MultiSelect,
+    AsyncPipe
+  ],
   standalone: true
 })
 export class MetadataSearcherComponent implements OnInit, OnDestroy {
   form: FormGroup;
   providers: string[] = [];
   allFetchedMetadata: BookMetadata[] = [];
-  selectedFetchedMetadata!: BookMetadata | null;
   bookId!: number;
   loading: boolean = false;
 
+  @Input() book$!: Observable<Book | null>;
+
+  selectedFetchedMetadata$ = new BehaviorSubject<BookMetadata | null>(null);
+
   private formBuilder = inject(FormBuilder);
-  private metadataCenterService = inject(BookMetadataCenterService);
   private bookService = inject(BookService);
   private appSettingsService = inject(AppSettingsService);
   private route = inject(ActivatedRoute);
@@ -42,69 +75,64 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
   private cancelRequest$ = new Subject<void>();
 
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
-  bookChanged$: Observable<Book | null> = this.metadataCenterService.bookChanged$;
 
   constructor() {
     this.form = this.formBuilder.group({
       provider: null,
       title: [''],
-      author: [''],
+      author: ['']
     });
   }
 
   ngOnInit() {
     this.subscription.add(
-      this.route.paramMap.pipe(
-        switchMap(params => {
-          const bookId = +params.get('id')!;
-          if (this.bookId !== bookId) {
-            this.bookId = bookId;
-            this.cancelRequest$.next();
-            this.loading = false;
-            this.selectedFetchedMetadata = null;
-            this.allFetchedMetadata = [];
-            this.form.patchValue({
-              provider: this.providers,
-              title: '',
-              author: '',
-            });
-          }
-          return combineLatest([this.bookChanged$, this.appSettings$]);
-        }),
-        filter(([book, settings]) => !!book && !!settings),
-        distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
-      ).subscribe(([book, settings]) => {
+      this.route.paramMap
+        .pipe(
+          switchMap(params => {
+            const bookId = +params.get('id')!;
+            if (this.bookId !== bookId) {
+              this.bookId = bookId;
+              this.cancelRequest$.next();
+              this.loading = false;
+              this.allFetchedMetadata = [];
+              this.selectedFetchedMetadata$.next(null);
+            }
+            return combineLatest([this.book$, this.appSettings$]);
+          }),
+          filter(([book, settings]) => !!book && !!settings),
+          distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
+        )
+        .subscribe(([book, settings]) => {
+          this.providers = Object.entries(settings!.metadataProviderSettings)
+            .filter(([_, value]) => value.enabled)
+            .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));
 
-        this.providers = Object.entries(settings!.metadataProviderSettings)
-          .filter(([key, value]) => value.enabled)
-          .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));
+          console.log('aditya')
+          this.resetFormFromBook(book!);
 
-        const autoBookSearchEnabled = settings!.autoBookSearch ?? false;
-
-        if (book) {
-          this.selectedFetchedMetadata = null;
-          this.allFetchedMetadata = [];
-          this.bookId = book.id;
-
-          this.form.patchValue({
-            provider: this.providers,
-            title: book.metadata?.title || null,
-            author: book.metadata?.authors?.length ? book.metadata.authors[0] : ''
-          });
-
-          if (autoBookSearchEnabled) {
+          if (settings!.autoBookSearch) {
             this.onSubmit();
           }
-        }
-      })
+        })
     );
+  }
+
+  private resetFormFromBook(book: Book): void {
+    this.selectedFetchedMetadata$.next(null);
+    this.allFetchedMetadata = [];
+    this.bookId = book.id;
+
+    this.form.patchValue({
+      provider: this.providers,
+      title: book.metadata?.title ?? '',
+      author: book.metadata?.authors?.[0] ?? ''
+    });
   }
 
   ngOnDestroy(): void {
     this.cancelRequest$.next();
     this.subscription.unsubscribe();
-    this.allFetchedMetadata = [];
-    this.selectedFetchedMetadata = null;
+    this.selectedFetchedMetadata$.complete();
   }
 
   get isSearchEnabled(): boolean {
@@ -116,25 +144,26 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.form.valid) {
       const providerKeys = this.form.get('provider')?.value;
-      if (!providerKeys) {
-        return;
-      }
+      if (!providerKeys) return;
+
       const fetchRequest: FetchMetadataRequest = {
         bookId: this.bookId,
         providers: providerKeys,
         title: this.form.get('title')?.value,
         author: this.form.get('author')?.value
       };
+
       this.loading = true;
       this.cancelRequest$.next();
+
       this.bookService.fetchBookMetadata(fetchRequest.bookId, fetchRequest)
         .pipe(takeUntil(this.cancelRequest$))
         .subscribe({
           next: (fetchedMetadata) => {
             this.loading = false;
-            this.allFetchedMetadata = fetchedMetadata.map((fetchedMetadata) => ({
-              ...fetchedMetadata,
-              thumbnailUrl: fetchedMetadata.thumbnailUrl
+            this.allFetchedMetadata = fetchedMetadata.map(m => ({
+              ...m,
+              thumbnailUrl: m.thumbnailUrl
             }));
           },
           error: () => {
@@ -144,6 +173,24 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
     } else {
       console.warn('Form is invalid. Please fill in all required fields.');
     }
+  }
+
+  onBookClick(fetchedMetadata: BookMetadata) {
+    this.selectedFetchedMetadata$.next(fetchedMetadata);
+  }
+
+  onGoBack() {
+    this.selectedFetchedMetadata$.next(null);
+  }
+
+  sanitizeHtml(htmlString: string | null | undefined): string {
+    if (!htmlString) return '';
+    return htmlString.replace(/<\/?[^>]+(>|$)/g, '').trim();
+  }
+
+  truncateText(text: string | null, length: number): string {
+    const safeText = text ?? '';
+    return safeText.length > length ? safeText.substring(0, length) + '...' : safeText;
   }
 
   buildProviderLink(metadata: BookMetadata): string {
@@ -158,25 +205,5 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
     }
 
     throw new Error("No provider ID found in metadata.");
-  }
-
-  truncateText(text: string | null, length: number): string {
-    const safeText = text ?? '';
-    return safeText.length > length ? safeText.substring(0, length) + '...' : safeText;
-  }
-
-  onBookClick(fetchedMetadata: BookMetadata) {
-    this.selectedFetchedMetadata = fetchedMetadata;
-  }
-
-  onGoBack() {
-    this.selectedFetchedMetadata = null;
-  }
-
-  sanitizeHtml(htmlString: string | null | undefined): string {
-    if (!htmlString) {
-      return '';
-    }
-    return htmlString.replace(/<\/?[^>]+(>|$)/g, '').trim();
   }
 }

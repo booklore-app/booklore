@@ -5,10 +5,9 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {Book} from '../../model/book.model';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {BookService} from '../../service/book.service';
-import {MessageService} from 'primeng/api';
-import {Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, Subscription} from 'rxjs';
 import {UserService} from '../../../settings/user-management/user.service';
-import {BookMetadataCenterService} from '../book-metadata-center/book-metadata-center.service';
+import {distinctUntilChanged, filter, map, shareReplay, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-multi-book-metadata-editor-component',
@@ -28,21 +27,21 @@ import {BookMetadataCenterService} from '../book-metadata-center/book-metadata-c
 export class MultiBookMetadataEditorComponent implements OnInit, OnDestroy {
 
   bookIds: number[] = [];
-  books: Book[] = [];
+  filteredBooks: Book[] = [];
   loading = false;
 
-  private userSubscription: Subscription = Subscription.EMPTY;
-  private metadataSubscription: Subscription = Subscription.EMPTY;
-  canEditMetadata: boolean = false;
-  admin: boolean = false;
-  currentIndex = 0;
+  currentIndex$ = new BehaviorSubject<number>(0);
+  book$!: Observable<Book>;
+
+  canEditMetadata = false;
+  admin = false;
 
   private readonly config = inject(DynamicDialogConfig);
   private readonly ref = inject(DynamicDialogRef);
   private readonly bookService = inject(BookService);
-  private readonly messageService = inject(MessageService);
-  private userService = inject(UserService);
-  private metadataCenterService = inject(BookMetadataCenterService);
+  private readonly userService = inject(UserService);
+
+  private userSubscription: Subscription = Subscription.EMPTY;
 
   ngOnInit(): void {
     this.bookIds = this.config.data?.bookIds ?? [];
@@ -53,65 +52,56 @@ export class MultiBookMetadataEditorComponent implements OnInit, OnDestroy {
       this.admin = userPermissions?.admin ?? false;
     });
 
-    this.metadataSubscription = this.metadataCenterService.currentMetadata$.subscribe(updatedMetadata => {
-      if (updatedMetadata) {
-        const index = this.books.findIndex(book => book.metadata?.bookId === updatedMetadata.bookId);
-        if (index !== -1) {
-          this.books[index] = {
-            ...this.books[index],
-            metadata: updatedMetadata
-          };
-        }
-      }
-    });
+    const filteredBooks$ = this.bookService.bookState$.pipe(
+      map(state => state.books?.filter(book =>
+        !!book?.metadata && this.bookIds.includes(book.id)
+      ) ?? []),
+      filter(books => books.length > 0),
+      map(books => {
+        this.filteredBooks = books;
+        return books;
+      })
+    );
 
-    this.loading = true;
-    this.bookService.getBooksByIdsFromAPI(this.bookIds, true).subscribe({
-      next: (fetchedBooks) => {
-        this.books = fetchedBooks;
-        this.loading = false;
-
-        if (this.books.length > 0) {
-          this.metadataCenterService.emitBookChanged(this.books[this.currentIndex]);
-          this.metadataCenterService.emitMetadata(this.books[this.currentIndex].metadata!);
-        }
-      },
-      error: (err) => {
-        this.loading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Failed to load books',
-          detail: err.message || 'An error occurred while fetching books.'
-        });
-      }
-    });
+    this.book$ = combineLatest([filteredBooks$, this.currentIndex$]).pipe(
+      map(([books, index]) => books[index]),
+      filter((book): book is Book => !!book),
+      distinctUntilChanged((a, b) => a.id === b.id && a.metadata === b.metadata),
+      switchMap(book =>
+        this.bookService.getBookByIdFromAPI(book.id, true)
+      ),
+      shareReplay(1)
+    );
   }
 
   ngOnDestroy(): void {
     this.userSubscription.unsubscribe();
-    this.metadataSubscription.unsubscribe();
-    this.metadataCenterService.emitBookChanged(null);
+    this.currentIndex$.complete();
   }
 
   handleNextBook() {
-    if (this.currentIndex < this.books.length - 1) {
-      this.currentIndex++;
-      const book = this.books[this.currentIndex];
-      this.metadataCenterService.emitBookChanged(book);
-      this.metadataCenterService.emitMetadata(book.metadata!);
+    const next = this.currentIndex$.value + 1;
+    if (next < this.filteredBooks.length) {
+      this.currentIndex$.next(next);
     }
   }
 
   handlePreviousBook() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-      const book = this.books[this.currentIndex];
-      this.metadataCenterService.emitBookChanged(book);
-      this.metadataCenterService.emitMetadata(book.metadata!);
+    const prev = this.currentIndex$.value - 1;
+    if (prev >= 0) {
+      this.currentIndex$.next(prev);
     }
   }
 
   handleCloseDialogButton() {
     this.ref.close();
+  }
+
+  get disableNext(): boolean {
+    return this.currentIndex$.value >= this.filteredBooks.length - 1;
+  }
+
+  get disablePrevious(): boolean {
+    return this.currentIndex$.value <= 0;
   }
 }

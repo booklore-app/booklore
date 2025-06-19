@@ -1,17 +1,18 @@
-import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {BookMetadata} from '../../../model/book.model';
+import {Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {Book, BookMetadata} from '../../../model/book.model';
 import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
-import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
+import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
 import {Divider} from 'primeng/divider';
-import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
 import {Tooltip} from 'primeng/tooltip';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {BookService} from '../../../service/book.service';
 import {Textarea} from 'primeng/textarea';
+import {filter, map} from 'rxjs/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -29,7 +30,7 @@ import {Textarea} from 'primeng/textarea';
     Tooltip,
     AsyncPipe,
     Textarea
-]
+  ]
 })
 export class MetadataPickerComponent implements OnInit {
 
@@ -66,6 +67,7 @@ export class MetadataPickerComponent implements OnInit {
   ];
 
   @Input() fetchedMetadata!: BookMetadata;
+  @Input() book$!: Observable<Book | null>;
   @Output() goBack = new EventEmitter<boolean>();
 
   metadataForm: FormGroup;
@@ -73,13 +75,12 @@ export class MetadataPickerComponent implements OnInit {
   copiedFields: Record<string, boolean> = {};
   savedFields: Record<string, boolean> = {};
   originalMetadata!: BookMetadata;
+  isSaving = false;
 
-  private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
   private bookService = inject(BookService);
   protected urlHelper = inject(UrlHelperService);
-
-  bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
+  private destroyRef = inject(DestroyRef);
 
   constructor() {
     this.metadataForm = new FormGroup({
@@ -138,7 +139,13 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.bookMetadata$.subscribe((metadata) => {
+    this.book$
+      .pipe(
+        filter((book): book is Book => !!book && !!book.metadata),
+        map(book => book.metadata),
+        takeUntilDestroyed(this.destroyRef)
+      ).
+    subscribe((metadata) => {
       if (metadata) {
         this.originalMetadata = metadata;
         this.originalMetadata.thumbnailUrl = this.urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn);
@@ -226,18 +233,20 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   onSave(): void {
+    this.isSaving = true;
     const updatedBookMetadata = this.buildMetadata(undefined);
     this.bookService.updateBookMetadata(this.currentBookId, updatedBookMetadata, false).subscribe({
       next: (bookMetadata) => {
+        this.isSaving = false;
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {
             this.savedFields[field] = true;
           }
         });
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
-        this.metadataCenterService.emitMetadata(bookMetadata);
       },
       error: () => {
+        this.isSaving = false;
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
       }
     });
@@ -314,8 +323,6 @@ export class MetadataPickerComponent implements OnInit {
   private updateMetadata(shouldLockAllFields: boolean | undefined): void {
     this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(shouldLockAllFields), false).subscribe({
       next: (response) => {
-        this.metadataCenterService.emitMetadata(response);
-
         if (shouldLockAllFields !== undefined) {
           this.messageService.add({
             severity: 'success',

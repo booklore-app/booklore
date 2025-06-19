@@ -1,13 +1,12 @@
-import {Component, EventEmitter, inject, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Observable} from 'rxjs';
-import {BookMetadataCenterService} from '../book-metadata-center.service';
-import { AsyncPipe, NgClass } from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {MessageService} from 'primeng/api';
-import {BookMetadata} from '../../../model/book.model';
+import {Book, BookMetadata} from '../../../model/book.model';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupload';
 import {HttpResponse} from '@angular/common/http';
@@ -19,6 +18,9 @@ import {debounceTime} from 'rxjs/operators';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {MetadataRestoreDialogComponent} from '../../../components/book-browser/metadata-restore-dialog-component/metadata-restore-dialog-component';
 import {DialogService} from 'primeng/dynamicdialog';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
+import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -42,12 +44,13 @@ import {DialogService} from 'primeng/dynamicdialog';
     Tab,
     TabPanels,
     TabPanel
-]
+  ]
 })
 export class MetadataEditorComponent implements OnInit {
 
   @ViewChild(Editor) quillEditor!: Editor;
 
+  @Input() book$!: Observable<Book | null>;
   @Output() nextBookClicked = new EventEmitter<void>();
   @Output() previousBookClicked = new EventEmitter<void>();
   @Output() closeDialogButtonClicked = new EventEmitter<void>();
@@ -56,19 +59,21 @@ export class MetadataEditorComponent implements OnInit {
   @Input() disablePrevious = false;
   @Input() showNavigationButtons = false;
 
-  private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
   private bookService = inject(BookService);
   protected urlHelper = inject(UrlHelperService);
   private dialogService = inject(DialogService);
+  private destroyRef = inject(DestroyRef);
 
-  bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   metadataForm: FormGroup;
   currentBookId!: number;
   isUploading = false;
   isLoading = false;
   htmlTextarea = '';
   isSaving = false;
+
+  refreshingBookIds = new Set<number>();
+  isAutoFetching = false;
 
   constructor() {
     this.metadataForm = new FormGroup({
@@ -128,117 +133,128 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.bookMetadata$.subscribe((metadata) => {
-      if (metadata) {
+    this.book$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(book => {
+        const metadata = book?.metadata;
+        if (!metadata) return;
+
         this.currentBookId = metadata.bookId;
 
-        if (this.quillEditor && this.quillEditor.quill) {
+        if (this.refreshingBookIds.has(book.id)) {
+          this.refreshingBookIds.delete(book.id);
+          this.isAutoFetching = false;
+        }
+
+        if (this.quillEditor?.quill) {
           this.quillEditor.quill.root.innerHTML = metadata.description;
           this.quillDisabled();
         }
 
-        this.metadataForm.patchValue({
-          title: metadata.title || null,
-          subtitle: metadata.subtitle || null,
-          authors: (metadata.authors || []).sort().join(', '),
-          categories: (metadata.categories || []).sort().join(', '),
-          publisher: metadata.publisher || null,
-          publishedDate: metadata.publishedDate || null,
-          isbn10: metadata.isbn10 || null,
-          isbn13: metadata.isbn13 || null,
-          description: metadata.description || null,
-          pageCount: metadata.pageCount || null,
-          language: metadata.language || null,
-          rating: metadata.rating || null,
-          reviewCount: metadata.reviewCount || null,
-          asin: metadata.asin || null,
-          amazonRating: metadata.amazonRating || null,
-          amazonReviewCount: metadata.amazonReviewCount || null,
-          goodreadsId: metadata.goodreadsId || null,
-          goodreadsRating: metadata.goodreadsRating || null,
-          goodreadsReviewCount: metadata.goodreadsReviewCount || null,
-          hardcoverId: metadata.hardcoverId || null,
-          hardcoverRating: metadata.hardcoverRating || null,
-          hardcoverReviewCount: metadata.hardcoverReviewCount || null,
-          googleId: metadata.googleId || null,
-          seriesName: metadata.seriesName || null,
-          seriesNumber: metadata.seriesNumber || null,
-          seriesTotal: metadata.seriesTotal || null,
+        this.populateFormFromMetadata(metadata);
+      });
 
-          titleLocked: metadata.titleLocked || false,
-          subtitleLocked: metadata.subtitleLocked || false,
-          authorsLocked: metadata.authorsLocked || false,
-          categoriesLocked: metadata.categoriesLocked || false,
-          publisherLocked: metadata.publisherLocked || false,
-          publishedDateLocked: metadata.publishedDateLocked || false,
-          isbn10Locked: metadata.isbn10Locked || false,
-          isbn13Locked: metadata.isbn13Locked || false,
-          descriptionLocked: metadata.descriptionLocked || false,
-          pageCountLocked: metadata.pageCountLocked || false,
-          languageLocked: metadata.languageLocked || false,
-          asinLocked: metadata.asinLocked || false,
-          amazonRatingLocked: metadata.amazonRatingLocked || false,
-          amazonReviewCountLocked: metadata.amazonReviewCountLocked || false,
-          goodreadsIdLocked: metadata.goodreadsIdLocked || false,
-          goodreadsRatingLocked: metadata.goodreadsRatingLocked || false,
-          goodreadsReviewCountLocked: metadata.goodreadsReviewCountLocked || false,
-          hardcoverIdLocked: metadata.hardcoverIdLocked || false,
-          hardcoverRatingLocked: metadata.hardcoverRatingLocked || false,
-          hardcoverReviewCountLocked: metadata.hardcoverReviewCountLocked || false,
-          googleIdLocked: metadata.googleIdLocked || false,
-          seriesNameLocked: metadata.seriesNameLocked || false,
-          seriesNumberLocked: metadata.seriesNumberLocked || false,
-          seriesTotalLocked: metadata.seriesTotalLocked || false,
-          thumbnailUrlLocked: metadata.coverLocked || false,
-        });
+    this.metadataForm.get('description')?.valueChanges
+      .pipe(debounceTime(100), takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        if (this.htmlTextarea !== value) {
+          this.htmlTextarea = value;
+        }
+      });
+  }
 
-        const lockableFields: { key: keyof BookMetadata, control: string }[] = [
-          {key: 'titleLocked', control: 'title'},
-          {key: 'subtitleLocked', control: 'subtitle'},
-          {key: 'authorsLocked', control: 'authors'},
-          {key: 'categoriesLocked', control: 'categories'},
-          {key: 'publisherLocked', control: 'publisher'},
-          {key: 'publishedDateLocked', control: 'publishedDate'},
-          {key: 'languageLocked', control: 'language'},
-          {key: 'isbn10Locked', control: 'isbn10'},
-          {key: 'isbn13Locked', control: 'isbn13'},
-          {key: 'asinLocked', control: 'asin'},
-          {key: 'amazonReviewCountLocked', control: 'amazonReviewCount'},
-          {key: 'amazonRatingLocked', control: 'amazonRating'},
-          {key: 'goodreadsIdLocked', control: 'goodreadsId'},
-          {key: 'goodreadsReviewCountLocked', control: 'goodreadsReviewCount'},
-          {key: 'goodreadsRatingLocked', control: 'goodreadsRating'},
-          {key: 'hardcoverIdLocked', control: 'hardcoverId'},
-          {key: 'hardcoverReviewCountLocked', control: 'hardcoverReviewCount'},
-          {key: 'hardcoverRatingLocked', control: 'hardcoverRating'},
-          {key: 'googleIdLocked', control: 'googleId'},
-          {key: 'pageCountLocked', control: 'pageCount'},
-          {key: 'descriptionLocked', control: 'description'},
-          {key: 'seriesNameLocked', control: 'seriesName'},
-          {key: 'seriesNumberLocked', control: 'seriesNumber'},
-          {key: 'seriesTotalLocked', control: 'seriesTotal'}
-        ];
-
-        lockableFields.forEach(({key, control}) => {
-          const isLocked = metadata[key] === true;
-          const formControl = this.metadataForm.get(control);
-          if (formControl) {
-            isLocked ? formControl.disable() : formControl.enable();
-          }
-        });
-
-        this.metadataForm.get('reviewCount')?.disable();
-        this.metadataForm.get('rating')?.disable();
-      }
-
-      this.metadataForm.get('description')?.valueChanges
-        .pipe(debounceTime(100))
-        .subscribe(value => {
-          if (this.htmlTextarea !== value) {
-            this.htmlTextarea = value;
-          }
-        });
+  private populateFormFromMetadata(metadata: BookMetadata): void {
+    this.metadataForm.patchValue({
+      title: metadata.title ?? null,
+      subtitle: metadata.subtitle ?? null,
+      authors: (metadata.authors ?? []).sort().join(', '),
+      categories: (metadata.categories ?? []).sort().join(', '),
+      publisher: metadata.publisher ?? null,
+      publishedDate: metadata.publishedDate ?? null,
+      isbn10: metadata.isbn10 ?? null,
+      isbn13: metadata.isbn13 ?? null,
+      description: metadata.description ?? null,
+      pageCount: metadata.pageCount ?? null,
+      language: metadata.language ?? null,
+      rating: metadata.rating ?? null,
+      reviewCount: metadata.reviewCount ?? null,
+      asin: metadata.asin ?? null,
+      amazonRating: metadata.amazonRating ?? null,
+      amazonReviewCount: metadata.amazonReviewCount ?? null,
+      goodreadsId: metadata.goodreadsId ?? null,
+      goodreadsRating: metadata.goodreadsRating ?? null,
+      goodreadsReviewCount: metadata.goodreadsReviewCount ?? null,
+      hardcoverId: metadata.hardcoverId ?? null,
+      hardcoverRating: metadata.hardcoverRating ?? null,
+      hardcoverReviewCount: metadata.hardcoverReviewCount ?? null,
+      googleId: metadata.googleId ?? null,
+      seriesName: metadata.seriesName ?? null,
+      seriesNumber: metadata.seriesNumber ?? null,
+      seriesTotal: metadata.seriesTotal ?? null,
+      titleLocked: metadata.titleLocked ?? false,
+      subtitleLocked: metadata.subtitleLocked ?? false,
+      authorsLocked: metadata.authorsLocked ?? false,
+      categoriesLocked: metadata.categoriesLocked ?? false,
+      publisherLocked: metadata.publisherLocked ?? false,
+      publishedDateLocked: metadata.publishedDateLocked ?? false,
+      isbn10Locked: metadata.isbn10Locked ?? false,
+      isbn13Locked: metadata.isbn13Locked ?? false,
+      descriptionLocked: metadata.descriptionLocked ?? false,
+      pageCountLocked: metadata.pageCountLocked ?? false,
+      languageLocked: metadata.languageLocked ?? false,
+      asinLocked: metadata.asinLocked ?? false,
+      amazonRatingLocked: metadata.amazonRatingLocked ?? false,
+      amazonReviewCountLocked: metadata.amazonReviewCountLocked ?? false,
+      goodreadsIdLocked: metadata.goodreadsIdLocked ?? false,
+      goodreadsRatingLocked: metadata.goodreadsRatingLocked ?? false,
+      goodreadsReviewCountLocked: metadata.goodreadsReviewCountLocked ?? false,
+      hardcoverIdLocked: metadata.hardcoverIdLocked ?? false,
+      hardcoverRatingLocked: metadata.hardcoverRatingLocked ?? false,
+      hardcoverReviewCountLocked: metadata.hardcoverReviewCountLocked ?? false,
+      googleIdLocked: metadata.googleIdLocked ?? false,
+      seriesNameLocked: metadata.seriesNameLocked ?? false,
+      seriesNumberLocked: metadata.seriesNumberLocked ?? false,
+      seriesTotalLocked: metadata.seriesTotalLocked ?? false,
+      thumbnailUrlLocked: metadata.coverLocked ?? false,
     });
+
+    const lockableFields: { key: keyof BookMetadata; control: string }[] = [
+      {key: 'titleLocked', control: 'title'},
+      {key: 'subtitleLocked', control: 'subtitle'},
+      {key: 'authorsLocked', control: 'authors'},
+      {key: 'categoriesLocked', control: 'categories'},
+      {key: 'publisherLocked', control: 'publisher'},
+      {key: 'publishedDateLocked', control: 'publishedDate'},
+      {key: 'languageLocked', control: 'language'},
+      {key: 'isbn10Locked', control: 'isbn10'},
+      {key: 'isbn13Locked', control: 'isbn13'},
+      {key: 'asinLocked', control: 'asin'},
+      {key: 'amazonReviewCountLocked', control: 'amazonReviewCount'},
+      {key: 'amazonRatingLocked', control: 'amazonRating'},
+      {key: 'goodreadsIdLocked', control: 'goodreadsId'},
+      {key: 'goodreadsReviewCountLocked', control: 'goodreadsReviewCount'},
+      {key: 'goodreadsRatingLocked', control: 'goodreadsRating'},
+      {key: 'hardcoverIdLocked', control: 'hardcoverId'},
+      {key: 'hardcoverReviewCountLocked', control: 'hardcoverReviewCount'},
+      {key: 'hardcoverRatingLocked', control: 'hardcoverRating'},
+      {key: 'googleIdLocked', control: 'googleId'},
+      {key: 'pageCountLocked', control: 'pageCount'},
+      {key: 'descriptionLocked', control: 'description'},
+      {key: 'seriesNameLocked', control: 'seriesName'},
+      {key: 'seriesNumberLocked', control: 'seriesNumber'},
+      {key: 'seriesTotalLocked', control: 'seriesTotal'}
+    ];
+
+    for (const {key, control} of lockableFields) {
+      const isLocked = metadata[key] === true;
+      const formControl = this.metadataForm.get(control);
+      if (formControl) {
+        isLocked ? formControl.disable() : formControl.enable();
+      }
+    }
+
+    this.metadataForm.get('reviewCount')?.disable();
+    this.metadataForm.get('rating')?.disable();
   }
 
   onSave(): void {
@@ -247,7 +263,6 @@ export class MetadataEditorComponent implements OnInit {
       next: (response) => {
         this.isSaving = false;
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
-        this.metadataCenterService.emitMetadata(response);
       },
       error: (err) => {
         this.isSaving = false;
@@ -374,7 +389,6 @@ export class MetadataEditorComponent implements OnInit {
   private updateMetadata(shouldLockAllFields: boolean | undefined): void {
     this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(shouldLockAllFields), false).subscribe({
       next: (response) => {
-        this.metadataCenterService.emitMetadata(response);
         if (shouldLockAllFields !== undefined) {
           this.messageService.add({
             severity: 'success',
@@ -408,7 +422,6 @@ export class MetadataEditorComponent implements OnInit {
     if (response && response.status === 200) {
       const bookMetadata: BookMetadata = response.body as BookMetadata;
       this.bookService.handleBookMetadataUpdate(this.currentBookId, bookMetadata);
-      this.metadataCenterService.emitMetadata(bookMetadata);
       this.isUploading = false;
     } else {
       this.isUploading = false;
@@ -453,6 +466,17 @@ export class MetadataEditorComponent implements OnInit {
         bookId: [this.currentBookId]
       }
     });
+  }
+
+  autoFetch(bookId: number) {
+    this.refreshingBookIds.add(bookId);
+    this.isAutoFetching = true;
+    const request: MetadataRefreshRequest = {
+      quick: true,
+      refreshType: MetadataRefreshType.BOOKS,
+      bookIds: [bookId],
+    };
+    this.bookService.autoRefreshMetadata(request).subscribe();
   }
 
   onNext() {

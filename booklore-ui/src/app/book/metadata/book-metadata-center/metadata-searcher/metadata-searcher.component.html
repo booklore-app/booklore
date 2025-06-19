@@ -1,9 +1,18 @@
-@if (!selectedFetchedMetadata) {
+@if (selectedFetchedMetadata$ | async; as selectedFetchedMetadata) {
+  <div class="h-full flex-auto">
+    <app-metadata-picker
+      [fetchedMetadata]="selectedFetchedMetadata"
+      [book$]="book$"
+      (goBack)="onGoBack()">
+    </app-metadata-picker>
+  </div>
+} @else {
   <form class="flex flex-col w-full h-full pt-2" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="flex w-full gap-x-4 items-end">
       <div class="flex flex-col gap-1 w-3/12">
         <label>Providers</label>
-        <p-multiselect id="provider" class="w-full" [filter]="false" showToggleAll="false" [options]="providers" formControlName="provider" placeholder="Select Providers"></p-multiselect>
+        <p-multiselect id="provider" class="w-full" [filter]="false" showToggleAll="false" [options]="providers" formControlName="provider"
+                       placeholder="Select Providers"></p-multiselect>
       </div>
       <div class="flex flex-col gap-1 w-5/12">
         <label for="title">Title</label>
@@ -53,10 +62,4 @@
       </div>
     }
   </form>
-}
-
-@if (selectedFetchedMetadata) {
-  <div class="h-full flex-auto">
-    <app-metadata-picker [fetchedMetadata]="selectedFetchedMetadata" (goBack)="onGoBack()"></app-metadata-picker>
-  </div>
 }

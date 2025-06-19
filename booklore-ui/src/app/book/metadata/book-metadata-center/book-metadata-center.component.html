@@ -11,16 +11,16 @@
     </p-tablist>
     <p-tabpanels class="overflow-auto" style="height: calc(100vh - 10rem);">
       <p-tabpanel value="view">
-        <app-metadata-viewer [book]="book" [recommendedBooks]="recommendedBooks"></app-metadata-viewer>
+        <app-metadata-viewer [book$]="book$" [recommendedBooks]="recommendedBooks"></app-metadata-viewer>
       </p-tabpanel>
       @if (admin || canEditMetadata) {
         <p-tabpanel value="edit">
-          <app-metadata-editor></app-metadata-editor>
+          <app-metadata-editor [book$]="book$"></app-metadata-editor>
         </p-tabpanel>
       }
       @if (admin || canEditMetadata) {
         <p-tabpanel value="match">
-          <app-metadata-searcher></app-metadata-searcher>
+          <app-metadata-searcher [book$]="book$"></app-metadata-searcher>
         </p-tabpanel>
       }
     </p-tabpanels>

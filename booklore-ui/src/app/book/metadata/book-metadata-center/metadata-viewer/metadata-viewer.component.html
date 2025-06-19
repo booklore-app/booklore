@@ -1,26 +1,26 @@
 <div class="pt-2 flex flex-col h-full">
-  @if (metadata$ | async; as metadata) {
+  @if (book$ | async; as book) {
     <div>
       <div class="flex flex-row">
         <div class="cover-wrapper relative">
           <img
-            [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
+            [attr.src]="urlHelper.getCoverUrl(book?.metadata!.bookId, book?.metadata!.coverUpdatedOn)"
             class="book-cover placeholder"
-            alt="Cover of {{ metadata.title }}"
+            alt="Cover of {{ book?.metadata!.title }}"
             loading="lazy"
             width="225"
             style="min-width: 225px;"
           />
-          @if (metadata?.seriesNumber != null) {
+          @if (book?.metadata!.seriesNumber != null) {
             <div class="series-number-overlay">
-              #{{ metadata?.seriesNumber }}
+              #{{ book?.metadata!.seriesNumber }}
             </div>
           }
-          @if (getProgressPercent() !== null) {
+          @if (getProgressPercent(book) !== null) {
             <p-progressBar
-              [value]="getProgressPercent()"
+              [value]="getProgressPercent(book)"
               [showValue]="true"
-              [ngClass]="{ 'progress-complete': getProgressPercent() === 100, 'progress-incomplete': getProgressPercent()! < 100 }"
+              [ngClass]="{ 'progress-complete': getProgressPercent(book) === 100, 'progress-incomplete': getProgressPercent(book)! < 100 }"
               [style]="{ height: '10px' }">
             </p-progressBar>
           }
@@ -29,22 +29,22 @@
           <div class="pl-6 flex flex-col w-full">
             <div class="flex flex-row items-center justify-between">
               <div>
-                @if (metadata.seriesName) {
-                  <p class="italic">{{ metadata.seriesName }} #{{ metadata.seriesNumber }}</p>
+                @if (book?.metadata!.seriesName) {
+                  <p class="italic">{{ book?.metadata!.seriesName }} #{{ book?.metadata!.seriesNumber }}</p>
                 }
                 <div class="flex items-center gap-2">
-                  <p class="text-2xl font-bold m-0">{{ metadata.title }}</p>
+                  <p class="text-2xl font-bold m-0">{{ book?.metadata!.title }}</p>
                   <i
                     class="pi"
-                    [ngClass]="isMetadataFullyLocked(metadata) ? 'pi-lock text-red-500' : 'pi-lock-open text-green-500'"
-                    [title]="isMetadataFullyLocked(metadata) ? 'Metadata is locked' : 'Metadata is unlocked'"
+                    [ngClass]="isMetadataFullyLocked(book?.metadata!) ? 'pi-lock text-red-500' : 'pi-lock-open text-green-500'"
+                    [title]="isMetadataFullyLocked(book?.metadata!) ? 'Metadata is locked' : 'Metadata is unlocked'"
                     style="font-size: 1.25rem;"
-                    pTooltip="{{ isMetadataFullyLocked(metadata) ? 'This book metadata is locked.' : 'This book metadata is unlocked.' }}"
+                    pTooltip="{{ isMetadataFullyLocked(book?.metadata!) ? 'This book metadata is locked.' : 'This book metadata is unlocked.' }}"
                     tooltipPosition="top">
                   </i>
                 </div>
                 <p class="text-lg">
-                  @for (author of metadata?.authors; track author; let isLast = $last) {
+                  @for (author of book?.metadata!.authors; track author; let isLast = $last) {
                     <a
                       class="underline hover:opacity-80"
                       [routerLink]="['/all-books']"
@@ -64,72 +64,72 @@
               </div>
             </div>
             <div class="flex items-center gap-2 pt-2">
-              @if (metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating) {
-                @if (metadata.amazonRating) {
-                  @if (metadata.asin) {
-                    <a class="flex items-center gap-1" [href]="'https://www.amazon.com/dp/' + metadata.asin" target="_blank" rel="noopener noreferrer">
+              @if (book?.metadata!.amazonRating || book?.metadata!.goodreadsRating || book?.metadata!.hardcoverRating) {
+                @if (book?.metadata!.amazonRating) {
+                  @if (book?.metadata!.asin) {
+                    <a class="flex items-center gap-1" [href]="'https://www.amazon.com/dp/' + book?.metadata!.asin" target="_blank" rel="noopener noreferrer">
                       <img src="https://www.amazon.com/favicon.ico" alt="Amazon"
                            class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
-                      <p class="font-semibold">{{ metadata.amazonRating }}</p>
+                      <p class="font-semibold">{{ book?.metadata!.amazonRating }}</p>
                     </a>
                   } @else {
                     <span class="flex items-center gap-1">
                       <img src="https://www.amazon.com/favicon.ico" alt="Amazon" class="w-5 h-5 object-contain"/>
-                      <p class="font-semibold">{{ metadata.amazonRating }}</p>
+                      <p class="font-semibold">{{ book?.metadata!.amazonRating }}</p>
                     </span>
                   }
-                  <p-rating [ngModel]="metadata.amazonRating" readonly stars="5"
-                            [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
+                  <p-rating [ngModel]="book?.metadata!.amazonRating" readonly stars="5"
+                            [style.--p-rating-icon-active-color]="getStarColor(book?.metadata!.amazonRating)">
                   </p-rating>
-                  <p class="font-semibold">({{ metadata.amazonReviewCount | number:'1.0-0' }})</p>
-                  @if (metadata.goodreadsRating || metadata.hardcoverRating) {
+                  <p class="font-semibold">({{ book?.metadata!.amazonReviewCount | number:'1.0-0' }})</p>
+                  @if (book?.metadata!.goodreadsRating || book?.metadata!.hardcoverRating) {
                     <span>|</span>
                   }
                 }
-                @if (metadata.goodreadsRating) {
-                  @if (metadata.goodreadsId) {
-                    <a class="flex items-center gap-1" [href]="'https://www.goodreads.com/book/show/' + metadata.goodreadsId" target="_blank" rel="noopener noreferrer">
+                @if (book?.metadata!.goodreadsRating) {
+                  @if (book?.metadata!.goodreadsId) {
+                    <a class="flex items-center gap-1" [href]="'https://www.goodreads.com/book/show/' + book?.metadata!.goodreadsId" target="_blank" rel="noopener noreferrer">
                       <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads"
                            class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
-                      <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
+                      <p class="font-semibold">{{ book?.metadata!.goodreadsRating }}</p>
                     </a>
                   } @else {
                     <span class="flex items-center gap-1">
                       <img src="https://www.goodreads.com/favicon.ico" alt="Goodreads" class="w-5 h-5 object-contain"/>
-                      <p class="font-semibold">{{ metadata.goodreadsRating }}</p>
+                      <p class="font-semibold">{{ book?.metadata!.goodreadsRating }}</p>
                     </span>
                   }
-                  <p-rating [ngModel]="metadata.goodreadsRating" readonly stars="5"
-                            [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
+                  <p-rating [ngModel]="book?.metadata!.goodreadsRating" readonly stars="5"
+                            [style.--p-rating-icon-active-color]="getStarColor(book?.metadata!.goodreadsRating)">
                   </p-rating>
-                  <p class="font-semibold">({{ metadata.goodreadsReviewCount | number:'1.0-0' }})</p>
-                  @if (metadata.hardcoverRating) {
+                  <p class="font-semibold">({{ book?.metadata!.goodreadsReviewCount | number:'1.0-0' }})</p>
+                  @if (book?.metadata!.hardcoverRating) {
                     <span>|</span>
                   }
                 }
-                @if (metadata.hardcoverRating) {
-                  @if (metadata.hardcoverId) {
-                    <a class="flex items-center gap-1" [href]="'https://hardcover.app/books/' + metadata.hardcoverId" target="_blank" rel="noopener noreferrer">
+                @if (book?.metadata!.hardcoverRating) {
+                  @if (book?.metadata!.hardcoverId) {
+                    <a class="flex items-center gap-1" [href]="'https://hardcover.app/books/' + book?.metadata!.hardcoverId" target="_blank" rel="noopener noreferrer">
                       <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover"
                            class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
-                      <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
+                      <p class="font-semibold">{{ book?.metadata!.hardcoverRating }}</p>
                     </a>
                   } @else {
                     <span class="flex items-center gap-1">
                       <img src="https://assets.hardcover.app/static/favicon.ico" alt="Hardcover" class="w-5 h-5 object-contain"/>
-                      <p class="font-semibold">{{ metadata.hardcoverRating }}</p>
+                      <p class="font-semibold">{{ book?.metadata!.hardcoverRating }}</p>
                     </span>
                   }
-                  <p-rating [ngModel]="metadata.hardcoverRating" readonly stars="5"
-                            [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
+                  <p-rating [ngModel]="book?.metadata!.hardcoverRating" readonly stars="5"
+                            [style.--p-rating-icon-active-color]="getStarColor(book?.metadata!.hardcoverRating)">
                   </p-rating>
-                  <p class="font-semibold">({{ metadata.hardcoverReviewCount | number:'1.0-0' }})</p>
-                  @if ((metadata.amazonRating || metadata.goodreadsRating || metadata.hardcoverRating) && metadata.googleId) {
+                  <p class="font-semibold">({{ book?.metadata!.hardcoverReviewCount | number:'1.0-0' }})</p>
+                  @if ((book?.metadata!.amazonRating || book?.metadata!.goodreadsRating || book?.metadata!.hardcoverRating) && book?.metadata!.googleId) {
                     <span>|</span>
                   }
                 }
-                @if (metadata.googleId) {
-                  <a class="flex items-center gap-1" [href]="'https://books.google.com/books?id=' + metadata.googleId" target="_blank" rel="noopener noreferrer">
+                @if (book?.metadata!.googleId) {
+                  <a class="flex items-center gap-1" [href]="'https://books.google.com/books?id=' + book?.metadata!.googleId" target="_blank" rel="noopener noreferrer">
                     <img src="https://books.google.com/favicon.ico" alt="Google Books"
                          class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
                   </a>
@@ -137,18 +137,18 @@
 
               } @else {
                 <p-rating
-                  [(ngModel)]="metadata.rating"
+                  [(ngModel)]="book?.metadata!.rating"
                   readonly
                   stars="5"
-                  [style.--p-rating-icon-active-color]="getStarColor(metadata.rating)">
+                  [style.--p-rating-icon-active-color]="getStarColor(book?.metadata!.rating)">
                 </p-rating>
                 <p class="font-semibold">
-                  {{ metadata?.reviewCount ? '(' + (metadata?.reviewCount | number:'1.0-0') + ' Ratings)' : 'No Ratings' }}
+                  {{ book.metadata?.reviewCount ? '(' + (book.metadata?.reviewCount | number:'1.0-0') + ' Ratings)' : 'No Ratings' }}
                 </p>
               }
             </div>
             <div class="flex gap-2 pt-4 overflow-x-auto scrollbar-hide">
-              @for (category of metadata.categories; track category) {
+              @for (category of book?.metadata!.categories; track category) {
                 <a
                   [routerLink]="['/all-books']"
                   [queryParams]="{
@@ -173,10 +173,10 @@
                   {{ getFileExtension(book?.filePath) || '-' }}
                 </span>
               </p>
-              <p class="whitespace-nowrap"><span class="font-bold">Publisher:</span> {{ metadata.publisher || '-' }}</p>
-              <p class="whitespace-nowrap"><span class="font-bold">Published:</span> {{ metadata.publishedDate || '-' }}</p>
-              <p class="whitespace-nowrap"><span class="font-bold">Language:</span> {{ metadata.language || '-' }}</p>
-              <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ metadata.isbn10 || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Publisher:</span> {{ book?.metadata!.publisher || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Published:</span> {{ book?.metadata!.publishedDate || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Language:</span> {{ book?.metadata!.language || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ book?.metadata!.isbn10 || '-' }}</p>
               <p class="whitespace-nowrap flex items-center gap-2">
                 <span class="font-bold">Metadata Score:</span>
                 @if (book?.metadataMatchScore != null) {
@@ -189,17 +189,17 @@
                   <span>-</span>
                 }
               </p>
-              <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ metadata.pageCount || '-' }}</p>
-              <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB() }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">Page Count:</span> {{ book?.metadata!.pageCount || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB(book) }}</p>
               <p class="whitespace-nowrap flex items-center gap-2">
                 <span class="font-bold">Progress:</span>
                 <span
                   class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                  [ngClass]="getProgressColorClass(getProgressPercent())">
-                  {{ getProgressPercent() !== null ? getProgressPercent() + '%' : 'N/A' }}
+                  [ngClass]="getProgressColorClass(getProgressPercent(book))">
+                  {{ getProgressPercent(book) !== null ? getProgressPercent(book) + '%' : 'N/A' }}
                 </span>
               </p>
-              <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ metadata.isbn13 || '-' }}</p>
+              <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ book?.metadata!.isbn13 || '-' }}</p>
             </div>
             <div class="pt-2 flex items-center gap-2 w-full">
               <span class="font-semibold flex-shrink-0">File Path:</span>
@@ -227,18 +227,20 @@
           @if (userService.userState$ | async; as userData) {
             <div class="pl-6 pt-4 flex flex-row w-full gap-4">
               @if (book!.bookType === 'PDF') {
-                <p-splitbutton
-                  label="Read"
-                  icon="pi pi-book"
-                  [model]="readMenuItems"
-                  (onClick)="read(metadata.bookId, 'ngx')"
-                  severity="info"/>
+                @if (readMenuItems$ | async; as readItems) {
+                  <p-splitbutton
+                    label="Read"
+                    icon="pi pi-book"
+                    [model]="readItems"
+                    (onClick)="read(book.id, 'ngx')"
+                    severity="info"/>
+                }
               }
               @if (book!.bookType !== 'PDF') {
                 <p-button
                   label="Read"
                   icon="pi pi-book"
-                  (onClick)="read(metadata.bookId, undefined)"
+                  (onClick)="read(book?.metadata!.bookId, undefined)"
                   severity="info"/>
               }
               <p-button
@@ -246,7 +248,7 @@
                 icon="pi pi-folder"
                 severity="info"
                 outlined
-                (onClick)="assignShelf(metadata.bookId)">
+                (onClick)="assignShelf(book.id)">
               </p-button>
               @if (userData.permissions.canDownload || userData.permissions.admin) {
                 <p-button
@@ -254,49 +256,55 @@
                   icon="pi pi-download"
                   severity="info"
                   outlined
-                  (onClick)="download(metadata.bookId)">
+                  (onClick)="download(book.id)">
                 </p-button>
               }
               @if (userData.permissions.canEmailBook || userData.permissions.admin) {
-                <p-splitbutton
-                  label="Quick Send"
-                  icon="pi pi-send"
-                  [model]="emailMenuItems"
-                  (onClick)="quickSend(metadata.bookId)"
-                  outlined
-                  severity="info">
-                </p-splitbutton>
+                @if (emailMenuItems$ | async; as emailItems) {
+                  <p-splitbutton
+                    label="Quick Send"
+                    icon="pi pi-send"
+                    [model]="emailItems"
+                    (onClick)="quickSend(book.id)"
+                    outlined
+                    severity="info">
+                  </p-splitbutton>
+                }
               }
               @if (userData.permissions.canEditMetadata || userData.permissions.admin) {
-                <p-splitbutton
-                  label="Quick Refresh"
-                  icon="pi pi-bolt"
-                  [model]="refreshMenuItems"
-                  (onClick)="quickRefresh(metadata.bookId)"
-                  outlined
-                  severity="info">
-                </p-splitbutton>
+                @if (refreshMenuItems$ | async; as refreshItems) {
+                  <p-splitbutton
+                    [label]="isAutoFetching ? 'Fetching...' : 'Auto Fetch'"
+                    [icon]="isAutoFetching ? 'pi pi-spin pi-spinner' : 'pi pi-bolt'"
+                    [outlined]="true"
+                    [model]="refreshItems"
+                    severity="info"
+                    (onClick)="quickRefresh(book.id)"
+                    [disabled]="isAutoFetching"
+                    pTooltip="Automatically fetch metadata using default sources"
+                    tooltipPosition="top">
+                  </p-splitbutton>
+                }
               }
             </div>
           }
         </div>
       </div>
     </div>
-  }
 
-  <p-divider></p-divider>
+    <p-divider></p-divider>
 
-  @if (metadata$ | async; as metadata) {
+
     <div class="flex-1 space-y-2 px-2">
       <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }" class="transition-all duration-300 overflow-hidden description-container">
         <div class="readonly-editor px-2">
-          <p-editor #quillEditor [readonly]="true" [style]="{height: '250px'}" [(ngModel)]="metadata.description">
+          <p-editor #quillEditor [readonly]="true" [style]="{height: '250px'}" [(ngModel)]="book.metadata!.description">
             <ng-template #header>
             </ng-template>
           </p-editor>
         </div>
       </div>
-      @if (metadata.description && metadata.description.length > 100) {
+      @if (book.metadata!.description && book.metadata!.description.length > 100) {
         <div class="text-left">
           <button pButton
                   type="button"

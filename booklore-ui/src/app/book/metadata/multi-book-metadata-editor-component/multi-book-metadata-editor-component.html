@@ -12,8 +12,9 @@
       @if (admin || canEditMetadata) {
         <p-tabpanel value="edit">
           <app-metadata-editor
-            [disableNext]="currentIndex >= books.length - 1"
-            [disablePrevious]="currentIndex <= 0"
+            [book$]="book$"
+            [disableNext]="disableNext"
+            [disablePrevious]="disablePrevious"
             (nextBookClicked)="handleNextBook()"
             (previousBookClicked)="handlePreviousBook()"
             (closeDialogButtonClicked)="handleCloseDialogButton()"
@@ -23,7 +24,7 @@
       }
       @if (admin || canEditMetadata) {
         <p-tabpanel value="match">
-          <app-metadata-searcher></app-metadata-searcher>
+          <app-metadata-searcher [book$]="book$"></app-metadata-searcher>
         </p-tabpanel>
       }
     </p-tabpanels>

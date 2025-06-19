@@ -1,9 +1,8 @@
 import {Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {Button, ButtonDirective} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass} from '@angular/common';
-import {first, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {BookService} from '../../../service/book.service';
-import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
@@ -28,6 +27,7 @@ import {MetadataFetchOptionsComponent} from '../../metadata-options-dialog/metad
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {RouterLink} from '@angular/router';
+import {filter, map, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -38,113 +38,112 @@ import {RouterLink} from '@angular/router';
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 
-  @Input() book: Book | undefined;
+  @Input() book$!: Observable<Book | null>;
   @Input() recommendedBooks: BookRecommendation[] = [];
-  private originalRecommendedBooks: BookRecommendation[] = [];
-
   @ViewChild(Editor) quillEditor!: Editor;
+  private originalRecommendedBooks: BookRecommendation[] = [];
 
   private dialogService = inject(DialogService);
   private emailService = inject(EmailService);
   private messageService = inject(MessageService);
   private bookService = inject(BookService);
-  private metadataCenterService = inject(BookMetadataCenterService);
   protected urlHelper = inject(UrlHelperService);
   protected userService = inject(UserService);
   private destroyRef = inject(DestroyRef);
 
-  metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
-  emailMenuItems: MenuItem[] | undefined;
-  readMenuItems: MenuItem[] | undefined;
-  refreshMenuItems: MenuItem[] | undefined;
+  emailMenuItems$!: Observable<MenuItem[]>;
+  readMenuItems$!: Observable<MenuItem[]>;
+  refreshMenuItems$!: Observable<MenuItem[]>;
   bookInSeries: Book[] = [];
+
   isExpanded = false;
   showFilePath = false;
+  isAutoFetching = false;
 
   ngOnInit(): void {
-    this.emailMenuItems = [
-      {
-        label: 'Custom Send',
-        command: () => {
-          this.metadata$.pipe(first()).subscribe((metadata) => {
-            if (metadata) {
-              this.dialogService.open(BookSenderComponent, {
-                header: 'Send Book to Email',
-                modal: true,
-                closable: true,
-                style: {
-                  position: 'absolute',
-                  top: '15%',
-                },
-                data: {
-                  bookId: metadata.bookId,
-                }
-              });
-            }
-          });
-        }
-      }
-    ];
-
-    this.refreshMenuItems = [
-      {
-        label: 'Granular Refresh',
-        icon: 'pi pi-database',
-        command: () => {
-          this.dialogService.open(MetadataFetchOptionsComponent, {
-            header: 'Metadata Refresh Options',
-            modal: true,
-            closable: true,
-            data: {
-              bookIds: [this.book!.id],
-              metadataRefreshType: MetadataRefreshType.BOOKS,
-            },
-          });
-        },
-      }
-    ];
-
-    this.readMenuItems = [
-      {
-        label: 'Streaming Reader',
-        command: () => {
-          this.read(this.book?.id, "streaming")
-        },
-      }
-    ];
-
-    this.metadata$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((metadata) => {
-        if (metadata) {
-          this.loadBooksInSeriesAndFilterRecommended(metadata.bookId);
-          if (this.quillEditor && this.quillEditor.quill) {
-            this.quillEditor.quill.root.innerHTML = metadata.description;
+    this.emailMenuItems$ = this.book$.pipe(
+      map(book => book?.metadata ?? null),
+      filter((metadata): metadata is BookMetadata => metadata != null),
+      map((metadata): MenuItem[] => [
+        {
+          label: 'Custom Send',
+          command: () => {
+            this.dialogService.open(BookSenderComponent, {
+              header: 'Send Book to Email',
+              modal: true,
+              closable: true,
+              style: { position: 'absolute', top: '15%' },
+              data: { bookId: metadata.bookId }
+            });
           }
         }
-      });
-  }
+      ])
+    );
 
-  private loadBooksInSeriesAndFilterRecommended(bookId: number): void {
-    this.bookService.getBooksInSeries(bookId).subscribe((bookInSeries) => {
-      bookInSeries.sort((a, b) => (a.metadata?.seriesNumber ?? 0) - (b.metadata?.seriesNumber ?? 0));
-      this.bookInSeries = bookInSeries;
-      this.originalRecommendedBooks = [...this.recommendedBooks];
-      this.filterRecommendations();
-    });
+    this.refreshMenuItems$ = this.book$.pipe(
+      filter((book): book is Book => book !== null),
+      map((book): MenuItem[] => [
+        {
+          label: 'Granular Refresh',
+          icon: 'pi pi-database',
+          command: () => {
+            this.dialogService.open(MetadataFetchOptionsComponent, {
+              header: 'Metadata Refresh Options',
+              modal: true,
+              closable: true,
+              data: {
+                bookIds: [book.id],
+                metadataRefreshType: MetadataRefreshType.BOOKS,
+              },
+            });
+          }
+        }
+      ])
+    );
+
+    this.readMenuItems$ = this.book$.pipe(
+      filter((book): book is Book => book !== null),
+      map((book): MenuItem[] => [
+        {
+          label: 'Streaming Reader',
+          command: () => this.read(book.id, 'streaming')
+        }
+      ])
+    );
+
+    this.book$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map(book => book?.metadata),
+        filter((metadata): metadata is BookMetadata => metadata != null)
+      )
+      .subscribe(metadata => {
+        this.isAutoFetching = false;
+        this.loadBooksInSeriesAndFilterRecommended(metadata.bookId);
+        if (this.quillEditor?.quill) {
+          this.quillEditor.quill.root.innerHTML = metadata.description;
+        }
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['recommendedBooks']) {
       this.originalRecommendedBooks = [...this.recommendedBooks];
-      this.filterRecommendations();
+      this.book$.pipe(take(1)).subscribe(book => this.filterRecommendations(book));
     }
   }
 
-  private filterRecommendations(): void {
-    if (!this.originalRecommendedBooks) {
-      return;
-    }
+  private loadBooksInSeriesAndFilterRecommended(bookId: number): void {
+    this.bookService.getBooksInSeries(bookId).subscribe(bookInSeries => {
+      bookInSeries.sort((a, b) => (a.metadata?.seriesNumber ?? 0) - (b.metadata?.seriesNumber ?? 0));
+      this.bookInSeries = bookInSeries;
+      this.originalRecommendedBooks = [...this.recommendedBooks];
+      this.book$.pipe(take(1)).subscribe(book => this.filterRecommendations(book));
+    });
+  }
+
+  private filterRecommendations(book: Book | null): void {
+    if (!this.originalRecommendedBooks) return;
     const bookInSeriesIds = new Set(this.bookInSeries.map(book => book.id));
     this.recommendedBooks = this.originalRecommendedBooks.filter(
       rec => !bookInSeriesIds.has(rec.book.id)
@@ -156,7 +155,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   }
 
   read(bookId: number | undefined, reader: "ngx" | "streaming" | undefined): void {
-    this.bookService.readBook(bookId!, reader);
+    if (bookId) this.bookService.readBook(bookId, reader);
   }
 
   download(bookId: number) {
@@ -164,31 +163,27 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   }
 
   quickRefresh(bookId: number) {
-    const metadataRefreshRequest: MetadataRefreshRequest = {
+    this.isAutoFetching = true;
+    const request: MetadataRefreshRequest = {
       quick: true,
       refreshType: MetadataRefreshType.BOOKS,
       bookIds: [bookId],
     };
-    this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
+    this.bookService.autoRefreshMetadata(request).subscribe();
   }
 
   quickSend(bookId: number) {
     this.emailService.emailBookQuick(bookId).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Success',
-          detail: 'The book sending has been scheduled.',
-        });
-      },
-      error: (err) => {
-        const errorMessage = err?.error?.message || 'An error occurred while sending the book.';
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage,
-        });
-      },
+      next: () => this.messageService.add({
+        severity: 'info',
+        summary: 'Success',
+        detail: 'The book sending has been scheduled.',
+      }),
+      error: (err) => this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.error?.message || 'An error occurred while sending the book.',
+      })
     });
   }
 
@@ -197,53 +192,28 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
       header: `Update Book's Shelves`,
       modal: true,
       closable: true,
-      contentStyle: {overflow: 'auto'},
+      contentStyle: { overflow: 'auto' },
       baseZIndex: 10,
-      style: {
-        position: 'absolute',
-        top: '15%',
-      },
-      data: {
-        book: this.bookService.getBookByIdFromState(bookId),
-      },
+      style: { position: 'absolute', top: '15%' },
+      data: { book: this.bookService.getBookByIdFromState(bookId) }
     });
   }
 
   isMetadataFullyLocked(metadata: BookMetadata): boolean {
-    const lockedKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
-    if (lockedKeys.length === 0) {
-      return false;
-    }
-    return lockedKeys.every(key => metadata[key] === true);
+    const lockedKeys = Object.keys(metadata).filter(k => k.endsWith('Locked'));
+    return lockedKeys.length > 0 && lockedKeys.every(k => metadata[k] === true);
   }
 
-  getFileSizeInMB(): string {
-    const sizeKb = this.book?.fileSizeKb;
-    if (sizeKb != null) {
-      const sizeMb = sizeKb / 1024;
-      return `${sizeMb.toFixed(2)} MB`;
-    }
-    return '-';
+  getFileSizeInMB(book: Book | null): string {
+    const sizeKb = book?.fileSizeKb;
+    return sizeKb != null ? `${(sizeKb / 1024).toFixed(2)} MB` : '-';
   }
 
-  getProgressPercent(): number | undefined {
-    if (this.book?.bookType === 'PDF') {
-      return this.book.pdfProgress?.percentage;
-    } else if (this.book?.bookType === 'CBX') {
-      return this.book?.cbxProgress?.percentage;
-    } else {
-      return this.book?.epubProgress?.percentage;
-    }
-  }
-
-  copyFilePath() {
-    if (this.book?.filePath) {
-      navigator.clipboard.writeText(this.book.filePath).then(() => {
-        this.messageService.add({severity: 'success', summary: 'Copied', detail: 'File path copied to clipboard.'});
-      }, () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to copy file path.'});
-      });
-    }
+  getProgressPercent(book: Book | null): number | undefined {
+    if (!book) return;
+    return book.bookType === 'PDF' ? book.pdfProgress?.percentage
+      : book.bookType === 'CBX' ? book.cbxProgress?.percentage
+        : book.epubProgress?.percentage;
   }
 
   getFileExtension(filePath?: string): string | null {
