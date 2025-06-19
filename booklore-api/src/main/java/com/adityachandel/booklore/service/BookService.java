@@ -74,6 +74,34 @@ public class BookService {
         return books;
     }
 
+    public List<Book> getBooksByIds(Set<Long> bookIds, boolean withDescription) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+
+        List<BookEntity> bookEntities;
+
+        bookEntities = bookQueryService.findAllWithMetadataByIds(bookIds);
+
+        Map<Long, UserBookProgressEntity> progressMap = userProgressService.fetchUserProgress(
+                user.getId(), bookEntities.stream().map(BookEntity::getId).collect(Collectors.toSet()));
+
+        return bookEntities.stream().map(bookEntity -> {
+            Book book = bookMapper.toBook(bookEntity);
+            book.setFilePath(FileUtils.getBookFullPath(bookEntity));
+
+            if (!withDescription) {
+                book.getMetadata().setDescription(null);
+            }
+
+            UserBookProgressEntity progress = progressMap.get(bookEntity.getId());
+            if (progress != null) {
+                setBookProgress(book, progress);
+                book.setLastReadTime(progress.getLastReadTime());
+            }
+
+            return book;
+        }).collect(Collectors.toList());
+    }
+
     private void setBookProgress(Book book, UserBookProgressEntity progress) {
         switch (book.getBookType()) {
             case EPUB -> book.setEpubProgress(EpubProgress.builder()

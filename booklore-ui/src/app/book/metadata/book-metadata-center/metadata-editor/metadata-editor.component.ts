@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
@@ -48,6 +48,14 @@ export class MetadataEditorComponent implements OnInit {
 
   @ViewChild(Editor) quillEditor!: Editor;
 
+  @Output() nextBookClicked = new EventEmitter<void>();
+  @Output() previousBookClicked = new EventEmitter<void>();
+  @Output() closeDialogButtonClicked = new EventEmitter<void>();
+
+  @Input() disableNext = false;
+  @Input() disablePrevious = false;
+  @Input() showNavigationButtons = false;
+
   private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
   private bookService = inject(BookService);
@@ -60,6 +68,7 @@ export class MetadataEditorComponent implements OnInit {
   isUploading = false;
   isLoading = false;
   htmlTextarea = '';
+  isSaving = false;
 
   constructor() {
     this.metadataForm = new FormGroup({
@@ -233,12 +242,15 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   onSave(): void {
+    this.isSaving = true;
     this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(undefined), false).subscribe({
       next: (response) => {
+        this.isSaving = false;
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.metadataCenterService.emitMetadata(response);
       },
       error: (err) => {
+        this.isSaving = false;
         console.error('Update metadata failed:', err);
         this.messageService.add({
           severity: 'error',
@@ -363,7 +375,6 @@ export class MetadataEditorComponent implements OnInit {
     this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(shouldLockAllFields), false).subscribe({
       next: (response) => {
         this.metadataCenterService.emitMetadata(response);
-
         if (shouldLockAllFields !== undefined) {
           this.messageService.add({
             severity: 'success',
@@ -444,4 +455,15 @@ export class MetadataEditorComponent implements OnInit {
     });
   }
 
+  onNext() {
+    this.nextBookClicked.emit();
+  }
+
+  onPrevious() {
+    this.previousBookClicked.emit();
+  }
+
+  closeDialog() {
+    this.closeDialogButtonClicked.emit();
+  }
 }

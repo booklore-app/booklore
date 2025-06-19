@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @RequestMapping("/api/v1/books")
 @RestController
@@ -40,6 +41,11 @@ public class BookController {
     @CheckBookAccess(bookIdParam = "bookId")
     public ResponseEntity<Book> getBook(@PathVariable long bookId, @RequestParam(required = false, defaultValue = "false") boolean withDescription) {
         return ResponseEntity.ok(bookService.getBook(bookId, withDescription));
+    }
+
+    @GetMapping("/batch")
+    public ResponseEntity<List<Book>> getBooksByIds(@RequestParam Set<Long> ids, @RequestParam(required = false, defaultValue = "false") boolean withDescription) {
+        return ResponseEntity.ok(bookService.getBooksByIds(ids, withDescription));
     }
 
     @GetMapping("/{bookId}/cover")

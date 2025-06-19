@@ -202,9 +202,14 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         command: () => this.updateMetadata()
       },
       {
-        label: 'Bulk Edit Metadata',
+        label: 'Edit Bulk Metadata',
         icon: 'pi pi-pencil',
         command: () => this.bulkEditMetadata()
+      },
+      {
+        label: 'Edit Multi Book Metadata',
+        icon: 'pi pi-pencil',
+        command: () => this.multiBookEditMetadata()
       }
     ];
   }
@@ -595,5 +600,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   bulkEditMetadata(): void {
     this.dialogHelperService.openBulkMetadataEditDialog(this.selectedBooks);
+  }
+
+  multiBookEditMetadata(): void {
+    this.dialogHelperService.openMultibookMetadataEditerDialog(this.selectedBooks);
   }
 }

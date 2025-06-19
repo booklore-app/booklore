@@ -20,5 +20,4 @@ export class BookMetadataCenterService {
   emitBookChanged(book: Book | null) {
     this.bookChangedSubject.next(book);
   }
-
 }

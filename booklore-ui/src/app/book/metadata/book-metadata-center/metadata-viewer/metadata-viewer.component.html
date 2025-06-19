@@ -1,4 +1,4 @@
-<div class="pt-2 flex flex-col h-full overflow-hidden">
+<div class="pt-2 flex flex-col h-full">
   @if (metadata$ | async; as metadata) {
     <div>
       <div class="flex flex-row">
@@ -287,7 +287,7 @@
   <p-divider></p-divider>
 
   @if (metadata$ | async; as metadata) {
-    <div class="flex-1 overflow-auto space-y-2 px-2">
+    <div class="flex-1 space-y-2 px-2">
       <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }" class="transition-all duration-300 overflow-hidden description-container">
         <div class="readonly-editor px-2">
           <p-editor #quillEditor [readonly]="true" [style]="{height: '250px'}" [(ngModel)]="metadata.description">

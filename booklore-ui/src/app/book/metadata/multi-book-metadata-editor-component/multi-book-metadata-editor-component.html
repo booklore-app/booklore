@@ -1,7 +1,6 @@
-<div class="rounded-xl overflow-hidden">
-  <p-tabs [value]="tab" lazy="true">
+<div class="rounded-xl">
+  <p-tabs [value]="'edit'" lazy="true">
     <p-tablist>
-      <p-tab value="view">Book Details</p-tab>
       @if (admin || canEditMetadata) {
         <p-tab value="edit">Edit Metadata</p-tab>
       }
@@ -9,13 +8,17 @@
         <p-tab value="match">Search Metadata</p-tab>
       }
     </p-tablist>
-    <p-tabpanels class="overflow-auto" style="height: calc(100vh - 10rem);">
-      <p-tabpanel value="view">
-        <app-metadata-viewer [book]="book" [recommendedBooks]="recommendedBooks"></app-metadata-viewer>
-      </p-tabpanel>
+    <p-tabpanels class="h-[calc(100vh-10rem)]">
       @if (admin || canEditMetadata) {
         <p-tabpanel value="edit">
-          <app-metadata-editor></app-metadata-editor>
+          <app-metadata-editor
+            [disableNext]="currentIndex >= books.length - 1"
+            [disablePrevious]="currentIndex <= 0"
+            (nextBookClicked)="handleNextBook()"
+            (previousBookClicked)="handlePreviousBook()"
+            (closeDialogButtonClicked)="handleCloseDialogButton()"
+            [showNavigationButtons]="true"
+          ></app-metadata-editor>
         </p-tabpanel>
       }
       @if (admin || canEditMetadata) {

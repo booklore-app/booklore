@@ -5,6 +5,7 @@ import {LockUnlockMetadataDialogComponent} from './lock-unlock-metadata-dialog/l
 import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
 import {BulkMetadataUpdateComponent} from '../../metadata/bulk-metadata-update-component/bulk-metadata-update-component';
+import {MultiBookMetadataEditorComponent} from '../../metadata/multi-book-metadata-editor-component/multi-book-metadata-editor-component';
 
 @Injectable({providedIn: 'root'})
 export class BookDialogHelperService {
@@ -62,6 +63,24 @@ export class BookDialogHelperService {
         width: '90vw',
         maxWidth: '1200px',
         position: 'absolute'
+      },
+      data: {
+        bookIds: Array.from(bookIds)
+      },
+    });
+  }
+
+  openMultibookMetadataEditerDialog(bookIds: Set<number>): DynamicDialogRef {
+    return this.dialogService.open(MultiBookMetadataEditorComponent, {
+      header: 'Bulk Edit Metadata',
+      showHeader: false,
+      modal: true,
+      closable: true,
+      closeOnEscape: true,
+      dismissableMask: true,
+      style: {
+        width: '95vw',
+        overflow: 'none',
       },
       data: {
         bookIds: Array.from(bookIds)

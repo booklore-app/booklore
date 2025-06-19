@@ -1,12 +1,13 @@
 @if (bookMetadata$ | async; as metadata) {
-  <form [formGroup]="metadataForm" (ngSubmit)="onSave()" class="pt-2 flex flex-col h-full">
+  <form [formGroup]="metadataForm" (ngSubmit)="onSave()" class="flex flex-col h-full">
     @if (isLoading) {
-      <div class="absolute inset-0 bg-black opacity-25 z-10"></div>
+      <div class="absolute inset-0 bg-black opacity-25 z-10 "></div>
     }
     @if (isLoading) {
       <p-progressSpinner [style]="{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}"></p-progressSpinner>
     }
-    <div class="overflow-y-scroll flex-1">
+
+    <div class="flex-grow overflow-auto p-4">
       <div class="flex flex-row w-full gap-4">
         <div class="flex flex-col items-center gap-2 relative">
           <img
@@ -349,7 +350,7 @@
               <p-tabpanels>
                 <p-tabpanel value="editor">
                   <form [formGroup]="metadataForm">
-                    <p-editor #quillEditor formControlName="description" [readonly]="quillDisabled()" [style]="{ height: '215px' }">
+                    <p-editor #quillEditor formControlName="description" [readonly]="quillDisabled()" [style]="{ height: '200px' }">
                       <ng-template #header>
                         <span class="ql-formats">
                           <button class="ql-bold" aria-label="Bold"></button>
@@ -383,7 +384,7 @@
                 <p-tabpanel value="html" class="w-full">
                   <textarea
                     class="w-full p-4"
-                    rows="10"
+                    rows="9"
                     [disabled]="quillDisabled()"
                     [ngModel]="htmlTextarea"
                     (ngModelChange)="onHtmlTextareaChange($event)"
@@ -403,15 +404,27 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-col gap-x-4 mt-auto">
+
+
+    <div class="mt-auto">
       <p-divider></p-divider>
-      <div class="flex gap-x-4 justify-end">
-        <p-button label="Restore Metadata" icon="pi pi-refresh" [outlined]="true" severity="danger" (onClick)="restoreMetadata()"></p-button>
-        <p-divider layout="vertical"/>
-        <p-button label="Unlock All" icon="pi pi-lock-open" [outlined]="true" severity="success" (onClick)="unlockAll()"></p-button>
-        <p-button label="Lock All" icon="pi pi-lock" [outlined]="true" severity="warn" (onClick)="lockAll()"></p-button>
-        <p-divider layout="vertical"/>
-        <p-button label="Save" icon="pi pi-check" type="submit"></p-button>
+      <div class="flex justify-between px-2 pt-1 pb-4 bg-gray-900 z-10">
+        @if (showNavigationButtons) {
+          <div class="flex gap-x-4">
+            <p-button label="Close" icon="pi pi-times" [outlined]="true" severity="danger" (onClick)="closeDialog()"></p-button>
+            <p-divider layout="vertical"/>
+            <p-button label="Previous Book" [disabled]="disablePrevious" icon="pi pi-arrow-left" [outlined]="true" severity="info" (onClick)="onPrevious()"></p-button>
+            <p-button label="Next Book" [disabled]="disableNext" icon="pi pi-arrow-right" iconPos="right" [outlined]="true" severity="info" (onClick)="onNext()"></p-button>
+          </div>
+        }
+        <div class="flex gap-x-4 items-center ml-auto">
+          <p-button label="Restore Metadata" icon="pi pi-refresh" [outlined]="true" severity="danger" (onClick)="restoreMetadata()"></p-button>
+          <p-divider layout="vertical"/>
+          <p-button label="Unlock All" icon="pi pi-lock-open" [outlined]="true" severity="success" (onClick)="unlockAll()"></p-button>
+          <p-button label="Lock All" icon="pi pi-lock" [outlined]="true" severity="warn" (onClick)="lockAll()"></p-button>
+          <p-divider layout="vertical"/>
+          <p-button label="Save" icon="pi pi-check" [loading]="isSaving" [disabled]="isSaving" type="submit"></p-button>
+        </div>
       </div>
     </div>
   </form>

@@ -139,7 +139,7 @@ public class BookMetadataUpdater {
                             .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build()));
 
                     existingCategories.add(categoryEntity);
-                }
+`                }
                 metadata.setCategories(existingCategories);
             } else if (!newMetadata.getCategories().isEmpty()) {
                 Set<CategoryEntity> newCategoryEntities = new HashSet<>();

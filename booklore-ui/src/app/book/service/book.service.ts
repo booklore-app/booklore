@@ -176,6 +176,15 @@ export class BookService {
     });
   }
 
+  getBooksByIdsFromAPI(bookIds: number[], withDescription: boolean) {
+    return this.http.get<Book[]>(`${this.url}/batch`, {
+      params: {
+        ids: bookIds.map(id => id.toString()),
+        withDescription: withDescription.toString()
+      }
+    });
+  }
+
   downloadFile(bookId: number): void {
     const downloadUrl = `${this.url}/${bookId}/download`;
     this.http.get(downloadUrl, {responseType: 'blob', observe: 'response'})
