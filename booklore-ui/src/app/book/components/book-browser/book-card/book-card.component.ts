@@ -1,4 +1,4 @@
-import {Component, inject, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Book, BookMetadata} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
@@ -12,7 +12,7 @@ import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../../metadata/model/request/metadata-refresh-request.model';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
-import { NgClass } from '@angular/common';
+import {NgClass} from '@angular/common';
 import {UserService} from '../../../../settings/user-management/user.service';
 import {filter} from 'rxjs';
 import {EmailService} from '../../../../settings/email/email.service';
@@ -29,6 +29,9 @@ import {ProgressBar} from 'primeng/progressbar';
   standalone: true
 })
 export class BookCardComponent implements OnInit {
+  @Input() index!: number;
+  @Output() checkboxClick = new EventEmitter<{ index: number; bookId: number; selected: boolean; shiftKey: boolean }>();
+
   @Input() book!: Book;
   @Input() isCheckboxEnabled: boolean = false;
   @Input() onBookSelect?: (bookId: number, selected: boolean) => void;
@@ -36,6 +39,8 @@ export class BookCardComponent implements OnInit {
   @Input() bottomBarHidden: boolean = false;
   @Input() readButtonHidden: boolean = false;
   @Input() isSeriesCollapsed: boolean = false;
+
+  @ViewChild('checkboxElem') checkboxElem!: ElementRef<HTMLInputElement>;
 
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
@@ -79,9 +84,16 @@ export class BookCardComponent implements OnInit {
     this.bookService.readBook(book.id);
   }
 
-  toggleSelection(selected: boolean): void {
+  toggleSelection(selected: boolean, event?: MouseEvent): void {
     if (this.isCheckboxEnabled) {
       this.isSelected = selected;
+      this.checkboxClick.emit({
+        index: this.index,
+        bookId: this.book.id,
+        selected,
+        shiftKey: !!event?.shiftKey,
+      });
+
       if (this.onBookSelect) {
         this.onBookSelect(this.book.id, selected);
       }

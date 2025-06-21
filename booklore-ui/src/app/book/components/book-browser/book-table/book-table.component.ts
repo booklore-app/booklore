@@ -45,6 +45,12 @@ export class BookTableComponent implements OnChanges {
     });
   }
 
+  selectAllBooks(): void {
+    this.selectedBookIds = new Set(this.books.map(book => book.id));
+    this.selectedBooks = [...this.books];
+    this.selectedBooksChange.emit(this.selectedBookIds);
+  }
+
   clearSelectedBooks(): void {
     this.selectedBookIds.clear();
     this.selectedBooks = [];

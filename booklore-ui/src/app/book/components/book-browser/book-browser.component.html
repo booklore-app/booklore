@@ -193,15 +193,17 @@
                     class="grid"
                     #container
                     [ngStyle]="{'grid-template-columns': 'repeat(auto-fill, minmax(' + gridColumnMinWidth + ', 1fr))'}">
-                    @for (book of scroll.viewPortItems; track book) {
+                    @for (book of scroll.viewPortItems; let i = $index; track book) {
                       <div
                         class="virtual-scroller-item relative"
                         [ngStyle]="{width: currentCardSize.width + 'px', height: currentCardSize.height + 'px'}">
                         <app-book-card
+                          [index]="i"
                           [book]="book"
                           [isCheckboxEnabled]="true"
                           [onBookSelect]="handleBookSelect.bind(this)"
                           [isSeriesCollapsed]="seriesCollapseFilter.isSeriesCollapsed"
+                          (checkboxClick)="onCheckboxClicked($event)"
                           [isSelected]="selectedBooks.has(book.id)">
                         </app-book-card>
                       </div>
@@ -220,7 +222,7 @@
                       <p-tieredmenu #menu [model]="metadataMenuItems" [popup]="true" appendTo="body"/>
                       <p-button
                         (click)="menu.toggle($event)"
-                        tooltip="Metadata actions"
+                        pTooltip="Metadata actions"
                         tooltipPosition="top"
                         outlined="true"
                         severity="info"
@@ -255,6 +257,14 @@
                     severity="info"
                     (click)="lockUnlockMetadata()"
                     pTooltip="Lock/Unlock metadata"
+                    tooltipPosition="top">
+                  </p-button>
+                  <p-button
+                    outlined="true"
+                    icon="pi pi-check-square"
+                    severity="success"
+                    (click)="selectAllBooks()"
+                    pTooltip="Select all books"
                     tooltipPosition="top">
                   </p-button>
                   <p-button

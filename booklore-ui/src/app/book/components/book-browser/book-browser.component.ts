@@ -145,6 +145,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   filterVisibility = true;
   private settingFiltersFromUrl = false;
   protected metadataMenuItems: MenuItem[] | undefined;
+  currentBooks: Book[] = [];
+  lastSelectedIndex: number | null = null;
 
   get currentCardSize() {
     return this.coverScalePreferenceService.currentCardSize;
@@ -478,6 +480,32 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     );
   }
 
+  onCheckboxClicked(event: { index: number; bookId: number; selected: boolean; shiftKey: boolean }) {
+    const {index, bookId, selected, shiftKey} = event;
+    if (!shiftKey || this.lastSelectedIndex === null) {
+      if (selected) {
+        this.selectedBooks.add(bookId);
+      } else {
+        this.selectedBooks.delete(bookId);
+      }
+      this.lastSelectedIndex = index;
+    } else {
+      const start = Math.min(this.lastSelectedIndex, index);
+      const end = Math.max(this.lastSelectedIndex, index);
+      const isUnselectingRange = !selected;
+      for (let i = start; i <= end; i++) {
+        const book = this.currentBooks[i];
+        if (!book) continue;
+
+        if (isUnselectingRange) {
+          this.selectedBooks.delete(book.id);
+        } else {
+          this.selectedBooks.add(book.id);
+        }
+      }
+    }
+  }
+
   handleBookSelect(bookId: number, selected: boolean): void {
     if (selected) {
       this.selectedBooks.add(bookId);
@@ -490,6 +518,16 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   onSelectedBooksChange(selectedBookIds: Set<number>): void {
     this.selectedBooks = new Set(selectedBookIds);
     this.isDrawerVisible = this.selectedBooks.size > 0;
+  }
+
+  selectAllBooks(): void {
+    if (!this.currentBooks) return;
+    for (const book of this.currentBooks) {
+      this.selectedBooks.add(book.id);
+    }
+    if (this.bookTableComponent) {
+      this.bookTableComponent.selectAllBooks();
+    }
   }
 
   deselectAllBooks(): void {
@@ -515,6 +553,14 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         switchMap(({entityId, entityType}) => this.fetchBooksByEntity(entityId, entityType))
       );
     }
+    this.bookState$
+      .pipe(
+        filter(state => state.loaded && !state.error),
+        map(state => state.books || [])
+      )
+      .subscribe(books => {
+        this.currentBooks = books;
+      });
   }
 
   onSearchTermChange(term: string): void {
