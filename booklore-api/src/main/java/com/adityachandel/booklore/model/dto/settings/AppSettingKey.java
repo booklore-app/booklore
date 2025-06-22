@@ -21,6 +21,7 @@ public enum AppSettingKey {
     OIDC_ENABLED("oidc_enabled", false),
     CBX_CACHE_SIZE_IN_MB("cbx_cache_size_in_mb", false),
     PDF_CACHE_SIZE_IN_MB("pdf_cache_size_in_mb", false),
+    BOOK_DELETION_ENABLED("book_deletion_enabled", false),
     MAX_FILE_UPLOAD_SIZE_IN_MB("max_file_upload_size_in_mb", false);
 
     private final String dbKey;

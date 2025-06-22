@@ -90,6 +90,7 @@ export interface User {
     canUpload: boolean;
     canDownload: boolean;
     canEmailBook: boolean;
+    canDeleteBook: boolean;
     canEditMetadata: boolean;
     canManipulateLibrary: boolean;
   };

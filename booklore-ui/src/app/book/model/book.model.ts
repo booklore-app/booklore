@@ -159,3 +159,8 @@ export interface BulkMetadataUpdateRequest {
   publishedDate?: string;
   genres?: string[];
 }
+
+export interface BookDeletionResponse {
+  deleted: number[];
+  failedFileDeletions: number[];
+}

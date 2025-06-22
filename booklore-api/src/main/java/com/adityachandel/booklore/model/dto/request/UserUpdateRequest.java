@@ -19,5 +19,6 @@ public class UserUpdateRequest {
         private boolean canEditMetadata;
         private boolean canManipulateLibrary;
         private boolean canEmailBook;
+        private boolean canDeleteBook;
     }
 }

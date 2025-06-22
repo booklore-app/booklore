@@ -214,70 +214,91 @@
             </div>
           }
           @if (selectedBooks.size > 0) {
-            <div class="book-browser-footer bg-[var(--card-background)] bg-opacity-10" [@slideInOut]>
-              <div class="flex justify-between gap-8">
-                @if (entityType$ | async; as entityType) {
-                  @if (userService.userState$ | async; as userData) {
-                    @if (userData.permissions.canEditMetadata) {
-                      <p-tieredmenu #menu [model]="metadataMenuItems" [popup]="true" appendTo="body"/>
-                      <p-button
-                        (click)="menu.toggle($event)"
-                        pTooltip="Metadata actions"
-                        tooltipPosition="top"
-                        outlined="true"
-                        severity="info"
-                        icon="pi pi-database">
-                      </p-button>
+            @if (userService.userState$ | async; as userData) {
+              <div class="book-browser-footer bg-[var(--card-background)] bg-opacity-10" [@slideInOut]>
+                <div class="flex justify-between items-center">
+                  <div class="flex">
+                    @if (entityType$ | async; as entityType) {
+                      <div class="flex gap-6 pr-2">
+                        @if (userData.permissions.canEditMetadata) {
+                          <p-menu #menu [model]="metadataMenuItems" [popup]="true" appendTo="body"/>
+                          <p-button
+                            (click)="menu.toggle($event)"
+                            pTooltip="Metadata actions"
+                            tooltipPosition="top"
+                            outlined="true"
+                            severity="info"
+                            icon="pi pi-database">
+                          </p-button>
+                        }
+                        @if (entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS || entityType === EntityType.UNSHELVED) {
+                          <p-button
+                            icon="pi pi-bookmark-fill"
+                            outlined="true"
+                            severity="info"
+                            (onClick)="openShelfAssigner()"
+                            pTooltip="Assign to shelf"
+                            tooltipPosition="top">
+                          </p-button>
+                        }
+                        @if (entityType === EntityType.SHELF) {
+                          <p-button
+                            icon="pi pi-bookmark"
+                            outlined="true"
+                            severity="info"
+                            (click)="unshelfBooks()"
+                            pTooltip="Remove from shelf"
+                            tooltipPosition="top">
+                          </p-button>
+                        }
+                        @if (userData.permissions.canEditMetadata) {
+                          <p-button
+                            outlined="true"
+                            icon="pi pi-lock"
+                            severity="info"
+                            (click)="lockUnlockMetadata()"
+                            pTooltip="Lock/Unlock metadata"
+                            tooltipPosition="top">
+                          </p-button>
+                        }
+                      </div>
                     }
-                    @if (entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS || entityType === EntityType.UNSHELVED) {
+                    <p-divider layout="vertical"></p-divider>
+                    <div class="flex gap-6 px-2">
                       <p-button
-                        icon="pi pi-bookmark-fill"
                         outlined="true"
-                        severity="info"
-                        (onClick)="openShelfAssigner()"
-                        pTooltip="Assign to shelf"
+                        icon="pi pi-check-square"
+                        severity="success"
+                        (click)="selectAllBooks()"
+                        pTooltip="Select all books"
                         tooltipPosition="top">
                       </p-button>
-                    }
-                    @if (entityType === EntityType.SHELF) {
                       <p-button
-                        icon="pi pi-bookmark"
                         outlined="true"
-                        severity="info"
-                        (click)="unshelfBooks()"
-                        pTooltip="Remove from shelf"
+                        icon="pi pi-times"
+                        severity="warn"
+                        (click)="deselectAllBooks()"
+                        pTooltip="Deselect all books"
                         tooltipPosition="top">
                       </p-button>
-                    }
-                  }
+                    </div>
+                  </div>
 
-                  <p-button
-                    outlined="true"
-                    icon="pi pi-lock"
-                    severity="info"
-                    (click)="lockUnlockMetadata()"
-                    pTooltip="Lock/Unlock metadata"
-                    tooltipPosition="top">
-                  </p-button>
-                  <p-button
-                    outlined="true"
-                    icon="pi pi-check-square"
-                    severity="success"
-                    (click)="selectAllBooks()"
-                    pTooltip="Select all books"
-                    tooltipPosition="top">
-                  </p-button>
-                  <p-button
-                    outlined="true"
-                    icon="pi pi-times"
-                    severity="warn"
-                    (click)="deselectAllBooks()"
-                    pTooltip="Deselect all books"
-                    tooltipPosition="top">
-                  </p-button>
-                }
+                  @if (userData?.permissions?.admin || userData?.permissions?.canDeleteBook) {
+                    <p-divider layout="vertical"></p-divider>
+                    <p-button
+                      outlined="true"
+                      icon="pi pi-trash"
+                      severity="danger"
+                      (click)="confirmDeleteBooks()"
+                      pTooltip="Delete selected books"
+                      class="pl-2"
+                      tooltipPosition="top">
+                    </p-button>
+                  }
+                </div>
               </div>
-            </div>
+            }
           }
         </div>
       </div>

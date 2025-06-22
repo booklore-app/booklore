@@ -35,6 +35,9 @@ public class UserPermissionsEntity {
     @Column(name = "permission_email_book", nullable = false)
     private boolean permissionEmailBook = false;
 
+    @Column(name = "permission_delete_book", nullable = false)
+    private boolean permissionDeleteBook = false;
+
     @Column(name = "permission_admin", nullable = false)
     private boolean permissionAdmin;
 }

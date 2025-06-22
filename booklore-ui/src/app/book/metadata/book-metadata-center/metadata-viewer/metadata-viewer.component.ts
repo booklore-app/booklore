@@ -11,7 +11,7 @@ import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {UserService} from '../../../../settings/user-management/user.service';
 import {SplitButton} from 'primeng/splitbutton';
-import {MenuItem, MessageService} from 'primeng/api';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {BookSenderComponent} from '../../../components/book-sender/book-sender.component';
 import {DialogService} from 'primeng/dynamicdialog';
 import {EmailService} from '../../../../settings/email/email.service';
@@ -26,15 +26,16 @@ import {ToggleButton} from 'primeng/togglebutton';
 import {MetadataFetchOptionsComponent} from '../../metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {filter, map, take} from 'rxjs/operators';
+import {Menu} from 'primeng/menu';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton, RouterLink]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton, RouterLink, Menu]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 
@@ -50,15 +51,19 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   protected urlHelper = inject(UrlHelperService);
   protected userService = inject(UserService);
   private destroyRef = inject(DestroyRef);
+  private confirmationService = inject(ConfirmationService);
+  private router = inject(Router);
 
   emailMenuItems$!: Observable<MenuItem[]>;
   readMenuItems$!: Observable<MenuItem[]>;
   refreshMenuItems$!: Observable<MenuItem[]>;
+  otherItems$!: Observable<MenuItem[]>;
   bookInSeries: Book[] = [];
 
   isExpanded = false;
   showFilePath = false;
   isAutoFetching = false;
+
 
   ngOnInit(): void {
     this.emailMenuItems$ = this.book$.pipe(
@@ -107,6 +112,35 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
         {
           label: 'Streaming Reader',
           command: () => this.read(book.id, 'streaming')
+        }
+      ])
+    );
+
+    this.otherItems$ = this.book$.pipe(
+      filter((book): book is Book => book !== null),
+      map((book): MenuItem[] => [
+        {
+          label: 'Delete Book',
+          icon: 'pi pi-trash',
+          command: () => {
+            this.confirmationService.confirm({
+              message: `Are you sure you want to delete "${book.metadata?.title}"?`,
+              header: 'Confirm Deletion',
+              icon: 'pi pi-exclamation-triangle',
+              acceptIcon: 'pi pi-trash',
+              rejectIcon: 'pi pi-times',
+              acceptButtonStyleClass: 'p-button-danger',
+              accept: () => {
+                this.bookService.deleteBooks(new Set([book.id])).subscribe({
+                  next: () => {
+                    this.router.navigate(['/dashboard']);
+                  },
+                  error: () => {
+                  }
+                });
+              }
+            });
+          },
         }
       ])
     );

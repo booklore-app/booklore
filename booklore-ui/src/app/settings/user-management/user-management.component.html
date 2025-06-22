@@ -21,6 +21,7 @@
         <th style="width: 80px;">Edit Metadata</th>
         <th style="width: 80px;">Manage Library</th>
         <th style="width: 80px;">Email Books</th>
+        <th style="width: 80px;">Delete Books</th>
         <th style="width: 120px;">Edit</th>
         <th style="width: 80px;">Change Password</th>
         <th style="width: 80px;">Delete</th>
@@ -112,6 +113,14 @@
           }
           @if (!user.isEditing) {
             <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canEmailBook" disabled></p-checkbox>
+          }
+        </td>
+        <td class="text-center">
+          @if (user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canDeleteBook"></p-checkbox>
+          }
+          @if (!user.isEditing) {
+            <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canDeleteBook" disabled></p-checkbox>
           }
         </td>
         <td class="text-center">

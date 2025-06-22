@@ -15,6 +15,7 @@ public class UserCreateRequest {
     private boolean permissionDownload;
     private boolean permissionEditMetadata;
     private boolean permissionEmailBook;
+    private boolean permissionDeleteBook;
     private boolean permissionAdmin;
 
     private Set<Long> selectedLibraries;

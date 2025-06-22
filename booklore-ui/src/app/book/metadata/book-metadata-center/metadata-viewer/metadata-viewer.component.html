@@ -286,6 +286,12 @@
                   </p-splitbutton>
                 }
               }
+              @if (userData.permissions.canDeleteBook || userData.permissions.admin) {
+                @if (otherItems$ | async; as otherItems) {
+                  <p-button icon="pi pi-ellipsis-v" outlined severity="info" (click)="entitymenu.toggle($event)"></p-button>
+                  <p-menu #entitymenu [model]="otherItems" [popup]="true" appendTo="body"></p-menu>
+                }
+              }
             </div>
           }
         </div>

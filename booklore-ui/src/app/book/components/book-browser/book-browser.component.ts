@@ -1,6 +1,6 @@
 import {AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {MenuItem, MessageService, PrimeTemplate} from 'primeng/api';
+import {ConfirmationService, MenuItem, MessageService, PrimeTemplate} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {debounceTime, filter, map, switchMap, take} from 'rxjs/operators';
@@ -42,6 +42,7 @@ import {Slider} from 'primeng/slider';
 import {Select} from 'primeng/select';
 import {FilterSortPreferenceService} from './filters/filter-sorting-preferences.service';
 import {TieredMenu} from 'primeng/tieredmenu';
+import {Divider} from 'primeng/divider';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -74,7 +75,7 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, TieredMenu],
+  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, TieredMenu, Divider],
   providers: [SeriesCollapseFilter],
   animations: [
     trigger('slideInOut', [
@@ -135,6 +136,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private changeDetectorRef = inject(ChangeDetectorRef);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
   protected seriesCollapseFilter = inject(SeriesCollapseFilter);
+  protected confirmationService = inject(ConfirmationService);
 
   private sideBarFilter = new SideBarFilter(this.selectedFilter, this.selectedFilterMode);
   private headerFilter = new HeaderFilter(this.searchTerm$);
@@ -536,6 +538,21 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     if (this.bookTableComponent) {
       this.bookTableComponent.clearSelectedBooks();
     }
+  }
+
+  confirmDeleteBooks(): void {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${this.selectedBooks.size} book(s)?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.bookService.deleteBooks(this.selectedBooks).subscribe(() => {
+          this.selectedBooks.clear();
+        });
+      },
+      reject: () => {
+      }
+    });
   }
 
   onSeriesCollapseCheckboxChange(value: boolean): void {

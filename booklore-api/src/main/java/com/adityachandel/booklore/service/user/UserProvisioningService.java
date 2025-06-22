@@ -50,6 +50,7 @@ public class UserProvisioningService {
         perms.setPermissionEditMetadata(true);
         perms.setPermissionManipulateLibrary(true);
         perms.setPermissionEmailBook(true);
+        perms.setPermissionDeleteBook(true);
 
         user.setPermissions(perms);
         createUser(user);
@@ -76,6 +77,7 @@ public class UserProvisioningService {
         permissions.setPermissionDownload(request.isPermissionDownload());
         permissions.setPermissionEditMetadata(request.isPermissionEditMetadata());
         permissions.setPermissionEmailBook(request.isPermissionEmailBook());
+        permissions.setPermissionDeleteBook(request.isPermissionDeleteBook());
         permissions.setPermissionAdmin(request.isPermissionAdmin());
         user.setPermissions(permissions);
 
@@ -105,6 +107,7 @@ public class UserProvisioningService {
             perms.setPermissionEditMetadata(defaultPermissions.contains("permissionEditMetadata"));
             perms.setPermissionManipulateLibrary(defaultPermissions.contains("permissionManipulateLibrary"));
             perms.setPermissionEmailBook(defaultPermissions.contains("permissionEmailBook"));
+            perms.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBooks"));
         }
         user.setPermissions(perms);
 
@@ -145,6 +148,7 @@ public class UserProvisioningService {
         permissions.setPermissionDownload(true);
         permissions.setPermissionEditMetadata(true);
         permissions.setPermissionEmailBook(true);
+        permissions.setPermissionDeleteBook(true);
         permissions.setPermissionAdmin(isAdmin);
         user.setPermissions(permissions);
 

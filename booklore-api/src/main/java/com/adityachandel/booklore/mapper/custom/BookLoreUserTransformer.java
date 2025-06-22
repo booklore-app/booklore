@@ -28,6 +28,7 @@ public class BookLoreUserTransformer {
         permissions.setCanDownload(userEntity.getPermissions().isPermissionDownload());
         permissions.setCanEditMetadata(userEntity.getPermissions().isPermissionEditMetadata());
         permissions.setCanEmailBook(userEntity.getPermissions().isPermissionEmailBook());
+        permissions.setCanDeleteBook(userEntity.getPermissions().isPermissionDeleteBook());
         permissions.setCanManipulateLibrary(userEntity.getPermissions().isPermissionManipulateLibrary());
 
         BookLoreUser bookLoreUser = new BookLoreUser();

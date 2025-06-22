@@ -5,9 +5,11 @@ import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
+import com.adityachandel.booklore.model.dto.response.BookDeletionResponse;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,12 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,6 +52,7 @@ public class BookService {
     private final AuthenticationService authenticationService;
     private final BookQueryService bookQueryService;
     private final UserProgressService userProgressService;
+    private final AppSettingService appSettingService;
 
     public List<Book> getBookDTOs(boolean includeDescription) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
@@ -348,5 +351,27 @@ public class BookService {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new ByteArrayResource(inputStream.readAllBytes()));
         }
+    }
+
+
+    @Transactional
+    public ResponseEntity<BookDeletionResponse> deleteBooks(Set<Long> ids) {
+        List<BookEntity> books = bookQueryService.findAllWithMetadataByIds(ids);
+        List<Long> failedFileDeletions = new ArrayList<>();
+        for (BookEntity book : books) {
+            Path fullFilePath = book.getFullFilePath();
+            try {
+                if (Files.exists(fullFilePath)) {
+                    Files.delete(fullFilePath);
+                }
+            } catch (IOException e) {
+                failedFileDeletions.add(book.getId());
+            }
+        }
+        bookRepository.deleteAll(books);
+        BookDeletionResponse response = new BookDeletionResponse(ids, failedFileDeletions);
+        return failedFileDeletions.isEmpty()
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.MULTI_STATUS).body(response);
     }
 }

@@ -2,7 +2,7 @@ import {Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, View
 import {Book, BookMetadata} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
-import {MenuItem, MessageService} from 'primeng/api';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {DialogService} from 'primeng/dynamicdialog';
 import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.component';
 import {BookService} from '../../../service/book.service';
@@ -53,6 +53,7 @@ export class BookCardComponent implements OnInit {
   private messageService = inject(MessageService);
   private router = inject(Router);
   protected urlHelper = inject(UrlHelperService);
+  private confirmationService = inject(ConfirmationService);
 
   private userPermissions: any;
 
@@ -125,55 +126,32 @@ export class BookCardComponent implements OnInit {
   private getPermissionBasedMenuItems(): MenuItem[] {
     const items: MenuItem[] = [];
 
-    if (this.hasEditMetadataPermission()) {
-      items.push(
-        {
-          label: 'Match Book',
-          icon: 'pi pi-sparkles',
-          command: () => {
-            setTimeout(() => {
-              this.router.navigate(['/book', this.book.id], {
-                queryParams: {tab: 'match'}
-              })
-            }, 150);
-          },
-        },
-        {
-          label: 'Quick Refresh',
-          icon: 'pi pi-bolt',
-          command: () => {
-            const metadataRefreshRequest: MetadataRefreshRequest = {
-              quick: true,
-              refreshType: MetadataRefreshType.BOOKS,
-              bookIds: [this.book.id],
-            };
-            this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
-          },
-        },
-        {
-          label: 'Granular Refresh',
-          icon: 'pi pi-database',
-          command: () => {
-            this.dialogService.open(MetadataFetchOptionsComponent, {
-              header: 'Metadata Refresh Options',
-              modal: true,
-              closable: true,
-              data: {
-                bookIds: [this.book!.id],
-                metadataRefreshType: MetadataRefreshType.BOOKS,
-              },
-            });
-          },
-        }
-      );
-    }
-
     if (this.hasDownloadPermission()) {
       items.push({
         label: 'Download',
         icon: 'pi pi-download',
         command: () => {
           this.bookService.downloadFile(this.book.id);
+        },
+      });
+    }
+
+    if (this.hasDeleteBookPermission()) {
+      items.push({
+        label: 'Delete Book',
+        icon: 'pi pi-trash',
+        command: () => {
+          this.confirmationService.confirm({
+            message: `Are you sure you want to delete "${this.book.metadata?.title}"?`,
+            header: 'Confirm Deletion',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-trash',
+            rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-danger',
+            accept: () => {
+              this.bookService.deleteBooks(new Set([this.book.id])).subscribe();
+            }
+          });
         },
       });
     }
@@ -228,6 +206,53 @@ export class BookCardComponent implements OnInit {
         });
     }
 
+    if (this.hasEditMetadataPermission()) {
+      items.push({
+        label: 'Metadata',
+        icon: 'pi pi-database',
+        items: [
+          {
+            label: 'Search Metadata',
+            icon: 'pi pi-sparkles',
+            command: () => {
+              setTimeout(() => {
+                this.router.navigate(['/book', this.book.id], {
+                  queryParams: {tab: 'match'}
+                })
+              }, 150);
+            },
+          },
+          {
+            label: 'Auto Fetch',
+            icon: 'pi pi-bolt',
+            command: () => {
+              const metadataRefreshRequest: MetadataRefreshRequest = {
+                quick: true,
+                refreshType: MetadataRefreshType.BOOKS,
+                bookIds: [this.book.id],
+              };
+              this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
+            },
+          },
+          {
+            label: 'Advanced Fetch',
+            icon: 'pi pi-database',
+            command: () => {
+              this.dialogService.open(MetadataFetchOptionsComponent, {
+                header: 'Metadata Refresh Options',
+                modal: true,
+                closable: true,
+                data: {
+                  bookIds: [this.book!.id],
+                  metadataRefreshType: MetadataRefreshType.BOOKS,
+                },
+              });
+            },
+          }
+        ]
+      });
+    }
+
     return items;
   }
 
@@ -254,16 +279,24 @@ export class BookCardComponent implements OnInit {
     });
   }
 
+  private isAdmin(): boolean {
+    return this.userPermissions?.admin ?? false;
+  }
+
   private hasEditMetadataPermission(): boolean {
-    return this.userPermissions?.canEditMetadata ?? false;
+    return this.isAdmin() || (this.userPermissions?.canEditMetadata ?? false);
   }
 
   private hasDownloadPermission(): boolean {
-    return this.userPermissions?.canDownload ?? false;
+    return this.isAdmin() || (this.userPermissions?.canDownload ?? false);
   }
 
   private hasEmailBookPermission(): boolean {
-    return this.userPermissions?.canEmailBook ?? false;
+    return this.isAdmin() || (this.userPermissions?.canEmailBook ?? false);
+  }
+
+  private hasDeleteBookPermission(): boolean {
+    return this.isAdmin() || (this.userPermissions?.canDeleteBook ?? false);
   }
 
   isMetadataFullyLocked(metadata: BookMetadata): boolean {

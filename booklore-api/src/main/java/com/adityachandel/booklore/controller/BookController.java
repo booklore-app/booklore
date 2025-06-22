@@ -6,6 +6,7 @@ import com.adityachandel.booklore.model.dto.BookRecommendation;
 import com.adityachandel.booklore.model.dto.BookViewerSettings;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
+import com.adityachandel.booklore.model.dto.response.BookDeletionResponse;
 import com.adityachandel.booklore.service.metadata.MetadataBackupRestoreService;
 import com.adityachandel.booklore.service.recommender.BookRecommendationService;
 import com.adityachandel.booklore.service.BookService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RequestMapping("/api/v1/books")
@@ -41,6 +43,12 @@ public class BookController {
     @CheckBookAccess(bookIdParam = "bookId")
     public ResponseEntity<Book> getBook(@PathVariable long bookId, @RequestParam(required = false, defaultValue = "false") boolean withDescription) {
         return ResponseEntity.ok(bookService.getBook(bookId, withDescription));
+    }
+
+    @PreAuthorize("@securityUtil.canDeleteBook() or @securityUtil.isAdmin()")
+    @DeleteMapping
+    public ResponseEntity<BookDeletionResponse> deleteBooks(@RequestParam Set<Long> ids) {
+        return bookService.deleteBooks(ids);
     }
 
     @GetMapping("/batch")

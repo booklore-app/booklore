@@ -1,8 +1,8 @@
 import {inject, Injectable} from '@angular/core';
-import {BehaviorSubject, first, Observable, of} from 'rxjs';
+import {BehaviorSubject, first, Observable, of, throwError} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {catchError, filter, map, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookRecommendation, BookSetting, BulkMetadataUpdateRequest} from '../model/book.model';
+import {Book, BookDeletionResponse, BookMetadata, BookRecommendation, BookSetting, BulkMetadataUpdateRequest} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
 import {FetchMetadataRequest} from '../metadata/model/request/fetch-metadata-request.model';
@@ -176,13 +176,46 @@ export class BookService {
     });
   }
 
-  getBooksByIdsFromAPI(bookIds: number[], withDescription: boolean) {
-    return this.http.get<Book[]>(`${this.url}/batch`, {
-      params: {
-        ids: bookIds.map(id => id.toString()),
-        withDescription: withDescription.toString()
-      }
-    });
+  deleteBooks(ids: Set<number>): Observable<BookDeletionResponse> {
+    const idList = Array.from(ids);
+    const params = new HttpParams().set('ids', idList.join(','));
+
+    return this.http.delete<BookDeletionResponse>(this.url, { params }).pipe(
+      tap(response => {
+        const currentState = this.bookStateSubject.value;
+        const remainingBooks = (currentState.books || []).filter(
+          book => !ids.has(book.id)
+        );
+
+        this.bookStateSubject.next({
+          books: remainingBooks,
+          loaded: true,
+          error: null,
+        });
+
+        if (response.failedFileDeletions?.length > 0) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Some files could not be deleted',
+            detail: `Books: ${response.failedFileDeletions.join(', ')}`,
+          });
+        } else {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Books Deleted',
+            detail: `${idList.length} book(s) deleted successfully.`,
+          });
+        }
+      }),
+      catchError(error => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Delete Failed',
+          detail: error?.error?.message || error?.message || 'An error occurred while deleting books.',
+        });
+        return throwError(() => error);
+      })
+    );
   }
 
   downloadFile(bookId: number): void {

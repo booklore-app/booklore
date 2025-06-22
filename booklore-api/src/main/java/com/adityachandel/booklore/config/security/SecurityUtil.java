@@ -54,6 +54,11 @@ public class SecurityUtil {
         var user = getCurrentUser();
         return user != null && user.getPermissions().isCanEmailBook();
     }
+    public boolean canDeleteBook() {
+        var user = getCurrentUser();
+        return user != null && user.getPermissions().isCanDeleteBook();
+    }
+
 
     public boolean canViewUserProfile(Long userId) {
         var user = getCurrentUser();

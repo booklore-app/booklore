@@ -14,12 +14,8 @@ import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.entity.UserSettingEntity;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +52,7 @@ public class UserService {
             user.getPermissions().setPermissionEditMetadata(updateRequest.getPermissions().isCanEditMetadata());
             user.getPermissions().setPermissionManipulateLibrary(updateRequest.getPermissions().isCanManipulateLibrary());
             user.getPermissions().setPermissionEmailBook(updateRequest.getPermissions().isCanEmailBook());
+            user.getPermissions().setPermissionDeleteBook(updateRequest.getPermissions().isCanDeleteBook());
         }
 
         if (updateRequest.getAssignedLibraries() != null && getMyself().getPermissions().isAdmin()) {
