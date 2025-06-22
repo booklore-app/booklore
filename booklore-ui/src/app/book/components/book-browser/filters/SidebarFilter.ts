@@ -2,11 +2,18 @@ import {Observable, combineLatest, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BookFilter} from './BookFilter';
 import {BookState} from '../../../model/state/book-state.model';
-import {fileSizeRanges, matchScoreRanges, pageCountRanges, ratingRanges} from '../book-filter/book-filter.component';
+import {fileSizeRanges, matchScoreRanges, pageCountRanges, ratingRanges, ratingRanges10} from '../book-filter/book-filter.component';
 
 export function isRatingInRange(rating: number | undefined | null, rangeId: string): boolean {
   if (rating == null) return false;
   const range = ratingRanges.find(r => r.id === rangeId);
+  if (!range) return false;
+  return rating >= range.min && rating < range.max;
+}
+
+export function isRatingInRange10(rating: number | undefined | null, rangeId: string): boolean {
+  if (rating == null) return false;
+  const range = ratingRanges10.find(r => r.id === rangeId);
   if (!range) return false;
   return rating >= range.min && rating < range.max;
 }
@@ -69,6 +76,8 @@ export class SideBarFilter implements BookFilter {
                 return filterValues.some(range => isRatingInRange(book.metadata?.goodreadsRating, range));
               case 'hardcoverRating':
                 return filterValues.some(range => isRatingInRange(book.metadata?.hardcoverRating, range));
+              case 'personalRating':
+                return filterValues.some(range => isRatingInRange10(book.metadata?.personalRating, range));
               case 'publishedDate':
                 return filterValues.includes(new Date(book.metadata?.publishedDate || '').getFullYear());
               case 'fileSize':

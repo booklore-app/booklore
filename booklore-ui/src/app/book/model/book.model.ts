@@ -61,6 +61,7 @@ export interface BookMetadata {
   goodreadsReviewCount?: number | null;
   hardcoverRating?: number | null;
   hardcoverReviewCount?: number | null;
+  personalRating?: number | null;
   coverUpdatedOn?: string;
   authors: string[];
   categories: string[];

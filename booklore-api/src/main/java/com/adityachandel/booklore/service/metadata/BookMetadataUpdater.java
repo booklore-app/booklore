@@ -113,6 +113,7 @@ public class BookMetadataUpdater {
         updateFieldIfUnlocked(metadata::getGoodreadsReviewCountLocked, newMetadata.getGoodreadsReviewCount(), metadata::setGoodreadsReviewCount);
         updateFieldIfUnlocked(metadata::getHardcoverRatingLocked, newMetadata.getHardcoverRating(), metadata::setHardcoverRating);
         updateFieldIfUnlocked(metadata::getHardcoverReviewCountLocked, newMetadata.getHardcoverReviewCount(), metadata::setHardcoverReviewCount);
+        updateFieldIfUnlocked(metadata::getPersonalRatingLocked, newMetadata.getPersonalRating(), metadata::setPersonalRating);
         updateFieldIfUnlocked(metadata::getSeriesNameLocked, newMetadata.getSeriesName(), metadata::setSeriesName);
         updateFieldIfUnlocked(metadata::getSeriesNumberLocked, newMetadata.getSeriesNumber(), metadata::setSeriesNumber);
         updateFieldIfUnlocked(metadata::getSeriesTotalLocked, newMetadata.getSeriesTotal(), metadata::setSeriesTotal);

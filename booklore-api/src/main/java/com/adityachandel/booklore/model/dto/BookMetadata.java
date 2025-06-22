@@ -43,6 +43,7 @@ public class BookMetadata {
     private String hardcoverId;
     private Double hardcoverRating;
     private Integer hardcoverReviewCount;
+    private Double personalRating;
     private String googleId;
 
     private Instant coverUpdatedOn;

@@ -3,7 +3,7 @@ import {Button, ButtonDirective} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass} from '@angular/common';
 import {Observable} from 'rxjs';
 import {BookService} from '../../../service/book.service';
-import {Rating} from 'primeng/rating';
+import {Rating, RatingRateEvent} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
 import {Book, BookMetadata, BookRecommendation} from '../../../model/book.model';
@@ -278,16 +278,18 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  getStarColor(rating?: number | null): string {
+  getStarColorScaled(rating?: number | null, maxScale: number = 5): string {
     if (rating == null) {
       return 'rgb(203, 213, 225)';
-    } else if (rating >= 4.5) {
+    }
+    const normalized = rating / maxScale;
+    if (normalized >= 0.9) {
       return 'rgb(34, 197, 94)';
-    } else if (rating >= 4) {
+    } else if (normalized >= 0.75) {
       return 'rgb(52, 211, 153)';
-    } else if (rating >= 3.5) {
+    } else if (normalized >= 0.6) {
       return 'rgb(234, 179, 8)';
-    } else if (rating >= 2.5) {
+    } else if (normalized >= 0.4) {
       return 'rgb(249, 115, 22)';
     } else {
       return 'rgb(239, 68, 68)';
@@ -309,5 +311,20 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   getProgressColorClass(progress: number | null | undefined): string {
     if (progress == null) return 'bg-gray-600';
     return 'bg-blue-500';
+  }
+
+  onPersonalRatingChange(book: Book, event: RatingRateEvent): void {
+    const rating = event.value;
+    if (!book || !book.metadata) return;
+    const updatedMetadata = {
+      ...book.metadata,
+      personalRating: rating
+    };
+    this.bookService.updateBookMetadata(book.id, updatedMetadata, false).subscribe({
+      next: () => {
+      },
+      error: (err) => {
+      }
+    });
   }
 }
