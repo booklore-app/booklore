@@ -24,9 +24,8 @@
         @if (userService.userState$ | async; as userData) {
           <li>
             @if (userData.permissions.canManipulateLibrary || userData.permissions.admin) {
-              <a class="topbar-item">
-                <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
-                pTooltip="Create New Library" tooltipPosition="top"></i>
+              <a class="topbar-item" (click)="openLibraryCreatorDialog()" pTooltip="Create New Library" tooltipPosition="top">
+                <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100"></i>
               </a>
             }
           </li>
@@ -34,17 +33,15 @@
         @if (userService.userState$ | async; as userData) {
           <li>
             @if (userData.permissions.canManipulateLibrary || userData.permissions.admin) {
-              <a class="topbar-item">
-                <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
-                pTooltip="Upload Book" tooltipPosition="top"></i>
+              <a class="topbar-item" (click)="openFileUploadDialog()" pTooltip="Upload Book" tooltipPosition="top">
+                <i class="pi pi-upload text-surface-700 dark:text-surface-100"></i>
               </a>
             }
           </li>
         }
         <li>
-          <a class="topbar-item">
-            <i class="pi pi-cog text-surface-700 dark:text-surface-100" (click)="navigateToSettings()"
-            pTooltip="Settings" tooltipPosition="top"></i>
+          <a class="topbar-item" (click)="navigateToSettings()" pTooltip="Settings" tooltipPosition="top">
+            <i class="pi pi-cog text-surface-700 dark:text-surface-100"></i>
           </a>
         </li>
       </div>
@@ -67,14 +64,14 @@
 
       <p-divider layout="vertical"/>
 
-      <div class="flex gap-6">
-        <li class="relative group overflow-hidden !border-transparent topbar-item" (click)="openGithubSupportDialog()">
+      <div class="flex gap-6" pTooltip="Love BookLore?" tooltipPosition="top" (click)="openGithubSupportDialog()">
+        <li class="relative group overflow-hidden !border-transparent topbar-item">
           <span
             style="animation-duration: 2s; background: conic-gradient(from 90deg, #f97316, #f59e0b, #eab308, #84cc16, #22c55e, #10b981, #14a8a6, #06b6d4, #0ea5e9, #3b82f6, #6366f1, #8b5cf6, #a855f7, #d946ef, #ec4899, #f43f5e)"
             class="absolute -top-5 -left-5 w-20 h-20 animate-spin">
           </span>
           <span style="inset: 1px; border-radius: 4px" class="absolute z-2 bg-surface-0 dark:bg-surface-900 transition-all"></span>
-          <i class="pi pi-thumbs-up z-10" pTooltip="Love BookLore?" tooltipPosition="top"></i>
+          <i class="pi pi-thumbs-up z-10"></i>
         </li>
         <li class="relative">
           <button type="button"
