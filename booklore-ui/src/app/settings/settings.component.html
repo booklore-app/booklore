@@ -3,14 +3,28 @@
     <div class="rounded-xl overflow-hidden">
       <p-tabs [(value)]="activeTab" scrollable>
         <p-tablist>
-          <p-tab [value]="SettingsTab.ReaderSettings">Reader Preferences</p-tab>
-          <p-tab [value]="SettingsTab.ViewPreferences">View Preferences</p-tab>
+          <p-tab [value]="SettingsTab.ReaderSettings">
+            <i class="pi pi-book"></i> Reader Preferences
+          </p-tab>
+          <p-tab [value]="SettingsTab.ViewPreferences">
+            <i class="pi pi-desktop"></i> View Preferences
+          </p-tab>
           @if (userData.permissions.admin) {
-            <p-tab [value]="SettingsTab.MetadataSettings">Metadata Settings</p-tab>
-            <p-tab [value]="SettingsTab.ApplicationSettings">Application Settings</p-tab>
-            <p-tab [value]="SettingsTab.UserManagement">User Management</p-tab>
-            <p-tab [value]="SettingsTab.EmailSettings">Email Settings</p-tab>
-            <p-tab [value]="SettingsTab.AuthenticationSettings">Authentication</p-tab>
+            <p-tab [value]="SettingsTab.MetadataSettings">
+              <i class="pi pi-sliders-h"></i> Metadata Settings
+            </p-tab>
+            <p-tab [value]="SettingsTab.ApplicationSettings">
+              <i class="pi pi-cog"></i> Application Settings
+            </p-tab>
+            <p-tab [value]="SettingsTab.UserManagement">
+              <i class="pi pi-users"></i> User Management
+            </p-tab>
+            <p-tab [value]="SettingsTab.EmailSettings">
+              <i class="pi pi-envelope"></i> Email Settings
+            </p-tab>
+            <p-tab [value]="SettingsTab.AuthenticationSettings">
+              <i class="pi pi-lock"></i> Authentication
+            </p-tab>
           }
         </p-tablist>
         <p-tabpanels>
