@@ -27,9 +27,47 @@ public class OpdsService {
         };
     }
 
+    public String generateSearchResults(HttpServletRequest request, String queryParam) {
+        List<BookEntity> books = List.of();
+        if (queryParam != null) {
+            books = bookQueryService.getBooksContainingMetadata(queryParam);
+        } else {
+            books = bookQueryService.getAllFullBookEntities();
+        }
+        var feedVersion = extractVersionFromAcceptHeader(request);
+
+        return switch (feedVersion) {
+            case "2.0" -> generateOpdsV2Feed(books);
+            default -> generateOpdsV1Feed(books);
+        };
+    }
+
+    public String generateSearchDescription(HttpServletRequest request) {
+        var feedVersion = extractVersionFromAcceptHeader(request);
+
+        return switch (feedVersion) {
+            case "2.0" -> generateOpdsV2SearchDescription();
+            default -> generateOpdsV1SearchDescription();
+        };
+    }
+
     private String extractVersionFromAcceptHeader(HttpServletRequest request) {
         var acceptHeader = request.getHeader("Accept");
         return (acceptHeader != null && acceptHeader.contains("version=2.0")) ? "2.0" : "1.2";
+    }
+
+    private String generateOpdsV1SearchDescription() {
+        return """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+                    <LongName>Booklore catalog</LongName>
+                    <Description>Search the Booklore ebook catalog.</Description>
+                    <Url type="application/atom+xml;profile=opds-catalog" template="/api/v1/opds/search?q={searchTerms}"/>
+                    <Language>en-us</Language>
+                    <OutputEncoding>UTF-8</OutputEncoding>
+                    <InputEncoding>UTF-8</InputEncoding>
+                </OpenSearchDescription>
+                """;
     }
 
     private String generateOpdsV1Feed(List<BookEntity> books) {
@@ -39,6 +77,7 @@ public class OpdsService {
                   <title>Booklore Catalog</title>
                   <id>urn:booklore:catalog</id>
                   <updated>%s</updated>
+                  <link rel="search" type="application/opensearchdescription+xml" title="Booklore Search" href="/api/v1/opds/search.opds"/>
                 """.formatted(now()));
 
         books.forEach(book -> appendBookEntryV1(feed, book));
@@ -109,6 +148,12 @@ public class OpdsService {
         // Placeholder for OPDS v2.0 feed implementation (similar structure as v1)
         return "OPDS v2.0 Feed is under construction";
     }
+    
+    private String generateOpdsV2SearchDescription() {
+        // Placeholder for OPDS v2.0 feed implementation (similar structure as v1)
+        return "OPDS v2.0 Feed is under construction";
+    }
+
 
     private String now() {
         return DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now());

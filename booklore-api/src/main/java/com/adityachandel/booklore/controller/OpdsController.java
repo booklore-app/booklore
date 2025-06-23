@@ -28,6 +28,22 @@ public class OpdsController {
                 .contentType(MediaType.parseMediaType("application/atom+xml;profile=opds-catalog"))
                 .body(feed);
     }
+   
+    @GetMapping(value = "/search", produces = "application/atom+xml;profile=opds-catalog")
+    public ResponseEntity<String> search(HttpServletRequest request) {
+        String feed = opdsService.generateSearchResults(request, request.getParameter("q"));
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/atom+xml;profile=opds-catalog"))
+                .body(feed);
+    }
+
+    @GetMapping(value = "/search.opds", produces = "application/atom+xml;profile=opds-catalog")
+    public ResponseEntity<String> searchDescription(HttpServletRequest request) {
+        String feed = opdsService.generateSearchDescription(request);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/atom+xml;profile=opds-catalog"))
+                .body(feed);
+    }
 
     @GetMapping("/{bookId}/download")
     public ResponseEntity<Resource> downloadBook(@PathVariable("bookId") Long bookId) {
