@@ -21,6 +21,7 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
+import {Chips} from 'primeng/chips';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -43,7 +44,8 @@ import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enu
     TabList,
     Tab,
     TabPanels,
-    TabPanel
+    TabPanel,
+    Chips
   ]
 })
 export class MetadataEditorComponent implements OnInit {
@@ -167,8 +169,8 @@ export class MetadataEditorComponent implements OnInit {
     this.metadataForm.patchValue({
       title: metadata.title ?? null,
       subtitle: metadata.subtitle ?? null,
-      authors: (metadata.authors ?? []).sort().join(', '),
-      categories: (metadata.categories ?? []).sort().join(', '),
+      authors: [...(metadata.authors ?? [])].sort(),
+      categories: [...(metadata.categories ?? [])].sort(),
       publisher: metadata.publisher ?? null,
       publishedDate: metadata.publishedDate ?? null,
       isbn10: metadata.isbn10 ?? null,
@@ -330,8 +332,8 @@ export class MetadataEditorComponent implements OnInit {
       bookId: this.currentBookId,
       title: this.metadataForm.get('title')?.value,
       subtitle: this.metadataForm.get('subtitle')?.value,
-      authors: this.metadataForm.get('authors')?.value.split(',').map((author: string) => author.trim()),
-      categories: this.metadataForm.get('categories')?.value.split(',').map((category: string) => category.trim()),
+      authors: this.metadataForm.get('authors')?.value ?? [],
+      categories: this.metadataForm.get('categories')?.value ?? [],
       publisher: this.metadataForm.get('publisher')?.value,
       publishedDate: this.metadataForm.get('publishedDate')?.value,
       isbn10: this.metadataForm.get('isbn10')?.value,

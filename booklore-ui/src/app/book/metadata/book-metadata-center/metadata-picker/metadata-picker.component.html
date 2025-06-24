@@ -9,14 +9,14 @@
           [ngStyle]="{'padding-left': '2rem', 'padding-right': '0.5rem'}"
           [outlined]="true"
           pTooltip="Move all missing fields" tooltipPosition="bottom"
-        (onClick)="copyMissing()"></p-button>
+          (onClick)="copyMissing()"></p-button>
         <p-button
           severity="info"
           icon='pi pi-angle-double-left'
           [ngStyle]="{'padding-left': '0.5rem', 'padding-right': '2rem'}"
           [outlined]="true"
           pTooltip="Move all fields" tooltipPosition="bottom"
-        (onClick)="copyAll()"></p-button>
+          (onClick)="copyAll()"></p-button>
         <p class="text-lg">Fetched Metadata</p>
       </div>
       <div class="form-row">
@@ -33,12 +33,12 @@
           <p-button
             [icon]="isValueSaved('thumbnailUrl') ? 'pi pi-check' : (hoveredFields['thumbnailUrl'] && isValueCopied('thumbnailUrl') ? 'pi pi-times' : 'pi pi-arrow-left')"
             [outlined]="true"
-          [ngClass]="
-          {
-            'green-outlined-button': isValueSaved('thumbnailUrl'),
-            'yellow-outlined-button': isValueCopied('thumbnailUrl') && !hoveredFields['thumbnailUrl'],
-            'red-outlined-button': isValueCopied('thumbnailUrl') && hoveredFields['thumbnailUrl']
-          }"
+            [ngClass]="
+              {
+                'green-outlined-button': isValueSaved('thumbnailUrl'),
+                'yellow-outlined-button': isValueCopied('thumbnailUrl') && !hoveredFields['thumbnailUrl'],
+                'red-outlined-button': isValueCopied('thumbnailUrl') && hoveredFields['thumbnailUrl']
+              }"
             class="arrow-button"
             (click)="hoveredFields['thumbnailUrl'] && isValueCopied('thumbnailUrl') ? resetField('thumbnailUrl') : copyFetchedToCurrent('thumbnailUrl')"
             (mouseenter)="onMouseEnter('thumbnailUrl')"
@@ -61,17 +61,54 @@
             <p-button
               [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
               [outlined]="true"
-          [ngClass]="
-          {
-            'green-outlined-button': isValueSaved(field.controlName),
-            'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
-            'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
-          }"
+              [ngClass]="
+                {
+                  'green-outlined-button': isValueSaved(field.controlName),
+                  'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
+                  'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
+                }"
               class="arrow-button"
               (click)="hoveredFields[field.controlName] && isValueCopied(field.controlName) ? resetField(field.controlName) : copyFetchedToCurrent(field.controlName)"
               (mouseenter)="onMouseEnter(field.controlName)"
               (mouseleave)="onMouseLeave(field.controlName)"/>
             <input pInputText [value]="fetchedMetadata[field.fetchedKey] ?? null" class="input" readonly/>
+          </div>
+        </div>
+      }
+      @for (field of metadataChips; track field) {
+        <div class="form-row">
+          <label for="{{field.controlName}}" class="label">{{ field.label }}</label>
+          <div class="input-container">
+            @if (!book.metadata![field.lockedKey]) {
+              <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="success"></p-button>
+            }
+            @if (book.metadata![field.lockedKey]) {
+              <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="warn"></p-button>
+            }
+            <div class="w-full px-2">
+              <p-chips formControlName="{{field.controlName}}" addOnBlur="true"></p-chips>
+            </div>
+            <p-button
+              [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
+              [outlined]="true"
+              [ngClass]="
+                {
+                  'green-outlined-button': isValueSaved(field.controlName),
+                  'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
+                  'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
+                }"
+              class="arrow-button"
+              (click)="hoveredFields[field.controlName] && isValueCopied(field.controlName) ? resetField(field.controlName) : copyFetchedToCurrent(field.controlName)"
+              (mouseenter)="onMouseEnter(field.controlName)"
+              (mouseleave)="onMouseLeave(field.controlName)"/>
+
+            <div class="w-full px-2">
+              <p-chips
+                [ngModel]="fetchedMetadata[field.fetchedKey] ?? []"
+                [ngModelOptions]="{ standalone: true }"
+                [disabled]="true">
+              </p-chips>
+            </div>
           </div>
         </div>
       }
@@ -89,12 +126,12 @@
             <p-button
               [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
               [outlined]="true"
-          [ngClass]="
-          {
-            'green-outlined-button': isValueSaved(field.controlName),
-            'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
-            'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
-          }"
+              [ngClass]="
+                {
+                  'green-outlined-button': isValueSaved(field.controlName),
+                  'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
+                  'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
+                }"
               class="arrow-button"
               (click)="hoveredFields[field.controlName] && isValueCopied(field.controlName) ? resetField(field.controlName) : copyFetchedToCurrent(field.controlName)"
               (mouseenter)="onMouseEnter(field.controlName)"
@@ -117,12 +154,12 @@
             <p-button
               [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
               [outlined]="true"
-          [ngClass]="
-          {
-            'green-outlined-button': isValueSaved(field.controlName),
-            'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
-            'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
-          }"
+              [ngClass]="
+                {
+                  'green-outlined-button': isValueSaved(field.controlName),
+                  'yellow-outlined-button': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
+                  'red-outlined-button': isValueCopied(field.controlName) && hoveredFields[field.controlName]
+                }"
               class="arrow-button"
               (click)="hoveredFields[field.controlName] && isValueCopied(field.controlName) ? resetField(field.controlName) : copyFetchedToCurrent(field.controlName)"
               (mouseenter)="onMouseEnter(field.controlName)"
@@ -139,14 +176,14 @@
           [ngStyle]="{'padding-left': '2rem', 'padding-right': '0.5rem'}"
           [outlined]="true"
           pTooltip="Move all missing fields" tooltipPosition="bottom"
-        (onClick)="copyMissing()"></p-button>
+          (onClick)="copyMissing()"></p-button>
         <p-button
           severity="info"
           icon='pi pi-angle-double-left'
           [ngStyle]="{'padding-left': '0.5rem', 'padding-right': '2rem'}"
           [outlined]="true"
           pTooltip="Move all fields" tooltipPosition="bottom"
-        (onClick)="copyAll()"></p-button>
+          (onClick)="copyAll()"></p-button>
         <p class="text-lg">Fetched Metadata</p>
       </div>
     </div>

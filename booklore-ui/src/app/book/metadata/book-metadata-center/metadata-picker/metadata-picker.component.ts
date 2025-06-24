@@ -13,6 +13,7 @@ import {BookService} from '../../../service/book.service';
 import {Textarea} from 'primeng/textarea';
 import {filter, map} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Chips} from 'primeng/chips';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -29,19 +30,21 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     NgStyle,
     Tooltip,
     AsyncPipe,
-    Textarea
+    Textarea,
+    Chips
   ]
 })
 export class MetadataPickerComponent implements OnInit {
 
   metadataFieldsTop = [
     {label: 'Title', controlName: 'title', lockedKey: 'titleLocked', fetchedKey: 'title'},
-    {label: 'Authors', controlName: 'authors', lockedKey: 'authorsLocked', fetchedKey: 'authors'},
-    {label: 'Categories', controlName: 'categories', lockedKey: 'categoriesLocked', fetchedKey: 'categories'},
     {label: 'Publisher', controlName: 'publisher', lockedKey: 'publisherLocked', fetchedKey: 'publisher'},
-    {label: 'Published', controlName: 'publishedDate', lockedKey: 'publishedDateLocked', fetchedKey: 'publishedDate'},
-    {label: 'ISBN-10', controlName: 'isbn10', lockedKey: 'isbn10Locked', fetchedKey: 'isbn10'},
-    {label: 'Language', controlName: 'language', lockedKey: 'languageLocked', fetchedKey: 'language'}
+    {label: 'Published', controlName: 'publishedDate', lockedKey: 'publishedDateLocked', fetchedKey: 'publishedDate'}
+  ];
+
+  metadataChips = [
+    {label: 'Authors', controlName: 'authors', lockedKey: 'authorsLocked', fetchedKey: 'authors'},
+    {label: 'Categories', controlName: 'categories', lockedKey: 'categoriesLocked', fetchedKey: 'categories'}
   ];
 
   metadataDescription = [
@@ -52,6 +55,8 @@ export class MetadataPickerComponent implements OnInit {
     {label: 'Series', controlName: 'seriesName', lockedKey: 'seriesNameLocked', fetchedKey: 'seriesName'},
     {label: 'Book #', controlName: 'seriesNumber', lockedKey: 'seriesNumberLocked', fetchedKey: 'seriesNumber'},
     {label: 'Total Books', controlName: 'seriesTotal', lockedKey: 'seriesTotalLocked', fetchedKey: 'seriesTotal'},
+    {label: 'Language', controlName: 'language', lockedKey: 'languageLocked', fetchedKey: 'language'},
+    {label: 'ISBN-10', controlName: 'isbn10', lockedKey: 'isbn10Locked', fetchedKey: 'isbn10'},
     {label: 'ISBN-13', controlName: 'isbn13', lockedKey: 'isbn13Locked', fetchedKey: 'isbn13'},
     {label: 'Amazon ID (ASIN)', controlName: 'asin', lockedKey: 'asinLocked', fetchedKey: 'asin'},
     {label: 'Amazon Reviews', controlName: 'amazonReviewCount', lockedKey: 'amazonReviewCountLocked', fetchedKey: 'amazonReviewCount'},
@@ -144,8 +149,7 @@ export class MetadataPickerComponent implements OnInit {
         filter((book): book is Book => !!book && !!book.metadata),
         map(book => book.metadata),
         takeUntilDestroyed(this.destroyRef)
-      ).
-    subscribe((metadata) => {
+      ).subscribe((metadata) => {
       if (metadata) {
         this.originalMetadata = metadata;
         this.originalMetadata.thumbnailUrl = this.urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn);
@@ -153,8 +157,8 @@ export class MetadataPickerComponent implements OnInit {
         this.metadataForm.patchValue({
           title: metadata.title || null,
           subtitle: metadata.subtitle || null,
-          authors: (metadata.authors || []).sort().join(', '),
-          categories: (metadata.categories || []).sort().join(', '),
+          authors: [...(metadata.authors ?? [])].sort(),
+          categories: [...(metadata.categories ?? [])].sort(),
           publisher: metadata.publisher || null,
           publishedDate: metadata.publishedDate || null,
           isbn10: metadata.isbn10 || null,
