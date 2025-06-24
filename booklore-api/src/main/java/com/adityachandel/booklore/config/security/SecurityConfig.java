@@ -56,6 +56,10 @@ public class SecurityConfig {
             "/api/v1/pdf/*/pages/*"
     };
 
+    private static final String[] COMMON_UNAUTHENTICATED_ENDPOINTS = {
+            "/api/v1/opds/search.opds"
+    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -64,11 +68,16 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain opdsBasicAuthSecurityChain(HttpSecurity http) throws Exception {
+
+        List<String> unauthenticatedEndpoints = new ArrayList<>(Arrays.asList(COMMON_UNAUTHENTICATED_ENDPOINTS));
         http
                 .securityMatcher("/api/v1/opds/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(unauthenticatedEndpoints.toArray(new String[0])).permitAll()
+                        .anyRequest().authenticated()
+                        )
                 .httpBasic(basic -> basic
                         .realmName("Booklore OPDS")
                         .authenticationEntryPoint((request, response, authException) -> {
