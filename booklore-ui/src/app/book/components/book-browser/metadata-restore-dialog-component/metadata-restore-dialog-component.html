@@ -86,7 +86,7 @@
             @if (backupMetadata.googleId) {
               <div><strong>Google Books ID:</strong> {{ backupMetadata.googleId }}</div>
             }
-            @if (backupMetadata.categories.length) {
+            @if (backupMetadata.categories && backupMetadata.categories.length) {
               <div><strong>Categories:</strong> {{ backupMetadata.categories.join(', ') }}</div>
             }
           </div>

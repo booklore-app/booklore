@@ -1,6 +1,5 @@
 package com.adityachandel.booklore.service.metadata;
 
-import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.MetadataPersistenceSettings;
 import com.adityachandel.booklore.model.entity.AuthorEntity;
@@ -9,10 +8,11 @@ import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.CategoryEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.AuthorRepository;
-import com.adityachandel.booklore.repository.BookMetadataRepository;
-import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.CategoryRepository;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
+import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestore;
+import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestoreFactory;
+import com.adityachandel.booklore.service.metadata.writer.MetadataWriterFactory;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +24,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URL;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -42,8 +44,8 @@ public class BookMetadataUpdater {
     private final FileService fileService;
     private final MetadataMatchService metadataMatchService;
     private final AppSettingService appSettingService;
-    private final MetadataBackupRestoreService metadataBackupRestoreService;
-    private final EpubMetadataWriter epubMetadataWriter;
+    private final MetadataWriterFactory metadataWriterFactory;
+    private final MetadataBackupRestoreFactory metadataBackupRestoreFactory;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void setBookMetadata(BookEntity bookEntity, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
@@ -62,9 +64,15 @@ public class BookMetadataUpdater {
         boolean backupCover = settings.isBackupCover();
         BookFileType bookType = bookEntity.getBookType();
 
-        if (writeToFile && backupEnabled && bookType == BookFileType.EPUB) {
+        if (writeToFile && backupEnabled) {
             try {
-                metadataBackupRestoreService.backupEmbeddedMetadataIfNotExists(bookEntity, backupCover);
+                MetadataBackupRestore service = metadataBackupRestoreFactory.getService(bookType);
+                if (service != null) {
+                    boolean coverBackup = bookType == BookFileType.EPUB && backupCover;
+                    service.backupEmbeddedMetadataIfNotExists(bookEntity, coverBackup);
+                } else {
+                    log.warn("No MetadataBackupRestore service found for book type: {}", bookType);
+                }
             } catch (Exception e) {
                 log.warn("Failed to backup metadata for book ID {}: {}", bookEntity.getId(), e.getMessage());
             }
@@ -82,14 +90,21 @@ public class BookMetadataUpdater {
             log.warn("Failed to calculate/save metadata match score for book ID {}: {}", bookEntity.getId(), e.getMessage());
         }
 
-        if (writeToFile && bookType == BookFileType.EPUB) {
-            try {
-                File bookFile = new File(bookEntity.getFullFilePath().toUri());
-                epubMetadataWriter.writeMetadataToFile(bookFile, metadata, newMetadata.getThumbnailUrl());
-                log.info("Embedded metadata written to EPUB for book ID {}", bookEntity.getId());
-            } catch (Exception e) {
-                log.warn("Failed to write metadata to EPUB for book ID {}: {}", bookEntity.getId(), e.getMessage());
-            }
+        if (writeToFile) {
+            metadataWriterFactory.getWriter(bookType).ifPresent(writer -> {
+                try {
+                    String thumbnailUrl = setThumbnail ? newMetadata.getThumbnailUrl() : null;
+                    if (org.apache.commons.lang3.StringUtils.isNotBlank(thumbnailUrl) && isLocalOrPrivateUrl(thumbnailUrl)) {
+                        log.warn("Rejected local/private thumbnail URL: {}", thumbnailUrl);
+                        thumbnailUrl = null;
+                    }
+                    File file = new File(bookEntity.getFullFilePath().toUri());
+                    writer.writeMetadataToFile(file, metadata, thumbnailUrl, false);
+                    log.info("Embedded metadata written for book ID {}", bookEntity.getId());
+                } catch (Exception e) {
+                    log.warn("Failed to write metadata for book ID {}: {}", bookEntity.getId(), e.getMessage());
+                }
+            });
         }
     }
 
@@ -221,4 +236,18 @@ public class BookMetadataUpdater {
         }
     }
 
+    private boolean isLocalOrPrivateUrl(String url) {
+        try {
+            URL parsedUrl = new URL(url);
+            String host = parsedUrl.getHost();
+            if ("localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host)) {
+                return true;
+            }
+            InetAddress address = InetAddress.getByName(host);
+            return address.isAnyLocalAddress() || address.isLoopbackAddress() || address.isSiteLocalAddress();
+        } catch (Exception e) {
+            log.warn("Thumbnail URL validation failed for '{}': {}", url, e.getMessage());
+            return true;
+        }
+    }
 }

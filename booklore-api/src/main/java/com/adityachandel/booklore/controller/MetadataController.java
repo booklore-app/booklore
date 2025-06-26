@@ -111,8 +111,8 @@ public class MetadataController {
     @GetMapping("/{bookId}/metadata/restore")
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
     @CheckBookAccess(bookIdParam = "bookId")
-    public ResponseEntity<EpubMetadata> getBackedUpMetadata(@PathVariable Long bookId) {
-        EpubMetadata restoredMetadata = bookMetadataService.getBackedUpMetadata(bookId);
+    public ResponseEntity<BookMetadata> getBackedUpMetadata(@PathVariable Long bookId) {
+        BookMetadata restoredMetadata = bookMetadataService.getBackedUpMetadata(bookId);
         return ResponseEntity.ok(restoredMetadata);
     }
 
