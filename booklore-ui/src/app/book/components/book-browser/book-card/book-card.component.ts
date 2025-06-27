@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, inject, Input, OnInit, Optional, Output, ViewChild} from '@angular/core';
 import {Book, BookMetadata} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
@@ -20,6 +20,8 @@ import {TieredMenu} from 'primeng/tieredmenu';
 import {BookSenderComponent} from '../../book-sender/book-sender.component';
 import {Router} from '@angular/router';
 import {ProgressBar} from 'primeng/progressbar';
+import {BookMetadataHostService} from '../../../../book-metadata-host-service';
+import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-center/book-metadata-center.component';
 
 @Component({
   selector: 'app-book-card',
@@ -56,6 +58,7 @@ export class BookCardComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
 
   private userPermissions: any;
+  private metadataCenterViewMode: 'route' | 'dialog' = 'route';
 
 
   ngOnInit(): void {
@@ -63,6 +66,7 @@ export class BookCardComponent implements OnInit {
       .pipe(filter(userData => !!userData))
       .subscribe((userData) => {
         this.userPermissions = userData.permissions;
+        this.metadataCenterViewMode = userData?.userSettings.metadataCenterViewMode;
         this.initMenu();
       });
   }
@@ -274,9 +278,19 @@ export class BookCardComponent implements OnInit {
   }
 
   openBookInfo(book: Book): void {
-    this.router.navigate(['/book', book.id], {
-      queryParams: {tab: 'view'}
-    });
+    if (this.metadataCenterViewMode === 'route') {
+      this.router.navigate(['/book', book.id], {
+        queryParams: {tab: 'view'}
+      });
+    } else {
+      this.dialogService.open(BookMetadataCenterComponent, {
+        width: '95%',
+        data: {bookId: book.id},
+        modal: true,
+        dismissableMask: true,
+        showHeader: false
+      });
+    }
   }
 
   private isAdmin(): boolean {

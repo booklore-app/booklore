@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, DestroyRef, inject, Input, OnChanges, OnInit, Optional, SimpleChanges, ViewChild} from '@angular/core';
 import {Button, ButtonDirective} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass} from '@angular/common';
 import {Observable} from 'rxjs';
@@ -9,16 +9,14 @@ import {Tag} from 'primeng/tag';
 import {Book, BookMetadata, BookRecommendation, ReadStatus} from '../../../model/book.model';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
-import {UserService} from '../../../../settings/user-management/user.service';
+import {User, UserService} from '../../../../settings/user-management/user.service';
 import {SplitButton} from 'primeng/splitbutton';
 import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {BookSenderComponent} from '../../../components/book-sender/book-sender.component';
-import {DialogService} from 'primeng/dynamicdialog';
+import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {EmailService} from '../../../../settings/email/email.service';
 import {ShelfAssignerComponent} from '../../../components/shelf-assigner/shelf-assigner.component';
 import {Tooltip} from 'primeng/tooltip';
-import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
-import {BookCardComponent} from '../../../components/book-browser/book-card/book-card.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Editor} from 'primeng/editor';
 import {ProgressBar} from 'primeng/progressbar';
@@ -29,13 +27,15 @@ import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-reque
 import {Router, RouterLink} from '@angular/router';
 import {filter, map, take} from 'rxjs/operators';
 import {Menu} from 'primeng/menu';
+import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
+import {BookCardLiteComponent} from '../../../components/book-card-lite/book-card-lite-component';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, InfiniteScrollDirective, BookCardComponent, ButtonDirective, Editor, ProgressBar, ToggleButton, RouterLink, Menu]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, ButtonDirective, Editor, ProgressBar, ToggleButton, RouterLink, Menu, InfiniteScrollDirective, BookCardLiteComponent]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 
@@ -54,6 +54,12 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
 
+  private dialogRef?: DynamicDialogRef;
+
+  constructor(@Optional() dialogRef?: DynamicDialogRef) {
+    this.dialogRef = dialogRef;
+  }
+
   emailMenuItems$!: Observable<MenuItem[]>;
   readMenuItems$!: Observable<MenuItem[]>;
   refreshMenuItems$!: Observable<MenuItem[]>;
@@ -63,6 +69,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   isExpanded = false;
   showFilePath = false;
   isAutoFetching = false;
+  private metadataCenterViewMode: 'route' | 'dialog' = 'route';
 
   readStatusOptions = [
     {label: 'Unread', value: ReadStatus.UNREAD},
@@ -145,7 +152,11 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
               accept: () => {
                 this.bookService.deleteBooks(new Set([book.id])).subscribe({
                   next: () => {
-                    this.router.navigate(['/dashboard']);
+                    if (this.metadataCenterViewMode === 'route') {
+                      this.router.navigate(['/dashboard']);
+                    } else {
+                      this.dialogRef?.close();
+                    }
                   },
                   error: () => {
                   }
@@ -156,6 +167,15 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
         }
       ])
     );
+
+    this.userService.userState$
+      .pipe(
+        filter(user => !!user),
+        take(1)
+      )
+      .subscribe(user => {
+        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode;
+      });
 
     this.book$
       .pipe(

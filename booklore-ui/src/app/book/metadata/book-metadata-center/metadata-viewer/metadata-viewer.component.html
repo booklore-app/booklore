@@ -349,12 +349,9 @@
                [horizontal]="true">
             @for (book of bookInSeries; track book) {
               <div class="dashboard-scroller-card">
-                <app-book-card
+                <app-book-card-lite-component
                   [book]="book"
-                  [isCheckboxEnabled]="false"
-                  [readButtonHidden]="true"
-                  [bottomBarHidden]="true">
-                </app-book-card>
+                ></app-book-card-lite-component>
               </div>
             }
           </div>
@@ -371,12 +368,9 @@
                [horizontal]="true">
             @for (book of recommendedBooks; track book) {
               <div class="dashboard-scroller-card">
-                <app-book-card
+                <app-book-card-lite-component
                   [book]="book.book"
-                  [isCheckboxEnabled]="false"
-                  [readButtonHidden]="true"
-                  [bottomBarHidden]="true">
-                </app-book-card>
+                ></app-book-card-lite-component>
               </div>
             }
           </div>
