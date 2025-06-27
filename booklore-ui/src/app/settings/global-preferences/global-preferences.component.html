@@ -45,42 +45,33 @@
     <p-divider></p-divider>
   </div>
 
-  <div class="flex flex-row gap-11 p-4">
-    <div>
-      <p class="text-lg pb-4 ">Auto Book Search
-        <i class="pi pi-info-circle text-sky-600"
-           pTooltip="Automatically attempts metadata matching when the book information panel is opened."
-           tooltipPosition="right"
-           style="cursor: pointer;">
-        </i>
-      </p>
-      <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
-        <p class=" py-1">Enable:</p>
-        <div class="flex gap-4 justify-start">
-          <p-toggleswitch
-            [(ngModel)]="toggles.autoBookSearch"
-            (onChange)="onToggleChange('autoBookSearch', $event.checked)"
-          />
-        </div>
-      </div>
+  <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+    <p class="text-lg pb-4">Auto Book Search
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Automatically attempts metadata matching when the book information panel is opened."
+         tooltipPosition="right"
+         style="cursor: pointer;">
+      </i>
+    </p>
+    <div class="flex gap-4 justify-start">
+      <p-toggleswitch
+        [(ngModel)]="toggles.autoBookSearch"
+        (onChange)="onToggleChange('autoBookSearch', $event.checked)"
+      />
     </div>
-    <div>
-      <p class="text-lg pb-4 ">Similar Book Recommendation
-        <i class="pi pi-info-circle text-sky-600"
-           pTooltip="Enables or disables similar book recommendations based on your library."
-           tooltipPosition="right"
-           style="cursor: pointer;">
-        </i>
-      </p>
-      <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
-        <p class=" py-1">Enable:</p>
-        <div class="flex gap-4 justify-start">
-          <p-toggleswitch
-            [(ngModel)]="toggles.similarBookRecommendation"
-            (onChange)="onToggleChange('similarBookRecommendation', $event.checked)"
-          />
-        </div>
-      </div>
+
+    <p class="text-lg pb-4">Similar Book Recommendation
+      <i class="pi pi-info-circle text-sky-600"
+         pTooltip="Enables or disables similar book recommendations based on your library."
+         tooltipPosition="right"
+         style="cursor: pointer;">
+      </i>
+    </p>
+    <div class="flex gap-2 justify-start">
+      <p-toggleswitch
+        [(ngModel)]="toggles.similarBookRecommendation"
+        (onChange)="onToggleChange('similarBookRecommendation', $event.checked)"
+      />
     </div>
   </div>
 

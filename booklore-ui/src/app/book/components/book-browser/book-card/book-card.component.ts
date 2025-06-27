@@ -6,7 +6,7 @@ import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {DialogService} from 'primeng/dynamicdialog';
 import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.component';
 import {BookService} from '../../../service/book.service';
-import {CheckboxModule} from 'primeng/checkbox';
+import {CheckboxChangeEvent, CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
@@ -87,22 +87,6 @@ export class BookCardComponent implements OnInit {
 
   readBook(book: Book): void {
     this.bookService.readBook(book.id);
-  }
-
-  toggleSelection(selected: boolean, event?: MouseEvent): void {
-    if (this.isCheckboxEnabled) {
-      this.isSelected = selected;
-      this.checkboxClick.emit({
-        index: this.index,
-        bookId: this.book.id,
-        selected,
-        shiftKey: !!event?.shiftKey,
-      });
-
-      if (this.onBookSelect) {
-        this.onBookSelect(this.book.id, selected);
-      }
-    }
   }
 
   private initMenu() {
@@ -327,5 +311,28 @@ export class BookCardComponent implements OnInit {
     const lockedKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
     if (lockedKeys.length === 0) return false;
     return lockedKeys.every(key => metadata[key] === true);
+  }
+
+  private lastMouseEvent: MouseEvent | null = null;
+
+  captureMouseEvent(event: MouseEvent): void {
+    this.lastMouseEvent = event;
+  }
+
+  toggleSelection(event: CheckboxChangeEvent): void {
+    if (this.isCheckboxEnabled) {
+      this.isSelected = event.checked;
+      const shiftKey = this.lastMouseEvent?.shiftKey ?? false;
+      this.checkboxClick.emit({
+        index: this.index,
+        bookId: this.book.id,
+        selected: event.checked,
+        shiftKey: shiftKey,
+      });
+      if (this.onBookSelect) {
+        this.onBookSelect(this.book.id, event.checked);
+      }
+      this.lastMouseEvent = null;
+    }
   }
 }
