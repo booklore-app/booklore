@@ -131,6 +131,10 @@ export class BookTableComponent implements OnInit, OnChanges {
     return genres?.join(', ') || '';
   }
 
+  trackByBookId(index: number, book: Book): number {
+    return book.id;
+  }
+
   isMetadataFullyLocked(metadata: BookMetadata): boolean {
     const lockedKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
     if (lockedKeys.length === 0) return false;
