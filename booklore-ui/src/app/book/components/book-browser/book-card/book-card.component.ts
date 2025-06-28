@@ -283,7 +283,7 @@ export class BookCardComponent implements OnInit, OnDestroy {
       });
     } else {
       this.dialogService.open(BookMetadataCenterComponent, {
-        width: '95%',
+        width: '85%',
         data: {bookId: book.id},
         modal: true,
         dismissableMask: true,

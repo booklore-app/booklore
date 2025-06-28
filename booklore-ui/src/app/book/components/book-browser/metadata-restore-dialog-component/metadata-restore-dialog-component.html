@@ -26,8 +26,8 @@
             @if (backupMetadata.subtitle) {
               <div><strong>Subtitle:</strong> {{ backupMetadata.subtitle }}</div>
             }
-            @if (backupMetadata.authors.length) {
-              <div><strong>Authors:</strong> {{ backupMetadata.authors.join(', ') }}</div>
+            @if (backupMetadata.authors!.length) {
+              <div><strong>Authors:</strong> {{ backupMetadata.authors!.join(', ') }}</div>
             }
             @if (backupMetadata.publisher) {
               <div><strong>Publisher:</strong> {{ backupMetadata.publisher }}</div>

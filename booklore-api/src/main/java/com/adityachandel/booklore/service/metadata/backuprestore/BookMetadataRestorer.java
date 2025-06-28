@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service.metadata.backuprestore;
 
+import com.adityachandel.booklore.model.MetadataClearFlags;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;
@@ -106,7 +107,7 @@ public class BookMetadataRestorer {
                 metadataWriterFactory.getWriter(bookEntity.getBookType()).ifPresent(writer -> {
                     try {
                         File file = new File(bookEntity.getFullFilePath().toUri());
-                        writer.writeMetadataToFile(file, metadata, coverPath, true);
+                        writer.writeMetadataToFile(file, metadata, coverPath, true, new MetadataClearFlags());
                         log.info("Embedded metadata written to file for book ID {}", bookEntity.getId());
                     } catch (Exception e) {
                         log.warn("Failed to write metadata to file for book ID {}: {}", bookEntity.getId(), e.getMessage());

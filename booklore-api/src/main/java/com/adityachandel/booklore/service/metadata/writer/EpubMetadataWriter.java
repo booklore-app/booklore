@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service.metadata.writer;
 
+import com.adityachandel.booklore.model.MetadataClearFlags;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
@@ -42,7 +43,7 @@ public class EpubMetadataWriter implements MetadataWriter {
     private static final String OPF_NS = "http://www.idpf.org/2007/opf";
 
     @Override
-    public void writeMetadataToFile(File epubFile, BookMetadataEntity metadata, String thumbnailUrl, boolean restoreMode) {
+    public void writeMetadataToFile(File epubFile, BookMetadataEntity metadata, String thumbnailUrl, boolean restoreMode, MetadataClearFlags clear) {
         Path tempDir;
         try {
             tempDir = Files.createTempDirectory("epub_edit_" + UUID.randomUUID());
@@ -65,144 +66,81 @@ public class EpubMetadataWriter implements MetadataWriter {
             final String DC_NS = "http://purl.org/dc/elements/1.1/";
 
             boolean[] hasChanges = {false};
-
             MetadataCopyHelper helper = new MetadataCopyHelper(metadata);
 
-            helper.copyTitle(restoreMode, val -> {
-                if (replaceElementText(opfDoc, metadataElement, "title", DC_NS, val, restoreMode)) {
-                    hasChanges[0] = true;
-                }
-            });
-            helper.copyDescription(restoreMode, val -> {
-                if (replaceElementText(opfDoc, metadataElement, "description", DC_NS, val, restoreMode)) {
-                    hasChanges[0] = true;
-                }
-            });
-            helper.copyPublisher(restoreMode, val -> {
-                if (replaceElementText(opfDoc, metadataElement, "publisher", DC_NS, val, restoreMode)) {
-                    hasChanges[0] = true;
-                }
-            });
-            helper.copyPublishedDate(restoreMode, val -> {
-                if (replaceElementText(opfDoc, metadataElement, "date", DC_NS, val != null ? val.toString() : null, restoreMode)) {
-                    hasChanges[0] = true;
-                }
-            });
-            helper.copyLanguage(restoreMode, val -> {
-                if (replaceElementText(opfDoc, metadataElement, "language", DC_NS, val, restoreMode)) {
-                    hasChanges[0] = true;
-                }
-            });
+            helper.copyTitle(restoreMode, clear != null && clear.isTitle(), val -> replaceAndTrackChange(opfDoc, metadataElement, "title", DC_NS, val, hasChanges));
+            helper.copyDescription(restoreMode, clear != null && clear.isDescription(), val -> replaceAndTrackChange(opfDoc, metadataElement, "description", DC_NS, val, hasChanges));
+            helper.copyPublisher(restoreMode, clear != null && clear.isPublisher(), val -> replaceAndTrackChange(opfDoc, metadataElement, "publisher", DC_NS, val, hasChanges));
+            helper.copyPublishedDate(restoreMode, clear != null && clear.isPublishedDate(), val -> replaceAndTrackChange(opfDoc, metadataElement, "date", DC_NS, val != null ? val.toString() : null, hasChanges));
+            helper.copyLanguage(restoreMode, clear != null && clear.isLanguage(), val -> replaceAndTrackChange(opfDoc, metadataElement, "language", DC_NS, val, hasChanges));
 
-            helper.copyAuthors(names -> {
-                NodeList creators = metadataElement.getElementsByTagNameNS(DC_NS, "creator");
-                List<String> existingAuthors = new ArrayList<>();
-                for (int i = 0; i < creators.getLength(); i++) {
-                    existingAuthors.add(creators.item(i).getTextContent().trim());
-                }
-
-                List<String> newAuthors = names == null ? List.of() : names.stream().map(String::trim).toList();
-
-                boolean shouldReplace = restoreMode || !existingAuthors.equals(newAuthors);
-                if (shouldReplace) {
-                    removeElementsByTagNameNS(metadataElement, DC_NS, "creator");
-                    for (String name : newAuthors) {
+            helper.copyAuthors(restoreMode, clear != null && clear.isAuthors(), names -> {
+                removeElementsByTagNameNS(metadataElement, DC_NS, "creator");
+                if (names != null) {
+                    for (String name : names) {
                         String[] parts = name.split(" ", 2);
                         String first = parts.length > 1 ? parts[0] : "";
                         String last = parts.length > 1 ? parts[1] : parts[0];
                         String fileAs = last + ", " + first;
                         metadataElement.appendChild(createCreatorElement(opfDoc, name, fileAs, "aut"));
                     }
-                    hasChanges[0] = true;
-                }
-            });
-
-            helper.copyCategories(categories -> {
-                NodeList subjects = metadataElement.getElementsByTagNameNS(DC_NS, "subject");
-                List<String> newCategories;
-                if (restoreMode) {
-                    newCategories = (categories == null) ? List.of() : categories.stream().map(String::trim).distinct().toList();
-                } else {
-                    List<String> existingCategories = new ArrayList<>();
-                    for (int i = 0; i < subjects.getLength(); i++) {
-                        existingCategories.add(subjects.item(i).getTextContent().trim());
-                    }
-                    newCategories = (categories == null) ? List.of() : categories.stream().map(String::trim).distinct().toList();
-                    if (existingCategories.equals(newCategories)) return;
-                }
-
-                removeElementsByTagNameNS(metadataElement, DC_NS, "subject");
-                for (String cat : newCategories) {
-                    metadataElement.appendChild(createSubjectElement(opfDoc, cat));
                 }
                 hasChanges[0] = true;
             });
 
-            helper.copySeriesName(restoreMode, val -> {
-                if (val == null && restoreMode) {
-                    removeMetaByName(metadataElement, "calibre:series");
-                    hasChanges[0] = true;
-                } else {
-                    String existing = getMetaContentByName(metadataElement, "calibre:series");
-                    if (!Objects.equals(existing, val)) {
-                        removeMetaByName(metadataElement, "calibre:series");
-                        if (val != null) metadataElement.appendChild(createMetaElement(opfDoc, "calibre:series", val));
-                        hasChanges[0] = true;
+            helper.copyCategories(restoreMode, clear != null && clear.isCategories(), categories -> {
+                removeElementsByTagNameNS(metadataElement, DC_NS, "subject");
+                if (categories != null) {
+                    for (String cat : categories.stream().map(String::trim).distinct().toList()) {
+                        metadataElement.appendChild(createSubjectElement(opfDoc, cat));
                     }
                 }
+                hasChanges[0] = true;
             });
 
-            helper.copySeriesNumber(restoreMode, val -> {
-                String formatted = val != null ? String.format("%.1f", val) : null;
-                if (formatted == null && restoreMode) {
-                    removeMetaByName(metadataElement, "calibre:series_index");
-                    hasChanges[0] = true;
-                } else {
-                    String existing = getMetaContentByName(metadataElement, "calibre:series_index");
-                    if (!Objects.equals(existing, formatted)) {
-                        removeMetaByName(metadataElement, "calibre:series_index");
-                        if (formatted != null) metadataElement.appendChild(createMetaElement(opfDoc, "calibre:series_index", formatted));
-                        hasChanges[0] = true;
-                    }
-                }
+            helper.copySeriesName(restoreMode, clear != null && clear.isSeriesName(), val -> {
+                replaceMetaElement(metadataElement, opfDoc, "calibre:series", val, hasChanges);
             });
 
-            helper.copyPersonalRating(restoreMode, val -> {
+            helper.copySeriesNumber(restoreMode, clear != null && clear.isSeriesNumber(), val -> {
                 String formatted = val != null ? String.format("%.1f", val) : null;
-                if (formatted == null && restoreMode) {
-                    removeMetaByName(metadataElement, "calibre:rating");
-                    hasChanges[0] = true;
-                } else {
-                    String existing = getMetaContentByName(metadataElement, "calibre:rating");
-                    if (!Objects.equals(existing, formatted)) {
-                        removeMetaByName(metadataElement, "calibre:rating");
-                        if (formatted != null) metadataElement.appendChild(createMetaElement(opfDoc, "calibre:rating", formatted));
-                        hasChanges[0] = true;
-                    }
-                }
+                replaceMetaElement(metadataElement, opfDoc, "calibre:series_index", formatted, hasChanges);
+            });
+
+            helper.copyPersonalRating(restoreMode, clear != null && clear.isPersonalRating(), val -> {
+                String formatted = val != null ? String.format("%.1f", val) : null;
+                replaceMetaElement(metadataElement, opfDoc, "calibre:rating", formatted, hasChanges);
             });
 
             List<String> schemes = List.of("AMAZON", "GOOGLE", "GOODREADS", "HARDCOVER", "ISBN");
+
             for (String scheme : schemes) {
-                String idValue = switch (scheme) {
-                    case "AMAZON" -> metadata.getAsin();
-                    case "GOOGLE" -> metadata.getGoogleId();
-                    case "GOODREADS" -> metadata.getGoodreadsId();
-                    case "HARDCOVER" -> metadata.getHardcoverId();
-                    case "ISBN" -> metadata.getIsbn10();
-                    default -> null;
+
+                boolean clearFlag = clear != null && switch (scheme) {
+                    case "AMAZON" -> clear.isAsin();
+                    case "GOOGLE" -> clear.isGoogleId();
+                    case "GOODREADS" -> clear.isGoodreadsId();
+                    case "HARDCOVER" -> clear.isHardcoverId();
+                    case "ISBN" -> clear.isIsbn10();
+                    default -> false;
                 };
 
-                if (idValue == null && restoreMode) {
-                    removeIdentifierByScheme(metadataElement, scheme);
-                    hasChanges[0] = true;
-                } else {
-                    String existing = getIdentifierByScheme(metadataElement, scheme);
-                    if (!Objects.equals(existing, idValue)) {
-                        removeIdentifierByScheme(metadataElement, scheme);
-                        if (idValue != null) metadataElement.appendChild(createIdentifierElement(opfDoc, scheme, idValue));
-                        hasChanges[0] = true;
-                    }
+                switch (scheme) {
+                    case "AMAZON" -> helper.copyAsin(restoreMode, clearFlag, idValue -> {
+                        updateIdentifier(metadataElement, opfDoc, scheme, idValue, hasChanges);
+                    });
+                    case "GOOGLE" -> helper.copyGoogleId(restoreMode, clearFlag, idValue -> {
+                        updateIdentifier(metadataElement, opfDoc, scheme, idValue, hasChanges);
+                    });
+                    case "GOODREADS" -> helper.copyGoodreadsId(restoreMode, clearFlag, idValue -> {
+                        updateIdentifier(metadataElement, opfDoc, scheme, idValue, hasChanges);
+                    });
+                    case "HARDCOVER" -> helper.copyHardcoverId(restoreMode, clearFlag, idValue -> {
+                        updateIdentifier(metadataElement, opfDoc, scheme, idValue, hasChanges);
+                    });
+                    case "ISBN" -> helper.copyIsbn13(restoreMode, clearFlag, idValue -> {
+                        updateIdentifier(metadataElement, opfDoc, scheme, idValue, hasChanges);
+                    });
                 }
             }
 
@@ -213,7 +151,7 @@ public class EpubMetadataWriter implements MetadataWriter {
                     hasChanges[0] = true;
                 }
             }
-
+            
             if (hasChanges[0]) {
                 Transformer transformer = TransformerFactory.newInstance().newTransformer();
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -236,6 +174,26 @@ public class EpubMetadataWriter implements MetadataWriter {
         }
     }
 
+    private void updateIdentifier(Element metadataElement, Document opfDoc, String scheme, String idValue, boolean[] hasChanges) {
+        removeIdentifierByScheme(metadataElement, scheme);
+        if (idValue != null && !idValue.isBlank()) {
+            metadataElement.appendChild(createIdentifierElement(opfDoc, scheme, idValue));
+        }
+        hasChanges[0] = true;
+    }
+
+    private void replaceAndTrackChange(Document doc, Element parent, String tag, String ns, String val, boolean[] flag) {
+        if (replaceElementText(doc, parent, tag, ns, val, false)) flag[0] = true;
+    }
+
+    private void replaceMetaElement(Element metadataElement, Document doc, String name, String newVal, boolean[] flag) {
+        String existing = getMetaContentByName(metadataElement, name);
+        if (!Objects.equals(existing, newVal)) {
+            removeMetaByName(metadataElement, name);
+            if (newVal != null) metadataElement.appendChild(createMetaElement(doc, name, newVal));
+            flag[0] = true;
+        }
+    }
 
     private boolean replaceElementText(Document doc, Element parent, String tagName, String namespaceURI, String newValue, boolean restoreMode) {
         NodeList nodes = parent.getElementsByTagNameNS(namespaceURI, tagName);
