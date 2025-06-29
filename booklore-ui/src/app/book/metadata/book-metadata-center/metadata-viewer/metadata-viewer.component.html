@@ -29,8 +29,13 @@
           <div class="pl-6 flex flex-col">
             <div class="flex flex-row items-center justify-between">
               <div>
-                @if (book?.metadata!.seriesName) {
-                  <p class="italic">{{ book?.metadata!.seriesName }} #{{ book?.metadata!.seriesNumber }}</p>
+                @if (book?.metadata?.seriesName) {
+                  <p class="underline hover:opacity-80 cursor-pointer" (click)="goToSeries(book?.metadata?.seriesName!)">
+                    {{ book?.metadata?.seriesName }}
+                    @if (book?.metadata?.seriesNumber) {
+                      #{{ book?.metadata?.seriesNumber }}
+                    }
+                  </p>
                 }
                 <div class="flex items-center gap-2">
                   <p class="text-2xl font-bold m-0">{{ book?.metadata!.title }}</p>
@@ -163,7 +168,16 @@
                   <p-menu #menu [popup]="true" [model]="readStatusMenuItems"></p-menu>
                 </p>
               </div>
-              <p class="whitespace-nowrap max-w-[250px] overflow-hidden text-ellipsis"><span class="font-bold">Publisher:</span> {{ book?.metadata!.publisher || '-' }}</p>
+              <p class="whitespace-nowrap max-w-[250px] overflow-hidden text-ellipsis">
+                <span class="font-bold">Publisher: </span>
+                @if (book?.metadata?.publisher) {
+                  <span class="underline hover:opacity-80 cursor-pointer" (click)="goToPublisher(book?.metadata?.publisher!)">
+                    {{ book?.metadata?.publisher }}
+                  </span>
+                } @else {
+                  <span>-</span>
+                }
+              </p>
               <p class="whitespace-nowrap"><span class="font-bold">Published:</span> {{ book?.metadata!.publishedDate || '-' }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">Language:</span> {{ book?.metadata!.language || '-' }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">ISBN 10:</span> {{ book?.metadata!.isbn10 || '-' }}</p>
@@ -311,12 +325,12 @@
       @if (book.metadata!.description && book.metadata!.description.length > 100) {
         <div class="text-left">
           <button pButton
-            type="button"
-            [label]="isExpanded ? 'Show less' : 'Show more'"
-            [icon]="isExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-            iconPos="right"
-            class="p-button-text p-button-sm"
-            (click)="toggleExpand()">
+                  type="button"
+                  [label]="isExpanded ? 'Show less' : 'Show more'"
+                  [icon]="isExpanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                  iconPos="right"
+                  class="p-button-text p-button-sm"
+                  (click)="toggleExpand()">
           </button>
         </div>
       }
