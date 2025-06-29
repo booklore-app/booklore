@@ -15,21 +15,22 @@ export class OidcCallbackComponent implements OnInit {
   private authService = inject(AuthService);
 
   ngOnInit(): void {
-    this.oAuthService.loadDiscoveryDocumentAndTryLogin().then(() => {
+    /*this.oAuthService.tryLoginCodeFlow().then(info => {
       if (this.oAuthService.hasValidAccessToken()) {
-        this.authService.saveOidcTokens(
-          this.oAuthService.getAccessToken(),
-          this.oAuthService.getRefreshToken()
-        );
+        const accessToken = this.oAuthService.getAccessToken();
+        const refreshToken = this.oAuthService.getRefreshToken();
+        this.authService.saveOidcTokens(accessToken, refreshToken ?? '');
+
         this.authService.getRxStompService().activate();
+        this.oAuthService.setupAutomaticSilentRefresh();
         this.router.navigate(['/dashboard']);
       } else {
-        console.error('Login failed or no valid tokens');
+        console.error('OIDC code exchange failed');
         this.router.navigate(['/login']);
       }
     }).catch(err => {
-      console.error('OIDC error during login:', err);
+      console.error('OIDC error:', err);
       this.router.navigate(['/login']);
-    });
+    });*/
   }
 }

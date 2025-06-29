@@ -4,6 +4,9 @@ import {Observable, tap} from 'rxjs';
 import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {API_CONFIG} from '../../config/api-config';
 import {createRxStompConfig} from '../../shared/websocket/rx-stomp.config';
+import {OAuthService} from 'angular-oauth2-oidc';
+import {AppSettingsService} from './app-settings.service';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +18,8 @@ export class AuthService {
 
   private http = inject(HttpClient);
   private injector = inject(Injector);
+  private oAuthService = inject(OAuthService);
+  private router = inject(Router);
 
   internalLogin(credentials: { username: string; password: string }): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
     return this.http.post<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/login`, credentials).pipe(
@@ -54,17 +59,12 @@ export class AuthService {
     localStorage.setItem('refreshToken_Internal', refreshToken);
   }
 
-  saveOidcTokens(accessToken: string, refreshToken: string): void {
-    localStorage.setItem('accessToken_OIDC', accessToken);
-    localStorage.setItem('refreshToken_OIDC', refreshToken);
-  }
-
   getInternalAccessToken(): string | null {
     return localStorage.getItem('accessToken_Internal');
   }
 
   getOidcAccessToken(): string | null {
-    return localStorage.getItem('accessToken_OIDC');
+    return this.oAuthService.getIdToken();
   }
 
   getInternalRefreshToken(): string | null {
@@ -74,9 +74,12 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('accessToken_Internal');
     localStorage.removeItem('refreshToken_Internal');
-    localStorage.removeItem('accessToken_OIDC');
-    localStorage.removeItem('refreshToken_OIDC');
     this.getRxStompService().deactivate();
+    if (this.oAuthService.clientId) {
+      this.oAuthService.logOut();
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 
   getRxStompService(): RxStompService {

@@ -10,18 +10,7 @@ import com.adityachandel.booklore.model.entity.UserPermissionsEntity;
 import com.adityachandel.booklore.repository.UserRepository;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.user.UserProvisioningService;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.source.DefaultJWKSetCache;
-import com.nimbusds.jose.jwk.source.JWKSetCache;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.jwk.source.RemoteJWKSet;
-import com.nimbusds.jose.proc.JWSKeySelector;
-import com.nimbusds.jose.proc.JWSVerificationKeySelector;
-import com.nimbusds.jose.proc.SecurityContext;
-import com.nimbusds.jose.util.DefaultResourceRetriever;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,14 +26,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Slf4j
 @Component
@@ -56,6 +42,9 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final AppSettingService appSettingService;
     private final UserProvisioningService userProvisioningService;
+    private static final ConcurrentMap<String, Object> userLocks = new ConcurrentHashMap<>();
+    private final DynamicOidcJwtProcessor dynamicOidcJwtProcessor;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -103,50 +92,41 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
     private void authenticateOidcUser(String token, HttpServletRequest request) {
         try {
             OidcProviderDetails providerDetails = appSettingService.getAppSettings().getOidcProviderDetails();
-            String jwksUrl = providerDetails.getJwksUrl();
-            if (jwksUrl == null || jwksUrl.isEmpty()) {
-                log.error("JWKS URL is not configured.");
-                throw ApiError.UNAUTHORIZED.createException("JWKS URL is not configured.");
-            }
+            JWTClaimsSet claimsSet = dynamicOidcJwtProcessor.getProcessor().process(token, null);
 
-            List<String> defaultOidcUserPermissions = appSettingService.getAppSettings().getOidcAutoProvisionDetails().getDefaultPermissions();
-            OidcProviderDetails.ClaimMapping claimMapping = providerDetails.getClaimMapping();
-            URL jwksURL = new URI(jwksUrl).toURL();
-
-            DefaultResourceRetriever resourceRetriever = new DefaultResourceRetriever(2000, 2000);
-            Duration ttl = Duration.ofHours(6);
-            Duration refresh = Duration.ofHours(1);
-            JWKSetCache jwkSetCache = new DefaultJWKSetCache(ttl.toMillis(), refresh.toMillis(), TimeUnit.MILLISECONDS);
-            JWKSource<SecurityContext> jwkSource = new RemoteJWKSet<>(jwksURL, resourceRetriever, jwkSetCache);
-
-            ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
-            JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, jwkSource);
-            jwtProcessor.setJWSKeySelector(keySelector);
-
-            JWTClaimsSet claimsSet = jwtProcessor.process(token, null);
             Date expirationTime = claimsSet.getExpirationTime();
             if (expirationTime == null || expirationTime.before(new Date())) {
                 log.warn("OIDC token is expired or missing exp claim");
                 throw ApiError.UNAUTHORIZED.createException("Token has expired or is invalid.");
             }
 
+            OidcProviderDetails.ClaimMapping claimMapping = providerDetails.getClaimMapping();
             String username = claimsSet.getStringClaim(claimMapping.getUsername());
             String email = claimsSet.getStringClaim(claimMapping.getEmail());
             String name = claimsSet.getStringClaim(claimMapping.getName());
 
-            boolean autoProvisionOidcUsers = appSettingService.getAppSettings().getOidcAutoProvisionDetails().isEnableAutoProvisioning();
-            OidcAutoProvisionDetails oidcAutoProvisionDetails = appSettingService.getAppSettings().getOidcAutoProvisionDetails();
+            OidcAutoProvisionDetails provisionDetails = appSettingService.getAppSettings().getOidcAutoProvisionDetails();
+            boolean autoProvision = provisionDetails != null && provisionDetails.isEnableAutoProvisioning();
 
-            Optional<BookLoreUserEntity> userOpt = userRepository.findByUsername(username);
-            if (userOpt.isEmpty()) {
-                if (!autoProvisionOidcUsers) {
-                    log.warn("User '{}' not found and auto-provisioning is disabled", username);
-                    throw ApiError.UNAUTHORIZED.createException("User not found and auto-provisioning is disabled.");
-                }
-                log.info("Provisioning new OIDC user '{}'", username);
-            }
-
-            BookLoreUserEntity entity = userOpt.orElseGet(() -> userProvisioningService.provisionOidcUser(username, email, name, oidcAutoProvisionDetails));
+            BookLoreUserEntity entity = userRepository.findByUsername(username)
+                    .orElseGet(() -> {
+                        if (!autoProvision) {
+                            log.warn("User '{}' not found and auto-provisioning is disabled.", username);
+                            throw ApiError.UNAUTHORIZED.createException("User not found and auto-provisioning is disabled.");
+                        }
+                        Object lock = userLocks.computeIfAbsent(username, k -> new Object());
+                        try {
+                            synchronized (lock) {
+                                return userRepository.findByUsername(username)
+                                        .orElseGet(() -> {
+                                            log.info("Provisioning new OIDC user '{}'", username);
+                                            return userProvisioningService.provisionOidcUser(username, email, name, provisionDetails);
+                                        });
+                            }
+                        } finally {
+                            userLocks.remove(username);
+                        }
+                    });
 
             BookLoreUser user = bookLoreUserTransformer.toDTO(entity);
             List<GrantedAuthority> authorities = getAuthorities(entity.getPermissions());

@@ -7,6 +7,7 @@ import {parseLogNotification} from './shared/websocket/model/log-notification.mo
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {Toast} from 'primeng/toast';
 import {RouterOutlet} from '@angular/router';
+import {AuthInitializationService} from './auth-initialization-service';
 
 @Component({
   selector: 'app-root',
@@ -17,11 +18,17 @@ import {RouterOutlet} from '@angular/router';
 })
 export class AppComponent implements OnInit {
 
+  loading = true;
+  private authInit = inject(AuthInitializationService);
   private bookService = inject(BookService);
   private rxStompService = inject(RxStompService);
   private eventService = inject(EventService);
 
   ngOnInit(): void {
+
+    this.authInit.initialized$.subscribe(ready => {
+      this.loading = !ready;
+    });
 
     this.rxStompService.watch('/topic/book-add').subscribe((message: Message) => {
       this.bookService.handleNewlyCreatedBook(JSON.parse(message.body));

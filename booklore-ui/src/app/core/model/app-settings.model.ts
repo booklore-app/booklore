@@ -28,7 +28,6 @@ export interface OidcProviderDetails {
   providerName: string;
   clientId: string;
   issuerUri: string;
-  jwksUrl: string;
   claimMapping: {
     username: string;
     email: string;

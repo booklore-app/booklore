@@ -7,7 +7,6 @@ public class OidcProviderDetails {
     private String providerName;
     private String clientId;
     private String issuerUri;
-    private String jwksUrl;
     private ClaimMapping claimMapping;
 
     @Data

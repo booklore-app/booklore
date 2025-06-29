@@ -30,7 +30,7 @@ import {LibraryService} from '../../../book/service/library.service';
     Button,
     MultiSelect,
     ReactiveFormsModule
-],
+  ],
   styleUrls: ['./authentication-settings.component.scss']
 })
 export class AuthenticationSettingsComponent implements OnInit {
@@ -52,7 +52,6 @@ export class AuthenticationSettingsComponent implements OnInit {
     providerName: '',
     clientId: '',
     issuerUri: '',
-    jwksUrl: '',
     claimMapping: {
       username: '',
       email: '',
@@ -98,7 +97,6 @@ export class AuthenticationSettingsComponent implements OnInit {
       providerName: settings.oidcProviderDetails?.providerName || '',
       clientId: settings.oidcProviderDetails?.clientId || '',
       issuerUri: settings.oidcProviderDetails?.issuerUri || '',
-      jwksUrl: settings.oidcProviderDetails?.jwksUrl || '',
       claimMapping: settings.oidcProviderDetails?.claimMapping || defaultClaimMapping
     };
 
@@ -110,51 +108,6 @@ export class AuthenticationSettingsComponent implements OnInit {
   isOidcFormComplete(): boolean {
     const p = this.oidcProvider;
     return !!(p.providerName && p.clientId && p.issuerUri && p.claimMapping.name && p.claimMapping.email && p.claimMapping.username);
-  }
-
-  saveAutoProvision(): void {
-    const payload = [
-      {key: 'auto_provision_oidc_users', newValue: this.autoUserProvisioningEnabled}
-    ];
-    this.appSettingsService.saveSettings(payload).subscribe({
-      next: () => this.messageService.add({
-        severity: 'success',
-        summary: 'Saved',
-        detail: 'Auto-provision setting saved.'
-      }),
-      error: () => this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to save auto-provision setting.'
-      })
-    });
-  }
-
-  onPermissionToggle(): void {
-    this.selectedPermissions = [
-      'permissionRead',
-      ...this.availablePermissions.filter(p => p.selected).map(p => p.value)
-    ];
-
-    const payload = [
-      {
-        key: 'default_oidc_user_permissions',
-        newValue: this.selectedPermissions
-      }
-    ];
-
-    this.appSettingsService.saveSettings(payload).subscribe({
-      next: () => this.messageService.add({
-        severity: 'success',
-        summary: 'Saved',
-        detail: 'Default permissions updated.'
-      }),
-      error: () => this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to update default permissions.'
-      })
-    });
   }
 
   toggleOidcEnabled(): void {
@@ -200,8 +153,7 @@ export class AuthenticationSettingsComponent implements OnInit {
     });
   }
 
-
-  saveAutoProvisioningSettings(): void {
+  saveOidcAutoProvisionSettings(): void {
     const provisionDetails = {
       enableAutoProvisioning: this.autoUserProvisioningEnabled,
       defaultPermissions: [

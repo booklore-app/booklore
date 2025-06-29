@@ -44,8 +44,7 @@ public class DefaultSettingInitializer {
     }
 
     private void addSettingIfMissing(BookLoreUserEntity user, UserSettingKey key, Object value) {
-        boolean exists = user.getSettings().stream()
-                .anyMatch(s -> s.getSettingKey().equals(key.getDbKey()));
+        boolean exists = user.getSettings().stream().anyMatch(s -> s.getSettingKey().equals(key.getDbKey()));
         if (!exists) {
             try {
                 String serializedValue = key.isJson()

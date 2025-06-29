@@ -77,6 +77,6 @@ export class LoginComponent implements OnInit {
   }
 
   loginWithOidc(): void {
-    this.oAuthService.initImplicitFlow();
+    this.oAuthService.initCodeFlow();
   }
 }
