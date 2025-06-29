@@ -1,5 +1,5 @@
 import {CommonModule, isPlatformBrowser} from '@angular/common';
-import {Component, computed, inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {Component, computed, effect, inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {$t, updatePreset, updateSurfacePalette} from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
@@ -9,6 +9,7 @@ import {InputSwitchModule} from 'primeng/inputswitch';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {AppConfigService} from '../../../core/service/app-config.service';
+import {FaviconService} from './favicon-service';
 
 type ColorPalette = Record<string, string>;
 
@@ -30,6 +31,7 @@ export class ThemeConfiguratorComponent implements OnInit {
   readonly config = inject(PrimeNG);
   readonly configService = inject(AppConfigService);
   readonly platformId = inject(PLATFORM_ID);
+  readonly faviconService = inject(FaviconService);
 
   readonly surfaces: Palette[] = [
     {
@@ -172,11 +174,21 @@ export class ThemeConfiguratorComponent implements OnInit {
 
   readonly selectedPrimaryColor = computed(() => this.configService.appState().primary);
   readonly selectedSurfaceColor = computed(() => this.configService.appState().surface);
+  readonly faviconColor = computed(() => {
+    const name = this.selectedPrimaryColor() ?? 'green';
+    const presetPalette = (Aura.primitive ?? {}) as Record<string, ColorPalette>;
+    const colorPalette = presetPalette[name];
+    return colorPalette?.[500] ?? name;
+  });
+
+  private readonly _faviconSyncEffect = effect(() => {
+    this.faviconService.updateFavicon(this.faviconColor());
+  });
 
   readonly primaryColors = computed<Palette[]>(() => {
     const presetPalette = (Aura.primitive ?? {}) as Record<string, ColorPalette>;
     const colors = ['emerald', 'green', 'lime', 'orange', 'amber', 'yellow', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
-    return [{ name: 'noir', palette: {} }].concat(
+    return [{name: 'noir', palette: {}}].concat(
       colors.map(name => ({
         name,
         palette: presetPalette[name] ?? {}
@@ -198,7 +210,7 @@ export class ThemeConfiguratorComponent implements OnInit {
     if (color.name === 'noir') {
       return {
         semantic: {
-          primary: { ...(surface?.palette ?? {}) },
+          primary: {...(surface?.palette ?? {})},
           colorScheme: {
             dark: {
               primary: {
@@ -262,6 +274,6 @@ export class ThemeConfiguratorComponent implements OnInit {
   onPresetChange(): void {
     const surface = this.surfaces.find(s => s.name === this.selectedSurfaceColor());
     const surfacePalette = surface?.palette ?? {};
-    $t().preset(Aura).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
+    $t().preset(Aura).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({useDefaultOptions: true});
   }
 }
