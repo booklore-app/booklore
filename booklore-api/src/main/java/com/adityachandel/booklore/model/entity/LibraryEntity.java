@@ -37,5 +37,4 @@ public class LibraryEntity {
     private boolean watch;
 
     private String icon;
-
 }
