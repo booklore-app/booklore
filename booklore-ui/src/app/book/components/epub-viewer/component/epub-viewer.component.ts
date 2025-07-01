@@ -131,7 +131,6 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
               body: {
                 ...baseTheme.body,
                 ...(this.selectedFontType ? {'font-family': this.selectedFontType} : {}),
-                ...(this.fontSize != null ? {'font-size': `${this.fontSize}%`} : {}),
                 ...(this.lineHeight != null ? {'line-height': this.lineHeight} : {}),
                 ...(this.letterSpacing != null ? {'letter-spacing': `${this.letterSpacing}em`} : {}),
               },
@@ -142,6 +141,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
               },
             };
 
+            this.rendition.themes.override('font-size', `${this.fontSize}%`);
             this.rendition.themes.register('custom', combinedTheme);
             this.rendition.themes.select('custom');
 
@@ -214,7 +214,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
 
   updateFontSize(): void {
     if (this.rendition) {
-      this.rendition.themes.fontSize(`${this.fontSize}%`);
+      this.rendition.themes.override('font-size', `${this.fontSize}%`);
       this.updateViewerSetting();
     }
   }
