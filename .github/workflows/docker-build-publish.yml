@@ -127,6 +127,7 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
+            --build-arg APP_VERSION=${{ env.new_tag }} \
             --tag ghcr.io/${{ github.actor }}/booklore-app:latest \
             --push .
 
