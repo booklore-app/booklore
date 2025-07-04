@@ -42,6 +42,11 @@ export class AppComponent implements OnInit {
       this.bookService.handleBookUpdate(JSON.parse(message.body));
     });
 
+    this.rxStompService.watch('/topic/book-metadata-batch-update').subscribe((message: Message) => {
+      const updatedBooks = JSON.parse(message.body);
+      this.bookService.handleMultipleBookUpdates(updatedBooks);
+    });
+
     this.rxStompService.watch('/topic/log').subscribe((message: Message) => {
       const logNotification = parseLogNotification(message.body);
       this.eventService.handleIncomingLog(logNotification);

@@ -9,6 +9,7 @@ import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
 import com.adityachandel.booklore.mapper.BookMapper;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -93,43 +94,25 @@ public class FileProcessingUtils {
         log.info("Deleted {} book covers", bookIds.size());
     }
 
-    public Optional<Book> checkForDuplicateAndUpdateMetadataIfNeeded(
-            LibraryFile libraryFile,
-            String hash,
-            boolean forceProcess,
-            BookRepository bookRepository,
-            BookMapper bookMapper
-    ) {
+    @Transactional
+    public Optional<Book> checkForDuplicateAndUpdateMetadataIfNeeded(LibraryFile libraryFile, String hash, boolean forceProcess, BookRepository bookRepository, BookMapper bookMapper) {
         if (StringUtils.isBlank(hash)) {
             log.warn("Skipping file due to missing hash: {}", libraryFile.getFullPath());
             return Optional.empty();
         }
-
         Optional<BookEntity> existingByHash = bookRepository.findByCurrentHash(hash);
         if (existingByHash.isPresent() && !forceProcess) {
             BookEntity book = existingByHash.get();
-
-            boolean changed = false;
             String fileName = libraryFile.getFullPath().getFileName().toString();
-
             if (!book.getFileName().equals(fileName)) {
                 book.setFileName(fileName);
-                changed = true;
             }
-
             if (!Objects.equals(book.getLibraryPath().getId(), libraryFile.getLibraryPathEntity().getId())) {
                 book.setLibraryPath(libraryFile.getLibraryPathEntity());
                 book.setFileSubPath(libraryFile.getFileSubPath());
-                changed = true;
             }
-
-            if (changed) {
-                bookRepository.save(book);
-            }
-
             return Optional.of(bookMapper.toBook(book));
         }
-
         return Optional.empty();
     }
 

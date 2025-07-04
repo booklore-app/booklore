@@ -26,12 +26,7 @@ public abstract class AbstractFileProcessor implements FileProcessor {
     protected final BookMetadataRepository bookMetadataRepository;
     protected final MetadataMatchService metadataMatchService;
 
-    protected AbstractFileProcessor(BookRepository bookRepository,
-                                    BookCreatorService bookCreatorService,
-                                    BookMapper bookMapper,
-                                    FileProcessingUtils fileProcessingUtils,
-                                    BookMetadataRepository bookMetadataRepository,
-                                    MetadataMatchService metadataMatchService) {
+    protected AbstractFileProcessor(BookRepository bookRepository, BookCreatorService bookCreatorService, BookMapper bookMapper, FileProcessingUtils fileProcessingUtils, BookMetadataRepository bookMetadataRepository, MetadataMatchService metadataMatchService) {
         this.bookRepository = bookRepository;
         this.bookCreatorService = bookCreatorService;
         this.bookMapper = bookMapper;
@@ -48,7 +43,9 @@ public abstract class AbstractFileProcessor implements FileProcessor {
         String hash = FileUtils.computeFileHash(filePath);
 
         Optional<Book> existing = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, forceProcess, bookRepository, bookMapper);
-        if (existing.isPresent()) return existing.get();
+        if (existing.isPresent()) {
+            return existing.get();
+        }
         if (!forceProcess) {
             Optional<BookEntity> byName = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
             if (byName.isPresent()) {
@@ -68,9 +65,6 @@ public abstract class AbstractFileProcessor implements FileProcessor {
         bookEntity.setMetadataMatchScore(score);
 
         bookCreatorService.saveConnections(bookEntity);
-
-        bookEntity = bookRepository.save(bookEntity);
-        bookRepository.flush();
 
         return bookMapper.toBook(bookEntity);
     }

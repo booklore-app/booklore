@@ -17,13 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.*;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -45,6 +40,7 @@ public class FileMoveService {
         log.info("Starting file move for {} books using pattern: '{}'", books.size(), pattern);
 
         Set<Long> libraryIds = new HashSet<>();
+        List<Book> updatedBooks = new ArrayList<>();
         boolean didPause = false;
 
         if (!monitoringService.isPaused()) {
@@ -99,10 +95,9 @@ public class FileMoveService {
                     book.setFileName(newFileName);
                     bookRepository.save(book);
 
-                    Book updatedBookDto = bookMapper.toBook(book);
-                    notificationService.sendMessage(Topic.BOOK_METADATA_UPDATE, updatedBookDto);
-
+                    updatedBooks.add(bookMapper.toBook(book));
                     log.info("Updated book id {} with new path", book.getId());
+
                     deleteEmptyParentDirsUpToLibraryFolders(oldFilePath.getParent(), Set.of(libraryRoot));
 
                     if (book.getLibraryPath().getLibrary().getId() != null) {
@@ -114,6 +109,10 @@ public class FileMoveService {
             }
 
             log.info("Completed file move for {} books.", books.size());
+
+            if (!updatedBooks.isEmpty()) {
+                notificationService.sendMessage(Topic.BOOK_METADATA_BATCH_UPDATE, updatedBooks);
+            }
 
             for (Long libraryId : libraryIds) {
                 try {

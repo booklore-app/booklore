@@ -16,7 +16,6 @@ import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
-import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +42,6 @@ public class LibraryProcessingService {
     private final EpubProcessor epubProcessor;
     private final CbxProcessor cbxProcessor;
     private final BookRepository bookRepository;
-    private final EntityManager entityManager;
     private final FileService fileService;
 
     @Transactional
@@ -59,34 +57,9 @@ public class LibraryProcessingService {
     public void rescanLibrary(long libraryId) throws IOException {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + libraryEntity.getName()));
-        detectMovedBooksAndUpdatePaths(libraryEntity);
-        entityManager.flush();
-        entityManager.clear();
         deleteRemovedBooks(detectDeletedBookIds(libraryEntity));
-        entityManager.flush();
-        entityManager.clear();
         processLibraryFiles(detectNewBookPaths(libraryEntity));
-        entityManager.flush();
-        entityManager.clear();
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + libraryEntity.getName()));
-    }
-
-    void detectMovedBooksAndUpdatePaths(LibraryEntity libraryEntity) throws IOException {
-        Map<String, Path> currentFileMap = getLibraryFiles(libraryEntity).stream().collect(Collectors.toMap(LibraryFile::getFileName, LibraryFile::getFullPath, (existing, replacement) -> existing));
-        for (BookEntity book : libraryEntity.getBookEntities()) {
-            Path existingPath = book.getFullFilePath();
-            Path updatedPath = currentFileMap.get(book.getFileName());
-            if (updatedPath != null && !updatedPath.equals(existingPath)) {
-                log.info("Detected moved book: '{}' from '{}' to '{}'", book.getFileName(), existingPath, updatedPath);
-                libraryEntity.getLibraryPaths().stream()
-                        .filter(lp -> updatedPath.startsWith(Path.of(lp.getPath())))
-                        .findFirst()
-                        .ifPresent(matchingPath -> {
-                            book.setLibraryPath(matchingPath);
-                            book.setFileSubPath(FileUtils.getRelativeSubPath(matchingPath.getPath(), updatedPath));
-                        });
-            }
-        }
     }
 
     public List<Long> detectDeletedBookIds(LibraryEntity libraryEntity) throws IOException {
