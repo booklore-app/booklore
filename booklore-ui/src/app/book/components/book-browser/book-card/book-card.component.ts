@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, inject, Input, OnInit, Optional, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Optional, Output, ViewChild} from '@angular/core';
 import {Book, BookMetadata} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
@@ -6,7 +6,7 @@ import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {DialogService} from 'primeng/dynamicdialog';
 import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.component';
 import {BookService} from '../../../service/book.service';
-import {CheckboxModule} from 'primeng/checkbox';
+import {CheckboxChangeEvent, CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
@@ -14,7 +14,7 @@ import {MetadataRefreshRequest} from '../../../metadata/model/request/metadata-r
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {NgClass} from '@angular/common';
 import {UserService} from '../../../../settings/user-management/user.service';
-import {filter} from 'rxjs';
+import {filter, Subject} from 'rxjs';
 import {EmailService} from '../../../../settings/email/email.service';
 import {TieredMenu} from 'primeng/tieredmenu';
 import {BookSenderComponent} from '../../book-sender/book-sender.component';
@@ -22,6 +22,7 @@ import {Router} from '@angular/router';
 import {ProgressBar} from 'primeng/progressbar';
 import {BookMetadataHostService} from '../../../../book-metadata-host-service';
 import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-center/book-metadata-center.component';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-book-card',
@@ -30,7 +31,7 @@ import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-cente
   imports: [Button, MenuModule, CheckboxModule, FormsModule, NgClass, TieredMenu, ProgressBar],
   standalone: true
 })
-export class BookCardComponent implements OnInit {
+export class BookCardComponent implements OnInit, OnDestroy {
   @Input() index!: number;
   @Output() checkboxClick = new EventEmitter<{ index: number; bookId: number; selected: boolean; shiftKey: boolean }>();
 
@@ -59,12 +60,16 @@ export class BookCardComponent implements OnInit {
 
   private userPermissions: any;
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
+  private destroy$ = new Subject<void>();
 
 
   ngOnInit(): void {
     this.userService.userState$
-      .pipe(filter(user => !!user))
-      .subscribe((user) => {
+      .pipe(
+        filter(user => !!user),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(user => {
         this.userPermissions = user.permissions;
         this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
         this.initMenu();
@@ -87,22 +92,6 @@ export class BookCardComponent implements OnInit {
 
   readBook(book: Book): void {
     this.bookService.readBook(book.id);
-  }
-
-  toggleSelection(selected: boolean, event?: MouseEvent): void {
-    if (this.isCheckboxEnabled) {
-      this.isSelected = selected;
-      this.checkboxClick.emit({
-        index: this.index,
-        bookId: this.book.id,
-        selected,
-        shiftKey: !!event?.shiftKey,
-      });
-
-      if (this.onBookSelect) {
-        this.onBookSelect(this.book.id, selected);
-      }
-    }
   }
 
   private initMenu() {
@@ -294,7 +283,7 @@ export class BookCardComponent implements OnInit {
       });
     } else {
       this.dialogService.open(BookMetadataCenterComponent, {
-        width: '95%',
+        width: '85%',
         data: {bookId: book.id},
         modal: true,
         dismissableMask: true,
@@ -327,5 +316,33 @@ export class BookCardComponent implements OnInit {
     const lockedKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
     if (lockedKeys.length === 0) return false;
     return lockedKeys.every(key => metadata[key] === true);
+  }
+
+  private lastMouseEvent: MouseEvent | null = null;
+
+  captureMouseEvent(event: MouseEvent): void {
+    this.lastMouseEvent = event;
+  }
+
+  toggleSelection(event: CheckboxChangeEvent): void {
+    if (this.isCheckboxEnabled) {
+      this.isSelected = event.checked;
+      const shiftKey = this.lastMouseEvent?.shiftKey ?? false;
+      this.checkboxClick.emit({
+        index: this.index,
+        bookId: this.book.id,
+        selected: event.checked,
+        shiftKey: shiftKey,
+      });
+      if (this.onBookSelect) {
+        this.onBookSelect(this.book.id, event.checked);
+      }
+      this.lastMouseEvent = null;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

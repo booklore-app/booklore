@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.config.security;
 
+import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -25,7 +26,7 @@ import java.util.List;
 public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
     private final JwtUtils jwtUtils;
-    private final OidcTokenValidator oidcTokenValidator;
+    private final DynamicOidcJwtProcessor dynamicOidcJwtProcessor;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -55,15 +56,19 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     }
 
     private Authentication authenticateToken(String token) {
-        if (jwtUtils.validateToken(token)) {
-            String username = jwtUtils.extractUsername(token);
-            return new UsernamePasswordAuthenticationToken(
-                    username,
-                    null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-            );
+        try {
+            if (jwtUtils.validateToken(token)) {
+                String username = jwtUtils.extractUsername(token);
+                return new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+            }
+            JWTClaimsSet claims = dynamicOidcJwtProcessor.getProcessor().process(token, null);
+            if (claims != null) {
+                String username = claims.getSubject();
+                return new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+            }
+        } catch (Exception e) {
+            log.error("Token authentication failed", e);
         }
-
-        return oidcTokenValidator.validate(token);
+        return null;
     }
 }

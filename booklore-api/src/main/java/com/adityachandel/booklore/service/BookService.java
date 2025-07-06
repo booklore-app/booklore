@@ -28,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,7 +56,6 @@ public class BookService {
     private final AuthenticationService authenticationService;
     private final BookQueryService bookQueryService;
     private final UserProgressService userProgressService;
-    private final AppSettingService appSettingService;
 
     public List<Book> getBookDTOs(boolean includeDescription) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
@@ -365,21 +365,95 @@ public class BookService {
     public ResponseEntity<BookDeletionResponse> deleteBooks(Set<Long> ids) {
         List<BookEntity> books = bookQueryService.findAllWithMetadataByIds(ids);
         List<Long> failedFileDeletions = new ArrayList<>();
+
         for (BookEntity book : books) {
             Path fullFilePath = book.getFullFilePath();
             try {
                 if (Files.exists(fullFilePath)) {
                     Files.delete(fullFilePath);
+                    Set<Path> libraryRoots = book.getLibrary().getLibraryPaths().stream()
+                            .map(LibraryPathEntity::getPath)
+                            .map(Paths::get)
+                            .map(Path::normalize)
+                            .collect(Collectors.toSet());
+
+                    deleteEmptyParentDirsUpToLibraryFolders(fullFilePath.getParent(), libraryRoots);
                 }
             } catch (IOException e) {
                 failedFileDeletions.add(book.getId());
             }
         }
+
         bookRepository.deleteAll(books);
         BookDeletionResponse response = new BookDeletionResponse(ids, failedFileDeletions);
         return failedFileDeletions.isEmpty()
                 ? ResponseEntity.ok(response)
                 : ResponseEntity.status(HttpStatus.MULTI_STATUS).body(response);
+    }
+
+    public void deleteEmptyParentDirsUpToLibraryFolders(Path currentDir, Set<Path> libraryRoots) throws IOException {
+        Set<String> ignoredFilenames = Set.of(".DS_Store", "Thumbs.db");
+        currentDir = currentDir.toAbsolutePath().normalize();
+
+        Set<Path> normalizedRoots = new HashSet<>();
+        for (Path root : libraryRoots) {
+            normalizedRoots.add(root.toAbsolutePath().normalize());
+        }
+
+        while (currentDir != null) {
+            boolean isLibraryRoot = false;
+            for (Path root : normalizedRoots) {
+                try {
+                    if (Files.isSameFile(root, currentDir)) {
+                        isLibraryRoot = true;
+                        break;
+                    }
+                } catch (IOException e) {
+                    log.warn("Failed to compare paths: {} and {}", root, currentDir);
+                }
+            }
+
+            if (isLibraryRoot) {
+                log.debug("Reached library root: {}. Stopping cleanup.", currentDir);
+                break;
+            }
+
+            File[] files = currentDir.toFile().listFiles();
+            if (files == null) {
+                log.warn("Cannot read directory: {}. Stopping cleanup.", currentDir);
+                break;
+            }
+
+            boolean hasImportantFiles = false;
+            for (File file : files) {
+                if (!ignoredFilenames.contains(file.getName())) {
+                    hasImportantFiles = true;
+                    break;
+                }
+            }
+
+            if (!hasImportantFiles) {
+                for (File file : files) {
+                    try {
+                        Files.delete(file.toPath());
+                        log.info("Deleted ignored file: {}", file.getAbsolutePath());
+                    } catch (IOException e) {
+                        log.warn("Failed to delete ignored file: {}", file.getAbsolutePath());
+                    }
+                }
+                try {
+                    Files.delete(currentDir);
+                    log.info("Deleted empty directory: {}", currentDir);
+                } catch (IOException e) {
+                    log.warn("Failed to delete directory: {}", currentDir, e);
+                    break;
+                }
+                currentDir = currentDir.getParent();
+            } else {
+                log.debug("Directory {} contains important files. Stopping cleanup.", currentDir);
+                break;
+            }
+        }
     }
 
     public void updateReadStatus(long bookId, @NotBlank String status) {

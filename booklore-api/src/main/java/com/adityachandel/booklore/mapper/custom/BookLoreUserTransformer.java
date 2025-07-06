@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,7 +73,15 @@ public class BookLoreUserTransformer {
         }
 
         bookLoreUser.setUserSettings(userSettings);
-        bookLoreUser.setAssignedLibraries(userEntity.getLibraries().stream().map(libraryMapper::toLibrary).collect(Collectors.toList()));
+        if (userEntity.getLibraries() != null) {
+            bookLoreUser.setAssignedLibraries(
+                    userEntity.getLibraries().stream()
+                            .map(libraryMapper::toLibrary)
+                            .collect(Collectors.toList())
+            );
+        } else {
+            bookLoreUser.setAssignedLibraries(Collections.emptyList());
+        }
         bookLoreUser.setProvisioningMethod(userEntity.getProvisioningMethod());
         return bookLoreUser;
     }

@@ -37,11 +37,14 @@ public class UserDefaultsService {
 
     private void add(BookLoreUserEntity user, UserSettingKey key, Object value) {
         try {
-            String json = objectMapper.writeValueAsString(value);
+            String storedValue = key.isJson()
+                    ? objectMapper.writeValueAsString(value)
+                    : value.toString();
+
             user.getSettings().add(UserSettingEntity.builder()
                     .user(user)
                     .settingKey(key.getDbKey())
-                    .settingValue(json)
+                    .settingValue(storedValue)
                     .build());
         } catch (Exception e) {
             log.error("Error serializing setting {} for user {}", key, user.getUsername(), e);

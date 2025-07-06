@@ -133,6 +133,5 @@ export class AppTopBarComponent implements OnDestroy {
 
   logout() {
     this.authService.logout();
-    window.location.href = '/login';
   }
 }

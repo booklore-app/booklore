@@ -22,11 +22,6 @@ bootstrapApplication(AppComponent, {
   providers: [
     {
       provide: APP_INITIALIZER,
-      useFactory: themeInitializer,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
       useFactory: websocketInitializer,
       deps: [AuthService],
       multi: true
@@ -61,10 +56,3 @@ bootstrapApplication(AppComponent, {
           })
   ]
 }).catch(err => console.error(err));
-
-export function themeInitializer(): () => void {
-  return () => {
-    document.documentElement.classList.add('p-dark');
-    document.body.classList.add('p-dark');
-  };
-}

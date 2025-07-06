@@ -7,6 +7,8 @@ import {parseLogNotification} from './shared/websocket/model/log-notification.mo
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {Toast} from 'primeng/toast';
 import {RouterOutlet} from '@angular/router';
+import {AuthInitializationService} from './auth-initialization-service';
+import {AppConfigService} from './core/service/app-config.service';
 
 @Component({
   selector: 'app-root',
@@ -17,11 +19,18 @@ import {RouterOutlet} from '@angular/router';
 })
 export class AppComponent implements OnInit {
 
+  loading = true;
+  private authInit = inject(AuthInitializationService);
   private bookService = inject(BookService);
   private rxStompService = inject(RxStompService);
   private eventService = inject(EventService);
+  private appConfigService = inject(AppConfigService);
 
   ngOnInit(): void {
+
+    this.authInit.initialized$.subscribe(ready => {
+      this.loading = !ready;
+    });
 
     this.rxStompService.watch('/topic/book-add').subscribe((message: Message) => {
       this.bookService.handleNewlyCreatedBook(JSON.parse(message.body));
@@ -33,6 +42,11 @@ export class AppComponent implements OnInit {
 
     this.rxStompService.watch('/topic/book-metadata-update').subscribe((message: Message) => {
       this.bookService.handleBookUpdate(JSON.parse(message.body));
+    });
+
+    this.rxStompService.watch('/topic/book-metadata-batch-update').subscribe((message: Message) => {
+      const updatedBooks = JSON.parse(message.body);
+      this.bookService.handleMultipleBookUpdates(updatedBooks);
     });
 
     this.rxStompService.watch('/topic/log').subscribe((message: Message) => {

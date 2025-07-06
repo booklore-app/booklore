@@ -1,4 +1,4 @@
-<div class="w-full h-[calc(100vh-12.1rem)] overflow-y-auto border rounded-lg enclosing-container">
+<div class="w-full h-[calc(100vh-11.65rem)] overflow-y-auto border rounded-lg enclosing-container">
 
   <div class="p-4">
     <p class="text-lg  gap-2 pb-4 pt-4">Internal Authentication:</p>
@@ -79,16 +79,7 @@
             pInputText
             id="issuerUri"
             [(ngModel)]="oidcProvider.issuerUri"
-            placeholder="e.g. https://authentik.your-domain.com/application/o/booklore/"
-            class="w-full"/>
-        </div>
-        <div class="md:col-span-2">
-          <label for="jwksUrl" class="mb-1">JWKS URL</label>
-          <input
-            pInputText
-            id="jwksUrl"
-            [(ngModel)]="oidcProvider.jwksUrl"
-            placeholder="e.g. https://authentik.your-domain.com/application/o/booklore/jwks/"
+            placeholder="e.g. https://authentik.domain.com/application/o/booklore/  or  https://pocket-id.domain.com"
             class="w-full"/>
         </div>
         <div class="md:col-span-2">
@@ -150,7 +141,7 @@
               <p-toggleswitch
                 [(ngModel)]="autoUserProvisioningEnabled"
                 inputId="autoProvision"
-                (onChange)="saveAutoProvision()">
+                (onChange)="saveOidcAutoProvisionSettings()">
               </p-toggleswitch>
               <div class="flex items-center gap-2 text-sm text-gray-400">
                 <i class="pi pi-info-circle text-blue-500"></i>
@@ -193,7 +184,7 @@
                   </p-multiSelect>
                 </div>
                 <div class="mt-8">
-                  <p-button label="Save Settings" [outlined]="true" (click)="saveAutoProvisioningSettings()"></p-button>
+                  <p-button label="Save Settings" [outlined]="true" (click)="saveOidcAutoProvisionSettings()"></p-button>
                 </div>
               </div>
             }

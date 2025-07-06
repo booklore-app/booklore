@@ -1,3 +1,14 @@
-<p-confirmDialog />
-<p-toast></p-toast>
-<router-outlet></router-outlet>
+@if (loading) {
+  <div class="splash-screen">
+    <div class="splash-content">
+      <img src="assets/favicon.svg" alt="Booklore logo" class="logo" />
+      <h1>Loading Booklore…</h1>
+      <p>Please wait while we get things ready.</p>
+      <div class="loader"></div>
+    </div>
+  </div>
+} @else {
+  <p-confirmDialog />
+  <p-toast></p-toast>
+  <router-outlet></router-outlet>
+}

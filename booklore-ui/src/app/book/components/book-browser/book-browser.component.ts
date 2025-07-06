@@ -650,6 +650,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   openShelfAssigner(): void {
     this.dynamicDialogRef = this.dialogHelperService.openShelfAssigner(this.selectedBooks);
+    this.dynamicDialogRef.onClose.subscribe(() => {
+      this.selectedBooks = new Set<number>();
+    });
   }
 
   lockUnlockMetadata(): void {
@@ -666,5 +669,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   multiBookEditMetadata(): void {
     this.dialogHelperService.openMultibookMetadataEditerDialog(this.selectedBooks);
+  }
+
+  moveFiles() {
+    this.dialogHelperService.openFileMoverDialog(this.selectedBooks);
   }
 }

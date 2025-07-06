@@ -6,7 +6,7 @@ import {BookService} from '../../../service/book.service';
 import {Rating, RatingRateEvent} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {Book, BookMetadata, BookRecommendation, ReadStatus} from '../../../model/book.model';
+import {Book, BookMetadata, BookRecommendation, MetadataClearFlags, MetadataUpdateWrapper, ReadStatus} from '../../../model/book.model';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {UserService} from '../../../../settings/user-management/user.service';
@@ -346,61 +346,68 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return 'bg-blue-500';
   }
 
-  onPersonalRatingChange(book: Book, event: RatingRateEvent): void {
-    const rating = event.value;
-    if (!book || !book.metadata) return;
-    const updatedMetadata = {
-      ...book.metadata,
-      personalRating: rating
-    };
-    this.bookService.updateBookMetadata(book.id, updatedMetadata, false).subscribe({
+  onPersonalRatingChange(book: Book, { value: personalRating }: RatingRateEvent): void {
+    if (!book?.metadata) return;
+
+    const updatedMetadata = { ...book.metadata, personalRating };
+
+    this.bookService.updateBookMetadata(book.id, {
+      metadata: updatedMetadata,
+      clearFlags: { personalRating: false }
+    }, false).subscribe({
       next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Rating Saved',
+          detail: 'Personal rating updated successfully'
+        });
       },
-      error: (err) => {
+      error: err => {
+        console.error('Failed to update personal rating:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: 'Could not update personal rating'
+        });
       }
     });
   }
 
   goToAuthorBooks(author: string): void {
-    if (this.metadataCenterViewMode === 'dialog') {
-      this.dialogRef?.close();
-      setTimeout(() => this.navigateToAuthorBooks(author), 200);
-    } else {
-      this.navigateToAuthorBooks(author);
-    }
-  }
-
-  private navigateToAuthorBooks(author: string): void {
-    this.router.navigate(['/all-books'], {
-      queryParams: {
-        view: 'grid',
-        sort: 'title',
-        direction: 'asc',
-        sidebar: true,
-        filter: `author:${author}`
-      }
-    });
+    this.handleMetadataClick('author', author);
   }
 
   goToCategory(category: string): void {
-    if (this.metadataCenterViewMode === 'dialog') {
-      this.dialogRef?.close();
-      setTimeout(() => this.navigateToCategory(category), 200);
-    } else {
-      this.navigateToCategory(category);
-    }
+    this.handleMetadataClick('category', category);
   }
 
-  private navigateToCategory(category: string): void {
+  goToSeries(seriesName: string): void {
+    this.handleMetadataClick('series', seriesName);
+  }
+
+  goToPublisher(publisher: string): void {
+    this.handleMetadataClick('publisher', publisher);
+  }
+
+  private navigateToFilteredBooks(filterKey: string, filterValue: string): void {
     this.router.navigate(['/all-books'], {
       queryParams: {
         view: 'grid',
         sort: 'title',
         direction: 'asc',
         sidebar: true,
-        filter: `category:${category}`
+        filter: `${filterKey}:${filterValue}`
       }
     });
+  }
+
+  private handleMetadataClick(filterKey: string, filterValue: string): void {
+    if (this.metadataCenterViewMode === 'dialog') {
+      this.dialogRef?.close();
+      setTimeout(() => this.navigateToFilteredBooks(filterKey, filterValue), 200);
+    } else {
+      this.navigateToFilteredBooks(filterKey, filterValue);
+    }
   }
 
   getStatusSeverity(status: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | undefined {

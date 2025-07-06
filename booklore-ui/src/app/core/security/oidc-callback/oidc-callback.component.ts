@@ -2,6 +2,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {AuthService} from '../../service/auth.service';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-oidc-callback',
@@ -9,27 +10,29 @@ import {AuthService} from '../../service/auth.service';
   styleUrls: ['./oidc-callback.component.scss']
 })
 export class OidcCallbackComponent implements OnInit {
-
   private router = inject(Router);
-  private oAuthService = inject(OAuthService);
-  private authService = inject(AuthService);
+  private oauthService = inject(OAuthService);
+  private messageService = inject(MessageService);
 
-  ngOnInit(): void {
-    this.oAuthService.loadDiscoveryDocumentAndTryLogin().then(() => {
-      if (this.oAuthService.hasValidAccessToken()) {
-        this.authService.saveOidcTokens(
-          this.oAuthService.getAccessToken(),
-          this.oAuthService.getRefreshToken()
-        );
-        this.authService.getRxStompService().activate();
+  async ngOnInit(): Promise<void> {
+    try {
+      await this.oauthService.tryLoginCodeFlow();
+      if (this.oauthService.hasValidAccessToken()) {
         this.router.navigate(['/dashboard']);
       } else {
-        console.error('Login failed or no valid tokens');
         this.router.navigate(['/login']);
       }
-    }).catch(err => {
-      console.error('OIDC error during login:', err);
-      this.router.navigate(['/login']);
-    });
+    } catch (e) {
+      console.error('[OIDC Callback] Login failed', e);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'OIDC Login Failed',
+        detail: 'Redirecting to local login...',
+        life: 3000
+      });
+      setTimeout(() => {
+        this.router.navigate(['/login']);
+      }, 3000);
+    }
   }
 }

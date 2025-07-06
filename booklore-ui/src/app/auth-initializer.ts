@@ -4,6 +4,7 @@ import {OAuthEvent, OAuthService} from 'angular-oauth2-oidc';
 import {AppSettingsService} from './core/service/app-settings.service';
 import {AuthService, websocketInitializer} from './core/service/auth.service';
 import {filter} from 'rxjs/operators';
+import {AuthInitializationService} from './auth-initialization-service';
 
 export function initializeAuthFactory() {
   return () => {
@@ -11,58 +12,63 @@ export function initializeAuthFactory() {
     const appSettingsService = inject(AppSettingsService);
     const authService = inject(AuthService);
     const router = inject(Router);
+    const authInitService = inject(AuthInitializationService);
 
     return new Promise<void>((resolve) => {
       const sub = appSettingsService.appSettings$.subscribe(settings => {
-        if (settings) {
-          if (settings.oidcEnabled && settings.oidcProviderDetails) {
-            const details = settings.oidcProviderDetails;
-            oauthService.configure({
-              issuer: details.issuerUri,
-              clientId: details.clientId,
-              scope: 'openid profile email offline_access',
-              redirectUri: window.location.origin + '/oauth2-callback',
-              responseType: 'code',
-              showDebugInformation: false,
-              requireHttps: true,
-              strictDiscoveryDocumentValidation: false,
-            });
+        if (!settings) return;
 
-            oauthService.events
-              .pipe(filter((e: OAuthEvent) =>
-                e.type === 'token_received' || e.type === 'token_refreshed'
-              ))
-              .subscribe((e: OAuthEvent) => {
-                const accessToken = oauthService.getAccessToken();
-                const refreshToken = oauthService.getRefreshToken();
-                authService.saveOidcTokens(accessToken, refreshToken ?? '');
-              });
+        sub.unsubscribe();
 
-            oauthService.loadDiscoveryDocumentAndTryLogin()
-              .then(() => {
+        if (settings.oidcEnabled && settings.oidcProviderDetails) {
+          const details = settings.oidcProviderDetails;
+
+          oauthService.configure({
+            issuer: details.issuerUri,
+            clientId: details.clientId,
+            scope: 'openid profile email offline_access',
+            redirectUri: window.location.origin + '/oauth2-callback',
+            responseType: 'code',
+            showDebugInformation: false,
+            requireHttps: false,
+            strictDiscoveryDocumentValidation: false,
+          });
+
+          oauthService.loadDiscoveryDocumentAndTryLogin()
+            .then(() => {
+              if (oauthService.hasValidAccessToken()) {
+                console.log('[OIDC] Valid access token found');
                 oauthService.setupAutomaticSilentRefresh();
                 websocketInitializer(authService);
-                resolve();
-              })
-              .catch(err => {
-                console.error(
-                  'OIDC initialization failed: Unable to complete OpenID Connect discovery or login. ' +
-                  'This may be due to an incorrect issuer URL, client ID, or network issue. ' +
-                  'Falling back to local login. Details:', err
-                );
-                resolve();
-              });
-          } else if (settings.remoteAuthEnabled) {
-            authService.remoteLogin().subscribe({
-              next: () => {
-                resolve();
-              },
-              error: resolve
+              } else {
+                console.warn('[OIDC] No valid access token. Will proceed to app and show login page.');
+              }
+            })
+            .catch(err => {
+              console.error('[OIDC] Failed to load discovery document or login:', err);
+              authInitService.setOidcFailed(true);
+            })
+            .finally(() => {
+              authInitService.markAsInitialized();
+              resolve();
             });
-          } else {
-            resolve();
-          }
-          sub.unsubscribe();
+
+        } else if (settings.remoteAuthEnabled) {
+          authService.remoteLogin().subscribe({
+            next: () => {
+              authInitService.markAsInitialized();
+              resolve();
+            },
+            error: err => {
+              console.error('[Remote Login] failed:', err);
+              authInitService.markAsInitialized();
+              resolve();
+            }
+          });
+
+        } else {
+          authInitService.markAsInitialized();
+          resolve();
         }
       });
     });
