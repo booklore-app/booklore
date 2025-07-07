@@ -1,9 +1,9 @@
 {
   "name": "Booklore",
   "short_name": "Booklore",
-  "display": "standalone",
+  "display": "minimal-ui",
   "scope": "/",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "icons": [
     {
       "src": "assets/icons/icon-192x192.png",
