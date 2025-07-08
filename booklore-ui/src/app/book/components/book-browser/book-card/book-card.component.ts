@@ -62,7 +62,6 @@ export class BookCardComponent implements OnInit, OnDestroy {
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
   private destroy$ = new Subject<void>();
 
-
   ngOnInit(): void {
     this.userService.userState$
       .pipe(
@@ -310,12 +309,6 @@ export class BookCardComponent implements OnInit, OnDestroy {
 
   private hasDeleteBookPermission(): boolean {
     return this.isAdmin() || (this.userPermissions?.canDeleteBook ?? false);
-  }
-
-  isMetadataFullyLocked(metadata: BookMetadata): boolean {
-    const lockedKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
-    if (lockedKeys.length === 0) return false;
-    return lockedKeys.every(key => metadata[key] === true);
   }
 
   private lastMouseEvent: MouseEvent | null = null;

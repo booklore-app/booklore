@@ -38,7 +38,7 @@
         }
       </div>
       <div class="flex flex-wrap items-center gap-4 flex-shrink-0">
-        <div class="flex flex-wrap items-center gap-4">
+        <div class="flex flex-wrap items-center gap-4 md:gap-6">
           @if (isFilterActive) {
             <a class="topbar-items topbar-item" (click)="clearFilter()">
               <i
@@ -48,6 +48,42 @@
               </i>
             </a>
           }
+
+          @if (currentViewMode === 'table') {
+            <div>
+              <a class="topbar-items topbar-item" (click)="columnPopover.toggle($event)">
+                <i
+                  class="pi pi-eye"
+                  pTooltip="Visible columns"
+                  tooltipPosition="top">
+                </i>
+              </a>
+              <p-popover #columnPopover [dismissable]="true" appendTo="body">
+                <div class="w-[200px]">
+                  <p-multiSelect
+                    optionLabel="header"
+                    [options]="columnPreferenceService.allColumns"
+                    [(ngModel)]="visibleColumns"
+                    (ngModelChange)="onVisibleColumnsChange($event)"
+                    display="chip"
+                    placeholder="Select Columns"
+                    [style]="{ width: '100%' }"
+                    [filter]="true"
+                    [showClear]="true"
+                  ></p-multiSelect>
+                </div>
+                <div class="flex items-center gap-2 pt-4 pl-1">
+                  <p>Set as default?</p>
+                  <p-button
+                    label="Save"
+                    outlined
+                    size="small"
+                    (click)="columnPreferenceService.saveVisibleColumns(visibleColumns)"></p-button>
+                </div>
+              </p-popover>
+            </div>
+          }
+
           <div>
             <a
               class="topbar-items topbar-item"
@@ -82,7 +118,7 @@
                   </div>
                 </div>
                 <div class="flex flex-col gap-2">
-                  <label class="font-medium text-sm">Sidbar Filter Sort:</label>
+                  <label class="font-medium text-sm">Sidebar Filter Sort:</label>
                   <div class="flex gap-4 justify-start">
                     <p-select
                       size="small"
@@ -181,7 +217,6 @@
           }
         </div>
 
-
         <p-button
           class="pr-2"
           icon="pi pi-chevron-right"
@@ -223,6 +258,7 @@
                   [books]="books"
                   (selectedBooksChange)="onSelectedBooksChange($event)"
                   [sortOption]="this.bookSorter.selectedSort!"
+                  [visibleColumns]="visibleColumns"
                 ></app-book-table>
               }
               @if (currentViewMode === 'grid') {
