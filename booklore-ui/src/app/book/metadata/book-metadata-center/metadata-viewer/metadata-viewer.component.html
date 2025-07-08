@@ -190,7 +190,28 @@
                   {{ getFileExtension(book?.filePath) || '-' }}
                 </span>
               </p>
-
+              <p class="whitespace-nowrap flex items-center">
+                <span class="font-bold mr-2">Progress:</span>
+                <span class="inline-flex items-center">
+                  <span
+                    class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                    [ngClass]="getProgressColorClass(getProgressPercent(book))">
+                    {{ getProgressPercent(book) !== null ? getProgressPercent(book) + '%' : 'N/A' }}
+                  </span>
+                  @if (getProgressPercent(book) !== null) {
+                    <p-button
+                      pTooltip="Reset progress"
+                      tooltipPosition="bottom"
+                      icon="pi pi-refresh"
+                      size="small"
+                      severity="danger"
+                      text
+                      class="ml-1"
+                      (onClick)="resetProgress(book)">
+                    </p-button>
+                  }
+                </span>
+              </p>
               <p class="whitespace-nowrap flex items-center gap-2">
                 <span class="font-bold">Metadata Score:</span>
                 @if (book?.metadataMatchScore != null) {
@@ -202,14 +223,6 @@
                 } @else {
                   <span>-</span>
                 }
-              </p>
-              <p class="whitespace-nowrap flex items-center gap-2">
-                <span class="font-bold">Progress:</span>
-                <span
-                  class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                  [ngClass]="getProgressColorClass(getProgressPercent(book))">
-                  {{ getProgressPercent(book) !== null ? getProgressPercent(book) + '%' : 'N/A' }}
-                </span>
               </p>
               <p class="whitespace-nowrap"><span class="font-bold">File Size:</span> {{ getFileSizeInMB(book) }}</p>
               <p class="whitespace-nowrap"><span class="font-bold">ISBN 13:</span> {{ book?.metadata!.isbn13 || '-' }}</p>

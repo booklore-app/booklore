@@ -124,4 +124,11 @@ public class BookController {
         bookService.updateReadStatus(bookId, request.status());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{bookId}/reset-progress")
+    @CheckBookAccess(bookIdParam = "bookId")
+    public ResponseEntity<Book> resetProgress(@PathVariable long bookId) {
+        Book book = bookService.resetProgress(bookId);
+        return ResponseEntity.ok(book);
+    }
 }

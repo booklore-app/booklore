@@ -397,6 +397,12 @@ export class BookService {
     );
   }
 
+  resetProgress(bookId: number): Observable<Book> {
+    return this.http.post<Book>(`${this.url}/${bookId}/reset-progress`, null).pipe(
+      tap(updatedBook => this.handleBookUpdate(updatedBook))
+    );
+  }
+
 
   /*------------------ All the websocket handlers go below ------------------*/
 
@@ -436,7 +442,7 @@ export class BookService {
       updatedMap.has(book.id) ? updatedMap.get(book.id)! : book
     );
 
-    this.bookStateSubject.next({ ...currentState, books: mergedBooks });
+    this.bookStateSubject.next({...currentState, books: mergedBooks});
   }
 
   handleBookMetadataUpdate(bookId: number, updatedMetadata: BookMetadata) {

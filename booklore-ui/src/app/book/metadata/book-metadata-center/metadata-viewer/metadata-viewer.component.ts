@@ -346,14 +346,14 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return 'bg-blue-500';
   }
 
-  onPersonalRatingChange(book: Book, { value: personalRating }: RatingRateEvent): void {
+  onPersonalRatingChange(book: Book, {value: personalRating}: RatingRateEvent): void {
     if (!book?.metadata) return;
 
-    const updatedMetadata = { ...book.metadata, personalRating };
+    const updatedMetadata = {...book.metadata, personalRating};
 
     this.bookService.updateBookMetadata(book.id, {
       metadata: updatedMetadata,
-      clearFlags: { personalRating: false }
+      clearFlags: {personalRating: false}
     }, false).subscribe({
       next: () => {
         this.messageService.add({
@@ -459,6 +459,37 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
           });
         }
       });
+    });
+  }
+
+  resetProgress(book: Book): void {
+    this.confirmationService.confirm({
+      message: `Reset reading progress for "${book.metadata?.title}"?`,
+      header: 'Confirm Reset',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.bookService.resetProgress(book.id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Progress Reset',
+              detail: 'Reading progress has been reset.',
+              life: 1500
+            });
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: 'Could not reset progress.',
+              life: 1500
+            });
+          }
+        });
+      }
     });
   }
 }

@@ -277,6 +277,24 @@ public class BookService {
         return book;
     }
 
+    public Book resetProgress(long bookId) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+
+        UserBookProgressEntity progress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), bookId).orElse(new UserBookProgressEntity());
+        progress.setBook(bookEntity);
+        progress.setReadStatus(null);
+        progress.setLastReadTime(null);
+        progress.setPdfProgress(null);
+        progress.setPdfProgressPercent(null);
+        progress.setEpubProgress(null);
+        progress.setEpubProgressPercent(null);
+        progress.setCbxProgress(null);
+        progress.setCbxProgressPercent(null);
+        userBookProgressRepository.save(progress);
+        return bookMapper.toBook(bookEntity);
+    }
+
 
     @Transactional
     public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
