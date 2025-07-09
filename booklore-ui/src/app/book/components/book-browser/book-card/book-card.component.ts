@@ -1,5 +1,5 @@
-import {Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Optional, Output, ViewChild} from '@angular/core';
-import {Book, BookMetadata} from '../../../model/book.model';
+import {Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Book} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
 import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
@@ -20,7 +20,6 @@ import {TieredMenu} from 'primeng/tieredmenu';
 import {BookSenderComponent} from '../../book-sender/book-sender.component';
 import {Router} from '@angular/router';
 import {ProgressBar} from 'primeng/progressbar';
-import {BookMetadataHostService} from '../../../../book-metadata-host-service';
 import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-center/book-metadata-center.component';
 import {takeUntil} from 'rxjs/operators';
 
@@ -32,9 +31,10 @@ import {takeUntil} from 'rxjs/operators';
   standalone: true
 })
 export class BookCardComponent implements OnInit, OnDestroy {
-  @Input() index!: number;
+
   @Output() checkboxClick = new EventEmitter<{ index: number; bookId: number; selected: boolean; shiftKey: boolean }>();
 
+  @Input() index!: number;
   @Input() book!: Book;
   @Input() isCheckboxEnabled: boolean = false;
   @Input() onBookSelect?: (bookId: number, selected: boolean) => void;

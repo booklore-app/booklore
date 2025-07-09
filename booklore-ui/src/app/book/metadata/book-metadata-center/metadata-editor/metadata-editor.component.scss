@@ -1,0 +1,7 @@
+::ng-deep .p-tabpanels .custom-tab-padding {
+  padding: 1rem 0rem 0rem 0.5rem !important;
+
+  @media (min-width: 640px) {
+    padding: var(--p-tabs-tabpanel-padding) !important;
+  }
+}

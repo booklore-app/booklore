@@ -1,12 +1,12 @@
 import {Component, DestroyRef, inject, Input, OnChanges, OnInit, Optional, SimpleChanges, ViewChild} from '@angular/core';
-import {Button, ButtonDirective} from 'primeng/button';
+import {Button} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass} from '@angular/common';
 import {Observable} from 'rxjs';
 import {BookService} from '../../../service/book.service';
 import {Rating, RatingRateEvent} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {Book, BookMetadata, BookRecommendation, MetadataClearFlags, MetadataUpdateWrapper, ReadStatus} from '../../../model/book.model';
+import {Book, BookMetadata, BookRecommendation, ReadStatus} from '../../../model/book.model';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {UserService} from '../../../../settings/user-management/user.service';
@@ -20,7 +20,6 @@ import {Tooltip} from 'primeng/tooltip';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Editor} from 'primeng/editor';
 import {ProgressBar} from 'primeng/progressbar';
-import {ToggleButton} from 'primeng/togglebutton';
 import {MetadataFetchOptionsComponent} from '../../metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
@@ -35,7 +34,7 @@ import {BookCardLiteComponent} from '../../../components/book-card-lite/book-car
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, ButtonDirective, Editor, ProgressBar, ToggleButton, Menu, InfiniteScrollDirective, BookCardLiteComponent]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 
@@ -341,6 +340,30 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return 'bg-red-600 border-red-700';
   }
 
+  getStatusSeverityClass(status: string): string {
+    const normalized = status?.toUpperCase();
+    switch (normalized) {
+      case 'UNREAD':
+        return 'bg-gray-500';
+      case 'PAUSED':
+        return 'bg-zinc-600';
+      case 'READING':
+        return 'bg-blue-600';
+      case 'RE_READING':
+        return 'bg-indigo-600';
+      case 'READ':
+        return 'bg-green-600';
+      case 'PARTIALLY_READ':
+        return 'bg-yellow-600';
+      case 'ABANDONED':
+        return 'bg-red-600';
+      case 'WONT_READ':
+        return 'bg-pink-700';
+      default:
+        return 'bg-gray-600';
+    }
+  }
+
   getProgressColorClass(progress: number | null | undefined): string {
     if (progress == null) return 'bg-gray-600';
     return 'bg-blue-500';
@@ -410,14 +433,31 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  getStatusSeverity(status: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | undefined {
-    const normalized = status?.toUpperCase();
-    if (['UNREAD', 'PAUSED'].includes(normalized)) return 'secondary';
-    if (['READING', 'RE_READING'].includes(normalized)) return 'info';
-    if (['READ'].includes(normalized)) return 'success';
-    if (['PARTIALLY_READ'].includes(normalized)) return 'warn';
-    if (['WONT_READ', 'ABANDONED'].includes(normalized)) return 'danger';
-    return undefined;
+  getRatingTooltip(book: Book, source: 'amazon' | 'goodreads' | 'hardcover'): string {
+    const meta = book?.metadata;
+    if (!meta) return '';
+
+    switch (source) {
+      case 'amazon':
+        return meta.amazonRating != null
+          ? `★ ${meta.amazonRating} | ${meta.amazonReviewCount?.toLocaleString() ?? '0'} reviews`
+          : '';
+      case 'goodreads':
+        return meta.goodreadsRating != null
+          ? `★ ${meta.goodreadsRating} | ${meta.goodreadsReviewCount?.toLocaleString() ?? '0'} reviews`
+          : '';
+      case 'hardcover':
+        return meta.hardcoverRating != null
+          ? `★ ${meta.hardcoverRating} | ${meta.hardcoverReviewCount?.toLocaleString() ?? '0'} reviews`
+          : '';
+      default:
+        return '';
+    }
+  }
+
+  getRatingPercent(rating: number | null | undefined): number {
+    if (rating == null) return 0;
+    return Math.round((rating / 5) * 100);
   }
 
   readStatusMenuItems = this.readStatusOptions.map(option => ({
@@ -426,7 +466,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   }));
 
   getStatusLabel(value: string): string {
-    return this.readStatusOptions.find(o => o.value === value)?.label ?? 'Unknown';
+    return this.readStatusOptions.find(o => o.value === value)?.label.toUpperCase() ?? 'N/A';
   }
 
   updateReadStatus(status: ReadStatus): void {

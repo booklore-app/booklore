@@ -84,3 +84,11 @@
   width: 100%;
 }
 
+::ng-deep .custom-button-padding .p-button {
+  padding-block: 0rem !important;
+}
+
+::ng-deep .custom-tag-padding {
+  padding: 0.1rem !important;
+}
+
