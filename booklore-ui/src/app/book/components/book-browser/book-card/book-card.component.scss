@@ -1,6 +1,6 @@
 .book-card {
   background-color: var(--card-background);
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 8px;
   position: relative;
   overflow: hidden;
   transition: border 0.2s;
@@ -13,7 +13,7 @@
 .cover-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 5/7;
+  aspect-ratio: 5 / 7;
   background-color: var(--card-background);
   border-radius: 8px 8px 0 0;
   overflow: hidden;
@@ -23,8 +23,24 @@
   transition: background-color 0.3s ease;
 }
 
-.cover-container.loaded {
-  background-color: transparent;
+.cover-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--card-background);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTI2IDEyNiIgZmlsbD0iY3VycmVudENvbG9yIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik01OSAzLjc5MjdDNzEuNTA1MSAxMC41NTU3IDgwIDIzLjc4NTQgODAgNDBDODAgNDAuNTk1OSA3OS45ODcgNDEuMTg4OCA3OS45NjA5IDQxLjc3ODNDNzkuODYwOSA0NC4wNDA2IDgxLjczNTUgNDYgODQgNDZDMTA2LjA5MSA0NiAxMjQgNjMuOTA4NiAxMjQgODYgQzEyNCAxMDguMDkxIDEwNi4wOTEgMTI2IDg0IDEyNkgxMEM0LjQ3NzE1IDEyNiAwIDEyMS41MjMgMCAxMTZWMzkuMDA2OEwwLjAxMjY5NTMgMzguOTk0MUMwLjM1NzYyNCAyNS4wMjUyIDcuODY1MDYgMTIuODM0NyAxOSAzLjAwNTIxNVY2My44MzJDMTkgNjQuODM0NSAyMC4wNjc2IDY1LjQzOTEgMjAuOTEyMSA2NC45OTAyTDIxLjA3NzEgNjQuODg2N0wzOC4yMjI3IDUyLjM0MjhDMzguNjgxOSAxMi4wMDY4IDM5LjMwNjQgMTIuMDA2OCAzOS43NjU2IDUyLjM0MjhMNTYuOTIyOSA2NC44OTQ1TDU3LjA4NzkgNjQuOTk4QzU3LjkzMjQgNjUuNDQ3IDU5IDY0Ljg0MjMgNTkgNjMuODM5OFYzLjc5Mjd6IiBmaWxsPSIjODE4Y2Y4Ii8+PHBhdGggZD0iTTQwIDBDNDMuODc0NSAwIDQ3LjYxOTkgMC41NTIzODEgNTEuMTYzMSAxLjU4MDA4VjUwLjk2OTdMNDQuMzkyNiA0Ni4wMTc2TDQ0LjA4NzkgNDUuODAzN0MzMC45MDYxIDQzLjY2NzkgMzYuNzA5OCA0My43MzkzIDMzLjU5NTcgNDYuMDE3NkwyNi44MzY5IDUwLjk2MTlWMi4yMTg3NUMzMC45NTkzIDAuNzgyNjM0IDM1LjM4ODEgMCA0MCAwWiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 35px auto;
+  filter: grayscale(100%) brightness(60%) contrast(80%);
+  opacity: 0.25;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.cover-container.loaded::before {
+  opacity: 0;
 }
 
 .book-cover {
@@ -34,6 +50,7 @@
   border-radius: 8px 8px 0 0;
   transition: opacity 0.3s ease-in;
   opacity: 0;
+  z-index: 1;
 }
 
 .cover-container img.loaded {
@@ -51,6 +68,7 @@
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
   pointer-events: none;
+  z-index: 2;
 }
 
 .cover-container:hover::after {
@@ -81,7 +99,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  z-index: 2;
+  z-index: 3;
 }
 
 .info-btn {
@@ -110,7 +128,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
-  z-index: 2;
+  z-index: 3;
 }
 
 .cover-container:hover .select-checkbox,
