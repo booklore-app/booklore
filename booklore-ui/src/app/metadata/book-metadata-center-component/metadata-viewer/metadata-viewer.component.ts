@@ -29,13 +29,14 @@ import {Menu} from 'primeng/menu';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {BookCardLiteComponent} from '../../../book/components/book-card-lite/book-card-lite-component';
 import {ResetProgressType, ResetProgressTypes} from '../../../shared/constants/reset-progress-type';
+import {TieredMenu} from 'primeng/tieredmenu';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent, TieredMenu]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
   @Input() book$!: Observable<Book | null>;
@@ -149,35 +150,57 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
 
     this.otherItems$ = this.book$.pipe(
       filter((book): book is Book => book !== null),
-      map((book): MenuItem[] => [
-        {
-          label: 'Delete Book',
-          icon: 'pi pi-trash',
-          command: () => {
-            this.confirmationService.confirm({
-              message: `Are you sure you want to delete "${book.metadata?.title}"?`,
-              header: 'Confirm Deletion',
-              icon: 'pi pi-exclamation-triangle',
-              acceptIcon: 'pi pi-trash',
-              rejectIcon: 'pi pi-times',
-              acceptButtonStyleClass: 'p-button-danger',
-              accept: () => {
-                this.bookService.deleteBooks(new Set([book.id])).subscribe({
-                  next: () => {
-                    if (this.metadataCenterViewMode === 'route') {
-                      this.router.navigate(['/dashboard']);
-                    } else {
-                      this.dialogRef?.close();
+      map((book): MenuItem[] => {
+        const items: MenuItem[] = [
+          {
+            label: 'Delete Book',
+            icon: 'pi pi-trash',
+            command: () => {
+              this.confirmationService.confirm({
+                message: `Are you sure you want to delete "${book.metadata?.title}"?`,
+                header: 'Confirm Deletion',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'pi pi-trash',
+                rejectIcon: 'pi pi-times',
+                acceptButtonStyleClass: 'p-button-danger',
+                accept: () => {
+                  this.bookService.deleteBooks(new Set([book.id])).subscribe({
+                    next: () => {
+                      if (this.metadataCenterViewMode === 'route') {
+                        this.router.navigate(['/dashboard']);
+                      } else {
+                        this.dialogRef?.close();
+                      }
+                    },
+                    error: () => {
                     }
-                  },
-                  error: () => {
-                  }
-                });
-              }
-            });
+                  });
+                }
+              });
+            },
           },
+        ];
+
+        // Add delete additional files menu if there are any additional files
+        if (book.alternativeFormats && book.alternativeFormats.length > 0) {
+          const deleteFileItems: MenuItem[] = book.alternativeFormats.map(format => {
+            const extension = this.getFileExtension(format.filePath);
+            return {
+              label: `${format.fileName} (${this.getFileSizeInMB(format)})`,
+              icon: this.getFileIcon(extension),
+              command: () => this.deleteAdditionalFile(book.id, format.id, format.fileName || 'file')
+            } as MenuItem;
+          });
+
+          items.push({
+            label: 'Delete Additional Files',
+            icon: 'pi pi-trash',
+            items: deleteFileItems
+          });
         }
-      ])
+
+        return items;
+      })
     );
 
     this.userService.userState$
@@ -250,6 +273,35 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
 
   downloadAdditionalFile(bookId: number, fileId: number) {
     this.bookService.downloadAdditionalFile(bookId, fileId);
+  }
+
+  deleteAdditionalFile(bookId: number, fileId: number, fileName: string) {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the additional file "${fileName}"?`,
+      header: 'Confirm File Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      acceptIcon: 'pi pi-trash',
+      rejectIcon: 'pi pi-times',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.bookService.deleteAdditionalFile(bookId, fileId).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: `Additional file "${fileName}" deleted successfully`
+            });
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: `Failed to delete additional file: ${error.message || 'Unknown error'}`
+            });
+          }
+        });
+      }
+    });
   }
 
   quickRefresh(bookId: number) {
