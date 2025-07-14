@@ -404,13 +404,14 @@ export class BookService {
     );
   }
 
-  updateBookReadStatus(id: number, status: ReadStatus): Observable<void> {
-    return this.http.put<void>(`${this.url}/${id}/read-status`, {status}).pipe(
+  updateBookReadStatus(bookIds: number | number[], status: ReadStatus): Observable<void> {
+    const ids = Array.isArray(bookIds) ? bookIds : [bookIds];
+    return this.http.put<void>(`${this.url}/read-status`, {ids, status}).pipe(
       tap(() => {
         const currentState = this.bookStateSubject.value;
         if (!currentState.books) return;
         const updatedBooks = currentState.books.map(book =>
-          book.id === id ? {...book, readStatus: status} : book
+          ids.includes(book.id) ? {...book, readStatus: status} : book
         );
         this.bookStateSubject.next({...currentState, books: updatedBooks});
       })

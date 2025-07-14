@@ -374,15 +374,26 @@ public class BookService {
     }
 
     @Transactional
-    public void updateReadStatus(Long bookId, String status) {
-        BookEntity book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+    public void updateReadStatus(List<Long> bookIds, String status) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
-        UserBookProgressEntity userBookProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), book.getId()).orElse(new UserBookProgressEntity());
-        userBookProgress.setUser(userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found")));
-        userBookProgress.setBook(book);
         ReadStatus readStatus = EnumUtils.getEnumIgnoreCase(ReadStatus.class, status);
-        userBookProgress.setReadStatus(readStatus);
-        userBookProgressRepository.save(userBookProgress);
+
+        List<BookEntity> books = bookRepository.findAllById(bookIds);
+        if (books.size() != bookIds.size()) {
+            throw ApiError.BOOK_NOT_FOUND.createException("One or more books not found");
+        }
+
+        BookLoreUserEntity userEntity = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        for (BookEntity book : books) {
+            UserBookProgressEntity progress = userBookProgressRepository
+                    .findByUserIdAndBookId(user.getId(), book.getId())
+                    .orElse(new UserBookProgressEntity());
+
+            progress.setUser(userEntity);
+            progress.setBook(book);
+            progress.setReadStatus(readStatus);
+            userBookProgressRepository.save(progress);
+        }
     }
 
     public ResponseEntity<Resource> downloadBook(Long bookId) {

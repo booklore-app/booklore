@@ -119,10 +119,9 @@ public class BookController {
         return ResponseEntity.ok(bookRecommendationService.getRecommendations(id, limit));
     }
 
-    @PutMapping("/{bookId}/read-status")
-    @CheckBookAccess(bookIdParam = "bookId")
-    public ResponseEntity<Void> updateReadStatus(@PathVariable long bookId, @RequestBody @Valid ReadStatusUpdateRequest request) {
-        bookService.updateReadStatus(bookId, request.status());
+    @PutMapping("/read-status")
+    public ResponseEntity<Void> updateReadStatus(@RequestBody @Valid ReadStatusUpdateRequest request) {
+        bookService.updateReadStatus(request.ids(), request.status());
         return ResponseEntity.noContent().build();
     }
 

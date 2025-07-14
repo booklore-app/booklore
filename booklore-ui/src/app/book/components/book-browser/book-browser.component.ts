@@ -12,7 +12,7 @@ import {Shelf} from '../../model/shelf.model';
 import {SortService} from '../../service/sort.service';
 import {SortDirection, SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
-import {Book} from '../../model/book.model';
+import {Book, ReadStatus} from '../../model/book.model';
 import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
 import {BookTableComponent} from './book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
@@ -24,7 +24,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {Menu} from 'primeng/menu';
 import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
-import {BookFilterComponent} from './book-filter/book-filter.component';
+import {BookFilterComponent, readStatusLabels} from './book-filter/book-filter.component';
 import {Tooltip} from 'primeng/tooltip';
 import {EntityViewPreferences, UserService} from '../../../settings/user-management/user.service';
 import {OverlayPanelModule} from 'primeng/overlaypanel';
@@ -43,6 +43,8 @@ import {FilterSortPreferenceService} from './filters/filter-sorting-preferences.
 import {Divider} from 'primeng/divider';
 import {MultiSelect} from 'primeng/multiselect';
 import {TableColumnPreferenceService} from './table-column-preference-service';
+import {TieredMenu} from 'primeng/tieredmenu';
+import {BookMenuService} from '../../service/book-menu.service';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -75,7 +77,7 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, Divider, MultiSelect],
+  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, Divider, MultiSelect, TieredMenu],
   providers: [SeriesCollapseFilter],
   animations: [
     trigger('slideInOut', [
@@ -134,6 +136,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private bookService = inject(BookService);
   private shelfService = inject(ShelfService);
   private dialogHelperService = inject(BookDialogHelperService);
+  private bookMenuService = inject(BookMenuService);
   private sortService = inject(SortService);
   private router = inject(Router);
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -149,10 +152,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   lastAppliedSort: SortOption | null = null;
   private settingFiltersFromUrl = false;
   protected metadataMenuItems: MenuItem[] | undefined;
-  protected moreActionsMenuItems: MenuItem[] | undefined;
+  protected tieredMenuItems: MenuItem[] | undefined;
   currentBooks: Book[] = [];
   lastSelectedIndex: number | null = null;
   showFilter: boolean = false;
+  
 
   get currentCardSize() {
     return this.coverScalePreferenceService.currentCardSize;
@@ -174,6 +178,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+
     this.coverScalePreferenceService.scaleChange$.pipe(debounceTime(1000)).subscribe();
 
     this.bookService.loadBooks();
@@ -210,44 +215,14 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.clearFilter();
     });
 
-    this.metadataMenuItems = [
-      {
-        label: 'Refresh Metadata',
-        icon: 'pi pi-sync',
-        command: () => this.updateMetadata()
-      },
-      {
-        label: 'Bulk Metadata Editor',
-        icon: 'pi pi-table',
-        command: () => this.bulkEditMetadata()
-      },
-      {
-        label: 'Multi-Book Metadata Editor',
-        icon: 'pi pi-clone',
-        command: () => this.multiBookEditMetadata()
-      }
-    ];
+    this.metadataMenuItems = this.bookMenuService.getMetadataMenuItems(
+      () => this.updateMetadata(),
+      () => this.bulkEditMetadata(),
+      () => this.multiBookEditMetadata()
+    );
 
-    this.moreActionsMenuItems = [
-      {
-        label: 'Reset Progress',
-        icon: 'pi pi-undo',
-        command: () => {
-          this.confirmationService.confirm({
-            message: 'Are you sure you want to reset progress for selected books?',
-            header: 'Confirm Reset',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Yes',
-            rejectLabel: 'No',
-            accept: () => {
-              this.resetProgress();
-            }
-          });
-        }
-      }
-    ];
+    this.tieredMenuItems = this.bookMenuService.getTieredMenuItems(this.selectedBooks);
   }
-
 
   ngAfterViewInit() {
 
@@ -708,27 +683,5 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   moveFiles() {
     this.dialogHelperService.openFileMoverDialog(this.selectedBooks);
-  }
-
-  resetProgress() {
-    const bookIds = Array.from(this.selectedBooks);
-    this.bookService.resetProgress(bookIds).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Progress Reset',
-          detail: 'Reading progress has been reset.',
-          life: 1500
-        });
-      },
-      error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Failed',
-          detail: 'Could not reset progress.',
-          life: 1500
-        });
-      }
-    });
   }
 }

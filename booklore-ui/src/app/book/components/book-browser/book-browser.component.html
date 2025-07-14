@@ -343,15 +343,17 @@
                             tooltipPosition="top">
                           </p-button>
                         }
-                        <p-menu #menuMore [model]="moreActionsMenuItems" [popup]="true" appendTo="body" class="hidden"/>
-                        <p-button
-                          (click)="menuMore.toggle($event)"
-                          pTooltip="More actions"
-                          tooltipPosition="top"
-                          outlined="true"
-                          severity="info"
-                          icon="pi pi-ellipsis-v">
-                        </p-button>
+                        <div class="card flex justify-center">
+                          <p-button
+                            (click)="menu.toggle($event)"
+                            pTooltip="More actions"
+                            tooltipPosition="top"
+                            outlined="true"
+                            severity="info"
+                            icon="pi pi-ellipsis-v">
+                          </p-button>
+                          <p-tieredMenu #menu [model]="tieredMenuItems" [popup]="true" appendTo="body"/>
+                        </div>
                       </div>
                     }
                     <p-divider layout="vertical"></p-divider>

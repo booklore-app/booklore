@@ -110,7 +110,7 @@ function getMatchScoreRangeFilters(score?: number | null): { id: string; name: s
   return match ? [{id: match.id, name: match.label, sortIndex: match.sortIndex}] : [];
 }
 
-const readStatusLabels: Record<ReadStatus, string> = {
+export const readStatusLabels: Record<ReadStatus, string> = {
   [ReadStatus.UNREAD]: 'Unread',
   [ReadStatus.READING]: 'Reading',
   [ReadStatus.RE_READING]: 'Re-reading',

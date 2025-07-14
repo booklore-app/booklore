@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
-public record ReadStatusUpdateRequest(@NotBlank String status) {}
+public record ReadStatusUpdateRequest(List<Long> ids, String status) {
+}
