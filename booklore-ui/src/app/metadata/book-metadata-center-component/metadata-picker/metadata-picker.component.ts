@@ -153,10 +153,12 @@ export class MetadataPickerComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       ).subscribe((metadata) => {
 
-      this.metadataForm.reset();
-      this.copiedFields = {};
-      this.savedFields = {};
-      this.hoveredFields = {};
+      if (this.reviewMode) {
+        this.metadataForm.reset();
+        this.copiedFields = {};
+        this.savedFields = {};
+        this.hoveredFields = {};
+      }
 
       if (metadata) {
         this.originalMetadata = metadata;
