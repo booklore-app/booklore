@@ -53,7 +53,7 @@
 
               <div class="flex flex-col items-center md:items-start gap-1">
                 <div class="flex items-center gap-2 justify-center md:justify-start flex-wrap text-center md:text-left">
-                  <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                  <h2 class="text-3xl font-extrabold leading-tight">
                     {{ book?.metadata!.title }}
                   </h2>
                   <i
@@ -65,7 +65,7 @@
                   ></i>
                 </div>
 
-                <p class="text-gray-600 dark:text-gray-300 text-lg">
+                <p class="text-lg">
                   @for (author of book?.metadata!.authors; track author; let isLast = $last) {
                     <a class="hover:underline dark:text-blue-400 cursor-pointer" (click)="goToAuthorBooks(author)">
                       {{ author }}
