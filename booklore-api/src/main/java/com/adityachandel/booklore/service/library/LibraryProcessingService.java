@@ -57,13 +57,14 @@ public class LibraryProcessingService {
     public void rescanLibrary(long libraryId) throws IOException {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + libraryEntity.getName()));
-        deleteRemovedBooks(detectDeletedBookIds(libraryEntity));
-        processLibraryFiles(detectNewBookPaths(libraryEntity));
+        List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
+        deleteRemovedBooks(detectDeletedBookIds(libraryFiles, libraryEntity));
+        processLibraryFiles(detectNewBookPaths(libraryFiles, libraryEntity));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + libraryEntity.getName()));
     }
 
-    public List<Long> detectDeletedBookIds(LibraryEntity libraryEntity) throws IOException {
-        Set<String> currentFileNames = getLibraryFiles(libraryEntity).stream()
+    public static List<Long> detectDeletedBookIds(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) throws IOException {
+        Set<String> currentFileNames = libraryFiles.stream()
                 .map(LibraryFile::getFileName)
                 .collect(Collectors.toSet());
 
@@ -74,11 +75,11 @@ public class LibraryProcessingService {
                 .collect(Collectors.toList());
     }
 
-    public List<LibraryFile> detectNewBookPaths(LibraryEntity libraryEntity) throws IOException {
+    public static List<LibraryFile> detectNewBookPaths(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) throws IOException {
         Set<String> existingFileNames = libraryEntity.getBookEntities().stream()
                 .map(BookEntity::getFileName)
                 .collect(Collectors.toSet());
-        return getLibraryFiles(libraryEntity).stream()
+        return libraryFiles.stream()
                 .filter(file -> !existingFileNames.contains(file.getFileName()))
                 .collect(Collectors.toList());
     }
