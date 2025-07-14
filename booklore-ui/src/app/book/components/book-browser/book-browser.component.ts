@@ -149,6 +149,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   lastAppliedSort: SortOption | null = null;
   private settingFiltersFromUrl = false;
   protected metadataMenuItems: MenuItem[] | undefined;
+  protected moreActionsMenuItems: MenuItem[] | undefined;
   currentBooks: Book[] = [];
   lastSelectedIndex: number | null = null;
   showFilter: boolean = false;
@@ -226,7 +227,27 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         command: () => this.multiBookEditMetadata()
       }
     ];
+
+    this.moreActionsMenuItems = [
+      {
+        label: 'Reset Progress',
+        icon: 'pi pi-undo',
+        command: () => {
+          this.confirmationService.confirm({
+            message: 'Are you sure you want to reset progress for selected books?',
+            header: 'Confirm Reset',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            accept: () => {
+              this.resetProgress();
+            }
+          });
+        }
+      }
+    ];
   }
+
 
   ngAfterViewInit() {
 
@@ -687,5 +708,27 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   moveFiles() {
     this.dialogHelperService.openFileMoverDialog(this.selectedBooks);
+  }
+
+  resetProgress() {
+    const bookIds = Array.from(this.selectedBooks);
+    this.bookService.resetProgress(bookIds).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Progress Reset',
+          detail: 'Reading progress has been reset.',
+          life: 1500
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed',
+          detail: 'Could not reset progress.',
+          life: 1500
+        });
+      }
+    });
   }
 }

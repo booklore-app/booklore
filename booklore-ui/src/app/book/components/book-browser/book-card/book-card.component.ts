@@ -122,6 +122,7 @@ export class BookCardComponent implements OnInit, OnDestroy {
         },
       },
       ...this.getPermissionBasedMenuItems(),
+      ...this.moreMenuItems(),
     ];
   }
 
@@ -248,6 +249,45 @@ export class BookCardComponent implements OnInit, OnDestroy {
                   bookIds: [this.book!.id],
                   metadataRefreshType: MetadataRefreshType.BOOKS,
                 },
+              });
+            },
+          }
+        ]
+      });
+    }
+
+    return items;
+  }
+
+  private moreMenuItems(): MenuItem[] {
+    const items: MenuItem[] = [];
+
+    if (this.hasEditMetadataPermission()) {
+      items.push({
+        label: 'More Actions',
+        icon: 'pi pi-ellipsis-v',
+        items: [
+          {
+            label: 'Reset Progress',
+            icon: 'pi pi-undo',
+            command: () => {
+              this.bookService.resetProgress(this.book.id).subscribe({
+                next: () => {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Progress Reset',
+                    detail: 'Reading progress has been reset.',
+                    life: 1500
+                  });
+                },
+                error: () => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Could not reset progress.',
+                    life: 1500
+                  });
+                }
               });
             },
           }

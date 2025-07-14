@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.config.security.annotation.CheckBookAccess;
+import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookRecommendation;
 import com.adityachandel.booklore.model.dto.BookViewerSettings;
@@ -125,10 +126,12 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{bookId}/reset-progress")
-    @CheckBookAccess(bookIdParam = "bookId")
-    public ResponseEntity<Book> resetProgress(@PathVariable long bookId) {
-        Book book = bookService.resetProgress(bookId);
-        return ResponseEntity.ok(book);
+    @PostMapping("/reset-progress")
+    public ResponseEntity<List<Book>> resetProgress(@RequestBody List<Long> bookIds) {
+        if (bookIds == null || bookIds.isEmpty()) {
+            throw ApiError.BAD_REQUEST.createException("No book IDs provided");
+        }
+        List<Book> updatedBooks = bookService.resetProgress(bookIds);
+        return ResponseEntity.ok(updatedBooks);
     }
 }

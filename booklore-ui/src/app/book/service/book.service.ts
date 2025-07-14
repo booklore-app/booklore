@@ -397,9 +397,10 @@ export class BookService {
     );
   }
 
-  resetProgress(bookId: number): Observable<Book> {
-    return this.http.post<Book>(`${this.url}/${bookId}/reset-progress`, null).pipe(
-      tap(updatedBook => this.handleBookUpdate(updatedBook))
+  resetProgress(bookIds: number | number[]): Observable<Book[]> {
+    const ids = Array.isArray(bookIds) ? bookIds : [bookIds];
+    return this.http.post<Book[]>(`${this.url}/reset-progress`, ids).pipe(
+      tap(updatedBooks => updatedBooks.forEach(book => this.handleBookUpdate(book)))
     );
   }
 
