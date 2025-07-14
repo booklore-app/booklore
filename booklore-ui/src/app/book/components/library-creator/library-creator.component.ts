@@ -83,7 +83,6 @@ export class LibraryCreatorComponent implements OnInit {
   }
 
   openIconPicker() {
-    console.log('aaa')
     if (this.iconPicker) {
       this.iconPicker.open();
     }

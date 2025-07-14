@@ -55,19 +55,30 @@
       </div>
 
       <p-divider layout="vertical"/>
-      <li class="relative" (mouseenter)="onHover(true)" (mouseleave)="onHover(false)">
-        <button type="button" class="topbar-item"
-                enterActiveClass="animate-scalein"
-                enterFromClass="hidden"
-                leaveActiveClass="animate-fadeout"
-                leaveToClass="hidden"
-                pStyleClass="@next"
-                [hideOnOutsideClick]="true">
-          <i class="pi pi-wave-pulse" style="font-size: 1.5rem" [class.pulsating]="eventHighlight" [class.highlight]="eventHighlight"></i>
+
+      <li class="relative">
+        <button
+          type="button"
+          class="topbar-item"
+          (click)="notificationPopover.toggle($event)"
+        >
+          <i
+            class="pi"
+            [ngClass]="iconClass"
+            [ngStyle]="{ color: iconColor }"
+            style="font-size: 1.25rem"
+            [class.pulsating]="iconPulsating"
+            aria-label="Unified Notification Icon"
+          ></i>
         </button>
-        @if (isHovered) {
-          <app-live-notification-box class="config-panel notification-box"></app-live-notification-box>
+
+        @if (shouldShowNotificationBadge) {
+          <span class="notification-badge">{{ completedTaskCount }}</span>
         }
+
+        <p-popover #notificationPopover>
+          <app-unified-notification-popover-component></app-unified-notification-popover-component>
+        </p-popover>
       </li>
 
       <p-divider layout="vertical"/>

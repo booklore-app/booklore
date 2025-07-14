@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.controller;
 
+import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.config.security.annotation.CheckBookAccess;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
@@ -33,6 +34,7 @@ public class MetadataController {
     private final BookMetadataService bookMetadataService;
     private final BookMetadataUpdater bookMetadataUpdater;
     private final JobSchedulerService jobSchedulerService;
+    private final AuthenticationService authenticationService;
     private final BookMetadataMapper bookMetadataMapper;
     private final MetadataMatchService metadataMatchService;
     private final BookRepository bookRepository;
@@ -64,7 +66,8 @@ public class MetadataController {
     @PutMapping(path = "/metadata/refresh")
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")
     public ResponseEntity<String> scheduleRefreshV2(@Validated @RequestBody MetadataRefreshRequest request) {
-        jobSchedulerService.scheduleMetadataRefresh(request);
+        Long userId = authenticationService.getAuthenticatedUser().getId();
+        jobSchedulerService.scheduleMetadataRefresh(request, userId);
         return ResponseEntity.noContent().build();
     }
 

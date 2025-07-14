@@ -1,10 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Divider } from 'primeng/divider';
-import { MetadataAdvancedFetchOptionsComponent } from '../../book/metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
+import { MetadataAdvancedFetchOptionsComponent } from '../../metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
 import { MetadataProviderSettingsComponent } from '../global-preferences/metadata-provider-settings/metadata-provider-settings.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Tooltip } from 'primeng/tooltip';
-import { MetadataRefreshOptions } from '../../book/metadata/model/request/metadata-refresh-options.model';
+import { MetadataRefreshOptions } from '../../metadata/model/request/metadata-refresh-options.model';
 import { AppSettingsService } from '../../core/service/app-settings.service';
 import { MessageService } from 'primeng/api';
 import { Observable } from 'rxjs';

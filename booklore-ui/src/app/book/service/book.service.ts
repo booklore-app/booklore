@@ -5,8 +5,8 @@ import {catchError, filter, map, tap} from 'rxjs/operators';
 import {Book, BookDeletionResponse, BookMetadata, BookRecommendation, BookSetting, BulkMetadataUpdateRequest, MetadataUpdateWrapper, ReadStatus} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
-import {FetchMetadataRequest} from '../metadata/model/request/fetch-metadata-request.model';
-import {MetadataRefreshRequest} from '../metadata/model/request/metadata-refresh-request.model';
+import {FetchMetadataRequest} from '../../metadata/model/request/fetch-metadata-request.model';
+import {MetadataRefreshRequest} from '../../metadata/model/request/metadata-refresh-request.model';
 import {MessageService} from 'primeng/api';
 
 @Injectable({

@@ -8,7 +8,7 @@ import {SettingsComponent} from './settings/settings.component';
 import {PdfViewerComponent} from './book/components/pdf-viewer/pdf-viewer.component';
 import {EpubViewerComponent} from './book/components/epub-viewer/component/epub-viewer.component';
 import {ChangePasswordComponent} from './core/component/change-password/change-password.component';
-import {BookMetadataCenterComponent} from './book/metadata/book-metadata-center/book-metadata-center.component';
+import {BookMetadataCenterComponent} from './metadata/book-metadata-center-component/book-metadata-center.component';
 import {SetupComponent} from './core/setup/setup.component';
 import {SetupGuard} from './core/setup/setup.guard';
 import {SetupRedirectGuard} from './core/setup/setup-redirect.guard';

@@ -12,7 +12,7 @@ import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {filter, Subject} from 'rxjs';
 import {UserService} from '../../../../settings/user-management/user.service';
-import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-center/book-metadata-center.component';
+import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center-component/book-metadata-center.component';
 import {DialogService} from 'primeng/dynamicdialog';
 import {takeUntil} from 'rxjs/operators';
 
