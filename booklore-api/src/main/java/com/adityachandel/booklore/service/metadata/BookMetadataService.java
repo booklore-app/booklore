@@ -190,6 +190,9 @@ public class BookMetadataService {
         if (metadataMap.containsKey(Hardcover)) {
             metadata.setHardcoverId(metadataMap.get(Hardcover).getHardcoverId());
         }
+        if (metadataMap.containsKey(Comicvine)) {
+            metadata.setComicvineId(metadataMap.get(Comicvine).getComicvineId());
+        }
         if (metadataMap.containsKey(Google)) {
             metadata.setGoogleId(metadataMap.get(Google).getGoogleId());
         }

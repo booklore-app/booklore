@@ -50,6 +50,7 @@ export interface BookMetadata {
   isbn10?: string;
   asin?: string;
   goodreadsId?: string;
+  comicvineId?: string;
   hardcoverId?: string;
   googleId?: string;
   pageCount?: number | null;
@@ -81,6 +82,7 @@ export interface BookMetadata {
   isbn13Locked?: boolean;
   isbn10Locked?: boolean;
   asinLocked?: boolean;
+  comicvineIdLocked?: boolean;
   goodreadsIdLocked?: boolean;
   hardcoverIdLocked?: boolean;
   googleIdLocked?: boolean;
@@ -114,6 +116,7 @@ export interface MetadataClearFlags {
   isbn10?: boolean;
   asin?: boolean;
   goodreadsId?: boolean;
+  comicvineId?: boolean;
   hardcoverId?: boolean;
   googleId?: boolean;
   pageCount?: boolean;

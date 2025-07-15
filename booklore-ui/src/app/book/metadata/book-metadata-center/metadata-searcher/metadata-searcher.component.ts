@@ -202,6 +202,9 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
     } else if (metadata.hardcoverId) {
       return `<a href="https://hardcover.app/books/${metadata.hardcoverId}" target="_blank">Hardcover</a>`;
     }
+    else if (metadata.comicvineId) {
+      return `<a href="https://comicvine.gamespot.com/volume/${metadata.comicvineId}" target="_blank">Comicvine</a>`;
+    }
 
     throw new Error("No provider ID found in metadata.");
   }

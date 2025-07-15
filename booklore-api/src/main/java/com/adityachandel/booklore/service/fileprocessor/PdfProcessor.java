@@ -123,6 +123,9 @@ public class PdfProcessor implements FileProcessor {
             if (StringUtils.isNotBlank(extracted.getGoodreadsId())) {
                 bookEntity.getMetadata().setGoodreadsId(extracted.getGoodreadsId());
             }
+            if (StringUtils.isNotBlank(extracted.getComicvineId())){
+                bookEntity.getMetadata().setComicvineId(extracted.getComicvineId());
+            }
             if (StringUtils.isNotBlank(extracted.getIsbn10())) {
                 bookEntity.getMetadata().setIsbn10(extracted.getIsbn10());
             }

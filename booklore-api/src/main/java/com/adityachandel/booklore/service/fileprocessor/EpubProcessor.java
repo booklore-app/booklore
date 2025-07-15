@@ -134,6 +134,7 @@ public class EpubProcessor implements FileProcessor {
         bookMetadata.setHardcoverRating(epubMetadata.getHardcoverRating());
         bookMetadata.setHardcoverReviewCount(epubMetadata.getHardcoverReviewCount());
         bookMetadata.setGoogleId(truncate(epubMetadata.getGoogleId(), 100));
+        bookMetadata.setComicvineId(truncate(epubMetadata.getComicvineId(), 100));
 
         bookCreatorService.addAuthorsToBook(epubMetadata.getAuthors(), bookEntity);
 

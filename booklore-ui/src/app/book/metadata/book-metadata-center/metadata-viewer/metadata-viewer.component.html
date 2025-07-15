@@ -144,6 +144,13 @@
                          class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
                   </a>
                 }
+                @if (book?.metadata!.comicvineId) {
+                  <a class="flex items-center gap-1" [href]="'https://comicvine.gamespot.com/comic/' + book?.metadata!.comicvineId" target="_blank" rel="noopener noreferrer">
+                    <img src="https://comicvine.gamespot.com/favicon.ico" alt="Comic Vine"
+                         class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"/>
+                    
+                  </a>
+                }
               }
             </div>
             <div class="overflow-x-auto pt-4 scrollbar-hide max-w-full w-full">
