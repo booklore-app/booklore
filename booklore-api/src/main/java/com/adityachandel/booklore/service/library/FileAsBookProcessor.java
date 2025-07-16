@@ -3,11 +3,11 @@ package com.adityachandel.booklore.service.library;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.service.NotificationService;
-import com.adityachandel.booklore.service.fileprocessor.CbxProcessor;
-import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
-import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
+import com.adityachandel.booklore.service.fileprocessor.BookFileProcessor;
+import com.adityachandel.booklore.service.fileprocessor.BookFileProcessorRegistry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,9 +23,7 @@ import static com.adityachandel.booklore.model.websocket.LogNotification.createL
 public class FileAsBookProcessor implements LibraryFileProcessor {
     
     private final NotificationService notificationService;
-    private final PdfProcessor pdfProcessor;
-    private final EpubProcessor epubProcessor;
-    private final CbxProcessor cbxProcessor;
+    private final BookFileProcessorRegistry processorRegistry;
 
     @Override
     @Transactional
@@ -43,10 +41,14 @@ public class FileAsBookProcessor implements LibraryFileProcessor {
 
     @Transactional
     protected Book processLibraryFile(LibraryFile libraryFile) {
-        return switch (libraryFile.getBookFileType()) {
-            case PDF -> pdfProcessor.processFile(libraryFile);
-            case EPUB -> epubProcessor.processFile(libraryFile);
-            case CBX -> cbxProcessor.processFile(libraryFile);
-        };
+        BookFileExtension extension = BookFileExtension.fromFileName(libraryFile.getFileName()).orElse(null);
+        if (extension == null) {
+            log.warn("Unsupported file type for file: {}", libraryFile.getFileName());
+            return null;
+        }
+
+        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(extension);
+        return processor.processFile(libraryFile);
     }
+
 }
