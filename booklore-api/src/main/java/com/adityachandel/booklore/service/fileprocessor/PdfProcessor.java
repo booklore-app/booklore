@@ -4,6 +4,7 @@ import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
@@ -23,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
 import static com.adityachandel.booklore.service.fileprocessor.FileProcessingUtils.truncate;
 
@@ -66,6 +68,11 @@ public class PdfProcessor extends AbstractFileProcessor implements BookFileProce
             log.warn("Failed to generate cover for '{}': {}", bookEntity.getFileName(), e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public List<BookFileExtension> getSupportedExtensions() {
+        return List.of(BookFileExtension.PDF);
     }
 
     private void extractAndSetMetadata(BookEntity bookEntity) {

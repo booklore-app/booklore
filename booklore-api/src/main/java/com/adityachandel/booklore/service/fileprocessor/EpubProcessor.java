@@ -5,6 +5,7 @@ import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
+import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
@@ -21,6 +22,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -90,6 +92,11 @@ public class EpubProcessor extends AbstractFileProcessor implements BookFileProc
             log.error("Error generating cover for EPUB '{}': {}", bookEntity.getFileName(), e.getMessage(), e);
             return false;
         }
+    }
+
+    @Override
+    public List<BookFileExtension> getSupportedExtensions() {
+        return List.of(BookFileExtension.EPUB);
     }
 
     private void setBookMetadata(BookEntity bookEntity) {
