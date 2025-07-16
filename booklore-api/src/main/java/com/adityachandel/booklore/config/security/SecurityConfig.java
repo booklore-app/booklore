@@ -77,7 +77,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(unauthenticatedEndpoints.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
-                        )
+                )
                 .httpBasic(basic -> basic
                         .realmName("Booklore OPDS")
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -91,6 +91,18 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
+    public SecurityFilterChain koreaderSecurityChain(HttpSecurity http, KoreaderAuthFilter koreaderAuthFilter) throws Exception {
+        http
+                .securityMatcher("/api/koreader/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .addFilterBefore(koreaderAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    @Order(3)
     public SecurityFilterChain jwtApiSecurityChain(HttpSecurity http) throws Exception {
         List<String> publicEndpoints = new ArrayList<>(Arrays.asList(COMMON_PUBLIC_ENDPOINTS));
         if (appProperties.getSwagger().isEnabled()) {

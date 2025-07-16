@@ -5,6 +5,7 @@ import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.repository.AppMigrationRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookQueryService;
+import com.adityachandel.booklore.service.FileFingerprint;
 import com.adityachandel.booklore.service.metadata.MetadataMatchService;
 import com.adityachandel.booklore.util.FileUtils;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -66,29 +69,35 @@ public class AppMigrationService {
 
     @Transactional
     public void populateFileHashesOnce() {
-        if (migrationRepository.existsById("populateFileHashes")) return;
+        if (migrationRepository.existsById("populateFileHashesV2")) return;
 
         List<BookEntity> books = bookRepository.findAll();
         int updated = 0;
 
         for (BookEntity book : books) {
-            if (book.getCurrentHash() == null || book.getInitialHash() == null) {
-                String hash = FileUtils.computeFileHash(book);
-                if (hash != null) {
-                    if (book.getInitialHash() == null) {
-                        book.setInitialHash(hash);
-                    }
-                    book.setCurrentHash(hash);
-                    updated++;
+            Path path = book.getFullFilePath();
+            if (path == null || !Files.exists(path)) {
+                log.warn("Skipping hashing for book ID {} — file not found at path: {}", book.getId(), path);
+                continue;
+            }
+
+            try {
+                String hash = FileFingerprint.generateHash(path);
+                if (book.getInitialHash() == null) {
+                    book.setInitialHash(hash);
                 }
+                book.setCurrentHash(hash);
+                updated++;
+            } catch (Exception e) {
+                log.error("Failed to compute hash for file: {}", path, e);
             }
         }
 
         bookRepository.saveAll(books);
 
-        log.info("Migration 'populateFileHashes' applied to {} books.", updated);
+        log.info("Migration 'populateFileHashesV2' applied to {} books.", updated);
         migrationRepository.save(new AppMigrationEntity(
-                "populateFileHashes",
+                "populateFileHashesV2",
                 LocalDateTime.now(),
                 "Calculate and store initialHash and currentHash for all books"
         ));

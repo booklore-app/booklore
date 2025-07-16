@@ -48,6 +48,18 @@ public class UserBookProgressEntity {
     @Column(name = "cbx_progress_percent")
     private Float cbxProgressPercent;
 
+    @Column(name = "koreader_progress", length = 1000)
+    private String koreaderProgress;
+
+    @Column(name = "koreader_progress_percent")
+    private Float koreaderProgressPercent;
+
+    @Column(name = "koreader_device", length = 100)
+    private String koreaderDevice;
+
+    @Column(name = "koreader_device_id", length = 100)
+    private String koreaderDeviceId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "read_status")
     private ReadStatus readStatus;

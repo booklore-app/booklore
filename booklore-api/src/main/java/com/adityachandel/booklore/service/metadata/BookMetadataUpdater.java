@@ -11,6 +11,7 @@ import com.adityachandel.booklore.model.entity.CategoryEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.CategoryRepository;
+import com.adityachandel.booklore.service.FileFingerprint;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestore;
 import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestoreFactory;
@@ -114,7 +115,7 @@ public class BookMetadataUpdater {
 
                     File file = new File(bookEntity.getFullFilePath().toUri());
                     writer.writeMetadataToFile(file, metadata, thumbnailUrl, false, clearFlags);
-                    String newHash = FileUtils.computeFileHash(bookEntity);
+                    String newHash = FileFingerprint.generateHash(bookEntity.getFullFilePath());
                     bookEntity.setCurrentHash(newHash);
                     log.info("Metadata written for book ID {}", bookId);
 
