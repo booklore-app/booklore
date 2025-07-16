@@ -62,23 +62,23 @@ public class LibraryProcessingService {
     }
 
     public static List<Long> detectDeletedBookIds(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) {
-        Set<String> currentFileNames = libraryFiles.stream()
-                .map(LibraryFile::getFileName)
+        Set<Path> currentFullPaths = libraryFiles.stream()
+                .map(LibraryFile::getFullPath)
                 .collect(Collectors.toSet());
 
         return libraryEntity.getBookEntities().stream()
                 .filter(book -> (book.getDeleted() == null || !book.getDeleted()))
-                .filter(book -> !currentFileNames.contains(book.getFileName()))
+                .filter(book -> !currentFullPaths.contains(book.getFullFilePath()))
                 .map(BookEntity::getId)
                 .collect(Collectors.toList());
     }
 
     public static List<LibraryFile> detectNewBookPaths(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) {
-        Set<String> existingFileNames = libraryEntity.getBookEntities().stream()
-                .map(BookEntity::getFileName)
+        Set<Path> existingFullPaths = libraryEntity.getBookEntities().stream()
+                .map(BookEntity::getFullFilePath)
                 .collect(Collectors.toSet());
         return libraryFiles.stream()
-                .filter(file -> !existingFileNames.contains(file.getFileName()))
+                .filter(file -> !existingFullPaths.contains(file.getFullPath()))
                 .collect(Collectors.toList());
     }
 
