@@ -63,7 +63,7 @@ public class LibraryProcessingService {
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + libraryEntity.getName()));
     }
 
-    public static List<Long> detectDeletedBookIds(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) throws IOException {
+    public static List<Long> detectDeletedBookIds(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) {
         Set<String> currentFileNames = libraryFiles.stream()
                 .map(LibraryFile::getFileName)
                 .collect(Collectors.toSet());
@@ -75,7 +75,7 @@ public class LibraryProcessingService {
                 .collect(Collectors.toList());
     }
 
-    public static List<LibraryFile> detectNewBookPaths(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) throws IOException {
+    public static List<LibraryFile> detectNewBookPaths(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) {
         Set<String> existingFileNames = libraryEntity.getBookEntities().stream()
                 .map(BookEntity::getFileName)
                 .collect(Collectors.toSet());
