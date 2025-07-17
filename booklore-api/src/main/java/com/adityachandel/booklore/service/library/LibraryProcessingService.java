@@ -36,14 +36,15 @@ public class LibraryProcessingService {
     private final NotificationService notificationService;
     private final BookRepository bookRepository;
     private final FileService fileService;
-    private final FileAsBookProcessor fileAsBookProcessor;
+    private final LibraryFileProcessorRegistry fileProcessorRegistry;
 
     @Transactional
     public void processLibrary(long libraryId) throws IOException {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started processing library: " + libraryEntity.getName()));
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
-        fileAsBookProcessor.processLibraryFiles(libraryFiles, libraryEntity);
+        LibraryFileProcessor processor = fileProcessorRegistry.getProcessor(libraryEntity);
+        processor.processLibraryFiles(libraryFiles, libraryEntity);
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished processing library: " + libraryEntity.getName()));
     }
 
@@ -53,12 +54,14 @@ public class LibraryProcessingService {
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + libraryEntity.getName()));
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
         deleteRemovedBooks(detectDeletedBookIds(libraryFiles, libraryEntity));
-        fileAsBookProcessor.processLibraryFiles(detectNewBookPaths(libraryFiles, libraryEntity), libraryEntity);
+        LibraryFileProcessor processor = fileProcessorRegistry.getProcessor(libraryEntity);
+        processor.processLibraryFiles(detectNewBookPaths(libraryFiles, libraryEntity), libraryEntity);
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + libraryEntity.getName()));
     }
 
     public void processLibraryFiles(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) {
-        fileAsBookProcessor.processLibraryFiles(libraryFiles, libraryEntity);
+        LibraryFileProcessor processor = fileProcessorRegistry.getProcessor(libraryEntity);
+        processor.processLibraryFiles(libraryFiles, libraryEntity);
     }
 
     public static List<Long> detectDeletedBookIds(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) {
