@@ -53,7 +53,7 @@
                   @for (uploadFile of this.files; track uploadFile; let i = $index) {
                     <div class="flex justify-between items-center w-full gap-4">
                       <div class="flex items-center gap-4 overflow-hidden flex-1">
-                        <p-badge [value]="uploadFile.status" [severity]="getBadgeSeverity(uploadFile.status)" class="shrink-0"/>
+                        <p-badge [value]="uploadFile.status === 'Pending' ? 'Ready to Upload' : uploadFile.status" [severity]="getBadgeSeverity(uploadFile.status)" class="shrink-0"/>
                         <span class="font-semibold text-ellipsis whitespace-nowrap overflow-hidden flex-1">
                           {{ uploadFile.file.name }}
                         </span>
