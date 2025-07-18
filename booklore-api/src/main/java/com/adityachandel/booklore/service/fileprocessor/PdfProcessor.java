@@ -1,7 +1,6 @@
 package com.adityachandel.booklore.service.fileprocessor;
 
 import com.adityachandel.booklore.mapper.BookMapper;
-import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.BookEntity;
@@ -47,13 +46,13 @@ public class PdfProcessor extends AbstractFileProcessor implements BookFileProce
     }
 
     @Override
-    public Book processNewFile(LibraryFile libraryFile) {
+    public BookEntity processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.PDF);
         if (generateCover(bookEntity)) {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
         extractAndSetMetadata(bookEntity);
-        return finishAndReturnBook(bookEntity);
+        return bookEntity;
     }
 
     @Override

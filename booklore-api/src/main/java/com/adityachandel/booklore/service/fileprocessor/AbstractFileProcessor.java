@@ -52,20 +52,18 @@ public abstract class AbstractFileProcessor implements FileProcessor {
                 return bookMapper.toBook(byName.get());
             }
         }
-        return processNewFile(libraryFile);
+
+        BookEntity book = processNewFile(libraryFile);
+        book.setCurrentHash(hash);
+
+        Float score = metadataMatchService.calculateMatchScore(book);
+        book.setMetadataMatchScore(score);
+
+        bookCreatorService.saveConnections(book);
+
+        return bookMapper.toBook(book);
     }
 
-    protected abstract Book processNewFile(LibraryFile libraryFile);
+    protected abstract BookEntity processNewFile(LibraryFile libraryFile);
 
-    protected Book finishAndReturnBook(BookEntity bookEntity) {
-        String hash = FileUtils.computeFileHash(bookEntity);
-        bookEntity.setCurrentHash(hash);
-
-        Float score = metadataMatchService.calculateMatchScore(bookEntity);
-        bookEntity.setMetadataMatchScore(score);
-
-        bookCreatorService.saveConnections(bookEntity);
-
-        return bookMapper.toBook(bookEntity);
-    }
 }

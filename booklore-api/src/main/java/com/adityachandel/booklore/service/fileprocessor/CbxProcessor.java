@@ -42,13 +42,13 @@ public class CbxProcessor extends AbstractFileProcessor implements BookFileProce
     }
 
     @Override
-    public Book processNewFile(LibraryFile libraryFile) {
+    public BookEntity processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.CBX);
         if (generateCover(bookEntity)) {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
         setMetadata(bookEntity);
-        return finishAndReturnBook(bookEntity);
+        return bookEntity;
     }
 
     @Override
