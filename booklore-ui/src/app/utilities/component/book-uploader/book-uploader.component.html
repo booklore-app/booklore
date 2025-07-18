@@ -22,7 +22,7 @@
       (uploadHandler)="uploadFiles($event)"
       [disabled]="!selectedLibrary || !selectedPath">
       <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback" let-uploadCallback="uploadCallback">
-        <div class="flex flex-wrap items-center justify-center flex-1 gap-4">
+        <div class="flex flex-col items-center justify-center flex-1 gap-4">
           <div class="flex gap-4">
             <p-button (onClick)="choose($event, chooseCallback)"
               icon="pi pi-images"
@@ -41,7 +41,8 @@
               [outlined]="true"
               severity="danger"
               [disabled]="!filesPresent() || isUploading"/>
-          </div>
+          </div> 
+           <div>Click the upload icon to upload your selected files</div>
         </div>
       </ng-template>
       <ng-template #content let-files let-removeFileCallback="removeFileCallback">
