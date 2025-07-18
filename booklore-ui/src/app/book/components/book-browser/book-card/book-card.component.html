@@ -4,13 +4,20 @@
   (mouseout)="isHovered = false">
 
   <div class="cover-container" [ngClass]="{ 'shimmer': !isImageLoaded, 'center-info-btn': readButtonHidden }">
-    <img
-      [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
-      class="book-cover"
-      [class.loaded]="isImageLoaded"
-      alt="Cover of {{ book.metadata?.title }}"
-      loading="lazy"
-      (load)="onImageLoad()"/>
+    <div
+      class="cover-container"
+      [ngClass]="{
+        'center-info-btn': readButtonHidden,
+        'loaded': isImageLoaded
+      }">
+      <img
+        [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
+        class="book-cover"
+        [class.loaded]="isImageLoaded"
+        alt="Cover of {{ book.metadata?.title }}"
+        loading="lazy"
+        (load)="onImageLoad()" />
+    </div>
 
     @if (book.metadata?.seriesNumber != null) {
       <div class="series-number-overlay">

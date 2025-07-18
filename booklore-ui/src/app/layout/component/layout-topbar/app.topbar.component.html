@@ -55,19 +55,30 @@
       </div>
 
       <p-divider layout="vertical"/>
-      <li class="relative" (mouseenter)="onHover(true)" (mouseleave)="onHover(false)">
-        <button type="button" class="topbar-item"
-                enterActiveClass="animate-scalein"
-                enterFromClass="hidden"
-                leaveActiveClass="animate-fadeout"
-                leaveToClass="hidden"
-                pStyleClass="@next"
-                [hideOnOutsideClick]="true">
-          <i class="pi pi-wave-pulse" style="font-size: 1.5rem" [class.pulsating]="eventHighlight" [class.highlight]="eventHighlight"></i>
+
+      <li class="relative">
+        <button
+          type="button"
+          class="topbar-item"
+          (click)="notificationPopover.toggle($event)"
+        >
+          <i
+            class="pi"
+            [ngClass]="iconClass"
+            [ngStyle]="{ color: iconColor }"
+            style="font-size: 1.25rem"
+            [class.pulsating]="iconPulsating"
+            aria-label="Unified Notification Icon"
+          ></i>
         </button>
-        @if (isHovered) {
-          <app-live-notification-box class="config-panel notification-box"></app-live-notification-box>
+
+        @if (shouldShowNotificationBadge) {
+          <span class="notification-badge">{{ completedTaskCount }}</span>
         }
+
+        <p-popover #notificationPopover>
+          <app-unified-notification-popover-component></app-unified-notification-popover-component>
+        </p-popover>
       </li>
 
       <p-divider layout="vertical"/>
@@ -78,7 +89,7 @@
             style="animation-duration: 2s; background: conic-gradient(from 90deg, #f97316, #f59e0b, #eab308, #84cc16, #22c55e, #10b981, #14a8a6, #06b6d4, #0ea5e9, #3b82f6, #6366f1, #8b5cf6, #a855f7, #d946ef, #ec4899, #f43f5e)"
             class="absolute -top-5 -left-5 w-20 h-20 animate-spin">
           </span>
-          <span style="inset: 1px; border-radius: 4px" class="absolute z-2 bg-surface-0 dark:bg-surface-900 transition-all"></span>
+          <span style="inset: 1px; border-radius: 4px" class="absolute z-2 bg-surface-900 transition-all"></span>
           <i class="pi pi-thumbs-up z-10"></i>
         </li>
         <li class="relative">

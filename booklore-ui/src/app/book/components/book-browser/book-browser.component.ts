@@ -41,6 +41,10 @@ import {Slider} from 'primeng/slider';
 import {Select} from 'primeng/select';
 import {FilterSortPreferenceService} from './filters/filter-sorting-preferences.service';
 import {Divider} from 'primeng/divider';
+import {MultiSelect} from 'primeng/multiselect';
+import {TableColumnPreferenceService} from './table-column-preference-service';
+import {TieredMenu} from 'primeng/tieredmenu';
+import {BookMenuService} from '../../service/book-menu.service';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -73,7 +77,7 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, Divider],
+  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, Divider, MultiSelect, TieredMenu],
   providers: [SeriesCollapseFilter],
   animations: [
     trigger('slideInOut', [
@@ -113,6 +117,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
   @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
 
+  visibleColumns: { field: string; header: string }[] = [];
+
   selectedFilter = new BehaviorSubject<Record<string, any> | null>(null);
   selectedFilterMode = new BehaviorSubject<'and' | 'or'>('and');
   protected resetFilterSubject = new Subject<void>();
@@ -122,6 +128,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   protected userService = inject(UserService);
   protected coverScalePreferenceService = inject(CoverScalePreferenceService);
   protected filterSortPreferenceService = inject(FilterSortPreferenceService);
+  protected columnPreferenceService = inject(TableColumnPreferenceService);
 
   private activatedRoute = inject(ActivatedRoute);
   private messageService = inject(MessageService);
@@ -129,6 +136,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private bookService = inject(BookService);
   private shelfService = inject(ShelfService);
   private dialogHelperService = inject(BookDialogHelperService);
+  private bookMenuService = inject(BookMenuService);
   private sortService = inject(SortService);
   private router = inject(Router);
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -142,12 +150,13 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   currentViewMode: string | undefined = undefined;
   lastAppliedSort: SortOption | null = null;
-  filterVisibility = true;
   private settingFiltersFromUrl = false;
   protected metadataMenuItems: MenuItem[] | undefined;
+  protected tieredMenuItems: MenuItem[] | undefined;
   currentBooks: Book[] = [];
   lastSelectedIndex: number | null = null;
   showFilter: boolean = false;
+
 
   get currentCardSize() {
     return this.coverScalePreferenceService.currentCardSize;
@@ -161,7 +170,15 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.coverScalePreferenceService.setScale(this.coverScalePreferenceService.scaleFactor);
   }
 
+  onVisibleColumnsChange(selected: any[]) {
+    const allFields = this.bookTableComponent.allColumns.map(col => col.field);
+    this.visibleColumns = selected.sort(
+      (a, b) => allFields.indexOf(a.field) - allFields.indexOf(b.field)
+    );
+  }
+
   ngOnInit(): void {
+
     this.coverScalePreferenceService.scaleChange$.pipe(debounceTime(1000)).subscribe();
 
     this.bookService.loadBooks();
@@ -198,26 +215,17 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.clearFilter();
     });
 
-    this.metadataMenuItems = [
-      {
-        label: 'Refresh Metadata',
-        icon: 'pi pi-sync',
-        command: () => this.updateMetadata()
-      },
-      {
-        label: 'Bulk Metadata Editor',
-        icon: 'pi pi-table',
-        command: () => this.bulkEditMetadata()
-      },
-      {
-        label: 'Multi-Book Metadata Editor',
-        icon: 'pi pi-clone',
-        command: () => this.multiBookEditMetadata()
-      }
-    ];
+    this.metadataMenuItems = this.bookMenuService.getMetadataMenuItems(
+      () => this.updateMetadata(),
+      () => this.bulkEditMetadata(),
+      () => this.multiBookEditMetadata()
+    );
+
+    this.tieredMenuItems = this.bookMenuService.getTieredMenuItems(this.selectedBooks);
   }
 
   ngAfterViewInit() {
+
     combineLatest({
       paramMap: this.activatedRoute.queryParamMap,
       user: this.userService.userState$.pipe(
@@ -229,7 +237,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const viewParam = paramMap.get(QUERY_PARAMS.VIEW);
       const sortParam = paramMap.get(QUERY_PARAMS.SORT);
       const directionParam = paramMap.get(QUERY_PARAMS.DIRECTION);
-      const sidebarParam = paramMap.get(QUERY_PARAMS.SIDEBAR);
       const filterParams = paramMap.get(QUERY_PARAMS.FILTER);
 
       const parsedFilters: Record<string, string[]> = {};
@@ -270,6 +277,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const currentEntityTypeStr = this.entityType ? this.entityType.toString().toUpperCase() : undefined;
       this.coverScalePreferenceService.initScaleValue(user?.userSettings?.entityViewPreferences?.global?.coverSize);
       this.filterSortPreferenceService.initValue(user?.userSettings?.filterSortingMode);
+      this.columnPreferenceService.initPreferences(user.userSettings?.tableColumnPreference);
+      this.visibleColumns = this.columnPreferenceService.visibleColumns;
+
 
       const override = this.entityViewPreferences?.overrides?.find(o =>
         o.entityType?.toUpperCase() === currentEntityTypeStr &&

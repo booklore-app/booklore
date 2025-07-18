@@ -1,4 +1,4 @@
-import {MetadataRefreshOptions} from '../../book/metadata/model/request/metadata-refresh-options.model';
+import {MetadataRefreshOptions} from '../../metadata/model/request/metadata-refresh-options.model';
 
 export interface MetadataMatchWeights {
   title: number;

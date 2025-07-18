@@ -70,6 +70,12 @@ export interface NewPdfReaderSetting {
   pageViewMode: PdfPageViewMode;
 }
 
+export interface TableColumnPreference {
+  field: string;
+  visible: boolean;
+  order: number;
+}
+
 export interface UserSettings {
   perBookSetting: PerBookSetting;
   pdfReaderSetting: PdfReaderSetting;
@@ -81,6 +87,7 @@ export interface UserSettings {
   filterSortingMode: 'alphabetical' | 'count';
   metadataCenterViewMode: 'route' | 'dialog';
   entityViewPreferences: EntityViewPreferences;
+  tableColumnPreference?: TableColumnPreference[];
 }
 
 export interface User {

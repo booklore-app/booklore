@@ -2,12 +2,13 @@ import {inject, Injectable} from '@angular/core';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {LockUnlockMetadataDialogComponent} from './lock-unlock-metadata-dialog/lock-unlock-metadata-dialog.component';
-import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
-import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
-import {BulkMetadataUpdateComponent} from '../../metadata/bulk-metadata-update-component/bulk-metadata-update-component';
-import {MultiBookMetadataEditorComponent} from '../../metadata/multi-book-metadata-editor-component/multi-book-metadata-editor-component';
+import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
+import {BulkMetadataUpdateComponent} from '../../../metadata/bulk-metadata-update-component/bulk-metadata-update-component';
+import {MultiBookMetadataEditorComponent} from '../../../metadata/multi-book-metadata-editor-component/multi-book-metadata-editor-component';
 import {FileMoverComponent} from '../../../file-mover-component/file-mover-component';
 import {count} from 'rxjs';
+import {MultiBookMetadataFetchComponent} from '../../../metadata/multi-book-metadata-fetch-component/multi-book-metadata-fetch-component';
 
 @Injectable({providedIn: 'root'})
 export class BookDialogHelperService {
@@ -45,7 +46,7 @@ export class BookDialogHelperService {
   }
 
   openMetadataRefreshDialog(bookIds: Set<number>): DynamicDialogRef {
-    return this.dialogService.open(MetadataFetchOptionsComponent, {
+    return this.dialogService.open(MultiBookMetadataFetchComponent, {
       header: 'Metadata Refresh Options',
       modal: true,
       closable: true,

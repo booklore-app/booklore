@@ -48,13 +48,13 @@
   <!-- Search results below small screen search input -->
   @if (books.length > 0 || searchQuery) {
     <div
-      class="search-dropdown layout-menu w-[350px] sm:w-[600px]"
+      class="search-dropdown layout-menu w-[300px] sm:w-[600px]"
       [class.show]="(books.length > 0)"
     >
       @if (books.length > 0) {
         @for (book of books; track book) {
           <div class="search-dropdown-item flex flex-col" (click)="onBookClick(book)">
-            <div class="flex flex-row w-full px-2">
+            <div class="flex flex-row w-full p-2">
               <img
                 [attr.src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
                 alt="Book Cover"
@@ -62,14 +62,12 @@
               />
               <div class="search-book-details">
                 <div class="flex items-center">
-                  <p class="search-book-name text-lg font-medium truncate">
+                  <p class="search-book-name text font-medium truncate">
                     {{ book.metadata?.title | slice: 0:70 }}
                   </p>
                 </div>
                 @if (book.metadata?.authors?.length ?? 0 > 0) {
-                  <div class="search-book-authors">
-                    <p class="italic">by: {{ getAuthorNames(book.metadata?.authors) }}</p>
-                  </div>
+                  <p class="italic text-gray-300">by: {{ getAuthorNames(book.metadata?.authors) }}</p>
                 }
               </div>
             </div>

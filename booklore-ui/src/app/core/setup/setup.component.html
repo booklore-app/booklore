@@ -2,7 +2,7 @@
      style="background: linear-gradient(60deg, var(--primary-color) 0%, #1e3a8a 100%);">
   <div class="flex flex-col items-center justify-center -mt-48">
     <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-      <div class="w-full bg-surface-0 dark:bg-surface-900 py-16 px-8 sm:px-16" style="border-radius: 53px">
+      <div class="w-full bg-surface-900 py-16 px-8 sm:px-16" style="border-radius: 53px">
         <div class="text-center mb-8">
           <svg class="mb-8 w-16 h-16 mx-auto" viewBox="0 0 126 126" fill="var(--primary-color)" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -12,13 +12,13 @@
               fill="white"/>
           </svg>
           <div class="text-3xl font-medium mb-4">Welcome to Booklore</div>
-          <span class="text-muted-color text-xl">Setup Initial Admin Account</span>
+          <span class="text-xl">Setup Initial Admin Account</span>
         </div>
 
         <form class="flex flex-col gap-4" [formGroup]="setupForm" (ngSubmit)="onSubmit()">
 
           <div class="flex flex-col gap-2">
-            <label for="username" class="text-xl font-medium">Username</label>
+            <label for="username" class="text-lg font-medium">Username</label>
             <input
               pInputText
               id="username"
@@ -36,7 +36,7 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="name" class="text-xl font-medium">Name</label>
+            <label for="name" class="text-lg font-medium">Name</label>
             <input
               pInputText
               id="name"
@@ -54,7 +54,7 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="email" class="text-xl font-medium">Email</label>
+            <label for="email" class="text-lg font-medium">Email</label>
             <input
               pInputText
               id="email"
@@ -72,7 +72,7 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="password" class="text-xl font-medium">Password</label>
+            <label for="password" class="text-lg font-medium">Password</label>
             <input
               pInputText
               id="password"

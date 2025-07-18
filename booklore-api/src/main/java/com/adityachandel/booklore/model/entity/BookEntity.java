@@ -10,7 +10,6 @@ import lombok.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -40,10 +39,6 @@ public class BookEntity {
 
     @Column(name = "metadata_match_score")
     private Float metadataMatchScore;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "read_status")
-    private ReadStatus readStatus;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private BookMetadataEntity metadata;

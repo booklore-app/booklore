@@ -1,0 +1,500 @@
+@if (book$ | async; as book) {
+  <form [formGroup]="metadataForm" (ngSubmit)="onSave()" class="flex flex-col h-full md:min-w-[85rem]">
+    @if (isLoading) {
+      <div class="absolute inset-0 bg-black opacity-25 z-10 "></div>
+    }
+    @if (isLoading) {
+      <p-progressSpinner [style]="{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}"></p-progressSpinner>
+    }
+    <div class="flex-grow overflow-auto md:py-2 md:px-2 ">
+      <div class="flex flex-col md:flex-row w-full gap-4">
+        <div class="flex flex-col items-center gap-4 relative">
+          <img
+            [attr.src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
+            alt="Image"
+            width="250"
+            [ngClass]="{ 'brightness-50': isUploading }"
+            class="transition-all duration-300 ease-in-out"/>
+          @if (isUploading) {
+            <p-progressSpinner
+              class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            </p-progressSpinner>
+          }
+          <div class="flex items-center gap-6">
+            <p-button
+              icon="pi pi-refresh"
+              (onClick)="regenerateCover(book.id)"
+              pTooltip="Regenerate cover"
+              tooltipPosition="top"
+              [outlined]="true"
+              severity="warn"
+              [disabled]="book.metadata!['coverLocked']">
+            </p-button>
+            <p-fileupload
+              pTooltip="Upload cover"
+              tooltipPosition="top"
+              [disabled]="book.metadata!['coverLocked']"
+              name="file"
+              [url]="getUploadCoverUrl()"
+              mode="basic"
+              chooseIcon="pi pi-upload"
+              accept="image/jpeg,image/png"
+              maxFileSize="5000000"
+              chooseLabel="Cover"
+              (onUpload)="onUpload($event)"
+              (onError)="onUploadError($event)"
+              [auto]="true"
+              (onBeforeUpload)="onBeforeSend()">
+            </p-fileupload>
+            @if (!book.metadata!['coverLocked']) {
+              <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('thumbnailUrl')" severity="success"></p-button>
+            }
+            @if (book.metadata!['coverLocked']) {
+              <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('thumbnailUrl')" severity="warn"></p-button>
+            }
+          </div>
+        </div>
+        <div class="flex flex-col flex-grow pl-2">
+
+          <div class="flex flex-col md:flex-row w-full gap-4 pb-1">
+            <div class="flex flex-col gap-1 md:w-2/3">
+              <label for="title">Title</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="title" formControlName="title" class="w-full"/>
+                @if (!book.metadata!['titleLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('title')" severity="success"></p-button>
+                }
+                @if (book.metadata!['titleLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('title')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/3">
+              <label for="subtitle">Subtitle</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="subtitle" formControlName="subtitle" class="w-full"/>
+                @if (!book.metadata!['subtitleLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('subtitle')" severity="success"></p-button>
+                }
+                @if (book.metadata!['subtitleLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('subtitle')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row w-full gap-4 mt-2 pb-1">
+            <div class="flex flex-col gap-1 md:basis-[71%]">
+              <label for="authors">Authors</label>
+              <div class="flex justify-between items-center gap-2">
+                <div class="w-full">
+                  <p-chips formControlName="authors" addOnBlur="true"></p-chips>
+                </div>
+                @if (!book.metadata!['authorsLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('authors')" severity="success"></p-button>
+                }
+                @if (book.metadata!['authorsLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('authors')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:basis-[20%]">
+              <label for="publisher">Publisher</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="publisher" formControlName="publisher" class="w-full"/>
+                @if (!book.metadata!['publisherLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('publisher')" severity="success"></p-button>
+                }
+                @if (book.metadata!['publisherLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('publisher')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:basis-[14%]">
+              <label for="language">Language</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="language" formControlName="language" class="w-full"/>
+                @if (!book.metadata!['languageLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('language')" severity="success"></p-button>
+                }
+                @if (book.metadata!['languageLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('language')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row w-full gap-4 mt-2 pb-1">
+            <div class="flex flex-col gap-1 w-full">
+              <label for="categories">Categories</label>
+              <div class="flex justify-between items-center gap-2">
+                <div class="w-full">
+                  <p-chips formControlName="categories" addOnBlur="true"></p-chips>
+                </div>
+                @if (!book.metadata!['categoriesLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('categories')" severity="success"></p-button>
+                }
+                @if (book.metadata!['categoriesLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('categories')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row w-full gap-4 mt-2 pb-1">
+            <div class="flex flex-col gap-1 md:basis-[75%]">
+              <label for="seriesName">Series Name</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="seriesName" formControlName="seriesName" class="w-full"/>
+                @if (!book.metadata!['seriesNameLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('seriesName')" severity="success"></p-button>
+                }
+                @if (book.metadata!['seriesNameLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('seriesName')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1 md:basis-[10%]">
+              <label for="seriesNumber">Book #</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="seriesNumber" formControlName="seriesNumber" class="w-full"/>
+                @if (!book.metadata!['seriesNumberLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('seriesNumber')" severity="success"></p-button>
+                }
+                @if (book.metadata!['seriesNumberLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('seriesNumber')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1 md:basis-[10%]">
+              <label for="seriesTotal">Total Books</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="seriesTotal" formControlName="seriesTotal" class="w-full"/>
+                @if (!book.metadata!['seriesTotalLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('seriesTotal')" severity="success"></p-button>
+                }
+                @if (book.metadata!['seriesTotalLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('seriesTotal')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1 md:basis-[10%]">
+              <label for="pageCount">Pages</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="pageCount" formControlName="pageCount" class="w-full"/>
+                @if (!book.metadata!['pageCountLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="success"></p-button>
+                }
+                @if (book.metadata!['pageCountLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1 md:basis-[15%]">
+              <label for="publishedDate">Publish Date</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="publishedDate" formControlName="publishedDate" class="w-full"/>
+                @if (!book.metadata!['publishedDateLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('publishedDate')" severity="success"></p-button>
+                }
+                @if (book.metadata!['publishedDateLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('publishedDate')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row w-full gap-4 mt-2 pb-1">
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="isbn10">ISBN 10</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="isbn10" formControlName="isbn10" class="w-full"/>
+                @if (!book.metadata!['isbn10Locked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('isbn10')" severity="success"></p-button>
+                }
+                @if (book.metadata!['isbn10Locked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('isbn10')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="isbn13">ISBN 13</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="isbn13" formControlName="isbn13" class="w-full"/>
+                @if (!book.metadata!['isbn13Locked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('isbn13')" severity="success"></p-button>
+                }
+                @if (book.metadata!['isbn13Locked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('isbn13')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="asin">ASIN (Amazon ID)</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="asin" formControlName="asin" class="w-full"/>
+                @if (!book.metadata!['asinLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('asin')" severity="success"></p-button>
+                }
+                @if (book.metadata!['asinLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('asin')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="amazonRating">Amazon ★</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="amazonRating" formControlName="amazonRating" class="w-full"/>
+                @if (!book.metadata!['amazonRatingLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('amazonRating')" severity="success"></p-button>
+                }
+                @if (book.metadata!['amazonRatingLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('amazonRating')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="amazonRatingCount">Amazon Reviews</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="amazonRatingCount" formControlName="amazonReviewCount" class="w-full"/>
+                @if (!book.metadata!['amazonReviewCountLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('amazonReviewCount')" severity="success"></p-button>
+                }
+                @if (book.metadata!['amazonReviewCountLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('amazonReviewCount')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="googleId">Google Books ID</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="googleId" formControlName="googleId" class="w-full"/>
+                @if (!book.metadata!['googleIdLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('googleId')" severity="success"></p-button>
+                }
+                @if (book.metadata!['googleIdLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('googleId')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row w-full gap-4 mt-2 pb-1">
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="goodreadsId">Goodreads ID</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="goodreadsId" formControlName="goodreadsId" class="w-full"/>
+                @if (!book.metadata!['goodreadsIdLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('goodreadsId')" severity="success"></p-button>
+                }
+                @if (book.metadata!['goodreadsIdLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('goodreadsId')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="goodreadsRating">Goodreads ★</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="goodreadsRating" formControlName="goodreadsRating" class="w-full"/>
+                @if (!book.metadata!['goodreadsRatingLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('goodreadsRating')" severity="success"></p-button>
+                }
+                @if (book.metadata!['goodreadsRatingLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('goodreadsRating')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="goodreadsReviewCount">Goodreads Reviews</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="goodreadsReviewCount" formControlName="goodreadsReviewCount" class="w-full"/>
+                @if (!book.metadata!['goodreadsReviewCountLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('goodreadsReviewCount')" severity="success"></p-button>
+                }
+                @if (book.metadata!['goodreadsReviewCountLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('goodreadsReviewCount')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="hardcoverId">Hardcover ID</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="hardcoverId" formControlName="hardcoverId" class="w-full"/>
+                @if (!book.metadata!['hardcoverIdLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('hardcoverId')" severity="success"></p-button>
+                }
+                @if (book.metadata!['hardcoverIdLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('hardcoverId')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="hardcoverRating">Hardcover ★</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="hardcoverRating" formControlName="hardcoverRating" class="w-full"/>
+                @if (!book.metadata!['hardcoverRatingLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('hardcoverRating')" severity="success"></p-button>
+                }
+                @if (book.metadata!['hardcoverRatingLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('hardcoverRating')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 md:w-1/6">
+              <label for="hardcoverReviewCount">Hardcover Reviews</label>
+              <div class="flex justify-between items-center gap-2">
+                <input pInputText id="hardcoverReviewCount" formControlName="hardcoverReviewCount" class="w-full"/>
+                @if (!book.metadata!['hardcoverReviewCountLocked']) {
+                  <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('hardcoverReviewCount')" severity="success"></p-button>
+                }
+                @if (book.metadata!['hardcoverReviewCountLocked']) {
+                  <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('hardcoverReviewCount')" severity="warn"></p-button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-row w-full pb-1">
+        <div class="flex flex-col gap-1 w-full">
+          <div class="flex justify-between items-center gap-2">
+            <p-tabs value="editor" class="w-full">
+              <p-tablist>
+                <p-tab value="editor">WYSIWYG Editor</p-tab>
+                <p-tab value="html">HTML Editor</p-tab>
+              </p-tablist>
+              <p-tabpanels class="custom-tab-padding">
+                <p-tabpanel value="editor">
+                  <form [formGroup]="metadataForm">
+                    <p-editor #quillEditor formControlName="description" [readonly]="quillDisabled()" [style]="{ height: '200px' }">
+                      <ng-template #header>
+                        <span class="ql-formats">
+                          <button class="ql-bold" aria-label="Bold"></button>
+                          <button class="ql-italic" aria-label="Italic"></button>
+                          <button class="ql-underline" aria-label="Underline"></button>
+                          <button class="ql-strike" aria-label="Strikethrough"></button>
+                        </span>
+                        <span class="ql-formats">
+                          <select class="ql-size" aria-label="Font Size">
+                            <option value="small">Small</option>
+                            <option selected>Normal</option>
+                            <option value="large">Large</option>
+                            <option value="huge">Huge</option>
+                          </select>
+                        </span>
+                        <span class="ql-formats">
+                          <button class="ql-list" value="ordered" aria-label="Numbered List"></button>
+                          <button class="ql-list" value="bullet" aria-label="Bullet List"></button>
+                        </span>
+                        <span class="ql-formats">
+                          <select class="ql-color" aria-label="Text Color"></select>
+                          <select class="ql-background" aria-label="Background Color"></select>
+                        </span>
+                        <span class="ql-formats">
+                          <button class="ql-clean" aria-label="Remove Formatting"></button>
+                        </span>
+                      </ng-template>
+                    </p-editor>
+                  </form>
+                </p-tabpanel>
+                <p-tabpanel value="html" class="w-full">
+                  <textarea
+                    class="w-full p-4"
+                    rows="9"
+                    [disabled]="quillDisabled()"
+                    [ngModel]="htmlTextarea"
+                    (ngModelChange)="onHtmlTextareaChange($event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    placeholder="Edit raw HTML here">
+                  </textarea>
+                </p-tabpanel>
+              </p-tabpanels>
+            </p-tabs>
+            @if (!book.metadata!['descriptionLocked']) {
+              <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('description')" severity="success"></p-button>
+            }
+            @if (book.metadata!['descriptionLocked']) {
+              <p-button icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('description')" severity="warn"></p-button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-auto">
+      <p-divider></p-divider>
+      <div class="flex flex-col gap-2 px-2 pt-4 md:pb-4 z-10">
+
+        <!-- Desktop Buttons -->
+        <div class="hidden sm:flex justify-between w-full gap-4">
+          @if (showNavigationButtons) {
+            <div class="flex gap-x-4">
+              <p-button label="Close" icon="pi pi-times" [outlined]="true" severity="danger" (onClick)="closeDialog()"></p-button>
+              <p-divider layout="vertical" />
+              <p-button label="Previous Book" [disabled]="disablePrevious" icon="pi pi-arrow-left" [outlined]="true" severity="info" (onClick)="onPrevious()"></p-button>
+              <p-button label="Next Book" [disabled]="disableNext" icon="pi pi-arrow-right" iconPos="right" [outlined]="true" severity="info" (onClick)="onNext()"></p-button>
+            </div>
+          }
+
+          <div class="flex gap-x-4 items-center ml-auto">
+            <p-button
+              [label]="isAutoFetching ? 'Fetching…' : 'Auto Fetch'"
+              [icon]="isAutoFetching ? 'pi pi-spin pi-spinner' : 'pi pi-bolt'"
+              [outlined]="true"
+              severity="info"
+              (onClick)="autoFetch(book.id)"
+              [disabled]="isAutoFetching"
+              pTooltip="Automatically fetch metadata using default sources"
+              tooltipPosition="top">
+            </p-button>
+
+            @if (book.bookType === 'PDF' || book.bookType === 'EPUB') {
+              <p-button label="Restore" icon="pi pi-refresh" [outlined]="true" severity="danger" (onClick)="restoreMetadata()" pTooltip="Revert all changes to original metadata" tooltipPosition="top"></p-button>
+              <p-divider layout="vertical" />
+            }
+
+            <p-button label="Unlock All" icon="pi pi-lock-open" [outlined]="true" severity="success" (onClick)="unlockAll()" pTooltip="Unlock all metadata fields for editing" tooltipPosition="top"></p-button>
+            <p-button label="Lock All" icon="pi pi-lock" [outlined]="true" severity="warn" (onClick)="lockAll()" pTooltip="Lock all metadata fields to prevent changes" tooltipPosition="top"></p-button>
+            <p-divider layout="vertical" />
+            <p-button label="Save" icon="pi pi-check" [loading]="isSaving" [disabled]="isSaving" type="submit"></p-button>
+          </div>
+        </div>
+
+        <!-- Mobile Buttons -->
+        <div class="flex sm:hidden justify-between w-full flex-wrap">
+          @if (showNavigationButtons) {
+            <div class="flex gap-2 flex-wrap">
+              <p-button icon="pi pi-times" [outlined]="true" severity="danger" (onClick)="closeDialog()" pTooltip="Close" tooltipPosition="top"></p-button>
+              <p-button icon="pi pi-arrow-left" [disabled]="disablePrevious" [outlined]="true" severity="info" (onClick)="onPrevious()" pTooltip="Previous Book" tooltipPosition="top"></p-button>
+              <p-button icon="pi pi-arrow-right" [disabled]="disableNext" iconPos="right" [outlined]="true" severity="info" (onClick)="onNext()" pTooltip="Next Book" tooltipPosition="top"></p-button>
+            </div>
+          }
+
+          <div class="flex gap-4 items-center flex-wrap ml-auto">
+            <p-button
+              icon="pi pi-bolt"
+              [outlined]="true"
+              severity="info"
+              (onClick)="autoFetch(book.id)"
+              [disabled]="isAutoFetching"
+              pTooltip="Auto Fetch"
+              tooltipPosition="top">
+            </p-button>
+
+            @if (book.bookType === 'PDF' || book.bookType === 'EPUB') {
+              <p-button icon="pi pi-refresh" [outlined]="true" severity="danger" (onClick)="restoreMetadata()" pTooltip="Restore" tooltipPosition="top"></p-button>
+            }
+            <p-button icon="pi pi-lock-open" [outlined]="true" severity="success" (onClick)="unlockAll()" pTooltip="Unlock All" tooltipPosition="top"></p-button>
+            <p-button icon="pi pi-lock" [outlined]="true" severity="warn" (onClick)="lockAll()" pTooltip="Lock All" tooltipPosition="top"></p-button>
+            <p-divider layout="vertical" />
+            <p-button label="Save" icon="pi pi-check" [loading]="isSaving" [disabled]="isSaving" type="submit"></p-button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </form>
+}

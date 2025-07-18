@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
 import {DatePipe} from '@angular/common';
 import {Rating} from 'primeng/rating';
@@ -10,10 +10,11 @@ import {Button} from 'primeng/button';
 import {BookService} from '../../../service/book.service';
 import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
-import {filter} from 'rxjs';
+import {filter, Subject} from 'rxjs';
 import {UserService} from '../../../../settings/user-management/user.service';
-import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-center/book-metadata-center.component';
+import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center-component/book-metadata-center.component';
 import {DialogService} from 'primeng/dynamicdialog';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-book-table',
@@ -23,18 +24,19 @@ import {DialogService} from 'primeng/dynamicdialog';
     TableModule,
     Rating,
     FormsModule,
-    Button,
-    DatePipe
+    Button
   ],
-  styleUrl: './book-table.component.scss'
+  styleUrls: ['./book-table.component.scss'],
+  providers: [DatePipe]
 })
-export class BookTableComponent implements OnInit, OnChanges {
+export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
   selectedBooks: Book[] = [];
   selectedBookIds = new Set<number>();
 
   @Output() selectedBooksChange = new EventEmitter<Set<number>>();
   @Input() books: Book[] = [];
   @Input() sortOption: SortOption | null = null;
+  @Input() visibleColumns: any[] = [];
 
   protected urlHelper = inject(UrlHelperService);
   private bookService = inject(BookService);
@@ -42,18 +44,43 @@ export class BookTableComponent implements OnInit, OnChanges {
   private userService = inject(UserService);
   private dialogService = inject(DialogService);
   private router = inject(Router);
+  private datePipe = inject(DatePipe);
 
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
+  private destroy$ = new Subject<void>();
+
+  readonly allColumns = [
+    {field: 'title', header: 'Title'},
+    {field: 'authors', header: 'Authors'},
+    {field: 'publisher', header: 'Publisher'},
+    {field: 'seriesName', header: 'Series'},
+    {field: 'seriesNumber', header: 'Series #'},
+    {field: 'categories', header: 'Genres'},
+    {field: 'publishedDate', header: 'Published'},
+    {field: 'lastReadTime', header: 'Last Read'},
+    {field: 'addedOn', header: 'Added'},
+    {field: 'fileSizeKb', header: 'File Size'},
+    {field: 'language', header: 'Language'},
+    {field: 'pageCount', header: 'Pages'},
+    {field: 'amazonRating', header: 'Amazon'},
+    {field: 'amazonReviewCount', header: 'AZ #'},
+    {field: 'goodreadsRating', header: 'Goodreads'},
+    {field: 'goodreadsReviewCount', header: 'GR #'},
+    {field: 'hardcoverRating', header: 'Hardcover'},
+    {field: 'hardcoverReviewCount', header: 'HC #'}
+  ];
 
   ngOnInit(): void {
     this.userService.userState$
-      .pipe(filter(user => !!user))
-      .subscribe((user) => {
+      .pipe(
+        filter(user => !!user),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(user => {
         this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
       });
   }
 
-  // Hack to set virtual-scroller height
   ngOnChanges() {
     const wrapperElements: HTMLCollection = document.getElementsByClassName('p-virtualscroller');
     Array.prototype.forEach.call(wrapperElements, function (wrapperElement) {
@@ -147,6 +174,61 @@ export class BookTableComponent implements OnInit, OnChanges {
     return mb >= 1 ? `${mb.toFixed(1)} MB` : `${mb.toFixed(2)} MB`;
   }
 
+  getCellValue(metadata: BookMetadata, book: Book, field: string): string | number {
+    switch (field) {
+      case 'title':
+        return metadata.title ?? '';
+
+      case 'authors':
+        return this.getAuthorNames(metadata.authors!);
+
+      case 'publisher':
+        return metadata.publisher ?? '';
+
+      case 'seriesName':
+        return metadata.seriesName ?? '';
+
+      case 'seriesNumber':
+        return metadata.seriesNumber ?? '';
+
+      case 'categories':
+        return this.getGenres(metadata.categories!);
+
+      case 'publishedDate':
+        return metadata.publishedDate ? this.datePipe.transform(metadata.publishedDate, 'dd-MMM-yyyy') ?? '' : '';
+
+      case 'lastReadTime':
+        return book.lastReadTime ? this.datePipe.transform(book.lastReadTime, 'dd-MMM-yyyy') ?? '' : '';
+
+      case 'addedOn':
+        return book.addedOn ? this.datePipe.transform(book.addedOn, 'dd-MMM-yyyy') ?? '' : '';
+
+      case 'fileSizeKb':
+        return this.formatFileSize(book.fileSizeKb);
+
+      case 'language':
+        return metadata.language ?? '';
+
+      case 'pageCount':
+        return metadata.pageCount ?? '';
+
+      case 'amazonRating':
+      case 'goodreadsRating':
+      case 'hardcoverRating': {
+        const rating = metadata[field];
+        return typeof rating === 'number' ? rating.toFixed(1) : '';
+      }
+
+      case 'amazonReviewCount':
+      case 'goodreadsReviewCount':
+      case 'hardcoverReviewCount':
+        return metadata[field] ?? '';
+
+      default:
+        return '';
+    }
+  }
+
   toggleMetadataLock(metadata: BookMetadata): void {
     const lockKeys = Object.keys(metadata).filter(key => key.endsWith('Locked'));
     const allLocked = lockKeys.every(key => metadata[key] === true);
@@ -168,5 +250,10 @@ export class BookTableComponent implements OnInit, OnChanges {
         });
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -140,6 +140,7 @@ public class SettingPersistenceHelper {
                 null,
                 false,
                 true,
+                false,
                 fieldOptions
         );
     }

@@ -39,7 +39,6 @@ public class EmailService {
         BookEntity book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         EmailProviderEntity defaultEmailProvider = emailProviderRepository.findDefaultEmailProvider().orElseThrow(ApiError.DEFAULT_EMAIL_PROVIDER_NOT_FOUND::createException);
         EmailRecipientEntity defaultEmailRecipient = emailRecipientRepository.findDefaultEmailRecipient().orElseThrow(ApiError.DEFAULT_EMAIL_RECIPIENT_NOT_FOUND::createException);
-
         sendEmailInVirtualThread(defaultEmailProvider, defaultEmailRecipient.getEmail(), book);
     }
 
@@ -47,7 +46,6 @@ public class EmailService {
         EmailProviderEntity emailProvider = emailProviderRepository.findById(request.getProviderId()).orElseThrow(() -> ApiError.EMAIL_PROVIDER_NOT_FOUND.createException(request.getProviderId()));
         BookEntity book = bookRepository.findById(request.getBookId()).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(request.getBookId()));
         EmailRecipientEntity emailRecipient = emailRecipientRepository.findById(request.getRecipientId()).orElseThrow(() -> ApiError.EMAIL_RECIPIENT_NOT_FOUND.createException(request.getRecipientId()));
-
         sendEmailInVirtualThread(emailProvider, emailRecipient.getEmail(), book);
     }
 
@@ -94,11 +92,68 @@ public class EmailService {
 
         Properties mailProps = dynamicMailSender.getJavaMailProperties();
         mailProps.put("mail.smtp.auth", emailProvider.isAuth());
-        mailProps.put("mail.smtp.starttls.enable", emailProvider.isStartTls());
-        mailProps.put("mail.smtp.connectiontimeout", 15000);  // 15 seconds connection timeout
-        mailProps.put("mail.smtp.timeout", 15000);            // 15 seconds socket timeout
+
+        ConnectionType connectionType = determineConnectionType(emailProvider);
+        configureConnectionType(mailProps, connectionType, emailProvider);
+        configureTimeouts(mailProps);
+
+        String debugMode = System.getProperty("mail.debug", "false");
+        mailProps.put("mail.debug", debugMode);
+
+        log.info("Email configuration: Host={}, Port={}, Type={}, Timeouts=60s", emailProvider.getHost(), emailProvider.getPort(), connectionType);
 
         return dynamicMailSender;
+    }
+
+    private ConnectionType determineConnectionType(EmailProviderEntity emailProvider) {
+        if (emailProvider.getPort() == 465) {
+            return ConnectionType.SSL;
+        } else if (emailProvider.getPort() == 587 && emailProvider.isStartTls()) {
+            return ConnectionType.STARTTLS;
+        } else if (emailProvider.isStartTls()) {
+            return ConnectionType.STARTTLS;
+        } else {
+            return ConnectionType.PLAIN;
+        }
+    }
+
+    private void configureConnectionType(Properties mailProps, ConnectionType connectionType, EmailProviderEntity emailProvider) {
+        switch (connectionType) {
+            case SSL -> {
+                mailProps.put("mail.transport.protocol", "smtps");
+                mailProps.put("mail.smtp.ssl.enable", "true");
+                mailProps.put("mail.smtp.ssl.trust", emailProvider.getHost());
+                mailProps.put("mail.smtp.starttls.enable", "false");
+                mailProps.put("mail.smtp.ssl.protocols", "TLSv1.2,TLSv1.3");
+                mailProps.put("mail.smtp.ssl.checkserveridentity", "false");
+                mailProps.put("mail.smtp.ssl.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                mailProps.put("mail.smtp.ssl.socketFactory.fallback", "false");
+            }
+            case STARTTLS -> {
+                mailProps.put("mail.transport.protocol", "smtp");
+                mailProps.put("mail.smtp.starttls.enable", "true");
+                mailProps.put("mail.smtp.starttls.required", "true");
+                mailProps.put("mail.smtp.ssl.enable", "false");
+            }
+            case PLAIN -> {
+                mailProps.put("mail.transport.protocol", "smtp");
+                mailProps.put("mail.smtp.starttls.enable", "false");
+                mailProps.put("mail.smtp.ssl.enable", "false");
+            }
+        }
+    }
+
+    private void configureTimeouts(Properties mailProps) {
+        String connectionTimeout = System.getProperty("mail.smtp.connectiontimeout", "60000");
+        String socketTimeout = System.getProperty("mail.smtp.timeout", "60000");
+        String writeTimeout = System.getProperty("mail.smtp.writetimeout", "60000");
+
+        mailProps.put("mail.smtp.connectiontimeout", connectionTimeout);
+        mailProps.put("mail.smtp.timeout", socketTimeout);
+        mailProps.put("mail.smtp.writetimeout", writeTimeout);
+
+        log.debug("Configured email timeouts: connection={}, socket={}, write={}",
+                connectionTimeout, socketTimeout, writeTimeout);
     }
 
     private String generateEmailBody(String bookTitle) {
@@ -109,5 +164,11 @@ public class EmailService {
                 
                 Thank you for using Booklore! We hope you enjoy your book.
                 """, bookTitle);
+    }
+
+    private enum ConnectionType {
+        SSL,
+        STARTTLS,
+        PLAIN
     }
 }

@@ -19,6 +19,7 @@ public class MetadataRefreshOptions {
     private MetadataProvider allP4;
     private boolean refreshCovers;
     private boolean mergeCategories;
+    private Boolean reviewBeforeApply;
     private FieldOptions fieldOptions;
 
     @Getter
