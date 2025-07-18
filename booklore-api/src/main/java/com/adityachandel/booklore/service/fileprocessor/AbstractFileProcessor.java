@@ -37,20 +37,18 @@ public abstract class AbstractFileProcessor implements FileProcessor {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public Book processFile(LibraryFile libraryFile, boolean forceProcess) {
+    public Book processFile(LibraryFile libraryFile) {
         Path filePath = libraryFile.getFullPath();
         String fileName = filePath.getFileName().toString();
         String hash = FileUtils.computeFileHash(filePath);
 
-        Optional<Book> existing = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, forceProcess, bookRepository, bookMapper);
+        Optional<Book> existing = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, bookRepository, bookMapper);
         if (existing.isPresent()) {
             return existing.get();
         }
-        if (!forceProcess) {
-            Optional<BookEntity> byName = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
-            if (byName.isPresent()) {
-                return bookMapper.toBook(byName.get());
-            }
+        Optional<BookEntity> byName = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
+        if (byName.isPresent()) {
+            return bookMapper.toBook(byName.get());
         }
 
         BookEntity book = processNewFile(libraryFile);

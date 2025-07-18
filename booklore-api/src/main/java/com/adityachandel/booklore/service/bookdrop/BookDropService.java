@@ -169,9 +169,9 @@ public class BookDropService {
                 .build();
 
         return switch (type) {
-            case PDF -> pdfProcessor.processFile(libraryFile, false);
-            case EPUB -> epubProcessor.processFile(libraryFile, false);
-            case CBX -> cbxProcessor.processFile(libraryFile, false);
+            case PDF -> pdfProcessor.processFile(libraryFile);
+            case EPUB -> epubProcessor.processFile(libraryFile);
+            case CBX -> cbxProcessor.processFile(libraryFile);
         };
     }
 

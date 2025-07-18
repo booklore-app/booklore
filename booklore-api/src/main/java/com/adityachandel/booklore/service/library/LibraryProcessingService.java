@@ -134,9 +134,9 @@ public class LibraryProcessingService {
     @Transactional
     protected Book processLibraryFile(LibraryFile libraryFile) {
         return switch (libraryFile.getBookFileType()) {
-            case PDF -> pdfProcessor.processFile(libraryFile, false);
-            case EPUB -> epubProcessor.processFile(libraryFile, false);
-            case CBX -> cbxProcessor.processFile(libraryFile, false);
+            case PDF -> pdfProcessor.processFile(libraryFile);
+            case EPUB -> epubProcessor.processFile(libraryFile);
+            case CBX -> cbxProcessor.processFile(libraryFile);
         };
     }
 
