@@ -90,6 +90,7 @@ export interface AppSettings {
   metadataProviderSettings: MetadataProviderSettings;
   metadataMatchWeights: MetadataMatchWeights;
   metadataPersistenceSettings: MetadataPersistenceSettings;
+  metadataDownloadOnBookdrop: boolean;
 }
 
 export enum AppSettingKey {
@@ -108,5 +109,5 @@ export enum AppSettingKey {
   METADATA_MATCH_WEIGHTS = 'METADATA_MATCH_WEIGHTS',
   METADATA_PERSISTENCE_SETTINGS = 'METADATA_PERSISTENCE_SETTINGS',
   MOVE_FILE_PATTERN = 'MOVE_FILE_PATTERN',
-  BOOK_DELETION_ENABLED = 'BOOK_DELETION_ENABLED'
+  METADATA_DOWNLOAD_ON_BOOKDROP = 'METADATA_DOWNLOAD_ON_BOOKDROP'
 }

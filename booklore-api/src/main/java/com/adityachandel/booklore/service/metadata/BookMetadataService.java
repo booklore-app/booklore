@@ -1,6 +1,5 @@
 package com.adityachandel.booklore.service.metadata;
 
-import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
@@ -17,7 +16,8 @@ import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.enums.Lock;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.model.websocket.Topic;
-import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.repository.BookMetadataRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
@@ -29,7 +29,6 @@ import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupR
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.adityachandel.booklore.service.metadata.writer.MetadataWriterFactory;
 import com.adityachandel.booklore.util.FileService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;

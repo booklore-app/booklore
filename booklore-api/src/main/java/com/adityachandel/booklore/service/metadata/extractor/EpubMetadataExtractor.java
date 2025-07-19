@@ -1,6 +1,8 @@
 package com.adityachandel.booklore.service.metadata.extractor;
 
 import com.adityachandel.booklore.model.dto.BookMetadata;
+import io.documentnode.epub4j.domain.Book;
+import io.documentnode.epub4j.epub.EpubReader;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
@@ -13,8 +15,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -23,6 +24,33 @@ import java.util.Set;
 @Slf4j
 @Component
 public class EpubMetadataExtractor implements FileMetadataExtractor {
+
+    @Override
+    public byte[] extractCover(File epubFile) {
+        try {
+            Book epub = new EpubReader().readEpub(new FileInputStream(epubFile));
+            io.documentnode.epub4j.domain.Resource coverImage = epub.getCoverImage();
+
+            if (coverImage == null) {
+                for (io.documentnode.epub4j.domain.Resource res : epub.getResources().getAll()) {
+                    String id = res.getId();
+                    String href = res.getHref();
+                    if ((id != null && id.toLowerCase().contains("cover")) ||
+                            (href != null && href.toLowerCase().contains("cover"))) {
+                        if (res.getMediaType() != null && res.getMediaType().getName().startsWith("image")) {
+                            coverImage = res;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return (coverImage != null) ? coverImage.getData() : null;
+        } catch (Exception e) {
+            log.warn("Failed to extract cover from EPUB: {}", epubFile.getName(), e);
+            return null;
+        }
+    }
 
     public BookMetadata extractMetadata(File epubFile) {
         try (ZipFile zip = new ZipFile(epubFile)) {
@@ -157,6 +185,7 @@ public class EpubMetadataExtractor implements FileMetadataExtractor {
         }
     }
 
+
     private void safeParseInt(String value, java.util.function.IntConsumer setter) {
         try {
             setter.accept(Integer.parseInt(value));
@@ -185,7 +214,7 @@ public class EpubMetadataExtractor implements FileMetadataExtractor {
         }
 
         try {
-            return LocalDate.parse(value.substring(0, 10)); // fallback to prefix
+            return LocalDate.parse(value.substring(0, 10));
         } catch (Exception ignored) {
         }
 

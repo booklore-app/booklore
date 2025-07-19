@@ -11,7 +11,7 @@ import {ConfirmationService, MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {filter} from 'rxjs';
 import {NgClass} from '@angular/common';
-import {BookMetadataHostService} from '../../../book-metadata-host-service';
+import {BookMetadataHostService} from '../../../utilities/service/book-metadata-host-service';
 
 @Component({
   selector: 'app-book-card-lite-component',

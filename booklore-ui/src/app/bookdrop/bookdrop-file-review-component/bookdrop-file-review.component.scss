@@ -1,0 +1,12 @@
+.custom-border {
+  border: 1px solid var(--border-color);
+  border-radius: 10px 10px 0px 0px;
+}
+
+.custom-border1 {
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  border-top: none;
+  border-radius: 0px 0px 10px 10px;
+}

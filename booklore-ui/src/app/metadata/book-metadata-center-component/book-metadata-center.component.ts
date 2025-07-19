@@ -26,7 +26,7 @@ import { MetadataViewerComponent } from './metadata-viewer/metadata-viewer.compo
 import { MetadataEditorComponent } from './metadata-editor/metadata-editor.component';
 import { MetadataSearcherComponent } from './metadata-searcher/metadata-searcher.component';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { BookMetadataHostService } from '../../book-metadata-host-service';
+import { BookMetadataHostService } from '../../utilities/service/book-metadata-host-service';
 
 @Component({
   selector: 'app-book-metadata-center',

@@ -8,12 +8,12 @@ import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
 import {filter, take} from 'rxjs/operators';
 
-import {BookService} from '../book/service/book.service';
-import {Book} from '../book/model/book.model';
-import {FileMoveRequest, FileOperationsService} from '../file-operations-service';
-import {LibraryService} from "../book/service/library.service";
-import {AppSettingsService} from '../core/service/app-settings.service';
-import {AppSettingKey} from '../core/model/app-settings.model';
+import {BookService} from '../../../book/service/book.service';
+import {Book} from '../../../book/model/book.model';
+import {FileMoveRequest, FileOperationsService} from '../../service/file-operations-service';
+import {LibraryService} from "../../../book/service/library.service";
+import {AppSettingsService} from '../../../core/service/app-settings.service';
+import {AppSettingKey} from '../../../core/model/app-settings.model';
 
 @Component({
   selector: 'app-file-mover-component',

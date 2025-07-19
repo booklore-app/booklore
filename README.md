@@ -28,7 +28,6 @@ For a step-by-step walkthrough, check out the official BookLore video guides on 
 
 These videos cover deployment, configuration, and feature highlights to help you get started quickly.
 
-
 ## 🐳 Deploy with Docker
 
 You can quickly set up and run BookLore using Docker.
@@ -50,18 +49,20 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore # Only modify this if you're familiar with JDBC and your database setup
-      - DATABASE_USERNAME=booklore # Must match MYSQL_USER defined in the mariadb container
-      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
-      - SWAGGER_ENABLED=false # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore   # Only modify this if you're familiar with JDBC and your database setup
+      - DATABASE_USERNAME=booklore                          # Must match MYSQL_USER defined in the mariadb container
+      - DATABASE_PASSWORD=your_secure_password              # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
+      - SWAGGER_ENABLED=false                               # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
     depends_on:
       mariadb:
         condition: service_healthy
     ports:
       - "6060:6060"
     volumes:
-      - /your/local/path/to/booklore/data:/app/data
-      - /your/local/path/to/booklore/books:/books
+      - /your/local/path/to/booklore/data:/app/data       # Internal app data (settings, metadata, cache)
+      - /your/local/path/to/booklore/books1:/books1       # Book library folder — point to one of your collections
+      - /your/local/path/to/booklore/books2:/books2       # Another book library — you can mount multiple library folders this way
+      - /your/local/path/to/booklore/bookdrop:/bookdrop   # Bookdrop folder — drop new files here for automatic import into libraries
     restart: unless-stopped
 
   mariadb:
@@ -71,10 +72,10 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=super_secure_password # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD=super_secure_password  # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
       - MYSQL_DATABASE=booklore
-      - MYSQL_USER=booklore # Must match DATABASE_USERNAME defined in the booklore container
-      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
+      - MYSQL_USER=booklore                        # Must match DATABASE_USERNAME defined in the booklore container
+      - MYSQL_PASSWORD=your_secure_password        # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
     volumes:
       - /your/local/path/to/mariadb/config:/config
     restart: unless-stopped
@@ -103,7 +104,31 @@ Once the containers are up, access BookLore in your browser at:
 ```ini
 http://localhost:6060
 ```
+## 📥 Bookdrop Folder: Auto-Import Files (New)
 
+BookLore now supports a **Bookdrop folder**, a special directory where you can drop your book files (`.pdf`, `.epub`, `.cbz`, etc.), and BookLore will automatically detect, process, and prepare them for import. This makes it easy to bulk add new books without manually uploading each one.
+
+### 🔍 How It Works
+
+1. **File Watcher:** A background process continuously monitors the Bookdrop folder.
+2. **File Detection:** When new files are added, BookLore automatically reads them and extracts basic metadata (title, author, etc.) from filenames or embedded data.
+3. **Optional Metadata Fetching:** If enabled, BookLore can query metadata sources like Google Books or Open Library to enrich the book information.
+4. **Review & Finalize:** You can then review the detected books in the Bookdrop UI, edit metadata if needed, and assign each book to a library and folder structure before finalizing the import.
+
+### ⚙️ Configuration (Docker Setup)
+
+To enable the Bookdrop feature in Docker:
+
+```yaml
+services:
+  booklore:
+    ...
+    volumes:
+      - /your/local/path/to/booklore/data:/app/data
+      - /your/local/path/to/booklore/books:/books
+      - /your/local/path/to/booklore/bookdrop:/bookdrop # 👈 Bookdrop directory
+```      
+      
 ## 🔑 OIDC/OAuth2 Authentication (Authentik, Pocket ID, etc.)
 
 

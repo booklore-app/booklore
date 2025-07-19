@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MessageService} from 'primeng/api';
-import {MetadataMatchWeightsService} from '../../../metadata-match-weights-service';
+import {MetadataMatchWeightsService} from '../../../utilities/service/metadata-match-weights-service';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {Tooltip} from 'primeng/tooltip';

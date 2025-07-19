@@ -1,7 +1,7 @@
 import {Component, DestroyRef, inject, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {FetchedProposalDto, MetadataTaskService} from '../../book/service/metadata-task';
+import {FetchedProposal, MetadataTaskService} from '../../book/service/metadata-task';
 import {BookService} from '../../book/service/book.service';
 import {Book} from '../../book/model/book.model';
 import {BehaviorSubject, Observable} from 'rxjs';
@@ -34,7 +34,7 @@ export class MetadataReviewDialogComponent implements OnInit {
   private progressService = inject(MetadataProgressService);
   private destroyRef = inject(DestroyRef);
 
-  proposals: FetchedProposalDto[] = [];
+  proposals: FetchedProposal[] = [];
   currentBooks: Record<number, Book> = {};
   loading = true;
   currentIndex = 0;
@@ -89,7 +89,7 @@ export class MetadataReviewDialogComponent implements OnInit {
     });
   }
 
-  get currentProposal(): FetchedProposalDto | null {
+  get currentProposal(): FetchedProposal | null {
     return this.proposals[this.currentIndex] ?? null;
   }
 
@@ -118,7 +118,7 @@ export class MetadataReviewDialogComponent implements OnInit {
     });
   }
 
-  onSave(updatedFields: Partial<FetchedProposalDto>): void {
+  onSave(updatedFields: Partial<FetchedProposal>): void {
     const currentProposal = this.currentProposal;
     if (!currentProposal) return;
 

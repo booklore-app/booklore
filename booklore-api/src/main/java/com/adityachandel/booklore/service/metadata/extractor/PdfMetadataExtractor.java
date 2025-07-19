@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.service.metadata.extractor;
 
 import com.adityachandel.booklore.model.dto.BookMetadata;
+import com.adityachandel.booklore.util.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -10,19 +11,25 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.messaging.rsocket.MetadataExtractor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import javax.imageio.ImageIO;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -32,6 +39,21 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PdfMetadataExtractor implements FileMetadataExtractor {
 
+
+    @Override
+    public byte[] extractCover(File file) {
+        try (PDDocument pdf = Loader.loadPDF(file)) {
+            BufferedImage coverImage = new PDFRenderer(pdf).renderImageWithDPI(0, 300, ImageType.RGB);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(coverImage, "jpg", baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            log.warn("Failed to extract cover from PDF: {}", file.getAbsolutePath(), e);
+            return null;
+        }
+    }
+
+    @Override
     public BookMetadata extractMetadata(File file) {
         if (!file.exists() || !file.isFile()) {
             log.warn("File does not exist or is not a file: {}", file.getPath());
