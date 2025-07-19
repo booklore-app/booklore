@@ -18,6 +18,12 @@
   overflow-y: auto;
 }
 
+@media (max-width: 768px) {
+  .virtual-scroller {
+    height: calc(100dvh - 9rem);
+  }
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(1px, 1fr));

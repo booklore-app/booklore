@@ -1,9 +1,9 @@
 <div class="p-0 md:p-2 flex flex-col h-full w-full rounded-xl">
   @if (book$ | async; as book) {
-    <div class="flex flex-col md:flex-row gap-6 pb-8">
+    <div class="flex flex-col md:flex-row gap-4 md:gap-6 pb-8">
 
       <div class="flex justify-center md:justify-start">
-        <div class="relative w-[250px] min-w-[250px] md:w-[250px]">
+        <div class="relative w-[175px] md:w-[250px]">
           <img
             [attr.src]="urlHelper.getCoverUrl(book?.metadata!.bookId, book?.metadata!.coverUpdatedOn)"
             class="rounded-xl w-full object-cover"
@@ -53,7 +53,7 @@
 
               <div class="flex flex-col items-center md:items-start gap-1">
                 <div class="flex items-center gap-2 justify-center md:justify-start flex-wrap text-center md:text-left">
-                  <h2 class="text-3xl font-extrabold leading-tight">
+                  <h2 class="text-2xl md:text-3xl font-extrabold leading-tight">
                     {{ book?.metadata!.title }}
                   </h2>
                   <i

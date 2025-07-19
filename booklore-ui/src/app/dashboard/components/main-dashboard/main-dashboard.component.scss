@@ -3,6 +3,12 @@
   overflow-y: auto;
 }
 
+@media (max-width: 768px) {
+  .dashboard-container {
+    height: calc(100dvh - 5rem);
+  }
+}
+
 .dashboard {
   flex-direction: column;
   align-items: center;

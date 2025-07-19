@@ -70,6 +70,8 @@ export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
     {field: 'hardcoverReviewCount', header: 'HC #'}
   ];
 
+  scrollHeight = 'calc(100dvh - 160px)';
+
   ngOnInit(): void {
     this.userService.userState$
       .pipe(
@@ -79,6 +81,16 @@ export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
       .subscribe(user => {
         this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
       });
+
+    this.setScrollHeight();
+    window.addEventListener('resize', this.setScrollHeight.bind(this));
+  }
+
+  setScrollHeight() {
+    const isMobile = window.innerWidth <= 768;
+    this.scrollHeight = isMobile
+      ? 'calc(100dvh - 125px)'
+      : 'calc(100dvh - 150px)';
   }
 
   ngOnChanges() {
@@ -255,5 +267,6 @@ export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    window.removeEventListener('resize', this.setScrollHeight.bind(this));
   }
 }
