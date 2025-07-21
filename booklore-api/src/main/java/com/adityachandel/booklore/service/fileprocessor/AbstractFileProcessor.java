@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Slf4j
-public abstract class AbstractFileProcessor implements FileProcessor {
+public abstract class AbstractFileProcessor implements BookFileProcessor {
 
     protected final BookRepository bookRepository;
     protected final BookCreatorService bookCreatorService;
