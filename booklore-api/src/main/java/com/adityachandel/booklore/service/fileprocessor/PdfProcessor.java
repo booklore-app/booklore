@@ -4,7 +4,6 @@ import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
@@ -71,8 +70,8 @@ public class PdfProcessor extends AbstractFileProcessor implements BookFileProce
     }
 
     @Override
-    public List<BookFileExtension> getSupportedExtensions() {
-        return List.of(BookFileExtension.PDF);
+    public List<BookFileType> getSupportedTypes() {
+        return List.of(BookFileType.PDF);
     }
 
     private void extractAndSetMetadata(BookEntity bookEntity) {

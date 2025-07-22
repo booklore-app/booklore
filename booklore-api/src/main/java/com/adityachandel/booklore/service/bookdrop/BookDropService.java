@@ -167,10 +167,7 @@ public class BookDropService {
                 .fileName(fileName)
                 .build();
 
-        BookFileExtension extension = BookFileExtension.fromFileName(fileName)
-                .orElseThrow(() -> ApiError.INVALID_FILE_FORMAT.createException("Unsupported file extension"));
-
-        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(extension);
+        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(type);
         return processor.processFile(libraryFile);
     }
 

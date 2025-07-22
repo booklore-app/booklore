@@ -194,11 +194,8 @@ public class BookMetadataService {
         String title = book.getMetadata().getTitle();
         String message = progress + "Regenerating cover for: " + title;
         notificationService.sendMessage(Topic.LOG, createLogNotification(message));
-        
-        BookFileExtension extension = BookFileExtension.fromFileName(book.getFileName())
-                .orElseThrow(() -> ApiError.UNSUPPORTED_BOOK_TYPE.createException(book.getBookType()));
 
-        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(extension);
+        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(book.getBookType());
         processor.generateCover(book);
 
         log.info("{}Successfully regenerated cover for book ID {} ({})", progress, book.getId(), title);

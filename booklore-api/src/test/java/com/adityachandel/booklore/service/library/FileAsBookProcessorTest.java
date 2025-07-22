@@ -4,7 +4,6 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.entity.LibraryPathEntity;
-import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.websocket.LogNotification;
 import com.adityachandel.booklore.model.websocket.Topic;
@@ -94,8 +93,8 @@ class FileAsBookProcessorTest {
                 .bookType(BookFileType.PDF)
                 .build();
         
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.EPUB)).thenReturn(bookFileProcessor);
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.PDF)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.EPUB)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.PDF)).thenReturn(bookFileProcessor);
         when(bookFileProcessor.processFile(file1)).thenReturn(book1);
         when(bookFileProcessor.processFile(file2)).thenReturn(book2);
         
@@ -144,7 +143,7 @@ class FileAsBookProcessorTest {
                 .bookType(BookFileType.EPUB)
                 .build();
         
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.EPUB)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.EPUB)).thenReturn(bookFileProcessor);
         when(bookFileProcessor.processFile(validFile)).thenReturn(book);
         
         // When
@@ -214,7 +213,7 @@ class FileAsBookProcessorTest {
                 .bookType(BookFileType.EPUB)
                 .build();
         
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.EPUB)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.EPUB)).thenReturn(bookFileProcessor);
         when(bookFileProcessor.processFile(libraryFile)).thenReturn(expectedBook);
         
         // When
@@ -222,7 +221,7 @@ class FileAsBookProcessorTest {
         
         // Then
         assertThat(result).isEqualTo(expectedBook);
-        verify(processorRegistry).getProcessorOrThrow(BookFileExtension.EPUB);
+        verify(processorRegistry).getProcessorOrThrow(BookFileType.EPUB);
         verify(bookFileProcessor).processFile(libraryFile);
     }
 
@@ -241,7 +240,7 @@ class FileAsBookProcessorTest {
                 .bookFileType(BookFileType.PDF)
                 .build();
         
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.PDF)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.PDF)).thenReturn(bookFileProcessor);
         when(bookFileProcessor.processFile(libraryFile)).thenReturn(null);
         
         // When
@@ -269,7 +268,7 @@ class FileAsBookProcessorTest {
         
         libraryFiles.add(file);
         
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.EPUB)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.EPUB)).thenReturn(bookFileProcessor);
         when(bookFileProcessor.processFile(file)).thenReturn(null);
         
         // When
@@ -344,11 +343,10 @@ class FileAsBookProcessorTest {
                 .bookType(BookFileType.CBX)
                 .build();
         
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.EPUB)).thenReturn(bookFileProcessor);
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.PDF)).thenReturn(bookFileProcessor);
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.CBZ)).thenReturn(bookFileProcessor);
-        when(processorRegistry.getProcessorOrThrow(BookFileExtension.CBR)).thenReturn(bookFileProcessor);
-        
+        when(processorRegistry.getProcessorOrThrow(BookFileType.EPUB)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.PDF)).thenReturn(bookFileProcessor);
+        when(processorRegistry.getProcessorOrThrow(BookFileType.CBX)).thenReturn(bookFileProcessor);
+
         when(bookFileProcessor.processFile(epubFile)).thenReturn(epubBook);
         when(bookFileProcessor.processFile(pdfFile)).thenReturn(pdfBook);
         when(bookFileProcessor.processFile(cbzFile)).thenReturn(cbzBook);

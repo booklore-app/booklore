@@ -4,6 +4,7 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.enums.BookFileExtension;
+import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.fileprocessor.BookFileProcessor;
@@ -41,13 +42,13 @@ public class FileAsBookProcessor implements LibraryFileProcessor {
 
     @Transactional
     protected Book processLibraryFile(LibraryFile libraryFile) {
-        BookFileExtension extension = BookFileExtension.fromFileName(libraryFile.getFileName()).orElse(null);
-        if (extension == null) {
+        BookFileType type = libraryFile.getBookFileType();
+        if (type == null) {
             log.warn("Unsupported file type for file: {}", libraryFile.getFileName());
             return null;
         }
 
-        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(extension);
+        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(type);
         return processor.processFile(libraryFile);
     }
 
