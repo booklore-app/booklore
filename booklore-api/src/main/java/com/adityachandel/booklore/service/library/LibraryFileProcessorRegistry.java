@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 // Removed unused imports
-import java.util.function.Function;
 @AllArgsConstructor
 @Component
 public class LibraryFileProcessorRegistry {
