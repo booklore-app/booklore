@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 
 // Removed unused imports
 import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @AllArgsConstructor
 @Component
 public class LibraryFileProcessorRegistry {
