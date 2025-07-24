@@ -11,7 +11,6 @@ import {LibraryShelfMenuService} from '../../../book/service/library-shelf-menu.
 import {AppVersion, VersionService} from '../../../core/service/version.service';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {VersionChangelogDialogComponent} from './version-changelog-dialog/version-changelog-dialog.component';
-import {AppSettingsService} from '../../../core/service/app-settings.service';
 import {UserService} from '../../../settings/user-management/user.service';
 
 @Component({
@@ -41,6 +40,8 @@ export class AppMenuComponent implements OnInit {
   shelfSortField: 'name' | 'id' = 'name';
   shelfSortOrder: 'asc' | 'desc' = 'asc';
 
+
+
   ngOnInit(): void {
     this.versionService.getVersion().subscribe((data) => {
       this.versionInfo = data;
@@ -64,7 +65,6 @@ export class AppMenuComponent implements OnInit {
       map((bookState) => [
         {
           label: 'Home',
-          separator: false,
           items: [
             {
               label: 'Dashboard',
@@ -89,11 +89,10 @@ export class AppMenuComponent implements OnInit {
       map((state) => {
         const libraries = state.libraries ?? [];
         const sortedLibraries = this.sortArray(libraries, this.librarySortField, this.librarySortOrder);
-
         return [
           {
             label: 'Library',
-            separator: false,
+            hasDropDown: true,
             items: sortedLibraries.map((library) => ({
               menu: this.libraryShelfMenuService.initializeLibraryMenuItems(library),
               label: library.name,
@@ -132,7 +131,7 @@ export class AppMenuComponent implements OnInit {
         return [
           {
             label: 'Shelves',
-            separator: false,
+            hasDropDown: true,
             items: [unshelvedItem, ...shelfItems],
           },
         ];

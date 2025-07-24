@@ -6,9 +6,6 @@
           @if (!item.separator) {
             <li app-menuitem [item]="item" [index]="i" [root]="true"></li>
           }
-          @if (item.separator) {
-            <li class="menu-separator"></li>
-          }
         }
       }
     </ul>
@@ -19,9 +16,6 @@
           @if (!item.separator) {
             <li app-menuitem [item]="item" [index]="i" [root]="true"></li>
           }
-          @if (item.separator) {
-            <li class="menu-separator"></li>
-          }
         }
       }
     </ul>
@@ -31,9 +25,6 @@
         @for (item of shelfMenu; track item; let i = $index) {
           @if (!item.separator) {
             <li app-menuitem [item]="item" [index]="i" [root]="true"></li>
-          }
-          @if (item.separator) {
-            <li class="menu-separator"></li>
           }
         }
       }
