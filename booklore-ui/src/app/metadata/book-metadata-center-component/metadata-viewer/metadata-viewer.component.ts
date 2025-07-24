@@ -28,13 +28,14 @@ import {filter, map, take} from 'rxjs/operators';
 import {Menu} from 'primeng/menu';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {BookCardLiteComponent} from '../../../book/components/book-card-lite/book-card-lite-component';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent, TranslocoDirective]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
 

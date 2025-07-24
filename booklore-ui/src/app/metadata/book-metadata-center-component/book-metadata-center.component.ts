@@ -27,6 +27,7 @@ import { MetadataEditorComponent } from './metadata-editor/metadata-editor.compo
 import { MetadataSearcherComponent } from './metadata-searcher/metadata-searcher.component';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { BookMetadataHostService } from '../../utilities/service/book-metadata-host-service';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-book-metadata-center',
@@ -41,6 +42,7 @@ import { BookMetadataHostService } from '../../utilities/service/book-metadata-h
     MetadataViewerComponent,
     MetadataEditorComponent,
     MetadataSearcherComponent,
+    TranslocoDirective,
   ],
   styleUrls: ['./book-metadata-center.component.scss'],
 })

@@ -22,6 +22,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {Chips} from 'primeng/chips';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -45,7 +46,8 @@ import {Chips} from 'primeng/chips';
     Tab,
     TabPanels,
     TabPanel,
-    Chips
+    Chips,
+    TranslocoDirective
   ]
 })
 export class MetadataEditorComponent implements OnInit {

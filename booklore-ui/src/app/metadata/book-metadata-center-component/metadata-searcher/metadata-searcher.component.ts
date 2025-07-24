@@ -17,6 +17,7 @@ import {BehaviorSubject, combineLatest, Observable, Subject, Subscription, takeU
 import {distinctUntilChanged, filter, switchMap} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {AsyncPipe} from '@angular/common';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -30,7 +31,8 @@ import {AsyncPipe} from '@angular/common';
     ProgressSpinner,
     MetadataPickerComponent,
     MultiSelect,
-    AsyncPipe
+    AsyncPipe,
+    TranslocoDirective
   ],
   standalone: true
 })

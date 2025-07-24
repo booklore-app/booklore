@@ -26,6 +26,7 @@ import {Subject} from 'rxjs';
 import {MetadataBatchProgressNotification} from '../../../core/model/metadata-batch-progress.model';
 import {UnifiedNotificationBoxComponent} from '../../../core/component/unified-notification-popover-component/unified-notification-popover-component';
 import {BookdropFileService} from '../../../bookdrop/bookdrop-file.service';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-topbar',
@@ -47,6 +48,7 @@ import {BookdropFileService} from '../../../bookdrop/bookdrop-file.service';
     Popover,
     UnifiedNotificationBoxComponent,
     NgStyle,
+    TranslocoDirective
   ],
 })
 export class AppTopBarComponent implements OnDestroy {

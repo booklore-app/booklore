@@ -14,6 +14,7 @@ import {Textarea} from 'primeng/textarea';
 import {filter, map} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Chips} from 'primeng/chips';
+import {TranslocoDirective} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -31,44 +32,45 @@ import {Chips} from 'primeng/chips';
     Tooltip,
     AsyncPipe,
     Textarea,
-    Chips
+    Chips,
+    TranslocoDirective
   ]
 })
 export class MetadataPickerComponent implements OnInit {
 
   metadataFieldsTop = [
-    {label: 'Title', controlName: 'title', lockedKey: 'titleLocked', fetchedKey: 'title'},
-    {label: 'Publisher', controlName: 'publisher', lockedKey: 'publisherLocked', fetchedKey: 'publisher'},
-    {label: 'Published', controlName: 'publishedDate', lockedKey: 'publishedDateLocked', fetchedKey: 'publishedDate'}
+    {label: 'title', controlName: 'title', lockedKey: 'titleLocked', fetchedKey: 'title'},
+    {label: 'publisher', controlName: 'publisher', lockedKey: 'publisherLocked', fetchedKey: 'publisher'},
+    {label: 'published', controlName: 'publishedDate', lockedKey: 'publishedDateLocked', fetchedKey: 'publishedDate'}
   ];
 
   metadataChips = [
-    {label: 'Authors', controlName: 'authors', lockedKey: 'authorsLocked', fetchedKey: 'authors'},
-    {label: 'Categories', controlName: 'categories', lockedKey: 'categoriesLocked', fetchedKey: 'categories'}
+    {label: 'authors', controlName: 'authors', lockedKey: 'authorsLocked', fetchedKey: 'authors'},
+    {label: 'genres', controlName: 'categories', lockedKey: 'categoriesLocked', fetchedKey: 'categories'}
   ];
 
   metadataDescription = [
-    {label: 'Description', controlName: 'description', lockedKey: 'descriptionLocked', fetchedKey: 'description'},
+    {label: 'description', controlName: 'description', lockedKey: 'descriptionLocked', fetchedKey: 'description'},
   ];
 
   metadataFieldsBottom = [
-    {label: 'Series', controlName: 'seriesName', lockedKey: 'seriesNameLocked', fetchedKey: 'seriesName'},
-    {label: 'Book #', controlName: 'seriesNumber', lockedKey: 'seriesNumberLocked', fetchedKey: 'seriesNumber'},
-    {label: 'Total Books', controlName: 'seriesTotal', lockedKey: 'seriesTotalLocked', fetchedKey: 'seriesTotal'},
-    {label: 'Language', controlName: 'language', lockedKey: 'languageLocked', fetchedKey: 'language'},
-    {label: 'ISBN-10', controlName: 'isbn10', lockedKey: 'isbn10Locked', fetchedKey: 'isbn10'},
-    {label: 'ISBN-13', controlName: 'isbn13', lockedKey: 'isbn13Locked', fetchedKey: 'isbn13'},
-    {label: 'ASIN', controlName: 'asin', lockedKey: 'asinLocked', fetchedKey: 'asin'},
-    {label: 'Amz Reviews', controlName: 'amazonReviewCount', lockedKey: 'amazonReviewCountLocked', fetchedKey: 'amazonReviewCount'},
-    {label: 'Amz Rating', controlName: 'amazonRating', lockedKey: 'amazonRatingLocked', fetchedKey: 'amazonRating'},
-    {label: 'GR ID', controlName: 'goodreadsId', lockedKey: 'goodreadsIdLocked', fetchedKey: 'goodreadsId'},
-    {label: 'GR Reviews', controlName: 'goodreadsReviewCount', lockedKey: 'goodreadsReviewCountLocked', fetchedKey: 'goodreadsReviewCount'},
-    {label: 'GR Rating', controlName: 'goodreadsRating', lockedKey: 'goodreadsRatingLocked', fetchedKey: 'goodreadsRating'},
-    {label: 'HC ID', controlName: 'hardcoverId', lockedKey: 'hardcoverIdLocked', fetchedKey: 'hardcoverId'},
-    {label: 'HC Reviews', controlName: 'hardcoverReviewCount', lockedKey: 'hardcoverReviewCountLocked', fetchedKey: 'hardcoverReviewCount'},
-    {label: 'HC Rating', controlName: 'hardcoverRating', lockedKey: 'hardcoverRatingLocked', fetchedKey: 'hardcoverRating'},
-    {label: 'Google ID', controlName: 'googleId', lockedKey: 'googleIdLocked', fetchedKey: 'googleIdRating'},
-    {label: 'Pages', controlName: 'pageCount', lockedKey: 'pageCountLocked', fetchedKey: 'pageCount'}
+    {label: 'series', controlName: 'seriesName', lockedKey: 'seriesNameLocked', fetchedKey: 'seriesName'},
+    {label: 'bookNumber', controlName: 'seriesNumber', lockedKey: 'seriesNumberLocked', fetchedKey: 'seriesNumber'},
+    {label: 'seriesTotal', controlName: 'seriesTotal', lockedKey: 'seriesTotalLocked', fetchedKey: 'seriesTotal'},
+    {label: 'language', controlName: 'language', lockedKey: 'languageLocked', fetchedKey: 'language'},
+    {label: 'isbn10', controlName: 'isbn10', lockedKey: 'isbn10Locked', fetchedKey: 'isbn10'},
+    {label: 'isbn13', controlName: 'isbn13', lockedKey: 'isbn13Locked', fetchedKey: 'isbn13'},
+    {label: 'asin', controlName: 'asin', lockedKey: 'asinLocked', fetchedKey: 'asin'},
+    {label: 'amazonReviews', controlName: 'amazonReviewCount', lockedKey: 'amazonReviewCountLocked', fetchedKey: 'amazonReviewCount'},
+    {label: 'amazonRating', controlName: 'amazonRating', lockedKey: 'amazonRatingLocked', fetchedKey: 'amazonRating'},
+    {label: 'goodreadsId', controlName: 'goodreadsId', lockedKey: 'goodreadsIdLocked', fetchedKey: 'goodreadsId'},
+    {label: 'goodreadsReviews', controlName: 'goodreadsReviewCount', lockedKey: 'goodreadsReviewCountLocked', fetchedKey: 'goodreadsReviewCount'},
+    {label: 'goodreadsRating', controlName: 'goodreadsRating', lockedKey: 'goodreadsRatingLocked', fetchedKey: 'goodreadsRating'},
+    {label: 'hardcoverId', controlName: 'hardcoverId', lockedKey: 'hardcoverIdLocked', fetchedKey: 'hardcoverId'},
+    {label: 'hardcoverReviews', controlName: 'hardcoverReviewCount', lockedKey: 'hardcoverReviewCountLocked', fetchedKey: 'hardcoverReviewCount'},
+    {label: 'hardcoverRating', controlName: 'hardcoverRating', lockedKey: 'hardcoverRatingLocked', fetchedKey: 'hardcoverRating'},
+    {label: 'googleId', controlName: 'googleId', lockedKey: 'googleIdLocked', fetchedKey: 'googleIdRating'},
+    {label: 'pages', controlName: 'pageCount', lockedKey: 'pageCountLocked', fetchedKey: 'pageCount'}
   ];
 
   @Input() reviewMode!: boolean;

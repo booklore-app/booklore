@@ -14,8 +14,10 @@ import {routes} from './app/app.routes';
 import {AuthInterceptorService} from './app/auth-interceptor.service';
 import {AuthService, websocketInitializer} from './app/core/service/auth.service';
 import {provideOAuthClient} from 'angular-oauth2-oidc';
-import {APP_INITIALIZER, provideAppInitializer} from '@angular/core';
+import {APP_INITIALIZER, isDevMode, provideAppInitializer} from '@angular/core';
 import {initializeAuthFactory} from './app/auth-initializer';
+import {provideTransloco} from '@jsverse/transloco';
+import {TranslocoHttpLoader} from './app/transloco-http-loader';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -49,6 +51,19 @@ bootstrapApplication(AppComponent, {
           darkModeSelector: '.p-dark'
         }
       }
-    })
+    }),
+    provideTransloco({
+      config: {
+        defaultLang: 'es',
+        fallbackLang: 'en',
+        availableLangs: ['en', 'es'],
+        missingHandler: {
+          useFallbackTranslation: true
+        },
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
+      },
+      loader: TranslocoHttpLoader,
+    }),
   ]
 }).catch(err => console.error(err));

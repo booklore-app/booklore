@@ -67,7 +67,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 return new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
             }
         } catch (Exception e) {
-            log.error("Token authentication failed", e);
+            log.debug("Token authentication failed", e);
         }
         return null;
     }

@@ -3,7 +3,7 @@ import {AppMenuitemComponent} from './app.menuitem.component';
 import {AsyncPipe} from '@angular/common';
 import {MenuModule} from 'primeng/menu';
 import {LibraryService} from '../../../book/service/library.service';
-import {Observable, of} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
 import {ShelfService} from '../../../book/service/shelf.service';
 import {BookService} from '../../../book/service/book.service';
@@ -11,8 +11,8 @@ import {LibraryShelfMenuService} from '../../../book/service/library-shelf-menu.
 import {AppVersion, VersionService} from '../../../core/service/version.service';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {VersionChangelogDialogComponent} from './version-changelog-dialog/version-changelog-dialog.component';
-import {AppSettingsService} from '../../../core/service/app-settings.service';
 import {UserService} from '../../../settings/user-management/user.service';
+import {TranslocoService} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-menu',
@@ -35,48 +35,57 @@ export class AppMenuComponent implements OnInit {
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
   private dialogService = inject(DialogService);
   private userService = inject(UserService);
+  private transloco = inject(TranslocoService);
 
   librarySortField: 'name' | 'id' = 'name';
   librarySortOrder: 'asc' | 'desc' = 'desc';
   shelfSortField: 'name' | 'id' = 'name';
   shelfSortOrder: 'asc' | 'desc' = 'asc';
 
+  private menuTranslations: Record<string, string> = {};
+
   ngOnInit(): void {
-    this.versionService.getVersion().subscribe((data) => {
-      this.versionInfo = data;
+    combineLatest([
+      this.versionService.getVersion(),
+      this.transloco.selectTranslateObject('menu').pipe(map(t => t || {})),
+      this.userService.userState$.pipe(filter(user => !!user))
+    ]).subscribe(([version, translations, user]) => {
+      this.versionInfo = version;
+      this.menuTranslations = translations;
+
+      if (user?.userSettings.sidebarLibrarySorting) {
+        this.librarySortField = this.validateSortField(user.userSettings.sidebarLibrarySorting.field);
+        this.librarySortOrder = this.validateSortOrder(user.userSettings.sidebarLibrarySorting.order);
+      }
+
+      if (user?.userSettings.sidebarShelfSorting) {
+        this.shelfSortField = this.validateSortField(user.userSettings.sidebarShelfSorting.field);
+        this.shelfSortOrder = this.validateSortOrder(user.userSettings.sidebarShelfSorting.order);
+      }
+
+      this.initMenus();
+      this.initHomeMenu();
     });
+  }
 
-    this.userService.userState$.pipe(
-      filter(settings => !!settings))
-      .subscribe(user => {
-        if (user?.userSettings.sidebarLibrarySorting) {
-          this.librarySortField = this.validateSortField(user.userSettings.sidebarLibrarySorting.field);
-          this.librarySortOrder = this.validateSortOrder(user.userSettings.sidebarLibrarySorting.order);
-        }
-        if (user?.userSettings.sidebarShelfSorting) {
-          this.shelfSortField = this.validateSortField(user.userSettings.sidebarShelfSorting.field);
-          this.shelfSortOrder = this.validateSortOrder(user.userSettings.sidebarShelfSorting.order);
-        }
-        this.initMenus();
-      });
-
+  private initHomeMenu(): void {
     this.homeMenu$ = this.bookService.bookState$.pipe(
       map((bookState) => [
         {
-          label: 'Home',
+          label: this.menuTranslations['dashboard'],
           separator: false,
           items: [
             {
-              label: 'Dashboard',
+              label: this.menuTranslations['dashboard'],
               icon: 'pi pi-fw pi-home',
               routerLink: ['/dashboard'],
             },
             {
-              label: 'All Books',
+              label: this.menuTranslations['allBooks'] ?? 'All Books',
               type: 'All Books',
               icon: 'pi pi-fw pi-book',
               routerLink: ['/all-books'],
-              bookCount$: of(bookState.books ? bookState.books.length : 0),
+              bookCount$: of(bookState.books?.length ?? 0),
             },
           ],
         },
@@ -92,7 +101,7 @@ export class AppMenuComponent implements OnInit {
 
         return [
           {
-            label: 'Library',
+            label: this.menuTranslations['library'],
             separator: false,
             items: sortedLibraries.map((library) => ({
               menu: this.libraryShelfMenuService.initializeLibraryMenuItems(library),
@@ -122,7 +131,7 @@ export class AppMenuComponent implements OnInit {
         }));
 
         const unshelvedItem = {
-          label: 'Unshelved',
+          label: this.menuTranslations['unshelved'],
           type: 'Shelf',
           icon: 'pi pi-inbox',
           routerLink: ['/unshelved-books'],
@@ -131,7 +140,7 @@ export class AppMenuComponent implements OnInit {
 
         return [
           {
-            label: 'Shelves',
+            label: this.menuTranslations['shelves'],
             separator: false,
             items: [unshelvedItem, ...shelfItems],
           },
@@ -143,7 +152,7 @@ export class AppMenuComponent implements OnInit {
   openChangelogDialog() {
     const isMobile = window.innerWidth <= 768;
     this.dynamicDialogRef = this.dialogService.open(VersionChangelogDialogComponent, {
-      header: 'What’s New',
+      header: this.menuTranslations['whatsnew'],
       modal: true,
       closable: true,
       style: {
