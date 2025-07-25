@@ -3,6 +3,10 @@ package com.adityachandel.booklore.service.metadata.parser;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
+import com.adityachandel.booklore.model.dto.response.comicvineapi.ComicvineApiResponse;
+import com.adityachandel.booklore.model.dto.response.comicvineapi.Issue;
+import com.adityachandel.booklore.model.dto.response.comicvineapi.Volume;
+import com.adityachandel.booklore.model.dto.response.comicvineapi.Comic;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.util.BookUtils;
@@ -11,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
-import com.adityachandel.booklore.model.dto.response.ComicvineApiResponse;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -24,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -35,9 +40,7 @@ public class ComicvineBookParser implements BookParser {
     
     private final ObjectMapper objectMapper;
     private static final String COMICVINE_URL = "https://comicvine.gamespot.com/api/";
-    //TODO: CHANGE THIS!!!
     private final AppSettingService appSettingService;
-    //private static final String API_KEY = "93e4425f66f8fbe6db5bd8c74d31c4defc2d27e9";
 
 
 
@@ -55,17 +58,25 @@ public class ComicvineBookParser implements BookParser {
         }
         log.info("Comicvine: Fetching metadata for: {}", term);
         try {
-            String fieldsList = "api_detail_url,description,id,image,name,publisher,start_year";
+    
+            String fieldsList = "cover_date,id,issue_number,name,person_credits,volume,api_detail_url,concept_credits,start_year,publisher,description,image";
+            String resources = "volume,issue";
+
             URI uri = UriComponentsBuilder.fromUriString(COMICVINE_URL) // Base URL
-                    .path("/volumes/")
+            
+                    .path("/search/")
                     .queryParam("api_key", apiToken) // Replace with your actual API key
                     .queryParam("format", "json")
+                    .queryParam("resources", resources)
+                    .queryParam("resouce_type", resources)
                     .queryParam("query", term)
                     .queryParam("filter", "name:" + term)
                     .queryParam("limit", "10") // Limit results to reduce response size
                     .queryParam("field_list", fieldsList)
                     .build()
                     .toUri();
+
+            System.out.println(uri.toString());
             HttpClient httpClient = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -110,30 +121,36 @@ public class ComicvineBookParser implements BookParser {
                 .collect(Collectors.toList());
     }
 
-    private BookMetadata convertToBookMetadata(ComicvineApiResponse.Comic comic) {
-    return BookMetadata.builder()
-            .title(comic.getName())
-            .comicvineId(String.valueOf(comic.getId()))
-            .description(comic.getDescription())
-            .publisher(comic.getPublisherName())      // Custom method
-            .thumbnailUrl(comic.getImageUrl())        // Custom method
-            .provider(MetadataProvider.Comicvine)
-            .publishedDate(parsePublishedDate(comic.getStartYear())) // Now camelCase
-            .build();
+
+
+
+
+    private BookMetadata convertToBookMetadata(com.adityachandel.booklore.model.dto.response.comicvineapi.Comic comic) {
+        BookMetadata.BookMetadataBuilder builder = BookMetadata.builder()
+        .title(comic.getDisplayName())
+        .comicvineId(String.valueOf(comic.getId()))
+        .authors(comic.getAuthors())
+        .thumbnailUrl(comic.getImageUrl())
+        .description(comic.getDescription())
+        .provider(MetadataProvider.Comicvine);
+
+        // Handle publishedDate based on the comic type
+        if (comic instanceof Volume) {
+            Volume volume = (Volume) comic;
+            builder.publisher(volume.getPublisherName());
+            builder.publishedDate(volume.getDate());
+        } else if (comic instanceof Issue) {
+             Issue issue = (Issue) comic;
+             builder.seriesName(issue.getVolume().getName());
+             builder.seriesNumber((float) issue.getIssueNumber());
+            builder.publishedDate(issue.getDate()); // Already parsed
+        }
+
+            // Return the final built object
+            return builder.build();
+
+
+
+
 }
-
-    private LocalDate parsePublishedDate(String startYear) {
-        if (startYear == null || startYear.isEmpty()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(startYear + "-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-
-
-
 }
