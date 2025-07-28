@@ -52,6 +52,8 @@ public abstract class Comic {
 
         public abstract String getDisplayName();
 
+        public abstract String getComicId();
+
         public abstract LocalDate getDate();
 
         public Set<String> getAuthors() {

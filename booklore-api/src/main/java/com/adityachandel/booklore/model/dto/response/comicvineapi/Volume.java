@@ -42,7 +42,10 @@ public class Volume extends Comic{
         }
     }
 
-
+    @Override   
+    public String getComicId() {
+        return "4500-" + String.valueOf(getId());
+    }
 
     @Override
     public LocalDate getDate() {

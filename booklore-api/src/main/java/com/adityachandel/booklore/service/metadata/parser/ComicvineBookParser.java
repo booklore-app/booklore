@@ -125,7 +125,7 @@ public class ComicvineBookParser implements BookParser {
 
 
 
-    private BookMetadata convertToBookMetadata(com.adityachandel.booklore.model.dto.response.comicvineapi.Comic comic) {
+    private BookMetadata convertToBookMetadata(Comic comic) {
         BookMetadata.BookMetadataBuilder builder = BookMetadata.builder()
         .title(comic.getDisplayName())
         .comicvineId(String.valueOf(comic.getId()))

@@ -21,6 +21,12 @@ public class Issue extends Comic {
     @JsonProperty("issue_number")
     private int issueNumber;
 
+
+    @Override   
+    public String getComicId() {
+        return "4000-" + String.valueOf(getId());
+    }
+
     @Override
     public String getDisplayName() {
         if(name ==null){
