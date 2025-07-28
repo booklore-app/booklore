@@ -1,6 +1,5 @@
 import {Routes} from '@angular/router';
 import {BookBrowserComponent} from './book/components/book-browser/book-browser.component';
-import {MainDashboardComponent} from './dashboard/components/main-dashboard/main-dashboard.component';
 import {AppLayoutComponent} from './layout/component/layout-main/app.layout.component';
 import {LoginComponent} from './core/component/login/login.component';
 import {AuthGuard} from './auth.guard';
@@ -17,6 +16,8 @@ import {LoginGuard} from './core/setup/ login.guard';
 import {OidcCallbackComponent} from './core/security/oidc-callback/oidc-callback.component';
 import {CbxReaderComponent} from './book/components/cbx-reader/cbx-reader.component';
 import {BookdropFileReviewComponent} from './bookdrop/bookdrop-file-review-component/bookdrop-file-review.component';
+import {MagicShelfComponent} from './magic-shelf-component/magic-shelf-component';
+import {MainDashboardComponent} from './dashboard/components/main-dashboard/main-dashboard.component';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,7 @@ export const routes: Routes = [
       {path: 'library/:libraryId/books', component: BookBrowserComponent, canActivate: [AuthGuard]},
       {path: 'shelf/:shelfId/books', component: BookBrowserComponent, canActivate: [AuthGuard]},
       {path: 'unshelved-books', component: BookBrowserComponent, canActivate: [AuthGuard]},
+      { path: 'magic-shelf/:magicShelfId/books', component: BookBrowserComponent, canActivate: [AuthGuard] },
       {path: 'book/:bookId', component: BookMetadataCenterComponent, canActivate: [AuthGuard]},
       {path: 'bookdrop', component: BookdropFileReviewComponent, canActivate: [AuthGuard]}
     ]

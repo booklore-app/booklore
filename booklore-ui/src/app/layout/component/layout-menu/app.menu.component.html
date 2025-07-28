@@ -29,6 +29,16 @@
         }
       }
     </ul>
+
+    <ul class="layout-menu">
+      @if (magicShelfMenu$ | async; as shelfMenu) {
+        @for (item of shelfMenu; track item; let i = $index) {
+          @if (!item.separator) {
+            <li app-menuitem [item]="item" [index]="i" [root]="true"></li>
+          }
+        }
+      }
+    </ul>
   </div>
 
   @if (versionInfo) {

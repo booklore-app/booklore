@@ -12,6 +12,7 @@ import {AppVersion, VersionService} from '../../../core/service/version.service'
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {VersionChangelogDialogComponent} from './version-changelog-dialog/version-changelog-dialog.component';
 import {UserService} from '../../../settings/user-management/user.service';
+import {MagicShelf, MagicShelfService, MagicShelfState} from '../../../magic-shelf-service';
 
 @Component({
   selector: 'app-menu',
@@ -23,6 +24,7 @@ export class AppMenuComponent implements OnInit {
   libraryMenu$: Observable<any> | undefined;
   shelfMenu$: Observable<any> | undefined;
   homeMenu$: Observable<any> | undefined;
+  magicShelfMenu$: Observable<any> | undefined;
 
   versionInfo: AppVersion | null = null;
   dynamicDialogRef: DynamicDialogRef | undefined;
@@ -34,12 +36,12 @@ export class AppMenuComponent implements OnInit {
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
   private dialogService = inject(DialogService);
   private userService = inject(UserService);
+  private magicShelfService = inject(MagicShelfService);
 
   librarySortField: 'name' | 'id' = 'name';
   librarySortOrder: 'asc' | 'desc' = 'desc';
   shelfSortField: 'name' | 'id' = 'name';
   shelfSortOrder: 'asc' | 'desc' = 'asc';
-
 
 
   ngOnInit(): void {
@@ -91,8 +93,10 @@ export class AppMenuComponent implements OnInit {
         const sortedLibraries = this.sortArray(libraries, this.librarySortField, this.librarySortOrder);
         return [
           {
-            label: 'Library',
+            label: 'Libraries',
+            type: 'library',
             hasDropDown: true,
+            hasCreate: true,
             items: sortedLibraries.map((library) => ({
               menu: this.libraryShelfMenuService.initializeLibraryMenuItems(library),
               label: library.name,
@@ -100,6 +104,29 @@ export class AppMenuComponent implements OnInit {
               icon: 'pi pi-' + library.icon,
               routerLink: [`/library/${library.id}/books`],
               bookCount$: this.libraryService.getBookCount(library.id ?? 0),
+            })),
+          },
+        ];
+      })
+    );
+
+    this.magicShelfMenu$ = this.magicShelfService.shelvesState$.pipe(
+      map((state: MagicShelfState) => {
+        const shelves = state.shelves ?? [];
+        const sortedShelves = this.sortArray(shelves, 'name', 'asc');
+        return [
+          {
+            label: 'Magic Shelves',
+            type: 'magicShelf',
+            hasDropDown: true,
+            hasCreate: true,
+            items: sortedShelves.map((shelf) => ({
+              label: shelf.name,
+              type: 'magicShelfItem',
+              icon: 'pi pi-' + shelf.icon,
+              menu: this.libraryShelfMenuService.initializeMagicShelfMenuItems(shelf),
+              routerLink: [`/magic-shelf/${shelf.id}/books`],
+              bookCount$: this.magicShelfService.getBookCount(shelf.id ?? 0),
             })),
           },
         ];
@@ -130,8 +157,10 @@ export class AppMenuComponent implements OnInit {
 
         return [
           {
+            type: 'shelf',
             label: 'Shelves',
             hasDropDown: true,
+            hasCreate: false,
             items: [unshelvedItem, ...shelfItems],
           },
         ];

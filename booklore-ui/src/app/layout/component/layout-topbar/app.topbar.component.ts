@@ -3,7 +3,6 @@ import {MenuItem} from 'primeng/api';
 import {LayoutService} from '../layout-main/service/app.layout.service';
 import {Router, RouterLink} from '@angular/router';
 import {DialogService as PrimeDialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {LibraryCreatorComponent} from '../../../book/components/library-creator/library-creator.component';
 import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
@@ -14,11 +13,8 @@ import {Button} from 'primeng/button';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
 import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
-import {BookUploaderComponent} from '../../../utilities/component/book-uploader/book-uploader.component';
 import {AuthService} from '../../../core/service/auth.service';
 import {UserService} from '../../../settings/user-management/user.service';
-import {UserProfileDialogComponent} from '../../../settings/global-preferences/user-profile-dialog/user-profile-dialog.component';
-import {GithubSupportDialog} from '../../../utilities/component/github-support-dialog/github-support-dialog';
 import {Popover} from 'primeng/popover';
 import {MetadataProgressService} from '../../../core/service/metadata-progress-service';
 import {takeUntil} from 'rxjs/operators';
@@ -26,6 +22,7 @@ import {Subject} from 'rxjs';
 import {MetadataBatchProgressNotification} from '../../../core/model/metadata-batch-progress.model';
 import {UnifiedNotificationBoxComponent} from '../../../core/component/unified-notification-popover-component/unified-notification-popover-component';
 import {BookdropFileService} from '../../../bookdrop/bookdrop-file.service';
+import {DialogLauncherService} from '../../../dialog-launcher.service';
 
 @Component({
   selector: 'app-topbar',
@@ -79,7 +76,8 @@ export class AppTopBarComponent implements OnDestroy {
     private authService: AuthService,
     protected userService: UserService,
     private metadataProgressService: MetadataProgressService,
-    private bookdropFileService: BookdropFileService
+    private bookdropFileService: BookdropFileService,
+    private dialogLauncher: DialogLauncherService
   ) {
     this.subscribeToMetadataProgress();
     this.subscribeToNotifications();
@@ -116,19 +114,19 @@ export class AppTopBarComponent implements OnDestroy {
   }
 
   openGithubSupportDialog(): void {
-    this.openDialog(GithubSupportDialog, 'Support BookLore on GitHub', '25%');
+    this.dialogLauncher.openGithubSupportDialog();
   }
 
   openLibraryCreatorDialog(): void {
-    this.openDialog(LibraryCreatorComponent, 'Create New Library', '15%');
+    this.dialogLauncher.openLibraryCreatorDialog();
   }
 
   openFileUploadDialog(): void {
-    this.openDialog(BookUploaderComponent, 'Book Uploader', '10%');
+    this.dialogLauncher.openFileUploadDialog();
   }
 
   openUserProfileDialog(): void {
-    this.openDialog(UserProfileDialogComponent, 'User Profile Information', '10%');
+    this.dialogLauncher.openUserProfileDialog();
   }
 
   navigateToSettings() {
@@ -137,24 +135,6 @@ export class AppTopBarComponent implements OnDestroy {
 
   logout() {
     this.authService.logout();
-  }
-
-  private openDialog(component: any, header: string, top: string) {
-    const isMobile = window.innerWidth <= 768;
-    this.ref = this.dialogService.open(component, {
-      header,
-      modal: true,
-      closable: true,
-      style: {
-        position: 'absolute',
-        top,
-        ...(isMobile && {
-          width: '90vw',
-          maxWidth: '90vw',
-          minWidth: '90vw',
-        }),
-      },
-    });
   }
 
   private subscribeToMetadataProgress() {

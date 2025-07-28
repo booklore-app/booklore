@@ -9,6 +9,7 @@ import {Ripple} from 'primeng/ripple';
 import {Button} from 'primeng/button';
 import {Menu} from 'primeng/menu';
 import {UserService} from '../../../settings/user-management/user.service';
+import {DialogLauncherService} from '../../../dialog-launcher.service';
 
 @Component({
   selector: '[app-menuitem]',
@@ -22,7 +23,7 @@ import {UserService} from '../../../settings/user-management/user.service';
     AsyncPipe,
     Button,
     Menu
-],
+  ],
   animations: [
     trigger('children', [
       state('collapsed', style({
@@ -65,7 +66,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
     return this.expandedItems.has(key);
   }
 
-  constructor(public router: Router, private menuService: MenuService, private userService: UserService) {
+  constructor(public router: Router, private menuService: MenuService, private userService: UserService, private dialogLauncher: DialogLauncherService) {
     this.userService.userState$.subscribe(userData => {
       if (userData) {
         this.canManipulateLibrary = userData.permissions.canManipulateLibrary;
@@ -141,6 +142,15 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
     }
     if (this.menuResetSubscription) {
       this.menuResetSubscription.unsubscribe();
+    }
+  }
+
+  openDialog(item: any) {
+    if (item.type === 'library' && this.canManipulateLibrary) {
+      this.dialogLauncher.openLibraryCreatorDialog();
+    }
+    if (item.type === 'magicShelf') {
+      this.dialogLauncher.openMagicShelfDialog();
     }
   }
 }

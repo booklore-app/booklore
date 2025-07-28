@@ -1,9 +1,20 @@
 <ng-container>
   @if (root) {
     @if (item.hasDropDown) {
-      <div class="flex items-center justify-between layout-menuitem-root-text cursor-pointer pt-4" (click)="toggleExpand(key)">
-        <div>{{ item.label }}</div>
-        <i [ngClass]="{
+      <div class=" flex items-center justify-between layout-menuitem-root-text cursor-pointer pt-4">
+        <div class="flex items-center justify-between gap-2 cursor-pointer">
+          <div>{{ item.label }}</div>
+          @if (item.hasCreate) {
+            <i
+              class="pi pi-plus text-surface-500 hover:text-surface-200"
+              style="font-size: 0.8rem"
+              (click)="openDialog(item)"
+            ></i>
+          }
+        </div>
+        <i
+          (click)="toggleExpand(key)"
+          [ngClass]="{
           'pi': true,
           'pi-angle-up': isExpanded(key),
           'pi-angle-down': !isExpanded(key),
@@ -39,7 +50,7 @@
         </a>
       }
       <span>
-        @if (item.type === 'Library' || item.type === 'Shelf') {
+        @if (item.type === 'Library' || item.type === 'Shelf' || item.type === 'magicShelfItem') {
           @if ((item.type !== 'Library' || (admin || canManipulateLibrary)) && item.label !== 'Unshelved') {
             <p-button
               (click)="entitymenu.toggle($event)"

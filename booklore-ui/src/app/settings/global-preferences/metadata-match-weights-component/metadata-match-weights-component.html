@@ -40,12 +40,12 @@
             <label class="capitalize w-full max-w-[150px]">
               {{ labelMap[key] }}
             </label>
-            <input
-              pSize="small"
-              type="number"
-              pInputText
+            <p-inputNumber
               [formControlName]="key"
-              class="w-16 text-center"
+              [min]="0"
+              [max]="10"
+              fluid
+              [showButtons]="true"
             />
           </div>
         }

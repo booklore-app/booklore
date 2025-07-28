@@ -63,7 +63,7 @@ export class BookService {
     return currentState.books.filter(book => idSet.has(+book.id));
   }
 
-  updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
+  updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | null | undefined>, shelvesToUnassign: Set<number | null | undefined>): Observable<Book[]> {
     const requestPayload = {
       bookIds: Array.from(bookIds),
       shelvesToAssign: Array.from(shelvesToAssign),
@@ -420,6 +420,10 @@ export class BookService {
         this.bookStateSubject.next({...currentState, books: updatedBooks});
       })
     );
+  }
+
+  getMagicShelfBookCount(number: number) {
+
   }
 
 
