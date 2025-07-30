@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.entity;
 
+import com.adityachandel.booklore.model.enums.ReadStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -46,4 +47,8 @@ public class UserBookProgressEntity {
 
     @Column(name = "cbx_progress_percent")
     private Float cbxProgressPercent;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "read_status")
+    private ReadStatus readStatus;
 }

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {BehaviorSubject, combineLatest, Observable, of, Subject, takeUntil} from 'rxjs';
-import {distinctUntilChanged, filter, map, take} from 'rxjs/operators';
+import {combineLatest, Observable, of, Subject, takeUntil} from 'rxjs';
+import {distinctUntilChanged, map} from 'rxjs/operators';
 import {BookService} from '../../../service/book.service';
 import {Library} from '../../../model/library.model';
 import {Shelf} from '../../../model/shelf.model';
@@ -13,6 +13,9 @@ import {FormsModule} from '@angular/forms';
 import {SelectButton} from 'primeng/selectbutton';
 import {UserService} from '../../../../settings/user-management/user.service';
 import {FilterSortPreferenceService} from '../filters/filter-sorting-preferences.service';
+import {MagicShelf} from '../../../../magic-shelf-service';
+import {GroupRule} from '../../../../magic-shelf-component/magic-shelf-component';
+import {BookRuleEvaluatorService} from '../../../../book-rule-evaluator.service';
 
 type Filter<T> = { value: T; bookCount: number };
 
@@ -25,7 +28,7 @@ export const ratingRanges = [
   {id: '4.5plus', label: '4.5+', min: 4.5, max: Infinity, sortIndex: 5}
 ];
 
-export const ratingOptions10 = Array.from({ length: 10 }, (_, i) => ({
+export const ratingOptions10 = Array.from({length: 10}, (_, i) => ({
   id: `${i + 1}`,
   label: `${i + 1}`,
   value: i + 1,
@@ -83,7 +86,7 @@ function getRatingRangeFilters(rating?: number): { id: string; name: string; sor
 function getRatingRangeFilters10(rating?: number): { id: string; name: string; sortIndex?: number }[] {
   if (!rating || rating < 1 || rating > 10) return [];
   const idx = ratingOptions10.find(r => r.value === rating || +r.id === rating);
-  return idx ? [{ id: idx.id, name: idx.label, sortIndex: idx.sortIndex }] : [];
+  return idx ? [{id: idx.id, name: idx.label, sortIndex: idx.sortIndex}] : [];
 }
 
 function extractPublishedYearFilter(book: Book): { id: number; name: string }[] {
@@ -110,7 +113,7 @@ function getMatchScoreRangeFilters(score?: number | null): { id: string; name: s
   return match ? [{id: match.id, name: match.label, sortIndex: match.sortIndex}] : [];
 }
 
-const readStatusLabels: Record<ReadStatus, string> = {
+export const readStatusLabels: Record<ReadStatus, string> = {
   [ReadStatus.UNREAD]: 'Unread',
   [ReadStatus.READING]: 'Reading',
   [ReadStatus.RE_READING]: 'Re-reading',
@@ -119,10 +122,11 @@ const readStatusLabels: Record<ReadStatus, string> = {
   [ReadStatus.READ]: 'Read',
   [ReadStatus.WONT_READ]: 'Won’t Read',
   [ReadStatus.ABANDONED]: 'Abandoned',
+  [ReadStatus.UNSET]: 'Unset'
 };
 
 function getReadStatusName(status?: ReadStatus | null): string {
-  return status != null ? readStatusLabels[status] ?? 'Unknown' : 'Unknown';
+  return status != null ? readStatusLabels[status] ?? 'Unset' : 'Unset';
 }
 
 @Component({
@@ -147,10 +151,10 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   @Output() filterSelected = new EventEmitter<Record<string, any> | null>();
   @Output() filterModeChanged = new EventEmitter<'and' | 'or'>();
 
-  @Input() showFilters: boolean = true;
-  @Input() entity$!: Observable<Library | Shelf | null> | undefined;
+  @Input() entity$!: Observable<Library | Shelf | MagicShelf | null> | undefined;
   @Input() entityType$!: Observable<EntityType> | undefined;
   @Input() resetFilter$!: Subject<void>;
+  @Input() showFilter: boolean = false;
 
   activeFilters: Record<string, any> = {};
   filterStreams: Record<string, Observable<Filter<any>[]>> = {};
@@ -184,6 +188,7 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   bookService = inject(BookService);
   userService = inject(UserService);
   filterSortPreferenceService = inject(FilterSortPreferenceService);
+  bookRuleEvaluatorService = inject(BookRuleEvaluatorService);
 
   ngOnInit(): void {
     combineLatest([
@@ -198,7 +203,13 @@ export class BookFilterComponent implements OnInit, OnDestroy {
           category: this.getFilterStream((book: Book) => book.metadata?.categories!.map(name => ({id: name, name})) || [], 'id', 'name', sortMode),
           series: this.getFilterStream((book) => (book.metadata?.seriesName ? [{id: book.metadata.seriesName, name: book.metadata.seriesName}] : []), 'id', 'name', sortMode),
           publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name', sortMode),
-          readStatus: this.getFilterStream((book: Book) => [{id: book.readStatus ?? ReadStatus.UNREAD, name: getReadStatusName(book.readStatus)}], 'id', 'name', sortMode),
+          readStatus: this.getFilterStream((book: Book) => {
+            let status = book.readStatus;
+            if (status == null || !(status in readStatusLabels)) {
+              status = ReadStatus.UNSET;
+            }
+            return [{id: status, name: getReadStatusName(status)}];
+          }, 'id', 'name', sortMode),
           matchScore: this.getFilterStream((book: Book) => getMatchScoreRangeFilters(book.metadataMatchScore), 'id', 'name', 'sortIndex'),
           personalRating: this.getFilterStream((book: Book) => getRatingRangeFilters10(book.metadata?.personalRating!), 'id', 'name', 'sortIndex'),
           amazonRating: this.getFilterStream((book: Book) => getRatingRangeFilters(book.metadata?.amazonRating!), 'id', 'name', 'sortIndex'),
@@ -276,9 +287,21 @@ export class BookFilterComponent implements OnInit, OnDestroy {
     if (entityType === EntityType.LIBRARY && entity && 'id' in entity) {
       return books.filter((book) => book.libraryId === entity.id);
     }
+
     if (entityType === EntityType.SHELF && entity && 'id' in entity) {
       return books.filter((book) => book.shelves?.some((shelf) => shelf.id === entity.id));
     }
+
+    if (entityType === EntityType.MAGIC_SHELF && entity && 'filterJson' in entity) {
+      try {
+        const groupRule = JSON.parse(entity.filterJson) as GroupRule;
+        return books.filter((book) => this.bookRuleEvaluatorService.evaluateGroup(book, groupRule));
+      } catch (e) {
+        console.warn('Invalid filterJson for MagicShelf:', e);
+        return [];
+      }
+    }
+
     return books;
   }
 

@@ -1,4 +1,4 @@
-import {MetadataRefreshOptions} from '../../book/metadata/model/request/metadata-refresh-options.model';
+import {MetadataRefreshOptions} from '../../metadata/model/request/metadata-refresh-options.model';
 
 export interface MetadataMatchWeights {
   title: number;
@@ -83,6 +83,7 @@ export interface AppSettings {
   metadataRefreshOptions: MetadataRefreshOptions;
   coverResolution: string;
   uploadPattern: string;
+  movePattern: string;
   opdsServerEnabled: boolean;
   remoteAuthEnabled: boolean;
   oidcEnabled: boolean;
@@ -93,6 +94,7 @@ export interface AppSettings {
   metadataProviderSettings: MetadataProviderSettings;
   metadataMatchWeights: MetadataMatchWeights;
   metadataPersistenceSettings: MetadataPersistenceSettings;
+  metadataDownloadOnBookdrop: boolean;
 }
 
 export enum AppSettingKey {
@@ -110,5 +112,6 @@ export enum AppSettingKey {
   METADATA_PROVIDER_SETTINGS = 'METADATA_PROVIDER_SETTINGS',
   METADATA_MATCH_WEIGHTS = 'METADATA_MATCH_WEIGHTS',
   METADATA_PERSISTENCE_SETTINGS = 'METADATA_PERSISTENCE_SETTINGS',
-  BOOK_DELETION_ENABLED = 'BOOK_DELETION_ENABLED'
+  MOVE_FILE_PATTERN = 'MOVE_FILE_PATTERN',
+  METADATA_DOWNLOAD_ON_BOOKDROP = 'METADATA_DOWNLOAD_ON_BOOKDROP'
 }

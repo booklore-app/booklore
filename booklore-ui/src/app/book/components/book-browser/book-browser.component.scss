@@ -12,18 +12,24 @@
 
 .virtual-scroller {
   width: 100%;
-  height: calc(100vh - 10.9rem);
+  height: calc(100dvh - 10.9rem);
   padding: 1rem;
   box-sizing: border-box;
   overflow-y: auto;
 }
 
+@media (max-width: 768px) {
+  .virtual-scroller {
+    height: calc(100dvh - 9rem);
+  }
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(1px, 1fr));
   gap: 1.3rem;
-  overflow: hidden;
   align-items: start;
+  width: 100%;
 }
 
 .virtual-scroller-item {
@@ -33,8 +39,8 @@
 .book-browser-footer {
   position: absolute;
   bottom: 0;
-  left: 25%;
-  right: 25%;
+  left: 10%;
+  right: 10%;
   display: flex;
   justify-content: center;
   padding: 1rem 0.5rem 0.5rem;
@@ -44,16 +50,10 @@
   border-width: 1px 1px 0px 1px;
 }
 
-.topbar-items {
-  display: flex;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  gap: 0.3rem;
-  align-items: center;
-
-  li {
-    position: relative;
+@media (max-width: 768px) {
+  .book-browser-footer {
+    left: 0%;
+    right: 0%;
   }
 }
 
@@ -101,4 +101,55 @@
   height: 2.5rem;
   line-height: 2.5rem;
   font-size: 1rem;
+}
+
+.mobile-filter-mask {
+  @media (max-width: 991px) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 998;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.filter-overlay-container {
+
+  @media (max-width: 991px) {
+    width: 225px;
+    position: fixed;
+    top: 3.85rem;
+    right: 0;
+    bottom: 0;
+    height: calc(100% - 3.85rem);
+    background-color: var(--card-background);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1001;
+
+    &.active {
+      transform: translateX(0);
+    }
+  }
+
+  @media (min-width: 992px) {
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    &:not(.active) {
+      width: 0 !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &.active {
+      width: 225px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
 }

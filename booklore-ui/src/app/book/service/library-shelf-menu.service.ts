@@ -6,10 +6,12 @@ import {ShelfService} from './shelf.service';
 import {Library} from '../model/library.model';
 import {Shelf} from '../model/shelf.model';
 import {DialogService} from 'primeng/dynamicdialog';
-import {MetadataFetchOptionsComponent} from '../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
-import {MetadataRefreshType} from '../metadata/model/request/metadata-refresh-type.enum';
+import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
 import {LibraryCreatorComponent} from '../components/library-creator/library-creator.component';
 import {ShelfEditDialogComponent} from '../components/shelf-edit-dialog/shelf-edit-dialog.component';
+import {MagicShelf, MagicShelfService} from '../../magic-shelf-service';
+import {MagicShelfComponent} from '../../magic-shelf-component/magic-shelf-component';
 
 @Injectable({
   providedIn: 'root',
@@ -22,8 +24,9 @@ export class LibraryShelfMenuService {
   private shelfService = inject(ShelfService);
   private router = inject(Router);
   private dialogService = inject(DialogService);
+  private magicShelfService = inject(MagicShelfService);
 
-  initializeLibraryMenuItems(entity: Library | Shelf | null): MenuItem[] {
+  initializeLibraryMenuItems(entity: Library | Shelf | MagicShelf | null): MenuItem[] {
     return [
       {
         label: 'Options',
@@ -56,6 +59,11 @@ export class LibraryShelfMenuService {
                 header: 'Confirmation',
                 rejectButtonProps: {
                   label: 'Cancel',
+                  severity: 'secondary',
+                },
+                acceptButtonProps: {
+                  label: 'Yes',
+                  severity: 'success',
                 },
                 accept: () => {
                   this.libraryService.deleteLibrary(entity?.id!).subscribe({
@@ -84,6 +92,11 @@ export class LibraryShelfMenuService {
                 header: 'Confirmation',
                 rejectButtonProps: {
                   label: 'Cancel',
+                  severity: 'secondary',
+                },
+                acceptButtonProps: {
+                  label: 'Yes',
+                  severity: 'success',
                 },
                 accept: () => {
                   this.libraryService.refreshLibrary(entity?.id!).subscribe({
@@ -157,6 +170,55 @@ export class LibraryShelfMenuService {
                     complete: () => {
                       this.router.navigate(['/']);
                       this.messageService.add({severity: 'info', summary: 'Success', detail: 'Shelf was deleted'});
+                    },
+                    error: () => {
+                      this.messageService.add({
+                        severity: 'error',
+                        summary: 'Failed',
+                        detail: 'Failed to delete shelf',
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          }
+        ]
+      }
+    ];
+  }
+
+  initializeMagicShelfMenuItems(entity: any): MenuItem[] {
+    return [
+      {
+        label: 'Options',
+        items: [
+          {
+            label: 'Edit Magic Shelf',
+            icon: 'pi pi-pen-to-square',
+            command: () => {
+              this.dialogService.open(MagicShelfComponent, {
+                header: 'Edit Magic Shelf',
+                modal: true,
+                closable: true,
+                data: {
+                  id: entity?.id
+                }
+              })
+            }
+          },
+          {
+            label: 'Delete Magic Shelf',
+            icon: 'pi pi-trash',
+            command: () => {
+              this.confirmationService.confirm({
+                message: `Are you sure you want to delete magic shelf: ${entity?.name}?`,
+                header: 'Confirmation',
+                accept: () => {
+                  this.magicShelfService.deleteShelf(entity?.id!).subscribe({
+                    complete: () => {
+                      this.router.navigate(['/']);
+                      this.messageService.add({severity: 'info', summary: 'Success', detail: 'Magic shelf was deleted'});
                     },
                     error: () => {
                       this.messageService.add({

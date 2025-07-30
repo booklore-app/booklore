@@ -51,7 +51,7 @@ public class AppMigrationService {
 
     @Transactional
     public void populateMetadataScoresOnce() {
-        if (migrationRepository.existsById("populateMetadataScores")) return;
+        if (migrationRepository.existsById("populateMetadataScores_v2")) return;
 
         List<BookEntity> books = bookQueryService.getAllFullBookEntities();
         for (BookEntity book : books) {
@@ -60,7 +60,37 @@ public class AppMigrationService {
         }
         bookRepository.saveAll(books);
 
-        log.info("Migration 'populateMetadataScores' applied to {} books.", books.size());
-        migrationRepository.save(new AppMigrationEntity("populateMetadataScores", LocalDateTime.now(), "Calculate and store metadata match score for all books"));
+        log.info("Migration 'populateMetadataScores_v2' applied to {} books.", books.size());
+        migrationRepository.save(new AppMigrationEntity("populateMetadataScores_v2", LocalDateTime.now(), "Calculate and store metadata match score for all books"));
+    }
+
+    @Transactional
+    public void populateFileHashesOnce() {
+        if (migrationRepository.existsById("populateFileHashes")) return;
+
+        List<BookEntity> books = bookRepository.findAll();
+        int updated = 0;
+
+        for (BookEntity book : books) {
+            if (book.getCurrentHash() == null || book.getInitialHash() == null) {
+                String hash = FileUtils.computeFileHash(book);
+                if (hash != null) {
+                    if (book.getInitialHash() == null) {
+                        book.setInitialHash(hash);
+                    }
+                    book.setCurrentHash(hash);
+                    updated++;
+                }
+            }
+        }
+
+        bookRepository.saveAll(books);
+
+        log.info("Migration 'populateFileHashes' applied to {} books.", updated);
+        migrationRepository.save(new AppMigrationEntity(
+                "populateFileHashes",
+                LocalDateTime.now(),
+                "Calculate and store initialHash and currentHash for all books"
+        ));
     }
 }

@@ -4,13 +4,20 @@
   (mouseout)="isHovered = false">
 
   <div class="cover-container" [ngClass]="{ 'shimmer': !isImageLoaded, 'center-info-btn': readButtonHidden }">
-    <img
-      [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
-      class="book-cover"
-      [class.loaded]="isImageLoaded"
-      alt="Cover of {{ book.metadata?.title }}"
-      loading="lazy"
-      (load)="onImageLoad()"/>
+    <div
+      class="cover-container"
+      [ngClass]="{
+        'center-info-btn': readButtonHidden,
+        'loaded': isImageLoaded
+      }">
+      <img
+        [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
+        class="book-cover"
+        [class.loaded]="isImageLoaded"
+        alt="Cover of {{ book.metadata?.title }}"
+        loading="lazy"
+        (load)="onImageLoad()" />
+    </div>
 
     @if (book.metadata?.seriesNumber != null) {
       <div class="series-number-overlay">
@@ -49,24 +56,15 @@
 
   <div [hidden]="bottomBarHidden">
     <div class="book-title-container flex items-center">
-      <p class="m-0 pl-2">
-        <i
-          class="pi"
-          [ngClass]="isMetadataFullyLocked(book.metadata!) ? 'pi-lock text-red-400' : 'pi-lock-open text-green-400'"
-          [title]="isMetadataFullyLocked(book.metadata!) ? 'Locked' : 'Unlocked'"
-          style="font-size: 0.75rem;">
-        </i>
-      </p>
       <h4 class="book-title m-0 pl-2">{{ book.metadata?.title }}</h4>
-
       <p-tieredmenu #menu [model]="items" [popup]="true" appendTo="body"></p-tieredmenu>
       <p-button
+        class="custom-button-padding"
         size="small"
         [text]="true"
         (click)="menu.toggle($event)"
         icon="pi pi-ellipsis-v">
       </p-button>
-
     </div>
   </div>
 </div>

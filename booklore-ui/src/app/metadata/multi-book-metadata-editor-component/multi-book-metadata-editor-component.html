@@ -1,0 +1,32 @@
+<div class="rounded-xl">
+  <p-tabs [value]="'edit'" lazy="true">
+    <p-tablist>
+      @if (admin || canEditMetadata) {
+        <p-tab value="edit">Edit Metadata</p-tab>
+      }
+      @if (admin || canEditMetadata) {
+        <p-tab value="match">Search Metadata</p-tab>
+      }
+    </p-tablist>
+    <p-tabpanels class="h-[calc(100dvh-10rem)]">
+      @if (admin || canEditMetadata) {
+        <p-tabpanel value="edit">
+          <app-metadata-editor
+            [book$]="book$"
+            [disableNext]="disableNext"
+            [disablePrevious]="disablePrevious"
+            (nextBookClicked)="handleNextBook()"
+            (previousBookClicked)="handlePreviousBook()"
+            (closeDialogButtonClicked)="handleCloseDialogButton()"
+            [showNavigationButtons]="true"
+          ></app-metadata-editor>
+        </p-tabpanel>
+      }
+      @if (admin || canEditMetadata) {
+        <p-tabpanel value="match">
+          <app-metadata-searcher [book$]="book$"></app-metadata-searcher>
+        </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
+</div>

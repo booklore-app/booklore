@@ -1,0 +1,59 @@
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.label {
+  width: 7rem;
+  text-align: left;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.input {
+  width: 50%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin: 0 1rem;
+}
+
+.thumbnail {
+  width: 15.625rem;
+  height: 21.875rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+}
+
+.arrow-button {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.yellow-outlined-button {
+  --p-button-outlined-primary-border-color: yellow;
+  --p-button-outlined-primary-color: yellow;
+}
+
+.green-outlined-button {
+  --p-button-outlined-primary-border-color: limegreen;
+  --p-button-outlined-primary-color: limegreen;
+}
+
+.red-outlined-button {
+  --p-button-outlined-primary-border-color: #E32636;
+  --p-button-outlined-primary-color: #E32636;
+}
+
+::ng-deep .p-inputchips {
+  width: 100% !important;
+}

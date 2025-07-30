@@ -1,0 +1,12 @@
+<input type="text" placeholder="Search icons..." [(ngModel)]="searchText" class="icon-search"/>
+
+<div class="icon-grid">
+  @for (icon of filteredIcons(); track icon) {
+    <div
+      class="icon-item"
+      (click)="selectIcon(icon)"
+      [class.selected]="icon === selectedIcon">
+      <i [class]="icon"></i>
+    </div>
+  }
+</div>

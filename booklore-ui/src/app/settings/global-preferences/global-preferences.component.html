@@ -1,6 +1,6 @@
-<div class="w-full h-[calc(100vh-12.1rem)] overflow-y-auto border rounded-lg enclosing-container">
+<div class="w-full h-[calc(100dvh-10.5rem)] md:h-[calc(100dvh-11.65rem)] overflow-y-auto border rounded-lg enclosing-container">
 
-  <div class="p-4">
+  <div class="px-4 pt-4 pb-2">
     <div class="flex items-center gap-2 pb-4 pt-4">
       <p class="text-lg ">Book Cover Image</p>
       <i class="pi pi-info-circle text-sky-600"
@@ -80,7 +80,7 @@
   </div>
 
   <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
-    <p class="text-lg pb-4 ">Max File Upload Size:
+    <p class="text-lg pb-4">Max File Upload Size:
       <i class="pi pi-info-circle text-sky-600"
          pTooltip="Defines the maximum allowed size (in MB) for each uploaded file. Applies to EPUB, PDF, CBZ, CBR, and CB7 formats."
          tooltipPosition="right"
@@ -93,7 +93,7 @@
           type="text"
           pInputText
           [(ngModel)]="maxFileUploadSizeInMb"
-          class="pr-10 w-full"
+          class="pr-10 w-full min-w-24"
           placeholder="Max size"/>
         <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">MB</span>
       </div>
@@ -118,7 +118,7 @@
           type="text"
           pInputText
           [(ngModel)]="cbxCacheValue"
-          class="pr-10 w-full"
+          class="pr-10 w-full  min-w-24"
           placeholder="Cache size"/>
         <span class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">MB</span>
       </div>
@@ -130,15 +130,7 @@
     <p-divider></p-divider>
   </div>
 
-  <div class="p-4">
-    <app-opds-settings></app-opds-settings>
-  </div>
-
-  <div class="pt-2 pb-4">
-    <p-divider></p-divider>
-  </div>
-
-  <div class="p-4">
+  <div class="px-4 py-2">
     <app-file-upload-pattern></app-file-upload-pattern>
   </div>
 

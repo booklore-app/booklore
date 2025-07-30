@@ -1,51 +1,41 @@
 <p-table
   [value]="books"
+  [columns]="visibleColumns"
   [dataKey]="'id'"
   [resizableColumns]="true"
-  [metaKeySelection]="true"
+  [reorderableColumns]="true"
+  columnResizeMode="expand"
   [rowTrackBy]="trackByBookId"
+  [metaKeySelection]="true"
   showGridlines
   stripedRows
   [scrollable]="true"
-  [scrollHeight]="'calc(100vh - 160px)'"
+  [scrollHeight]="scrollHeight"
   [virtualScroll]="true"
   [virtualScrollItemSize]="46"
   [(selection)]="selectedBooks"
   (onHeaderCheckboxToggle)="onHeaderCheckboxToggle($event)"
   (onRowSelect)="onRowSelect($event)"
-  (onRowUnselect)="onRowUnselect($event)">
-  <ng-template #header>
+  (onRowUnselect)="onRowUnselect($event)"
+>
+  <ng-template pTemplate="header">
     <tr>
       <th>
         <p-tableHeaderCheckbox/>
       </th>
-      <th pResizableColumn></th>
+      <th></th>
       <th class="max-w-14 min-w-14"></th>
-      <th pResizableColumn>Title</th>
-      <th pResizableColumn>Authors</th>
-      <th pResizableColumn>Publisher</th>
-      <th pResizableColumn>Series</th>
-      <th pResizableColumn>#</th>
-      <th pResizableColumn>Genres</th>
-      <th>Published</th>
-      <th>Last Read</th>
-      <th>Added</th>
-      <th>File Size</th>
-      <th>Lang</th>
-      <th>Pages</th>
-      <th>Amazon</th>
-      <th>Amz #</th>
-      <th>Goodreads</th>
-      <th>GR #</th>
-      <th>Hardcover</th>
-      <th>HC #</th>
+      @for (col of visibleColumns; track col.field) {
+        <th pResizableColumn>{{ col.header }}</th>
+      }
     </tr>
   </ng-template>
-  <ng-template #body let-book>
+
+  <ng-template pTemplate="body" let-book>
     @if (book.metadata; as metadata) {
       <tr style="height:46px">
-        <td class="max-w-16">
-          <p-tableCheckbox [value]="book"></p-tableCheckbox>
+        <td>
+          <p-tableCheckbox [value]="book"/>
         </td>
         <td class="text-center">
           <p-button
@@ -59,75 +49,30 @@
           </p-button>
         </td>
         <td (click)="openMetadataCenter(book.id)">
-          <img [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)" alt="Book Cover" class="size-7"/>
+          <img [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn)" alt="Book Cover" class="size-7"/>
         </td>
-        <td class="min-w-[18rem] max-w-[25rem] overflow-hidden truncate" [title]="metadata.title">{{ metadata.title }}</td>
-        <td class="min-w-[10rem] max-w-[20rem] overflow-hidden truncate" [title]="getAuthorNames(metadata.authors)">{{ getAuthorNames(metadata.authors) }}</td>
-        <td class="min-w-[10rem] max-w-[25rem] overflow-hidden truncate" [title]="metadata.publisher">{{ metadata.publisher }}</td>
-        <td class="min-w-[10rem] max-w-[25rem] overflow-hidden truncate" [title]="metadata.seriesName">{{ metadata.seriesName }}</td>
-        <td class="min-w-[1rem] max-w-[4rem] overflow-hidden truncate" [title]="metadata.seriesNumber">{{ metadata.seriesNumber }}</td>
-        <td class="min-w-[12rem] max-w-[18rem] overflow-hidden truncate" [title]="getGenres(metadata.categories)">{{ getGenres(metadata.categories) }}</td>
-        <td class="min-w-[9rem] max-w-[9rem] overflow-hidden truncate">
-          {{ metadata.publishedDate ? (metadata.publishedDate | date: 'dd-MMM-yyyy') : '' }}
-        </td>
-        <td class="min-w-[9rem] max-w-[9rem] overflow-hidden truncate text-right">
-          {{ book.lastReadTime ? (book.lastReadTime | date: 'dd-MMM-yyyy') : '' }}
-        </td>
-        <td class="min-w-[9rem] max-w-[9rem] overflow-hidden truncate text-right">
-          {{ book.addedOn ? (book.addedOn | date: 'dd-MMM-yyyy') : '' }}
-        </td>
-        <td class="min-w-[7rem] max-w-[9rem] overflow-hidden truncate"
-            [title]="book.fileSizeKb + ' KB'">
-          {{ formatFileSize(book.fileSizeKb) }}
-        </td>
-        <td class="min-w-[6rem] max-w-[6rem] overflow-hidden truncate">{{ metadata.language }}</td>
-        <td class="min-w-[4rem] max-w-[5rem] overflow-hidden truncate">{{ metadata.pageCount }}</td>
-        <td class="min-w-[10rem] max-w-[10rem] overflow-hidden truncate">
-          <span class="flex items-center gap-1">
-            <p-rating
-              [(ngModel)]="metadata.amazonRating"
-              readonly
-              stars="5"
-              [style.--p-rating-icon-active-color]="getStarColor(metadata.amazonRating)">
-            </p-rating>
-            @if (metadata.amazonRating != null) {
-              <span>({{ metadata.amazonRating?.toFixed(1) }})</span>
-            }
-          </span>
-        </td>
-        <td class="min-w-[7rem] max-w-[7rem] overflow-hidden truncate text-right">
-          {{ metadata.amazonReviewCount ?? '' }}
-        </td>
-        <td class="min-w-[10rem] max-w-[10rem] overflow-hidden truncate">
-          <span class="flex items-center gap-1">
-            <p-rating
-              [(ngModel)]="metadata.goodreadsRating"
-              readonly
-              stars="5"
-              [style.--p-rating-icon-active-color]="getStarColor(metadata.goodreadsRating)">
-            </p-rating>
-            @if (metadata.goodreadsRating != null) {
-              <span>({{ metadata.goodreadsRating?.toFixed(1) }})</span>
-            }
-          </span>
-        </td>
-        <td class="min-w-[7rem] max-w-[7rem] overflow-hidden truncate text-right">
-          {{ metadata.goodreadsReviewCount ?? '' }}
-        </td>
-        <td class="min-w-[10rem] max-w-[10rem] overflow-hidden truncate">
-          <span class="flex items-center gap-1">
-            <p-rating
-              [(ngModel)]="metadata.hardcoverRating"
-              readonly
-              stars="5"
-              [style.--p-rating-icon-active-color]="getStarColor(metadata.hardcoverRating)">
-            </p-rating>
-            @if (metadata.hardcoverRating != null) {
-              <span>({{ metadata.hardcoverRating?.toFixed(1) }})</span>
-            }
-          </span>
-        </td>
-        <td class="min-w-[6rem] max-w-[6rem] overflow-hidden truncate">{{ metadata.hardcoverReviewCount }}</td>
+
+        @for (col of visibleColumns; track col.field) {
+          @if (col.field === 'amazonRating' || col.field === 'goodreadsRating' || col.field === 'hardcoverRating') {
+            <td class="min-w-[10rem] max-w-[10rem] overflow-hidden truncate">
+              <span class="flex items-center gap-1">
+                <p-rating
+                  [(ngModel)]="metadata[col.field]"
+                  readonly
+                  stars="5"
+                  [style.--p-rating-icon-active-color]="getStarColor(metadata[col.field])"
+                ></p-rating>
+                @if (metadata[col.field] != null) {
+                  <span>({{ metadata[col.field]?.toFixed(1) }})</span>
+                }
+              </span>
+            </td>
+          } @else {
+            <td [title]="getCellValue(metadata, book, col.field)" class="overflow-hidden truncate text-right min-w-[6rem] max-w-[12rem]">
+              {{ getCellValue(metadata, book, col.field) }}
+            </td>
+          }
+        }
       </tr>
     }
   </ng-template>

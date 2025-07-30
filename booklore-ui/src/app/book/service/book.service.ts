@@ -5,8 +5,8 @@ import {catchError, filter, map, tap} from 'rxjs/operators';
 import {Book, BookDeletionResponse, BookMetadata, BookRecommendation, BookSetting, BulkMetadataUpdateRequest, MetadataUpdateWrapper, ReadStatus} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
-import {FetchMetadataRequest} from '../metadata/model/request/fetch-metadata-request.model';
-import {MetadataRefreshRequest} from '../metadata/model/request/metadata-refresh-request.model';
+import {FetchMetadataRequest} from '../../metadata/model/request/fetch-metadata-request.model';
+import {MetadataRefreshRequest} from '../../metadata/model/request/metadata-refresh-request.model';
 import {MessageService} from 'primeng/api';
 
 @Injectable({
@@ -63,7 +63,7 @@ export class BookService {
     return currentState.books.filter(book => idSet.has(+book.id));
   }
 
-  updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
+  updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | null | undefined>, shelvesToUnassign: Set<number | null | undefined>): Observable<Book[]> {
     const requestPayload = {
       bookIds: Array.from(bookIds),
       shelvesToAssign: Array.from(shelvesToAssign),
@@ -157,11 +157,15 @@ export class BookService {
     if (query.length < 2) {
       return [];
     }
+    const normalize = (str: string): string => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const normalizedQuery = normalize(query);
     const state = this.bookStateSubject.value;
-    return (state.books || []).filter(book =>
-      book.metadata?.title?.toLowerCase().includes(query.toLowerCase()) ||
-      book.metadata?.authors?.some(author => author.toLowerCase().includes(query.toLowerCase()))
-    );
+    return (state.books || []).filter(book => {
+      const title = book.metadata?.title;
+      const authors = book.metadata?.authors || [];
+      return (title && normalize(title).includes(normalizedQuery)) ||
+        authors.some(author => normalize(author).includes(normalizedQuery));
+    });
   }
 
   getFileContent(bookId: number): Observable<Blob> {
@@ -397,6 +401,31 @@ export class BookService {
     );
   }
 
+  resetProgress(bookIds: number | number[]): Observable<Book[]> {
+    const ids = Array.isArray(bookIds) ? bookIds : [bookIds];
+    return this.http.post<Book[]>(`${this.url}/reset-progress`, ids).pipe(
+      tap(updatedBooks => updatedBooks.forEach(book => this.handleBookUpdate(book)))
+    );
+  }
+
+  updateBookReadStatus(bookIds: number | number[], status: ReadStatus): Observable<void> {
+    const ids = Array.isArray(bookIds) ? bookIds : [bookIds];
+    return this.http.put<void>(`${this.url}/read-status`, {ids, status}).pipe(
+      tap(() => {
+        const currentState = this.bookStateSubject.value;
+        if (!currentState.books) return;
+        const updatedBooks = currentState.books.map(book =>
+          ids.includes(book.id) ? {...book, readStatus: status} : book
+        );
+        this.bookStateSubject.next({...currentState, books: updatedBooks});
+      })
+    );
+  }
+
+  getMagicShelfBookCount(number: number) {
+
+  }
+
 
   /*------------------ All the websocket handlers go below ------------------*/
 
@@ -420,10 +449,23 @@ export class BookService {
 
   handleBookUpdate(updatedBook: Book) {
     const currentState = this.bookStateSubject.value;
-    const updatedBooks = (currentState.books || []).map(book => {
-      return book.id == updatedBook.id ? {...book, metadata: updatedBook.metadata} : book
-    });
+    const updatedBooks = (currentState.books || []).map(book =>
+      book.id === updatedBook.id ? updatedBook : book
+    );
     this.bookStateSubject.next({...currentState, books: updatedBooks});
+  }
+
+  handleMultipleBookUpdates(updatedBooks: Book[]): void {
+    const currentState = this.bookStateSubject.value;
+    const currentBooks = currentState.books || [];
+
+    const updatedMap = new Map(updatedBooks.map(book => [book.id, book]));
+
+    const mergedBooks = currentBooks.map(book =>
+      updatedMap.has(book.id) ? updatedMap.get(book.id)! : book
+    );
+
+    this.bookStateSubject.next({...currentState, books: mergedBooks});
   }
 
   handleBookMetadataUpdate(bookId: number, updatedMetadata: BookMetadata) {
@@ -486,9 +528,5 @@ export class BookService {
 
   getBackupMetadata(bookId: number) {
     return this.http.get<any>(`${this.url}/${bookId}/metadata/restore`);
-  }
-
-  updateBookReadStatus(id: number, status: ReadStatus): Observable<void> {
-    return this.http.put<void>(`${this.url}/${id}/read-status`, {status});
   }
 }

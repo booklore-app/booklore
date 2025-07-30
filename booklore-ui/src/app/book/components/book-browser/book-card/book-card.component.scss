@@ -1,6 +1,6 @@
 .book-card {
   background-color: var(--card-background);
-  border-radius: 0 0 8px 8px;
+  border-radius: 8px 8px 8px 8px;
   position: relative;
   overflow: hidden;
   transition: border 0.2s;
@@ -13,25 +13,18 @@
 .cover-container {
   position: relative;
   width: 100%;
+  aspect-ratio: 5/7;
+  background-color: var(--card-background);
+  border-radius: 8px 8px 0 0;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s ease;
 }
 
-.cover-container.shimmer {
-  /*background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-  background-size: 200% 100%;
-  animation: shimmer 2.5s infinite linear;*/
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+.cover-container.loaded {
+  background-color: transparent;
 }
 
 .book-cover {
@@ -175,4 +168,8 @@
 
 ::ng-deep p-progressbar {
   --p-progressbar-border-radius: 0 !important;
+}
+
+::ng-deep .custom-button-padding .p-button {
+  padding-block: 0.25rem !important;
 }

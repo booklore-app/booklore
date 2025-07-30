@@ -17,11 +17,13 @@ public enum AppSettingKey {
     COVER_IMAGE_RESOLUTION("cover_image_resolution", false),
     SIMILAR_BOOK_RECOMMENDATION("similar_book_recommendation", false),
     UPLOAD_FILE_PATTERN("upload_file_pattern", false),
+    MOVE_FILE_PATTERN("move_file_pattern", false),
     OPDS_SERVER_ENABLED("opds_server_enabled", false),
     OIDC_ENABLED("oidc_enabled", false),
     CBX_CACHE_SIZE_IN_MB("cbx_cache_size_in_mb", false),
     PDF_CACHE_SIZE_IN_MB("pdf_cache_size_in_mb", false),
     BOOK_DELETION_ENABLED("book_deletion_enabled", false),
+    METADATA_DOWNLOAD_ON_BOOKDROP("metadata_download_on_bookdrop", false),
     MAX_FILE_UPLOAD_SIZE_IN_MB("max_file_upload_size_in_mb", false);
 
     private final String dbKey;

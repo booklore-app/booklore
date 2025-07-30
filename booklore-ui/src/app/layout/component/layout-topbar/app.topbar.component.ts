@@ -3,28 +3,32 @@ import {MenuItem} from 'primeng/api';
 import {LayoutService} from '../layout-main/service/app.layout.service';
 import {Router, RouterLink} from '@angular/router';
 import {DialogService as PrimeDialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {LibraryCreatorComponent} from '../../../book/components/library-creator/library-creator.component';
 import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookSearcherComponent} from '../../../book/components/book-searcher/book-searcher.component';
-import { AsyncPipe, NgClass } from '@angular/common';
-import {EventService} from '../../../shared/websocket/event.service';
+import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
+import {NotificationEventService} from '../../../shared/websocket/notification-event.service';
 import {Button} from 'primeng/button';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
 import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
-import {LiveNotificationBoxComponent} from '../../../core/component/live-notification-box/live-notification-box.component';
-import {BookUploaderComponent} from '../../../utilities/component/book-uploader/book-uploader.component';
 import {AuthService} from '../../../core/service/auth.service';
 import {UserService} from '../../../settings/user-management/user.service';
-import {UserProfileDialogComponent} from '../../../settings/global-preferences/user-profile-dialog/user-profile-dialog.component';
-import {GithubSupportDialog} from '../../../github-support-dialog/github-support-dialog';
+import {Popover} from 'primeng/popover';
+import {MetadataProgressService} from '../../../core/service/metadata-progress-service';
+import {takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {MetadataBatchProgressNotification} from '../../../core/model/metadata-batch-progress.model';
+import {UnifiedNotificationBoxComponent} from '../../../core/component/unified-notification-popover-component/unified-notification-popover-component';
+import {BookdropFileService} from '../../../bookdrop/bookdrop-file.service';
+import {DialogLauncherService} from '../../../dialog-launcher.service';
 
 @Component({
   selector: 'app-topbar',
   templateUrl: './app.topbar.component.html',
   styleUrls: ['./app.topbar.component.scss'],
+  standalone: true,
   imports: [
     RouterLink,
     TooltipModule,
@@ -36,35 +40,72 @@ import {GithubSupportDialog} from '../../../github-support-dialog/github-support
     StyleClass,
     NgClass,
     Divider,
-    LiveNotificationBoxComponent,
-    AsyncPipe
-],
+    AsyncPipe,
+    Popover,
+    UnifiedNotificationBoxComponent,
+    NgStyle,
+  ],
 })
 export class AppTopBarComponent implements OnDestroy {
   items!: MenuItem[];
-  ref: DynamicDialogRef | undefined;
-
-  eventHighlight: boolean = false;
-  showEvents: boolean = false;
-  eventTimeout: any;
+  ref?: DynamicDialogRef;
 
   @ViewChild('menubutton') menuButton!: ElementRef;
   @ViewChild('topbarmenubutton') topbarMenuButton!: ElementRef;
   @ViewChild('topbarmenu') menu!: ElementRef;
 
-  constructor(public layoutService: LayoutService, public dialogService: PrimeDialogService,
-              private eventService: EventService, private router: Router, private authService: AuthService,
-              protected userService: UserService) {
-    this.eventService.eventHighlight$.subscribe(highlight => {
-      this.eventHighlight = highlight;
-    });
+  isMenuVisible = true;
+  progressHighlight = false;
+  completedTaskCount = 0;
+  hasActiveOrCompletedTasks = false;
+  showPulse = false;
+  hasAnyTasks = false;
+  hasPendingBookdropFiles = false;
+
+  private eventTimer: any;
+  private destroy$ = new Subject<void>();
+
+  private latestTasks: { [taskId: string]: MetadataBatchProgressNotification } = {};
+  private latestHasPendingFiles = false;
+
+  constructor(
+    public layoutService: LayoutService,
+    public dialogService: PrimeDialogService,
+    private notificationService: NotificationEventService,
+    private router: Router,
+    private authService: AuthService,
+    protected userService: UserService,
+    private metadataProgressService: MetadataProgressService,
+    private bookdropFileService: BookdropFileService,
+    private dialogLauncher: DialogLauncherService
+  ) {
+    this.subscribeToMetadataProgress();
+    this.subscribeToNotifications();
+
+    this.metadataProgressService.activeTasks$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((tasks) => {
+        this.latestTasks = tasks;
+        this.hasAnyTasks = Object.keys(tasks).length > 0;
+        this.updateCompletedTaskCount();
+        this.updateTaskVisibility(tasks);
+      });
+
+    this.bookdropFileService.hasPendingFiles$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((hasPending) => {
+        this.latestHasPendingFiles = hasPending;
+        this.hasPendingBookdropFiles = hasPending;
+        this.updateCompletedTaskCount();
+        this.updateTaskVisibilityWithBookdrop();
+      });
   }
 
-  isMenuVisible: boolean = true;
-  isHovered: boolean = false;
-
-  onHover(hovered: boolean): void {
-    this.isHovered = hovered;
+  ngOnDestroy(): void {
+    if (this.ref) this.ref.close();
+    clearTimeout(this.eventTimer);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   toggleMenu() {
@@ -73,65 +114,92 @@ export class AppTopBarComponent implements OnDestroy {
   }
 
   openGithubSupportDialog(): void {
-    this.ref = this.dialogService.open(GithubSupportDialog, {
-      header: 'Support BookLore on GitHub',
-      modal: true,
-      closable: true,
-      style: {
-        position: 'absolute',
-        top: '25%',
-      },
-    });
+    this.dialogLauncher.openGithubSupportDialog();
   }
 
   openLibraryCreatorDialog(): void {
-    this.ref = this.dialogService.open(LibraryCreatorComponent, {
-      header: 'Create New Library',
-      modal: true,
-      closable: true,
-      style: {
-        position: 'absolute',
-        top: '15%',
-      }
-    });
+    this.dialogLauncher.openLibraryCreatorDialog();
   }
 
-  openFileUploadDialog() {
-    this.ref = this.dialogService.open(BookUploaderComponent, {
-      header: 'Book Uploader',
-      modal: true,
-      closable: true,
-      style: {
-        position: 'absolute',
-        top: '10%',
-      }
-    });
+  openFileUploadDialog(): void {
+    this.dialogLauncher.openFileUploadDialog();
   }
 
-  ngOnDestroy(): void {
-    if (this.ref) {
-      this.ref.close();
-    }
-    clearTimeout(this.eventTimeout);
+  openUserProfileDialog(): void {
+    this.dialogLauncher.openUserProfileDialog();
   }
 
   navigateToSettings() {
     this.router.navigate(['/settings']);
   }
 
-  openUserProfileDialog() {
-    this.ref = this.dialogService.open(UserProfileDialogComponent, {
-      header: 'User Profile Information',
-      modal: true,
-      closable: true,
-      style: {
-        position: 'absolute',
-        top: '10%',
-      }
-    });
-  }
-
   logout() {
     this.authService.logout();
+  }
+
+  private subscribeToMetadataProgress() {
+    this.metadataProgressService.progressUpdates$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((progress) => {
+        this.progressHighlight = progress.status === 'IN_PROGRESS';
+      });
+  }
+
+  private subscribeToNotifications() {
+    this.notificationService.latestNotification$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.triggerPulseEffect();
+      });
+  }
+
+  private triggerPulseEffect() {
+    this.showPulse = true;
+    clearTimeout(this.eventTimer);
+    this.eventTimer = setTimeout(() => {
+      this.showPulse = false;
+    }, 4000);
+  }
+
+  private updateCompletedTaskCount() {
+    const completedMetadataTasks = Object.values(this.latestTasks).filter(task => task.status === 'COMPLETED').length;
+    const bookdropFileTaskCount = this.latestHasPendingFiles ? 1 : 0;
+    this.completedTaskCount = completedMetadataTasks + bookdropFileTaskCount;
+  }
+
+  private updateTaskVisibility(tasks: { [taskId: string]: MetadataBatchProgressNotification }) {
+    this.hasActiveOrCompletedTasks =
+      this.progressHighlight || this.completedTaskCount > 0 || Object.keys(tasks).length > 0;
+    this.updateTaskVisibilityWithBookdrop();
+  }
+
+  private updateTaskVisibilityWithBookdrop() {
+    this.hasActiveOrCompletedTasks = this.hasActiveOrCompletedTasks || this.hasPendingBookdropFiles;
+  }
+
+  get iconClass(): string {
+    if (this.progressHighlight) return 'pi-spinner spin';
+    if (this.iconPulsating) return 'pi-wave-pulse';
+    if (this.completedTaskCount > 0 || this.hasPendingBookdropFiles) return 'pi-bell';
+    return 'pi-wave-pulse';
+  }
+
+  get iconColor(): string {
+    if (this.progressHighlight) return 'yellow';
+    if (this.showPulse) return 'red';
+    if (this.completedTaskCount > 0 || this.hasPendingBookdropFiles) return 'orange';
+    return 'inherit';
+  }
+
+  get iconPulsating(): boolean {
+    return !this.progressHighlight && (this.showPulse);
+  }
+
+  get shouldShowNotificationBadge(): boolean {
+    return (
+      (this.completedTaskCount > 0 || this.hasPendingBookdropFiles) &&
+      !this.progressHighlight &&
+      !this.showPulse
+    );
   }
 }

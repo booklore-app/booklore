@@ -42,8 +42,19 @@ public class BookLoreUser {
         public SidebarSortOption sidebarLibrarySorting;
         public SidebarSortOption sidebarShelfSorting;
         public EntityViewPreferences entityViewPreferences;
+        public List<TableColumnPreference> tableColumnPreference;
         public String filterSortingMode;
         public String metadataCenterViewMode;
+
+        @Data
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class TableColumnPreference {
+            private String field;
+            private Boolean visible;
+            private Integer order;
+        }
 
         @Data
         @Builder

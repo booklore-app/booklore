@@ -1,16 +1,18 @@
-@if (showFilters) {
-  <div class="w-[225px] ml-4 h-[calc(100vh-6.1rem)] rounded-xl bg-[var(--card-background)] overflow-hidden">
-    <div class="flex items-center justify-between px-4 py-4">
-      <span class="text font-semibold">Filter Mode</span>
-      <p-selectButton
-        [options]="filterModeOptions"
-        [(ngModel)]="selectedFilterMode"
-        optionLabel="label"
-        optionValue="value"
-        class="text-sm"
-        allowEmpty="false"
-        styleClass="h-8"></p-selectButton>
-    </div>
+<div class="h-[calc(100dvh-6.1rem)] rounded-xl bg-[var(--card-background)] flex flex-col">
+
+  <div class="flex items-center justify-between px-4 py-4">
+    <span class="text font-semibold">Filter Mode</span>
+    <p-selectButton
+      [options]="filterModeOptions"
+      [(ngModel)]="selectedFilterMode"
+      optionLabel="label"
+      optionValue="value"
+      class="text-sm"
+      allowEmpty="false"
+      styleClass="h-8"></p-selectButton>
+  </div>
+
+  <div class="flex-1 overflow-y-auto pb-4 pr-1" style="overscroll-behavior: contain;">
     <p-accordion [value]="expandedPanels">
       @for (filterType of filterTypes; track filterType; let i = $index) {
         <p-accordion-panel [value]="i">
@@ -24,29 +26,21 @@
               }
             </span>
           </p-accordion-header>
-          <p-accordion-content class="h-[27.5rem] !overflow-y-auto">
+
+          <p-accordion-content>
             @if (filterStreams[filterType] | async; as filters) {
-              <div>
+              <div
+                class="max-h-[27.5rem] overflow-y-auto overscroll-contain pr-1"
+                style="overscroll-behavior: contain;">
                 @for (filter of filters; track filter) {
-                  <div>
-                    <div
-                      class="cursor-pointer transition-colors duration-200 ease-in-out pb-1 flex items-center gap-2"
-                      [ngClass]="{
-                          'text-[var(--primary-color)]':
-                            activeFilters[filterType]?.includes(filter.value?.id || filter.value)
-                        }"
-                      (click)="handleFilterClick(filterType, filter.value?.id || filter.value)">
-                      <p-badge [value]="filter.bookCount"></p-badge>
-                      @if (filterType === 'amazonRating') {
-                        @if (filterType === 'amazonRating') {
-                          <span>{{ filter.value.name }}</span>
-                        } @else {
-                          {{ filter.value.name || filter.value }}
-                        }
-                      } @else {
-                        {{ filter.value.name || filter.value }}
-                      }
-                    </div>
+                  <div
+                    class="cursor-pointer transition-colors duration-200 ease-in-out pb-1 flex items-center gap-2"
+                    [ngClass]="{
+                      'text-[var(--primary-color)]': activeFilters[filterType]?.includes(filter.value?.id || filter.value)
+                    }"
+                    (click)="handleFilterClick(filterType, filter.value?.id || filter.value)">
+                    <p-badge [value]="filter.bookCount"></p-badge>
+                    {{ filter.value.name || filter.value }}
                   </div>
                 }
               </div>
@@ -56,4 +50,4 @@
       }
     </p-accordion>
   </div>
-}
+</div>
