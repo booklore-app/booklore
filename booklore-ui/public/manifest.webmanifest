@@ -1,7 +1,7 @@
 {
   "name": "Booklore",
   "short_name": "Booklore",
-  "display": "minimal-ui",
+  "display": "standalone",
   "scope": "/",
   "start_url": "/dashboard",
   "theme_color": "#737373",
