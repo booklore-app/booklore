@@ -23,7 +23,8 @@
         "maxAge": "365d",
         "timeout": "10s",
         "strategy": "freshness"
-      }
+      },
+      "credentials": "include"
     }
   ]
 }
