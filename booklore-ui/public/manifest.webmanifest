@@ -4,6 +4,8 @@
   "display": "minimal-ui",
   "scope": "/",
   "start_url": "/dashboard",
+  "theme_color": "#737373",
+  "background_color": "#22c55e",
   "icons": [
     {
       "src": "assets/icons/icon-192x192.png",
