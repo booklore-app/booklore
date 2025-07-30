@@ -63,7 +63,7 @@ public class MetadataMatchService {
         if (isPositive(metadata.getHardcoverReviewCount())) score += weights.getHardcoverReviewCount();
         if (isPresent(metadata.getThumbnail())) score += weights.getCoverImage();
 
-        return score / totalWeight;
+        return (score / totalWeight) * 100f;
     }
 
     private boolean isPresent(String value) {

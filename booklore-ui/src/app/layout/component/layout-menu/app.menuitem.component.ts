@@ -4,12 +4,12 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {MenuService} from './service/app.menu.service';
-import { AsyncPipe, NgClass } from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {Ripple} from 'primeng/ripple';
 import {Button} from 'primeng/button';
 import {Menu} from 'primeng/menu';
-import {MenuItem} from 'primeng/api';
 import {UserService} from '../../../settings/user-management/user.service';
+import {DialogLauncherService} from '../../../dialog-launcher.service';
 
 @Component({
   selector: '[app-menuitem]',
@@ -23,7 +23,7 @@ import {UserService} from '../../../settings/user-management/user.service';
     AsyncPipe,
     Button,
     Menu
-],
+  ],
   animations: [
     trigger('children', [
       state('collapsed', style({
@@ -52,7 +52,21 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
   menuSourceSubscription: Subscription;
   menuResetSubscription: Subscription;
 
-  constructor(public router: Router, private menuService: MenuService, private userService: UserService) {
+  expandedItems = new Set<string>();
+
+  toggleExpand(key: string) {
+    if (this.expandedItems.has(key)) {
+      this.expandedItems.delete(key);
+    } else {
+      this.expandedItems.add(key);
+    }
+  }
+
+  isExpanded(key: string): boolean {
+    return this.expandedItems.has(key);
+  }
+
+  constructor(public router: Router, private menuService: MenuService, private userService: UserService, private dialogLauncher: DialogLauncherService) {
     this.userService.userState$.subscribe(userData => {
       if (userData) {
         this.canManipulateLibrary = userData.permissions.canManipulateLibrary;
@@ -85,6 +99,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.key = this.parentKey ? this.parentKey + '-' + this.index : String(this.index);
+    this.expandedItems.add(this.key);
     if (this.item.routerLink) {
       this.updateActiveStateFromRoute();
     }
@@ -116,10 +131,6 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
     this.menuService.onMenuStateChange({key: this.key});
   }
 
-  get submenuAnimation() {
-    return this.root ? 'expanded' : (this.active ? 'expanded' : 'collapsed');
-  }
-
   @HostBinding('class.active-menuitem')
   get activeClass() {
     return this.active && !this.root;
@@ -131,6 +142,15 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
     }
     if (this.menuResetSubscription) {
       this.menuResetSubscription.unsubscribe();
+    }
+  }
+
+  openDialog(item: any) {
+    if (item.type === 'library' && this.canManipulateLibrary) {
+      this.dialogLauncher.openLibraryCreatorDialog();
+    }
+    if (item.type === 'magicShelf') {
+      this.dialogLauncher.openMagicShelfDialog();
     }
   }
 }

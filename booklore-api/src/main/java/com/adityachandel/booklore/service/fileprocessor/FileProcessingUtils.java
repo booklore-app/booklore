@@ -7,7 +7,6 @@ import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.util.FileService;
-import com.adityachandel.booklore.util.FileUtils;
 import com.adityachandel.booklore.mapper.BookMapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -95,13 +94,13 @@ public class FileProcessingUtils {
     }
 
     @Transactional
-    public Optional<Book> checkForDuplicateAndUpdateMetadataIfNeeded(LibraryFile libraryFile, String hash, boolean forceProcess, BookRepository bookRepository, BookMapper bookMapper) {
+    public Optional<Book> checkForDuplicateAndUpdateMetadataIfNeeded(LibraryFile libraryFile, String hash, BookRepository bookRepository, BookMapper bookMapper) {
         if (StringUtils.isBlank(hash)) {
             log.warn("Skipping file due to missing hash: {}", libraryFile.getFullPath());
             return Optional.empty();
         }
         Optional<BookEntity> existingByHash = bookRepository.findByCurrentHash(hash);
-        if (existingByHash.isPresent() && !forceProcess) {
+        if (existingByHash.isPresent()) {
             BookEntity book = existingByHash.get();
             String fileName = libraryFile.getFullPath().getFileName().toString();
             if (!book.getFileName().equals(fileName)) {
@@ -113,6 +112,7 @@ public class FileProcessingUtils {
             }
             return Optional.of(bookMapper.toBook(book));
         }
+
         return Optional.empty();
     }
 

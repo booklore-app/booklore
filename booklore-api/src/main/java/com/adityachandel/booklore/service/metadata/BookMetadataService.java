@@ -1,6 +1,5 @@
 package com.adityachandel.booklore.service.metadata;
 
-import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
@@ -14,22 +13,22 @@ import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.dto.request.ToggleAllLockRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
+import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.enums.Lock;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.model.websocket.Topic;
-import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.repository.BookMetadataRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
-import com.adityachandel.booklore.service.fileprocessor.CbxProcessor;
-import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
-import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
+import com.adityachandel.booklore.service.fileprocessor.BookFileProcessor;
+import com.adityachandel.booklore.service.fileprocessor.BookFileProcessorRegistry;
 import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestore;
 import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestoreFactory;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.adityachandel.booklore.service.metadata.writer.MetadataWriterFactory;
 import com.adityachandel.booklore.util.FileService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -62,9 +61,7 @@ public class BookMetadataService {
     private final AppSettingService appSettingService;
     private final BookMetadataRepository bookMetadataRepository;
     private final FileService fileService;
-    private final PdfProcessor pdfProcessor;
-    private final EpubProcessor epubProcessor;
-    private final CbxProcessor cbxProcessor;
+    private final BookFileProcessorRegistry processorRegistry;
     private final BookQueryService bookQueryService;
     private final Map<MetadataProvider, BookParser> parserMap;
     private final MetadataBackupRestoreFactory metadataBackupRestoreFactory;
@@ -197,12 +194,10 @@ public class BookMetadataService {
         String title = book.getMetadata().getTitle();
         String message = progress + "Regenerating cover for: " + title;
         notificationService.sendMessage(Topic.LOG, createLogNotification(message));
-        switch (book.getBookType()) {
-            case PDF -> pdfProcessor.generateCover(book);
-            case EPUB -> epubProcessor.generateCover(book);
-            case CBX -> cbxProcessor.generateCover(book);
-            default -> throw ApiError.UNSUPPORTED_BOOK_TYPE.createException(book.getBookType());
-        }
+
+        BookFileProcessor processor = processorRegistry.getProcessorOrThrow(book.getBookType());
+        processor.generateCover(book);
+
         log.info("{}Successfully regenerated cover for book ID {} ({})", progress, book.getId(), title);
     }
 

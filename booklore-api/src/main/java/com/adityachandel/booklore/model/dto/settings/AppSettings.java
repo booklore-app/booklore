@@ -24,6 +24,7 @@ public class AppSettings {
     private boolean remoteAuthEnabled;
     private boolean oidcEnabled;
     private boolean bookDeletionEnabled;
+    private boolean metadataDownloadOnBookdrop;
     private OidcProviderDetails oidcProviderDetails;
     private OidcAutoProvisionDetails oidcAutoProvisionDetails;
     private MetadataProviderSettings metadataProviderSettings;

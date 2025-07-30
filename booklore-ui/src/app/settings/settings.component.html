@@ -4,26 +4,29 @@
       <p-tabs [(value)]="activeTab" scrollable>
         <p-tablist>
           <p-tab [value]="SettingsTab.ReaderSettings">
-            <i class="pi pi-book"></i> Reader Preferences
+            <i class="pi pi-book"></i> Reader
           </p-tab>
           <p-tab [value]="SettingsTab.ViewPreferences">
-            <i class="pi pi-desktop"></i> View Preferences
+            <i class="pi pi-desktop"></i> View
           </p-tab>
           @if (userData.permissions.admin) {
             <p-tab [value]="SettingsTab.MetadataSettings">
-              <i class="pi pi-sliders-h"></i> Metadata Settings
+              <i class="pi pi-sliders-h"></i> Metadata
             </p-tab>
             <p-tab [value]="SettingsTab.ApplicationSettings">
-              <i class="pi pi-cog"></i> Application Settings
+              <i class="pi pi-cog"></i> Application
             </p-tab>
             <p-tab [value]="SettingsTab.UserManagement">
-              <i class="pi pi-users"></i> User Management
+              <i class="pi pi-users"></i> User
             </p-tab>
             <p-tab [value]="SettingsTab.EmailSettings">
-              <i class="pi pi-envelope"></i> Email Settings
+              <i class="pi pi-envelope"></i> Email
             </p-tab>
             <p-tab [value]="SettingsTab.AuthenticationSettings">
               <i class="pi pi-lock"></i> Authentication
+            </p-tab>
+            <p-tab [value]="SettingsTab.Opds">
+              <i class="pi pi-globe"></i> OPDS
             </p-tab>
           }
         </p-tablist>
@@ -49,6 +52,9 @@
             </p-tabpanel>
             <p-tabpanel [value]="SettingsTab.AuthenticationSettings">
               <app-authentication-settings></app-authentication-settings>
+            </p-tabpanel>
+            <p-tabpanel [value]="SettingsTab.Opds">
+              <app-opds-settings></app-opds-settings>
             </p-tabpanel>
           }
         </p-tabpanels>

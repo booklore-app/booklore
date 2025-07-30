@@ -12,7 +12,7 @@
             <p-button size="small" icon="pi pi-home" severity="secondary"></p-button>
           </a>
           <p-button size="small" class="menu-toggle-button" (click)="toggleDrawer()" icon="pi pi-bars" severity="secondary"></p-button>
-          <p-drawer [(visible)]="isDrawerVisible" [modal]="false" [position]="'left'" header="Chapters">
+          <p-drawer [(visible)]="isDrawerVisible" [modal]="true" [position]="'left'" header="Chapters">
             <ul class="chapter-list">
               @for (chapter of chapters; track chapter) {
                 <li (click)="navigateToChapter(chapter); $event.stopPropagation()" class="chapter-item">
@@ -32,7 +32,7 @@
             }
             <div>
               <p-button size="small" class="settings-toggle-button" (click)="toggleSettingsDrawer()" icon="pi pi-cog" severity="secondary"></p-button>
-              <p-drawer [(visible)]="isSettingsDrawerVisible" [modal]="false" [position]="'right'" header="Settings">
+              <p-drawer [(visible)]="isSettingsDrawerVisible" [modal]="true" [position]="'right'"  header="Settings">
                 <div class="flex flex-col gap-4 max-w-md mx-auto">
 
                   <div class="flex items-center gap-4">

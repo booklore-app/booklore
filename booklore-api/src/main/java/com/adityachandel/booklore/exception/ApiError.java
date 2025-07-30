@@ -46,7 +46,8 @@ public enum ApiError {
     SELF_DELETION_NOT_ALLOWED(HttpStatus.FORBIDDEN, "You cannot delete your own account"),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "%s"),
     FILE_DELETION_DISABLED(HttpStatus.BAD_REQUEST, "File deletion is disabled"),
-    UNSUPPORTED_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "%s");
+    UNSUPPORTED_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "%s"),
+    FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "File not found: %s");
 
     private final HttpStatus status;
     private final String message;

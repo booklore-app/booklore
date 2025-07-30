@@ -51,7 +51,7 @@ public class AppMigrationService {
 
     @Transactional
     public void populateMetadataScoresOnce() {
-        if (migrationRepository.existsById("populateMetadataScores")) return;
+        if (migrationRepository.existsById("populateMetadataScores_v2")) return;
 
         List<BookEntity> books = bookQueryService.getAllFullBookEntities();
         for (BookEntity book : books) {
@@ -60,8 +60,8 @@ public class AppMigrationService {
         }
         bookRepository.saveAll(books);
 
-        log.info("Migration 'populateMetadataScores' applied to {} books.", books.size());
-        migrationRepository.save(new AppMigrationEntity("populateMetadataScores", LocalDateTime.now(), "Calculate and store metadata match score for all books"));
+        log.info("Migration 'populateMetadataScores_v2' applied to {} books.", books.size());
+        migrationRepository.save(new AppMigrationEntity("populateMetadataScores_v2", LocalDateTime.now(), "Calculate and store metadata match score for all books"));
     }
 
     @Transactional

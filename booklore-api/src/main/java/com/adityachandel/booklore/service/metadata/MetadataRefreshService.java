@@ -10,20 +10,21 @@ import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
-import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.MetadataFetchProposalEntity;
-import com.adityachandel.booklore.model.entity.LibraryEntity;
-import com.adityachandel.booklore.model.entity.MetadataFetchJobEntity;
+import com.adityachandel.booklore.model.entity.*;
+import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.enums.FetchedMetadataProposalStatus;
 import com.adityachandel.booklore.model.enums.MetadataFetchTaskStatus;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.model.websocket.Topic;
-import com.adityachandel.booklore.repository.MetadataFetchProposalRepository;
+import com.adityachandel.booklore.repository.BookdropFileRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.MetadataFetchJobRepository;
+import com.adityachandel.booklore.repository.MetadataFetchProposalRepository;
 import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
+import com.adityachandel.booklore.service.metadata.extractor.EpubMetadataExtractor;
+import com.adityachandel.booklore.service.metadata.extractor.PdfMetadataExtractor;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,12 +33,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import static com.adityachandel.booklore.model.entity.BookdropFileEntity.Status.PENDING_REVIEW;
 import static com.adityachandel.booklore.model.enums.MetadataProvider.*;
 import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
 
@@ -186,7 +189,7 @@ public class MetadataRefreshService {
     }
 
     @Transactional
-    protected void updateBookMetadata(BookEntity bookEntity, BookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
+    public void updateBookMetadata(BookEntity bookEntity, BookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
         if (metadata != null) {
             MetadataUpdateWrapper metadataUpdateWrapper = MetadataUpdateWrapper.builder()
                     .metadata(metadata)
@@ -200,7 +203,7 @@ public class MetadataRefreshService {
     }
 
     @Transactional
-    protected List<MetadataProvider> prepareProviders(MetadataRefreshRequest request) {
+    public List<MetadataProvider> prepareProviders(MetadataRefreshRequest request) {
         Set<MetadataProvider> allProviders = new HashSet<>(getAllProvidersUsingIndividualFields(request));
         return new ArrayList<>(allProviders);
     }
@@ -229,6 +232,23 @@ public class MetadataRefreshService {
             if (fieldProvider.getP2() != null) providerSet.add(fieldProvider.getP2());
             if (fieldProvider.getP1() != null) providerSet.add(fieldProvider.getP1());
         }
+    }
+
+    @Transactional
+    public Map<MetadataProvider, BookMetadata> fetchMetadataForBook(List<MetadataProvider> providers, Book book) {
+        return providers.stream()
+                .map(provider -> CompletableFuture.supplyAsync(() -> fetchTopMetadataFromAProvider(provider, book))
+                        .exceptionally(e -> {
+                            log.error("Error fetching metadata from provider: {}", provider, e);
+                            return null;
+                        }))
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(
+                        BookMetadata::getProvider,
+                        metadata -> metadata,
+                        (existing, replacement) -> existing
+                ));
     }
 
     @Transactional
@@ -261,17 +281,18 @@ public class MetadataRefreshService {
     }
 
     private FetchMetadataRequest buildFetchMetadataRequestFromBook(Book book) {
+        BookMetadata metadata = book.getMetadata();
         return FetchMetadataRequest.builder()
-                .isbn(book.getMetadata().getIsbn10())
-                .asin(book.getMetadata().getAsin())
-                .author(String.join(", ", book.getMetadata().getAuthors()))
-                .title(book.getMetadata().getTitle())
+                .isbn(metadata.getIsbn10())
+                .asin(metadata.getAsin())
+                .author(metadata.getAuthors() != null ? String.join(", ", metadata.getAuthors()) : null)
+                .title(metadata.getTitle())
                 .bookId(book.getId())
                 .build();
     }
 
     @Transactional
-    protected BookMetadata buildFetchMetadata(Long bookId, MetadataRefreshRequest request, Map<MetadataProvider, BookMetadata> metadataMap) {
+    public BookMetadata buildFetchMetadata(Long bookId, MetadataRefreshRequest request, Map<MetadataProvider, BookMetadata> metadataMap) {
         BookMetadata metadata = BookMetadata.builder().bookId(bookId).build();
         MetadataRefreshOptions.FieldOptions fieldOptions = request.getRefreshOptions().getFieldOptions();
 

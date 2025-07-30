@@ -1,7 +1,6 @@
 package com.adityachandel.booklore.service.fileprocessor;
 
 import com.adityachandel.booklore.mapper.BookMapper;
-import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.BookEntity;
@@ -24,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
 import static com.adityachandel.booklore.service.fileprocessor.FileProcessingUtils.truncate;
 
@@ -47,13 +47,13 @@ public class PdfProcessor extends AbstractFileProcessor implements BookFileProce
     }
 
     @Override
-    public Book processNewFile(LibraryFile libraryFile) {
+    public BookEntity processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.PDF);
         if (generateCover(bookEntity)) {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
         extractAndSetMetadata(bookEntity);
-        return finishAndReturnBook(bookEntity);
+        return bookEntity;
     }
 
     @Override
@@ -67,6 +67,11 @@ public class PdfProcessor extends AbstractFileProcessor implements BookFileProce
             log.warn("Failed to generate cover for '{}': {}", bookEntity.getFileName(), e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public List<BookFileType> getSupportedTypes() {
+        return List.of(BookFileType.PDF);
     }
 
     private void extractAndSetMetadata(BookEntity bookEntity) {

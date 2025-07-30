@@ -12,10 +12,16 @@
 
 .virtual-scroller {
   width: 100%;
-  height: calc(100vh - 10.9rem);
+  height: calc(100dvh - 10.9rem);
   padding: 1rem;
   box-sizing: border-box;
   overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .virtual-scroller {
+    height: calc(100dvh - 9rem);
+  }
 }
 
 .grid {
@@ -42,6 +48,13 @@
   border-radius: 10px 10px 0 0;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-width: 1px 1px 0px 1px;
+}
+
+@media (max-width: 768px) {
+  .book-browser-footer {
+    left: 0%;
+    right: 0%;
+  }
 }
 
 .topbar-item {

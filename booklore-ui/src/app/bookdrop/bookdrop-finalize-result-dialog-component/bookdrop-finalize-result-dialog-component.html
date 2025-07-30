@@ -1,0 +1,26 @@
+<ul class="space-y-3">
+  @for (result of results; track result) {
+    <li
+      class="flex items-start gap-3 p-3 rounded-xl border shadow-sm transition-colors"
+      [ngClass]="{
+        'bg-green-800/10 border-green-500/40 text-green-100': result.success,
+        'bg-red-800/10 border-red-500/40 text-red-100': !result.success
+      }"
+    >
+      <i
+        class="pi text-xl mt-1"
+        [ngClass]="{
+           'pi-check-circle text-green-500': result.success,
+            'pi-times-circle text-red-500': !result.success
+        }"
+      ></i>
+
+      <div class="flex flex-col">
+        <span class="font-medium text-sm text-white">
+          {{ result.fileName }}
+        </span>
+        <span class="text-sm text-gray-400">{{ result.message }}</span>
+      </div>
+    </li>
+  }
+</ul>

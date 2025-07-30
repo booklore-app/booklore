@@ -13,6 +13,9 @@ import {FormsModule} from '@angular/forms';
 import {SelectButton} from 'primeng/selectbutton';
 import {UserService} from '../../../../settings/user-management/user.service';
 import {FilterSortPreferenceService} from '../filters/filter-sorting-preferences.service';
+import {MagicShelf} from '../../../../magic-shelf-service';
+import {GroupRule} from '../../../../magic-shelf-component/magic-shelf-component';
+import {BookRuleEvaluatorService} from '../../../../book-rule-evaluator.service';
 
 type Filter<T> = { value: T; bookCount: number };
 
@@ -148,7 +151,7 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   @Output() filterSelected = new EventEmitter<Record<string, any> | null>();
   @Output() filterModeChanged = new EventEmitter<'and' | 'or'>();
 
-  @Input() entity$!: Observable<Library | Shelf | null> | undefined;
+  @Input() entity$!: Observable<Library | Shelf | MagicShelf | null> | undefined;
   @Input() entityType$!: Observable<EntityType> | undefined;
   @Input() resetFilter$!: Subject<void>;
   @Input() showFilter: boolean = false;
@@ -185,6 +188,7 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   bookService = inject(BookService);
   userService = inject(UserService);
   filterSortPreferenceService = inject(FilterSortPreferenceService);
+  bookRuleEvaluatorService = inject(BookRuleEvaluatorService);
 
   ngOnInit(): void {
     combineLatest([
@@ -283,9 +287,21 @@ export class BookFilterComponent implements OnInit, OnDestroy {
     if (entityType === EntityType.LIBRARY && entity && 'id' in entity) {
       return books.filter((book) => book.libraryId === entity.id);
     }
+
     if (entityType === EntityType.SHELF && entity && 'id' in entity) {
       return books.filter((book) => book.shelves?.some((shelf) => shelf.id === entity.id));
     }
+
+    if (entityType === EntityType.MAGIC_SHELF && entity && 'filterJson' in entity) {
+      try {
+        const groupRule = JSON.parse(entity.filterJson) as GroupRule;
+        return books.filter((book) => this.bookRuleEvaluatorService.evaluateGroup(book, groupRule));
+      } catch (e) {
+        console.warn('Invalid filterJson for MagicShelf:', e);
+        return [];
+      }
+    }
+
     return books;
   }
 

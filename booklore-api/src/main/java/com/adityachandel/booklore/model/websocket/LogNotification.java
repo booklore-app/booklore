@@ -11,7 +11,7 @@ public class LogNotification {
     private final Instant timestamp = Instant.now();
     private final String message;
 
-    private LogNotification(String message) {
+    public LogNotification(String message) {
         this.message = message;
     }
 

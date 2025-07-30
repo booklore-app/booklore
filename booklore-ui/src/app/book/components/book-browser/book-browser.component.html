@@ -1,7 +1,7 @@
 <div class="relative flex flex-row">
   <div class="flex flex-col w-full">
 
-    <div class="flex items-center justify-between w-full gap-4 py-2 px-2 md:px-4 rounded-t-xl mb-4 bg-[var(--card-background)]">
+    <div class="flex items-center justify-between w-full gap-4 py-2 px-2 md:px-4 rounded-t-xl md:mb-4 mb-2 bg-[var(--card-background)]">
       <div class="flex items-center min-w-0 max-w-full flex-shrink">
         @if (entityType$ | async; as entityType) {
           <p class="text-xl whitespace-nowrap overflow-hidden text-ellipsis w-full">
@@ -252,40 +252,38 @@
             </div>
           }
           @if (bookState?.books; as books) {
-            <div class="book-card-container">
-              @if (currentViewMode === 'table' && books.length > 0) {
-                <app-book-table
-                  [books]="books"
-                  (selectedBooksChange)="onSelectedBooksChange($event)"
-                  [sortOption]="this.bookSorter.selectedSort!"
-                  [visibleColumns]="visibleColumns"
-                ></app-book-table>
-              }
-              @if (currentViewMode === 'grid') {
-                <virtual-scroller class="virtual-scroller" #scroll [items]="books">
-                  <div
-                    class="grid"
-                    #container
-                    [ngStyle]="{'grid-template-columns': 'repeat(auto-fill, minmax(' + gridColumnMinWidth + ', 1fr))'}">
-                    @for (book of scroll.viewPortItems; let i = $index; track book) {
-                      <div
-                        class="virtual-scroller-item relative"
-                        [ngStyle]="{width: currentCardSize.width + 'px', height: currentCardSize.height + 'px'}">
-                        <app-book-card
-                          [index]="i"
-                          [book]="book"
-                          [isCheckboxEnabled]="true"
-                          [onBookSelect]="handleBookSelect.bind(this)"
-                          [isSeriesCollapsed]="seriesCollapseFilter.isSeriesCollapsed"
-                          (checkboxClick)="onCheckboxClicked($event)"
-                          [isSelected]="selectedBooks.has(book.id)">
-                        </app-book-card>
-                      </div>
-                    }
-                  </div>
-                </virtual-scroller>
-              }
-            </div>
+            @if (currentViewMode === 'table' && books.length > 0) {
+              <app-book-table
+                [books]="books"
+                (selectedBooksChange)="onSelectedBooksChange($event)"
+                [sortOption]="this.bookSorter.selectedSort!"
+                [visibleColumns]="visibleColumns"
+              ></app-book-table>
+            }
+            @if (currentViewMode === 'grid') {
+              <virtual-scroller class="virtual-scroller" #scroll [items]="books">
+                <div
+                  class="grid"
+                  #container
+                  [ngStyle]="{'grid-template-columns': 'repeat(auto-fill, minmax(' + gridColumnMinWidth + ', 1fr))'}">
+                  @for (book of scroll.viewPortItems; let i = $index; track book) {
+                    <div
+                      class="virtual-scroller-item relative"
+                      [ngStyle]="{width: currentCardSize.width + 'px', height: currentCardSize.height + 'px'}">
+                      <app-book-card
+                        [index]="i"
+                        [book]="book"
+                        [isCheckboxEnabled]="true"
+                        [onBookSelect]="handleBookSelect.bind(this)"
+                        [isSeriesCollapsed]="seriesCollapseFilter.isSeriesCollapsed"
+                        (checkboxClick)="onCheckboxClicked($event)"
+                        [isSelected]="selectedBooks.has(book.id)">
+                      </app-book-card>
+                    </div>
+                  }
+                </div>
+              </virtual-scroller>
+            }
           }
           @if (selectedBooks.size > 0) {
             @if (userService.userState$ | async; as userData) {

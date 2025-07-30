@@ -1,5 +1,6 @@
 app:
   path-config: '/app/data'
+  bookdrop-folder: '/bookdrop'
   version: 'v0.0.40'
   swagger:
     enabled: ${SWAGGER_ENABLED:false}
