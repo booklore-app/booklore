@@ -65,7 +65,7 @@ public class ComicvineBookParser implements BookParser {
             URI uri = UriComponentsBuilder.fromUriString(COMICVINE_URL) // Base URL
             
                     .path("/search/")
-                    .queryParam("api_key", apiToken) // Replace with your actual API key
+                    .queryParam("api_key", apiToken) 
                     .queryParam("format", "json")
                     .queryParam("resources", resources)
                     .queryParam("resouce_type", resources)

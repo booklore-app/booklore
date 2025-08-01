@@ -237,6 +237,7 @@ public class BookMetadataEntity {
         this.goodreadsReviewCountLocked = lock;
         this.hardcoverRatingLocked = lock;
         this.hardcoverReviewCountLocked = lock;
+        this.comicvineIdLocked = lock;
         this.personalRatingLocked = lock;
         this.goodreadsIdLocked = lock;
         this.hardcoverIdLocked = lock;
