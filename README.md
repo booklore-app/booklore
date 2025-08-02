@@ -155,8 +155,8 @@ services:
       - /your/local/path/to/booklore/data:/app/data
       - /your/local/path/to/booklore/books:/books
       - /your/local/path/to/booklore/bookdrop:/bookdrop # 👈 Bookdrop directory
-```      
-      
+```
+
 ## 🔑 OIDC/OAuth2 Authentication (Authentik, Pocket ID, etc.)
 
 
@@ -168,6 +168,13 @@ For detailed instructions on setting up OIDC authentication:
 
 - 📺 [YouTube video on configuring Authentik with BookLore](https://www.youtube.com/watch?v=r6Ufh9ldF9M)
 - 📘 [Step-by-step setup guide for Pocket ID](docs/OIDC-Setup-With-PocketID.md)
+
+## 🛡️ Forward Auth with Reverse Proxy
+
+BookLore also supports **Forward Auth** (also known as Remote Auth) for authentication through reverse proxies like **Traefik**, **Nginx**, or **Caddy**. Forward Auth works by having your reverse proxy handle authentication and pass user information via HTTP headers to BookLore. This can be set up with providers like **Authelia** and **Authentik**.
+
+For detailed setup instructions and configuration examples:
+- 📘 [Complete Forward Auth Setup Guide](docs/forward-auth-with-proxy.md)
 
 ## 🤝 Community & Support
 
@@ -199,4 +206,3 @@ Thanks to all the amazing people who contribute to Booklore.
 
 * [GNU GPL v3](http://www.gnu.org/licenses/gpl.html)
 * Copyright 2024-2025
-
