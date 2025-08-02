@@ -9,6 +9,7 @@ import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.*;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.UserRepository;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class UserProvisioningService {
     private final LibraryRepository libraryRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final UserDefaultsService userDefaultsService;
+    private final AppSettingService appSettingService;
 
     public boolean isInitialUserAlreadyProvisioned() {
         return userRepository.count() > 0;
@@ -142,18 +144,36 @@ public class UserProvisioningService {
         user.setProvisioningMethod(ProvisioningMethod.REMOTE);
         user.setPasswordHash("RemoteUser_" + RandomStringUtils.secure().nextAlphanumeric(32));
 
+        OidcAutoProvisionDetails oidcAutoProvisionDetails = appSettingService.getAppSettings().getOidcAutoProvisionDetails();
+        
         UserPermissionsEntity permissions = new UserPermissionsEntity();
         permissions.setUser(user);
-        permissions.setPermissionUpload(true);
-        permissions.setPermissionDownload(true);
-        permissions.setPermissionEditMetadata(true);
-        permissions.setPermissionEmailBook(true);
-        permissions.setPermissionDeleteBook(true);
+        
+        if (oidcAutoProvisionDetails != null && oidcAutoProvisionDetails.getDefaultPermissions() != null) {
+            List<String> defaultPermissions = oidcAutoProvisionDetails.getDefaultPermissions();
+            permissions.setPermissionUpload(defaultPermissions.contains("permissionUpload"));
+            permissions.setPermissionDownload(defaultPermissions.contains("permissionDownload"));
+            permissions.setPermissionEditMetadata(defaultPermissions.contains("permissionEditMetadata"));
+            permissions.setPermissionManipulateLibrary(defaultPermissions.contains("permissionManipulateLibrary"));
+            permissions.setPermissionEmailBook(defaultPermissions.contains("permissionEmailBook"));
+            permissions.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBooks"));
+        } else {
+            permissions.setPermissionUpload(true);
+            permissions.setPermissionDownload(true);
+            permissions.setPermissionEditMetadata(true);
+            permissions.setPermissionManipulateLibrary(false);
+            permissions.setPermissionEmailBook(true);
+            permissions.setPermissionDeleteBook(true);
+        }
+        
         permissions.setPermissionAdmin(isAdmin);
         user.setPermissions(permissions);
 
         if (isAdmin) {
             List<LibraryEntity> libraries = libraryRepository.findAll();
+            user.setLibraries(new ArrayList<>(libraries));
+        } else if (oidcAutoProvisionDetails != null && oidcAutoProvisionDetails.getDefaultLibraryIds() != null && !oidcAutoProvisionDetails.getDefaultLibraryIds().isEmpty()) {
+            List<LibraryEntity> libraries = libraryRepository.findAllById(oidcAutoProvisionDetails.getDefaultLibraryIds());
             user.setLibraries(new ArrayList<>(libraries));
         }
 
