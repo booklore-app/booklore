@@ -68,7 +68,7 @@ public class ComicvineBookParser implements BookParser {
                     .queryParam("api_key", apiToken) 
                     .queryParam("format", "json")
                     .queryParam("resources", resources)
-                    .queryParam("resouce_type", resources)
+                    .queryParam("resource_type", resources)
                     .queryParam("query", term)
                     .queryParam("filter", "name:" + term)
                     .queryParam("limit", "10") // Limit results to reduce response size
@@ -76,7 +76,7 @@ public class ComicvineBookParser implements BookParser {
                     .build()
                     .toUri();
 
-            System.out.println(uri.toString());
+            log.debug("Comicvine API request URI: {}", uri);
             HttpClient httpClient = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()

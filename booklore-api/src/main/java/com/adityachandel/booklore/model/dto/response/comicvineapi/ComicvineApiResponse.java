@@ -28,10 +28,6 @@ public class ComicvineApiResponse {
     
     @JsonProperty("status_code")
     private int statusCode;
-    /**
-     * Check if you can make two classes, one that has List<Comic> results
-     * And one that takes in Issue result.
-     */
     private List<Comic> results;
     private String version;
 
