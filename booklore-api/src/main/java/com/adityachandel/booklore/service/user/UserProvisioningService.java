@@ -109,7 +109,7 @@ public class UserProvisioningService {
             perms.setPermissionEditMetadata(defaultPermissions.contains("permissionEditMetadata"));
             perms.setPermissionManipulateLibrary(defaultPermissions.contains("permissionManipulateLibrary"));
             perms.setPermissionEmailBook(defaultPermissions.contains("permissionEmailBook"));
-            perms.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBooks"));
+            perms.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBook"));
         }
         user.setPermissions(perms);
 
@@ -156,7 +156,7 @@ public class UserProvisioningService {
             permissions.setPermissionEditMetadata(defaultPermissions.contains("permissionEditMetadata"));
             permissions.setPermissionManipulateLibrary(defaultPermissions.contains("permissionManipulateLibrary"));
             permissions.setPermissionEmailBook(defaultPermissions.contains("permissionEmailBook"));
-            permissions.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBooks"));
+            permissions.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBook"));
         } else {
             permissions.setPermissionUpload(true);
             permissions.setPermissionDownload(true);
@@ -186,4 +186,3 @@ public class UserProvisioningService {
         userDefaultsService.addDefaultSettings(user);
         return user;
     }
-}
