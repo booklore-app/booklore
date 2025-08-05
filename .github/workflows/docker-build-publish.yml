@@ -26,6 +26,13 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up QEMU for multi-arch builds
         uses: docker/setup-qemu-action@v3
 
@@ -116,13 +123,14 @@ jobs:
           git tag ${{ env.new_tag }}
           git push origin ${{ env.new_tag }}
 
-      - name: Build and Push Docker Image
+      - name: Build and Push Docker Image (Docker Hub & GHCR)
         run: |
           docker buildx create --use
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.image_tag }} \
             --tag booklore/booklore-app:${{ env.image_tag }} \
+            --tag ghcr.io/${{ github.repository }}/booklore-app:${{ env.image_tag }} \
             --push .
 
       - name: Push Latest Tag (Only for Master)
@@ -132,6 +140,7 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.new_tag }} \
             --tag booklore/booklore-app:latest \
+            --tag ghcr.io/${{ github.repository }}/booklore-app:latest \
             --push .
 
       - name: Update Release Draft (Only for Master)
