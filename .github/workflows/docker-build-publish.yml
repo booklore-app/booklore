@@ -130,7 +130,7 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.image_tag }} \
             --tag booklore/booklore-app:${{ env.image_tag }} \
-            --tag ghcr.io/${{ github.repository }}/booklore-app:${{ env.image_tag }} \
+            --tag ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ env.image_tag }} \
             --push .
 
       - name: Push Latest Tag (Only for Master)
@@ -140,7 +140,7 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.new_tag }} \
             --tag booklore/booklore-app:latest \
-            --tag ghcr.io/${{ github.repository }}/booklore-app:latest \
+            --tag ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest \
             --push .
 
       - name: Update Release Draft (Only for Master)
@@ -171,8 +171,7 @@ jobs:
           release_url=$(echo "$release_json" | jq -r '.url')
           dockerhub_image="https://hub.docker.com/r/booklore/booklore-app/tags"
           ghcr_image="https://github.com/${{ github.repository }}/packages"
-          content=":tada: **New Release:** [$release_name]($release_url)\n\n$release_body\n\n**Docker Images:**\n- Docker Hub: \`booklore/booklore-app:${{ env.new_tag }}\` ([View]($dockerhub_image))\n- GHCR: \`ghcr.io/${{ github.repository }}/booklore-app:${{ env.new_tag }}\` ([View]($ghcr_image))"
+          content=":tada: **New Release:** [$release_name]($release_url)\n\n$release_body\n\n**Docker Images:**\n- Docker Hub: \`booklore/booklore-app:${{ env.new_tag }}\` ([View]($dockerhub_image))\n- GHCR: \`ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ env.new_tag }}\` ([View]($ghcr_image))"
           payload="{\"content\": \"$content\"}"
           curl -H "Content-Type: application/json" -X POST -d "$payload" $DISCORD_WEBHOOK_URL
-
 
