@@ -480,8 +480,9 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
       }
 
       this.bookService.updateBookReadStatus(book.id, status).subscribe({
-        next: () => {
+        next: (updatedBooks) => {
           this.selectedReadStatus = status;
+          // The book state will be updated automatically by the service
           this.messageService.add({
             severity: 'success',
             summary: 'Read Status Updated',
@@ -530,6 +531,16 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
           }
         });
       }
+    });
+  }
+
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   }
 }
