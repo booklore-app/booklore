@@ -1,10 +1,9 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DirectoryPickerComponent} from '../../../utilities/component/directory-picker/directory-picker.component';
 import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {LibraryService} from '../../service/library.service';
-import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
 import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
@@ -13,18 +12,16 @@ import {InputText} from 'primeng/inputtext';
 import {Library} from '../../model/library.model';
 import {ToggleSwitch} from 'primeng/toggleswitch';
 import {Tooltip} from 'primeng/tooltip';
+import { IconPickerService } from '../../../utilities/services/icon-picker.service';
 
 @Component({
   selector: 'app-library-creator',
   standalone: true,
   templateUrl: './library-creator.component.html',
-  imports: [Button, TableModule, StepPanel, IconPickerComponent, FormsModule, InputText, Stepper, StepList, Step, StepPanels, ToggleSwitch, Tooltip],
+  imports: [Button, TableModule, StepPanel, FormsModule, InputText, Stepper, StepList, Step, StepPanels, ToggleSwitch, Tooltip],
   styleUrl: './library-creator.component.scss'
 })
 export class LibraryCreatorComponent implements OnInit {
-
-  @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
-
   chosenLibraryName: string = '';
   folders: string[] = [];
   selectedIcon: string | null = null;
@@ -35,13 +32,13 @@ export class LibraryCreatorComponent implements OnInit {
   directoryPickerDialogRef!: DynamicDialogRef<DirectoryPickerComponent>;
   watch: boolean = false;
 
-  private dialogService = inject(DialogService);
-  private dynamicDialogRef = inject(DynamicDialogRef);
+  private dialogService       = inject(DialogService);
+  private dynamicDialogRef    = inject(DynamicDialogRef);
   private dynamicDialogConfig = inject(DynamicDialogConfig);
-  private libraryService = inject(LibraryService);
-  private messageService = inject(MessageService);
-  private router = inject(Router);
-
+  private libraryService      = inject(LibraryService);
+  private messageService      = inject(MessageService);
+  private router              = inject(Router);
+  private iconPicker          = inject(IconPickerService);
 
   ngOnInit(): void {
     const data = this.dynamicDialogConfig?.data;
@@ -59,7 +56,7 @@ export class LibraryCreatorComponent implements OnInit {
     }
   }
 
-  openDirectoryPicker() {
+  openDirectoryPicker(): void {
     this.directoryPickerDialogRef = this.dialogService.open(DirectoryPickerComponent, {
       header: 'Select Media Directory',
       modal: true,
@@ -74,6 +71,14 @@ export class LibraryCreatorComponent implements OnInit {
     });
   }
 
+  openIconPicker(): void {
+    this.iconPicker.open().subscribe(icon => {
+      if (icon) {
+        this.selectedIcon = icon;
+      }
+    });
+  }
+
   addFolder(folder: string): void {
     this.folders.push(folder);
   }
@@ -82,17 +87,7 @@ export class LibraryCreatorComponent implements OnInit {
     this.folders.splice(index, 1);
   }
 
-  openIconPicker() {
-    if (this.iconPicker) {
-      this.iconPicker.open();
-    }
-  }
-
-  onIconSelected(icon: string) {
-    this.selectedIcon = icon;
-  }
-
-  clearSelectedIcon() {
+  clearSelectedIcon(): void {
     this.selectedIcon = null;
   }
 
@@ -104,7 +99,25 @@ export class LibraryCreatorComponent implements OnInit {
     return this.folders.length > 0;
   }
 
-  createOrUpdateLibrary() {
+  validateLibraryNameAndProceed(activateCallback: Function): void {
+    let trimmedLibraryName = this.chosenLibraryName.trim();
+    if (trimmedLibraryName && trimmedLibraryName != this.editModeLibraryName) {
+      let exists = this.libraryService.doesLibraryExistByName(trimmedLibraryName);
+      if (exists) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Library Name Exists',
+          detail: 'This library name is already taken.',
+        });
+      } else {
+        activateCallback(2);
+      }
+    } else {
+      activateCallback(2);
+    }
+  }
+
+  createOrUpdateLibrary(): void {
     if (this.mode === 'edit') {
       const library: Library = {
         name: this.chosenLibraryName,
@@ -142,23 +155,4 @@ export class LibraryCreatorComponent implements OnInit {
       });
     }
   }
-
-  validateLibraryNameAndProceed(activateCallback: Function) {
-    let trimmedLibraryName = this.chosenLibraryName.trim();
-    if (trimmedLibraryName && trimmedLibraryName != this.editModeLibraryName) {
-      let exists = this.libraryService.doesLibraryExistByName(trimmedLibraryName);
-      if (exists) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Library Name Exists',
-          detail: 'This library name is already taken.',
-        });
-      } else {
-        activateCallback(2);
-      }
-    } else {
-      activateCallback(2);
-    }
-  }
-
 }

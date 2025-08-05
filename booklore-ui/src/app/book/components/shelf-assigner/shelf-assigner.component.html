@@ -1,7 +1,7 @@
 <div class="p-4 min-w-[26rem] min-h-[30rem] flex flex-col">
 
   <div class="flex flex-col flex-grow">
-    <!-- Dynamic shelves content -->
+
     @for (shelf of (shelfState$ | async)?.shelves; track shelf) {
       <div>
         <div class="flex flex-row items-center gap-4 py-2">
@@ -11,7 +11,6 @@
       </div>
     }
 
-    <!-- Button section, anchored to the bottom -->
     <div class="flex justify-between items-center pt-4 mt-auto">
       <p-button outlined="true" label="Create Shelf" (onClick)="createShelfDialog()"></p-button>
       <div class="flex gap-4">
@@ -21,10 +20,6 @@
     </div>
   </div>
 
-  <!-- Icon picker component -->
-  <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>
-
-  <!-- Shelf dialog component -->
   <p-dialog [style]="{ width: '26rem', height: '30rem' }"  [(visible)]="displayShelfDialog" header="Create Shelf" [modal]="true" [draggable]="false" [closable]="true" (onHide)="closeShelfDialog()">
     <div class="py-2">
       <label for="shelfName">Shelf Name</label>
