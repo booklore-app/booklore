@@ -55,6 +55,33 @@ public class BookService {
     private final BookQueryService bookQueryService;
     private final UserProgressService userProgressService;
 
+
+    private void setBookProgress(Book book, UserBookProgressEntity progress) {
+        switch (book.getBookType()) {
+            case EPUB -> book.setEpubProgress(EpubProgress.builder()
+                    .cfi(progress.getEpubProgress())
+                    .percentage(progress.getEpubProgressPercent())
+                    .build());
+            case PDF -> book.setPdfProgress(PdfProgress.builder()
+                    .page(progress.getPdfProgress())
+                    .percentage(progress.getPdfProgressPercent())
+                    .build());
+            case CBX -> book.setCbxProgress(CbxProgress.builder()
+                    .page(progress.getCbxProgress())
+                    .percentage(progress.getCbxProgressPercent())
+                    .build());
+        }
+    }
+
+    private void enrichBookWithProgress(Book book, UserBookProgressEntity progress) {
+        if (progress != null) {
+            setBookProgress(book, progress);
+            book.setLastReadTime(progress.getLastReadTime());
+            book.setReadStatus(String.valueOf(progress.getReadStatus()));
+            book.setDateFinished(progress.getDateFinished());
+        }
+    }
+
     public List<Book> getBookDTOs(boolean includeDescription) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
         boolean isAdmin = user.getPermissions().isAdmin();
@@ -74,15 +101,7 @@ public class BookService {
                         books.stream().map(Book::getId).collect(Collectors.toSet())
                 );
 
-        books.forEach(book -> {
-            UserBookProgressEntity progress = progressMap.get(book.getId());
-            if (progress != null) {
-                setBookProgress(book, progress);
-                book.setLastReadTime(progress.getLastReadTime());
-                book.setReadStatus(String.valueOf(progress.getReadStatus()));
-                book.setDateFinished(progress.getDateFinished());
-            }
-        });
+        books.forEach(book -> enrichBookWithProgress(book, progressMap.get(book.getId())));
 
         return books;
     }
@@ -90,9 +109,7 @@ public class BookService {
     public List<Book> getBooksByIds(Set<Long> bookIds, boolean withDescription) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
 
-        List<BookEntity> bookEntities;
-
-        bookEntities = bookQueryService.findAllWithMetadataByIds(bookIds);
+        List<BookEntity> bookEntities = bookQueryService.findAllWithMetadataByIds(bookIds);
 
         Map<Long, UserBookProgressEntity> progressMap = userProgressService.fetchUserProgress(
                 user.getId(), bookEntities.stream().map(BookEntity::getId).collect(Collectors.toSet()));
@@ -100,38 +117,48 @@ public class BookService {
         return bookEntities.stream().map(bookEntity -> {
             Book book = bookMapper.toBook(bookEntity);
             book.setFilePath(FileUtils.getBookFullPath(bookEntity));
-
-            if (!withDescription) {
-                book.getMetadata().setDescription(null);
-            }
-
-            UserBookProgressEntity progress = progressMap.get(bookEntity.getId());
-            if (progress != null) {
-                setBookProgress(book, progress);
-                book.setLastReadTime(progress.getLastReadTime());
-                book.setReadStatus(String.valueOf(progress.getReadStatus()));
-                book.setDateFinished(progress.getDateFinished());
-            }
-
+            if (!withDescription) book.getMetadata().setDescription(null);
+            enrichBookWithProgress(book, progressMap.get(bookEntity.getId()));
             return book;
         }).collect(Collectors.toList());
     }
 
-    private void setBookProgress(Book book, UserBookProgressEntity progress) {
-        switch (book.getBookType()) {
-            case EPUB -> book.setEpubProgress(EpubProgress.builder()
-                    .cfi(progress.getEpubProgress())
-                    .percentage(progress.getEpubProgressPercent())
-                    .build());
-            case PDF -> book.setPdfProgress(PdfProgress.builder()
-                    .page(progress.getPdfProgress())
-                    .percentage(progress.getPdfProgressPercent())
-                    .build());
-            case CBX -> book.setCbxProgress(CbxProgress.builder()
-                    .page(progress.getCbxProgress())
-                    .percentage(progress.getCbxProgressPercent())
+    public Book getBook(long bookId, boolean withDescription) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+
+        UserBookProgressEntity userProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), bookId).orElse(new UserBookProgressEntity());
+
+        Book book = bookMapper.toBook(bookEntity);
+        book.setLastReadTime(userProgress.getLastReadTime());
+
+        if (bookEntity.getBookType() == BookFileType.PDF) {
+            book.setPdfProgress(PdfProgress.builder()
+                    .page(userProgress.getPdfProgress())
+                    .percentage(userProgress.getPdfProgressPercent())
                     .build());
         }
+        if (bookEntity.getBookType() == BookFileType.EPUB) {
+            book.setEpubProgress(EpubProgress.builder()
+                    .cfi(userProgress.getEpubProgress())
+                    .percentage(userProgress.getEpubProgressPercent())
+                    .build());
+        }
+        if (bookEntity.getBookType() == BookFileType.CBX) {
+            book.setCbxProgress(CbxProgress.builder()
+                    .page(userProgress.getCbxProgress())
+                    .percentage(userProgress.getCbxProgressPercent())
+                    .build());
+        }
+        book.setFilePath(FileUtils.getBookFullPath(bookEntity));
+        book.setReadStatus(String.valueOf(userProgress.getReadStatus()));
+        book.setDateFinished(userProgress.getDateFinished());
+
+        if (!withDescription) {
+            book.getMetadata().setDescription(null);
+        }
+
+        return book;
     }
 
     public BookViewerSettings getBookViewerSetting(long bookId) {
@@ -251,112 +278,6 @@ public class BookService {
         }
     }
 
-    public Book getBook(long bookId, boolean withDescription) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-
-        UserBookProgressEntity userProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), bookId).orElse(new UserBookProgressEntity());
-
-        Book book = bookMapper.toBook(bookEntity);
-        book.setLastReadTime(userProgress.getLastReadTime());
-
-        if (bookEntity.getBookType() == BookFileType.PDF) {
-            book.setPdfProgress(PdfProgress.builder()
-                    .page(userProgress.getPdfProgress())
-                    .percentage(userProgress.getPdfProgressPercent())
-                    .build());
-        }
-        if (bookEntity.getBookType() == BookFileType.EPUB) {
-            book.setEpubProgress(EpubProgress.builder()
-                    .cfi(userProgress.getEpubProgress())
-                    .percentage(userProgress.getEpubProgressPercent())
-                    .build());
-        }
-        if (bookEntity.getBookType() == BookFileType.CBX) {
-            book.setCbxProgress(CbxProgress.builder()
-                    .page(userProgress.getCbxProgress())
-                    .percentage(userProgress.getCbxProgressPercent())
-                    .build());
-        }
-        book.setFilePath(FileUtils.getBookFullPath(bookEntity));
-        book.setReadStatus(String.valueOf(userProgress.getReadStatus()));
-        book.setDateFinished(userProgress.getDateFinished());
-
-        if (!withDescription) {
-            book.getMetadata().setDescription(null);
-        }
-
-        return book;
-    }
-
-    public List<Book> resetProgress(List<Long> bookIds) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
-        List<Book> updatedBooks = new ArrayList<>();
-        Optional<BookLoreUserEntity> userEntity = userRepository.findById(user.getId());
-
-        for (Long bookId : bookIds) {
-            BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-
-            UserBookProgressEntity progress = userBookProgressRepository
-                    .findByUserIdAndBookId(user.getId(), bookId)
-                    .orElse(new UserBookProgressEntity());
-
-            progress.setBook(bookEntity);
-            progress.setUser(userEntity.orElseThrow());
-            progress.setReadStatus(null);
-            progress.setLastReadTime(null);
-            progress.setPdfProgress(null);
-            progress.setPdfProgressPercent(null);
-            progress.setEpubProgress(null);
-            progress.setEpubProgressPercent(null);
-            progress.setCbxProgress(null);
-            progress.setCbxProgressPercent(null);
-            progress.setDateFinished(null);
-
-            userBookProgressRepository.save(progress);
-            updatedBooks.add(bookMapper.toBook(bookEntity));
-        }
-
-        return updatedBooks;
-    }
-
-
-    @Transactional
-    public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
-        BookLoreUserEntity userEntity = userRepository.findById(user.getId()).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(user.getId()));
-
-        Set<Long> userShelfIds = userEntity.getShelves().stream()
-                .map(ShelfEntity::getId)
-                .collect(Collectors.toSet());
-
-        if (!userShelfIds.containsAll(shelfIdsToAssign)) {
-            throw ApiError.UNAUTHORIZED.createException("Cannot assign shelves that do not belong to the user.");
-        }
-        if (!userShelfIds.containsAll(shelfIdsToUnassign)) {
-            throw ApiError.UNAUTHORIZED.createException("Cannot unassign shelves that do not belong to the user.");
-        }
-
-        List<BookEntity> bookEntities = bookQueryService.findAllWithMetadataByIds(bookIds);
-        List<ShelfEntity> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
-        for (BookEntity bookEntity : bookEntities) {
-            bookEntity.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
-
-            for (ShelfEntity shelf : shelvesToAssign) {
-                if (!bookEntity.getShelves().contains(shelf)) {
-                    bookEntity.getShelves().add(shelf);
-                }
-            }
-        }
-        bookRepository.saveAll(bookEntities);
-        return bookEntities.stream().map(bookMapper::toBook).collect(Collectors.toList());
-    }
-
-    public Resource getBookCover(long bookId) {
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        return fileService.getBookCover(bookEntity.getMetadata().getThumbnail());
-    }
-
     @Transactional
     public void updateReadProgress(ReadProgressRequest request) {
         BookEntity book = bookRepository.findById(request.getBookId()).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(request.getBookId()));
@@ -397,37 +318,102 @@ public class BookService {
             progress.setUser(userEntity);
             progress.setBook(book);
             progress.setReadStatus(readStatus);
-            
-            // Set dateFinished when status is READ, clear it otherwise
-            if (readStatus == ReadStatus.READ) {
-                progress.setDateFinished(Instant.now());
-            } else {
-                progress.setDateFinished(null);
-            }
-            
+
             userBookProgressRepository.save(progress);
         }
-        
-        // Return updated books with the latest data
+
         return books.stream()
                 .map(bookEntity -> {
                     Book book = bookMapper.toBook(bookEntity);
                     book.setFilePath(FileUtils.getBookFullPath(bookEntity));
-                    
+
                     UserBookProgressEntity progress = userBookProgressRepository
                             .findByUserIdAndBookId(user.getId(), bookEntity.getId())
                             .orElse(null);
-                    
+
                     if (progress != null) {
                         setBookProgress(book, progress);
                         book.setLastReadTime(progress.getLastReadTime());
                         book.setReadStatus(String.valueOf(progress.getReadStatus()));
                         book.setDateFinished(progress.getDateFinished());
                     }
-                    
+
                     return book;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<Book> resetProgress(List<Long> bookIds) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        List<Book> updatedBooks = new ArrayList<>();
+        Optional<BookLoreUserEntity> userEntity = userRepository.findById(user.getId());
+
+        for (Long bookId : bookIds) {
+            BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+
+            UserBookProgressEntity progress = userBookProgressRepository
+                    .findByUserIdAndBookId(user.getId(), bookId)
+                    .orElse(new UserBookProgressEntity());
+
+            progress.setBook(bookEntity);
+            progress.setUser(userEntity.orElseThrow());
+            progress.setReadStatus(null);
+            progress.setLastReadTime(null);
+            progress.setPdfProgress(null);
+            progress.setPdfProgressPercent(null);
+            progress.setEpubProgress(null);
+            progress.setEpubProgressPercent(null);
+            progress.setCbxProgress(null);
+            progress.setCbxProgressPercent(null);
+            progress.setDateFinished(null);
+
+            userBookProgressRepository.save(progress);
+            updatedBooks.add(bookMapper.toBook(bookEntity));
+        }
+
+        return updatedBooks;
+    }
+
+    @Transactional
+    public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        BookLoreUserEntity userEntity = userRepository.findById(user.getId()).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(user.getId()));
+
+        Set<Long> userShelfIds = userEntity.getShelves().stream().map(ShelfEntity::getId).collect(Collectors.toSet());
+
+        if (!userShelfIds.containsAll(shelfIdsToAssign)) {
+            throw ApiError.UNAUTHORIZED.createException("Cannot assign shelves that do not belong to the user.");
+        }
+        if (!userShelfIds.containsAll(shelfIdsToUnassign)) {
+            throw ApiError.UNAUTHORIZED.createException("Cannot unassign shelves that do not belong to the user.");
+        }
+
+        List<BookEntity> bookEntities = bookQueryService.findAllWithMetadataByIds(bookIds);
+        List<ShelfEntity> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
+        for (BookEntity bookEntity : bookEntities) {
+            bookEntity.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
+            for (ShelfEntity shelf : shelvesToAssign) {
+                if (!bookEntity.getShelves().contains(shelf)) {
+                    bookEntity.getShelves().add(shelf);
+                }
+            }
+        }
+        bookRepository.saveAll(bookEntities);
+
+        Map<Long, UserBookProgressEntity> progressMap = userProgressService.fetchUserProgress(
+                user.getId(), bookEntities.stream().map(BookEntity::getId).collect(Collectors.toSet()));
+
+        return bookEntities.stream().map(bookEntity -> {
+            Book book = bookMapper.toBook(bookEntity);
+            book.setFilePath(FileUtils.getBookFullPath(bookEntity));
+            enrichBookWithProgress(book, progressMap.get(bookEntity.getId()));
+            return book;
+        }).collect(Collectors.toList());
+    }
+
+    public Resource getBookCover(long bookId) {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        return fileService.getBookCover(bookEntity.getMetadata().getThumbnail());
     }
 
     public ResponseEntity<Resource> downloadBook(Long bookId) {
