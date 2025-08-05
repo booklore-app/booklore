@@ -91,6 +91,15 @@
                   [style.--p-rating-icon-active-color]="getStarColorScaled(book?.metadata!.personalRating, 10)">
                 </p-rating>
               </div>
+              <p-button
+                text
+                size="small"
+                icon="pi pi-undo"
+                severity="warn"
+                (onClick)="resetPersonalRating(book)"
+                pTooltip="Reset Rating"
+                tooltipPosition="top">
+              </p-button>
             </div>
 
             @if (book?.metadata?.amazonRating || book?.metadata?.goodreadsRating || book?.metadata?.hardcoverRating || book?.metadata?.googleId) {
