@@ -158,3 +158,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release edit ${{ env.new_tag }} --draft=false
+
+      - name: Notify Discord of New Release
+        if: github.ref == 'refs/heads/master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          release_json=$(gh release view ${{ env.new_tag }} --json name,body,url)
+          release_name=$(echo "$release_json" | jq -r '.name')
+          release_body=$(echo "$release_json" | jq -r '.body')
+          release_url=$(echo "$release_json" | jq -r '.url')
+          dockerhub_image="https://hub.docker.com/r/booklore/booklore-app/tags"
+          ghcr_image="https://github.com/${{ github.repository }}/packages"
+          content=":tada: **New Release:** [$release_name]($release_url)\n\n$release_body\n\n**Docker Images:**\n- Docker Hub: \`booklore/booklore-app:${{ env.new_tag }}\` ([View]($dockerhub_image))\n- GHCR: \`ghcr.io/${{ github.repository }}/booklore-app:${{ env.new_tag }}\` ([View]($ghcr_image))"
+          payload="{\"content\": \"$content\"}"
+          curl -H "Content-Type: application/json" -X POST -d "$payload" $DISCORD_WEBHOOK_URL
+
+
