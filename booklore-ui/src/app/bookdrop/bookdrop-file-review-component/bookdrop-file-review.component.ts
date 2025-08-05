@@ -25,6 +25,9 @@ import {BookdropFinalizeResultDialogComponent} from '../bookdrop-finalize-result
 import {DialogService} from 'primeng/dynamicdialog';
 import {BookMetadata} from '../../book/model/book.model';
 import {UrlHelperService} from '../../utilities/service/url-helper.service';
+import {Checkbox} from 'primeng/checkbox';
+import {NgClass, NgStyle} from '@angular/common';
+import {Paginator} from 'primeng/paginator';
 
 export interface BookdropFileUI {
   file: BookdropFile;
@@ -53,7 +56,10 @@ export interface BookdropFileUI {
     Tooltip,
     Divider,
     InputText,
-
+    Checkbox,
+    NgStyle,
+    NgClass,
+    Paginator,
   ],
 })
 export class BookdropFileReviewComponent implements OnInit {
@@ -64,28 +70,32 @@ export class BookdropFileReviewComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly appSettingsService = inject(AppSettingsService);
   private readonly messageService = inject(MessageService);
+  private readonly urlHelper = inject(UrlHelperService);
 
   @ViewChildren('metadataPicker') metadataPickers!: QueryList<BookdropFileMetadataPickerComponent>;
+
+  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
   uploadPattern = '';
   defaultLibraryId: string | null = null;
   defaultPathId: string | null = null;
-  bookdropFileUis: BookdropFileUI[] = [];
   libraries: Library[] = [];
+  bookdropFileUis: BookdropFileUI[] = [];
+  fileUiCache: Record<number, BookdropFileUI> = {};
   copiedFlags: Record<number, boolean> = {};
   loading = true;
   saving = false;
-  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
-  protected urlHelper = inject(UrlHelperService);
+  pageSize = 50;
+  totalRecords = 0;
+  currentPage = 0;
+
+  selectAllAcrossPages = false;
+  excludedFiles = new Set<number>();
 
   ngOnInit(): void {
-    this.bookdropFileService.getPendingFiles()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(files => {
-        this.bookdropFileUis = files.map(file => this.createFileUI(file));
-        this.loading = false;
-      });
+    this.loading = true;
+    this.loadPage(0);
 
     this.libraryService.libraryState$
       .pipe(filter(state => !!state?.loaded), take(1))
@@ -101,12 +111,80 @@ export class BookdropFileReviewComponent implements OnInit {
   }
 
   get libraryOptions() {
+    if (!this.libraries) return [];
     return this.libraries.map(lib => ({label: lib.name, value: String(lib.id ?? '')}));
   }
 
   get selectedLibraryPaths() {
+    if (!this.libraries) return [];
     const selectedLibrary = this.libraries.find(lib => String(lib.id) === this.defaultLibraryId);
     return selectedLibrary?.paths.map(path => ({label: path.path, value: String(path.id ?? '')})) ?? [];
+  }
+
+  get canApplyDefaults(): boolean {
+    return !!(this.defaultLibraryId && this.defaultPathId);
+  }
+
+  get canFinalize(): boolean {
+    if (this.selectAllAcrossPages) {
+      return (this.totalRecords - this.excludedFiles.size) > 0 && this.areAllSelectedHaveLibraryAndPath();
+    }
+    const selectedFiles = this.bookdropFileUis.filter(f => f.selected);
+    if (selectedFiles.length === 0) return false;
+    return selectedFiles.every(f => f.selectedLibraryId && f.selectedPathId);
+  }
+
+  get hasSelectedFiles(): boolean {
+    if (this.selectAllAcrossPages) {
+      return this.totalRecords > this.excludedFiles.size;
+    } else {
+      return Object.values(this.fileUiCache).some(file => file.selected);
+    }
+  }
+
+  get selectedCount(): number {
+    if (this.selectAllAcrossPages) {
+      return this.totalRecords - this.excludedFiles.size;
+    } else {
+      return Object.values(this.fileUiCache).filter(file => file.selected).length;
+    }
+  }
+
+  loadPage(page: number): void {
+    this.bookdropFileService.getPendingFiles(page, this.pageSize)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: response => {
+          this.bookdropFileUis = response.content.map(file => {
+            const cached = this.fileUiCache[file.id];
+            if (cached) {
+              cached.file = file;
+              return cached;
+            } else {
+              const fresh = this.createFileUI(file);
+
+              if (this.defaultLibraryId) {
+                const selectedLib = this.libraries.find(l => String(l.id) === this.defaultLibraryId);
+                const selectedPaths = selectedLib?.paths ?? [];
+                fresh.selectedLibraryId = this.defaultLibraryId;
+                fresh.availablePaths = selectedPaths.map(p => ({id: String(p.id ?? ''), name: p.path}));
+                fresh.selectedPathId = this.defaultPathId ?? null;
+              }
+
+              this.fileUiCache[file.id] = fresh;
+              return fresh;
+            }
+          });
+          this.totalRecords = response.totalElements;
+          this.currentPage = page;
+          this.loading = false;
+          this.syncCurrentPageSelection();
+        },
+        error: err => {
+          console.error('Error loading files:', err);
+          this.loading = false;
+        }
+      });
   }
 
   onLibraryChange(file: BookdropFileUI): void {
@@ -120,27 +198,23 @@ export class BookdropFileReviewComponent implements OnInit {
   }
 
   applyDefaultsToAll(): void {
-    if (!this.defaultLibraryId) return;
+    if (!this.defaultLibraryId || !this.libraries) return;
 
     const selectedLib = this.libraries.find(l => String(l.id) === this.defaultLibraryId);
     const selectedPaths = selectedLib?.paths ?? [];
 
-    for (const file of this.bookdropFileUis) {
+    Object.values(this.fileUiCache).forEach(file => {
       file.selectedLibraryId = this.defaultLibraryId;
       file.availablePaths = selectedPaths.map(path => ({id: String(path.id), name: path.path}));
       file.selectedPathId = this.defaultPathId ?? null;
-    }
-  }
-
-  get canApplyDefaults(): boolean {
-    return !!(this.defaultLibraryId && this.defaultPathId);
+    });
   }
 
   copyAll(includeThumbnail: boolean): void {
-    for (const fileUi of this.bookdropFileUis) {
+    Object.values(this.fileUiCache).forEach(fileUi => {
       const fetched = fileUi.file.fetchedMetadata;
       const form = fileUi.metadataForm;
-      if (!fetched) continue;
+      if (!fetched) return;
       for (const key of Object.keys(fetched)) {
         if (!includeThumbnail && key === 'thumbnailUrl') continue;
         const value = fetched[key as keyof typeof fetched];
@@ -150,11 +224,11 @@ export class BookdropFileReviewComponent implements OnInit {
         }
       }
       this.onMetadataCopied(fileUi.file.id, true);
-    }
+    });
   }
 
   resetAll(): void {
-    for (const fileUi of this.bookdropFileUis) {
+    Object.values(this.fileUiCache).forEach(fileUi => {
       const original = fileUi.file.originalMetadata;
       fileUi.metadataForm.patchValue({
         title: original.title || null,
@@ -163,41 +237,76 @@ export class BookdropFileReviewComponent implements OnInit {
         categories: [...(original.categories ?? [])].sort(),
         publisher: original.publisher || null,
         publishedDate: original.publishedDate || null,
-        isbn10: original.isbn10 || null,
-        isbn13: original.isbn13 || null,
-        description: original.description || null,
-        pageCount: original.pageCount || null,
-        language: original.language || null,
-        asin: original.asin || null,
-        amazonRating: original.amazonRating || null,
-        amazonReviewCount: original.amazonReviewCount || null,
-        goodreadsId: original.goodreadsId || null,
-        goodreadsRating: original.goodreadsRating || null,
-        goodreadsReviewCount: original.goodreadsReviewCount || null,
-        hardcoverId: original.hardcoverId || null,
-        hardcoverRating: original.hardcoverRating || null,
-        hardcoverReviewCount: original.hardcoverReviewCount || null,
-        googleId: original.googleId || null,
-        comicvineId: original.comicvineId || null,
-        seriesName: original.seriesName || null,
-        seriesNumber: original.seriesNumber || null,
-        seriesTotal: original.seriesTotal || null,
+        isbn10: original.isbn10 ?? null,
+        isbn13: original.isbn13 ?? null,
+        description: original.description ?? null,
+        pageCount: original.pageCount ?? null,
+        language: original.language ?? null,
+        asin: original.asin ?? null,
+        amazonRating: original.amazonRating ?? null,
+        amazonReviewCount: original.amazonReviewCount ?? null,
+        goodreadsId: original.goodreadsId ?? null,
+        goodreadsRating: original.goodreadsRating ?? null,
+        goodreadsReviewCount: original.goodreadsReviewCount ?? null,
+        hardcoverId: original.hardcoverId ?? null,
+        hardcoverRating: original.hardcoverRating ?? null,
+        hardcoverReviewCount: original.hardcoverReviewCount ?? null,
+        googleId: original.googleId ?? null,
+        comicvineId: original.comicvineId ?? null,
+        seriesName: original.seriesName ?? null,
+        seriesNumber: original.seriesNumber ?? null,
+        seriesTotal: original.seriesTotal ?? null,
         thumbnailUrl: this.urlHelper.getBookdropCoverUrl(fileUi.file.id),
       });
       fileUi.copiedFields = {};
       fileUi.savedFields = {};
-    }
+    });
     this.copiedFlags = {};
   }
 
-  get canFinalize(): boolean {
-    return this.bookdropFileUis.length > 0 &&
-      this.bookdropFileUis.every(file => file.selectedLibraryId && file.selectedPathId);
+  selectAll(selected: boolean): void {
+    if (selected) {
+      this.selectAllAcrossPages = true;
+      this.excludedFiles.clear();
+      Object.values(this.fileUiCache).forEach(file => file.selected = true);
+      this.bookdropFileUis.forEach(file => file.selected = true);
+    } else {
+      this.selectAllAcrossPages = false;
+      this.excludedFiles.clear();
+      Object.values(this.fileUiCache).forEach(file => file.selected = false);
+      this.bookdropFileUis.forEach(file => file.selected = false);
+    }
+  }
+
+  toggleFileSelection(fileId: number, selected: boolean): void {
+    if (this.selectAllAcrossPages) {
+      if (!selected) {
+        this.excludedFiles.add(fileId);
+      } else {
+        this.excludedFiles.delete(fileId);
+      }
+      const cachedFile = this.fileUiCache[fileId];
+      if (cachedFile) cachedFile.selected = selected;
+    } else {
+      const cachedFile = this.fileUiCache[fileId];
+      if (cachedFile) cachedFile.selected = selected;
+    }
+    this.syncCurrentPageSelection();
   }
 
   confirmFinalize(): void {
+    const selectedCount = this.selectedCount;
+    if (selectedCount === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No files selected',
+        detail: 'Please select files to finalize.',
+      });
+      return;
+    }
+
     this.confirmationService.confirm({
-      message: 'Are you sure you want to finalize the import?',
+      message: `Are you sure you want to finalize the import of ${selectedCount} file${selectedCount !== 1 ? 's' : ''}?`,
       header: 'Confirm Finalize',
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Yes',
@@ -206,9 +315,123 @@ export class BookdropFileReviewComponent implements OnInit {
     });
   }
 
+  confirmDelete(): void {
+    const selectedCount = this.selectedCount;
+    if (selectedCount === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No files selected',
+        detail: 'Please select files to delete.',
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${selectedCount} selected Bookdrop file${selectedCount !== 1 ? 's' : ''}? This action cannot be undone.`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        const payload: any = {
+          selectAll: this.selectAllAcrossPages,
+        };
+
+        if (this.selectAllAcrossPages) {
+          payload.excludedIds = Array.from(this.excludedFiles);
+        } else {
+          payload.selectedIds = Object.values(this.fileUiCache)
+            .filter(file => file.selected)
+            .map(file => file.file.id);
+        }
+
+        this.bookdropFileService.discardFiles(payload).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Files Deleted',
+              detail: 'Selected Bookdrop files were deleted successfully.',
+            });
+
+            const toDelete = Object.values(this.fileUiCache).filter(file => {
+              return this.selectAllAcrossPages
+                ? !this.excludedFiles.has(file.file.id)
+                : file.selected;
+            });
+            toDelete.forEach(file => delete this.fileUiCache[file.file.id]);
+
+            this.selectAllAcrossPages = false;
+            this.excludedFiles.clear();
+            this.loadPage(this.currentPage);
+          },
+          error: (err) => {
+            console.error('Error deleting files:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Delete Failed',
+              detail: 'An error occurred while deleting Bookdrop files.',
+            });
+          },
+        });
+      },
+    });
+  }
+
+  private areAllSelectedHaveLibraryAndPath(): boolean {
+    return Object.values(this.fileUiCache).every(file => {
+      if (this.selectAllAcrossPages) {
+        if (this.excludedFiles.has(file.file.id)) return true;
+        return file.selectedLibraryId != null && file.selectedPathId != null;
+      } else {
+        if (!file.selected) return true;
+        return file.selectedLibraryId != null && file.selectedPathId != null;
+      }
+    });
+  }
+
+  private syncCurrentPageSelection(): void {
+    if (this.selectAllAcrossPages) {
+      this.bookdropFileUis.forEach(fileUi => {
+        fileUi.selected = !this.excludedFiles.has(fileUi.file.id);
+        const cachedFile = this.fileUiCache[fileUi.file.id];
+        if (cachedFile) cachedFile.selected = fileUi.selected;
+      });
+    }
+  }
+
   private finalizeImport(): void {
     this.saving = true;
-    const payload = this.buildFinalizePayload();
+
+    const selectedFiles = Object.values(this.fileUiCache).filter(file => {
+      if (this.selectAllAcrossPages) {
+        return !this.excludedFiles.has(file.file.id);
+      } else {
+        return file.selected;
+      }
+    });
+
+    const files = selectedFiles.map(fileUi => {
+      const rawMetadata = fileUi.metadataForm.value;
+      const metadata = {...rawMetadata};
+
+      if (metadata.thumbnailUrl?.includes('/api/bookdrop/')) {
+        delete metadata.thumbnailUrl;
+      }
+
+      return {
+        fileId: fileUi.file.id,
+        libraryId: Number(fileUi.selectedLibraryId),
+        pathId: Number(fileUi.selectedPathId),
+        metadata,
+      };
+    });
+
+    const payload: BookdropFinalizePayload = {
+      uploadPattern: this.uploadPattern,
+      selectAll: this.selectAllAcrossPages,
+      excludedIds: this.selectAllAcrossPages ? Array.from(this.excludedFiles) : undefined,
+      defaultLibraryId: this.defaultLibraryId ? Number(this.defaultLibraryId) : undefined,
+      defaultPathId: this.defaultPathId ? Number(this.defaultPathId) : undefined,
+      files,
+    };
 
     this.bookdropFileService.finalizeImport(payload).subscribe({
       next: (result: BookdropFinalizeResult) => {
@@ -225,12 +448,18 @@ export class BookdropFileReviewComponent implements OnInit {
           modal: true,
           closable: true,
           closeOnEscape: true,
-          data: {
-            results: result.results
-          }
+          data: {results: result.results},
         });
 
-        this.reloadPendingFiles();
+        const finalizedIds = new Set(files.map(f => f.fileId));
+        Object.keys(this.fileUiCache).forEach(idStr => {
+          const id = Number(idStr);
+          if (finalizedIds.has(id)) delete this.fileUiCache[id];
+        });
+
+        this.selectAllAcrossPages = false;
+        this.excludedFiles.clear();
+        this.loadPage(this.currentPage);
       },
       error: (err) => {
         console.error('Error finalizing import:', err);
@@ -241,70 +470,6 @@ export class BookdropFileReviewComponent implements OnInit {
         });
         this.saving = false;
       }
-    });
-  }
-
-  private buildFinalizePayload(): BookdropFinalizePayload {
-    return {
-      uploadPattern: this.uploadPattern,
-      files: this.bookdropFileUis.map((fileUi, index) => {
-        const rawMetadata = this.bookdropFileUis[index].metadataForm.value;
-        const metadata = {...rawMetadata};
-        if (metadata.thumbnailUrl?.includes('/api/bookdrop/')) {
-          delete metadata.thumbnailUrl;
-        }
-        return {
-          fileId: fileUi.file.id,
-          libraryId: Number(fileUi.selectedLibraryId),
-          pathId: Number(fileUi.selectedPathId),
-          metadata,
-        };
-      }),
-    };
-  }
-
-  private reloadPendingFiles(): void {
-    this.loading = true;
-    this.bookdropFileService.getPendingFiles()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: files => {
-          this.bookdropFileUis = files.map(file => this.createFileUI(file));
-          this.loading = false;
-          this.saving = false;
-        },
-        error: err => {
-          console.error('Error loading pending files:', err);
-          this.loading = false;
-          this.saving = false;
-        }
-      });
-  }
-
-  confirmDelete(): void {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete all Bookdrop files? This action cannot be undone.',
-      header: 'Confirm Delete',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.bookdropFileService.discardAllFile().subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Files Deleted',
-              detail: 'All Bookdrop files were deleted successfully.',
-            });
-            this.reloadPendingFiles();
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Delete Failed',
-              detail: 'An error occurred while deleting Bookdrop files.',
-            });
-          },
-        });
-      },
     });
   }
 
