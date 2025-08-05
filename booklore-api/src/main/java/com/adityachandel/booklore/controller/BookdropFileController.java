@@ -1,62 +1,40 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.mapper.BookdropFileMapper;
 import com.adityachandel.booklore.model.dto.BookdropFile;
 import com.adityachandel.booklore.model.dto.BookdropFileNotification;
 import com.adityachandel.booklore.model.dto.request.BookdropFinalizeRequest;
+import com.adityachandel.booklore.model.dto.request.BookdropSelectionRequest;
 import com.adityachandel.booklore.model.dto.response.BookdropFinalizeResult;
-import com.adityachandel.booklore.model.entity.BookdropFileEntity;
-import com.adityachandel.booklore.repository.BookdropFileRepository;
 import com.adityachandel.booklore.service.bookdrop.BookDropService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/bookdrop")
 public class BookdropFileController {
 
-    private final BookdropFileRepository repository;
-    private final BookdropFileMapper mapper;
     private final BookDropService bookDropService;
 
     @GetMapping("/notification")
     public BookdropFileNotification getSummary() {
-        long pendingCount = repository.countByStatus(BookdropFileEntity.Status.PENDING_REVIEW);
-        long totalCount = repository.count();
-
-        return new BookdropFileNotification(
-                (int) pendingCount,
-                (int) totalCount,
-                Instant.now().toString()
-        );
+        return bookDropService.getFileNotificationSummary();
     }
 
     @GetMapping("/files")
-    public List<BookdropFile> getFilesByStatus(@RequestParam(required = false) String status) {
-        if ("pending".equalsIgnoreCase(status)) {
-            return repository.findAllByStatus(BookdropFileEntity.Status.PENDING_REVIEW)
-                    .stream()
-                    .map(mapper::toDto)
-                    .collect(Collectors.toList());
-        }
-        return repository.findAll()
-                .stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<BookdropFile> getFilesByStatus(@RequestParam(required = false) String status, Pageable pageable) {
+        return bookDropService.getFilesByStatus(status, pageable);
     }
 
-    @DeleteMapping("/files")
-    public ResponseEntity<Void> discardAllFiles() {
-        bookDropService.discardAllFiles();
+    @PostMapping("/files/discard")
+    public ResponseEntity<Void> discardSelectedFiles(@RequestBody BookdropSelectionRequest request) {
+        bookDropService.discardSelectedFiles(request.isSelectAll(), request.getExcludedIds(), request.getSelectedIds());
         return ResponseEntity.ok().build();
     }
 
@@ -69,12 +47,11 @@ public class BookdropFileController {
     @GetMapping("/{bookdropId}/cover")
     public ResponseEntity<Resource> getBookdropCover(@PathVariable long bookdropId) {
         Resource file = bookDropService.getBookdropCover(bookdropId);
-        if (file == null) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok()
+        return (file != null)
+                ? ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=cover.jpg")
                 .contentType(MediaType.IMAGE_JPEG)
-                .body(file);
+                .body(file)
+                : ResponseEntity.noContent().build();
     }
 }

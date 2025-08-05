@@ -12,7 +12,11 @@ export enum BookdropFileStatus {
 
 export interface BookdropFinalizePayload {
   uploadPattern: string;
-  files: {
+  selectAll?: boolean;
+  excludedIds?: number[];
+  defaultLibraryId?: number;
+  defaultPathId?: number;
+  files?: {
     fileId: number;
     libraryId: number;
     pathId: number;
@@ -43,22 +47,27 @@ export interface BookdropFinalizeResult {
   results: BookdropFileResult[];
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+}
+
+@Injectable({providedIn: 'root'})
 export class BookdropFileTaskService {
   private readonly url = `${API_CONFIG.BASE_URL}/api/bookdrop`;
   private http = inject(HttpClient);
 
-  getPendingFiles(): Observable<BookdropFile[]> {
-    return this.http.get<BookdropFile[]>(`${this.url}/files?status=pending`);
+  getPendingFiles(page: number = 0, size: number = 50): Observable<Page<BookdropFile>> {
+    return this.http.get<Page<BookdropFile>>(`${this.url}/files?status=pending&page=${page}&size=${size}`);
   }
 
   finalizeImport(payload: BookdropFinalizePayload): Observable<BookdropFinalizeResult> {
     return this.http.post<BookdropFinalizeResult>(`${this.url}/imports/finalize`, payload);
   }
 
-  discardAllFile(): Observable<void> {
-    return this.http.delete<void>(`${this.url}/files`);
+  discardFiles(payload: { selectAll: boolean; excludedIds?: number[]; selectedIds?: number[] }): Observable<void> {
+    return this.http.post<void>(`${this.url}/files/discard`, payload);
   }
 }

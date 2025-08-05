@@ -93,7 +93,7 @@ public class BookdropEventHandlerService {
                 }
 
                 if (bookdropFileRepository.findByFilePath(filePath).isPresent()) {
-                    log.info("File already processed in bookdrop, ignoring: {}", filePath);
+                    log.info("File already exists in Bookdrop and is pending review or acceptance: {}", filePath);
                     return;
                 }
 
