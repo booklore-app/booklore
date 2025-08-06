@@ -11,6 +11,7 @@ import {AuthInitializationService} from './auth-initialization-service';
 import {AppConfigService} from './core/service/app-config.service';
 import {MetadataBatchProgressNotification} from './core/model/metadata-batch-progress.model';
 import {MetadataProgressService} from './core/service/metadata-progress-service';
+import {BookdropFileService, BookdropFileNotification} from './bookdrop/bookdrop-file.service';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,7 @@ export class AppComponent implements OnInit {
   private rxStompService = inject(RxStompService);
   private notificationEventService = inject(NotificationEventService);
   private metadataProgressService = inject(MetadataProgressService);
+  private bookdropFileService = inject(BookdropFileService);
   private appConfigService = inject(AppConfigService);
 
   ngOnInit(): void {
@@ -60,6 +62,11 @@ export class AppComponent implements OnInit {
     this.rxStompService.watch('/topic/log').subscribe((message: Message) => {
       const logNotification = parseLogNotification(message.body);
       this.notificationEventService.handleNewNotification(logNotification);
+    });
+
+    this.rxStompService.watch('/topic/bookdrop-file').subscribe((message: Message) => {
+      const notification = JSON.parse(message.body) as BookdropFileNotification;
+      this.bookdropFileService.handleIncomingFile(notification);
     });
   }
 }

@@ -1,7 +1,6 @@
 package com.adityachandel.booklore.service.fileprocessor;
 
 import com.adityachandel.booklore.mapper.BookMapper;
-import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.BookEntity;
@@ -16,14 +15,13 @@ import com.adityachandel.booklore.util.FileUtils;
 import io.documentnode.epub4j.domain.Resource;
 import io.documentnode.epub4j.epub.EpubReader;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.Instant;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,13 +47,13 @@ public class EpubProcessor extends AbstractFileProcessor implements BookFileProc
     }
 
     @Override
-    public Book processNewFile(LibraryFile libraryFile) {
+    public BookEntity processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.EPUB);
         setBookMetadata(bookEntity);
         if (generateCover(bookEntity)) {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
         }
-        return finishAndReturnBook(bookEntity);
+        return bookEntity;
     }
 
     @Override
@@ -93,6 +91,11 @@ public class EpubProcessor extends AbstractFileProcessor implements BookFileProc
             log.error("Error generating cover for EPUB '{}': {}", bookEntity.getFileName(), e.getMessage(), e);
             return false;
         }
+    }
+
+    @Override
+    public List<BookFileType> getSupportedTypes() {
+        return List.of(BookFileType.EPUB);
     }
 
     private void setBookMetadata(BookEntity bookEntity) {

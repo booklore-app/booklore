@@ -1,30 +1,28 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { LayoutService } from '../layout-main/service/app.layout.service';
-import { Router, RouterLink } from '@angular/router';
-import { DialogService as PrimeDialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { LibraryCreatorComponent } from '../../../book/components/library-creator/library-creator.component';
-import { TooltipModule } from 'primeng/tooltip';
-import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { BookSearcherComponent } from '../../../book/components/book-searcher/book-searcher.component';
-import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
-import { NotificationEventService } from '../../../shared/websocket/notification-event.service';
-import { Button } from 'primeng/button';
-import { StyleClass } from 'primeng/styleclass';
-import { Divider } from 'primeng/divider';
-import { ThemeConfiguratorComponent } from '../theme-configurator/theme-configurator.component';
-import { BookUploaderComponent } from '../../../utilities/component/book-uploader/book-uploader.component';
-import { AuthService } from '../../../core/service/auth.service';
-import { UserService } from '../../../settings/user-management/user.service';
-import { UserProfileDialogComponent } from '../../../settings/global-preferences/user-profile-dialog/user-profile-dialog.component';
-import { GithubSupportDialog } from '../../../github-support-dialog/github-support-dialog';
-import { Popover } from 'primeng/popover';
-import { MetadataProgressService } from '../../../core/service/metadata-progress-service';
-import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-import { MetadataBatchProgressNotification } from '../../../core/model/metadata-batch-progress.model';
-import { UnifiedNotificationBoxComponent } from '../../../core/component/unified-notification-popover-component/unified-notification-popover-component';
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {MenuItem} from 'primeng/api';
+import {LayoutService} from '../layout-main/service/app.layout.service';
+import {Router, RouterLink} from '@angular/router';
+import {DialogService as PrimeDialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {TooltipModule} from 'primeng/tooltip';
+import {FormsModule} from '@angular/forms';
+import {InputTextModule} from 'primeng/inputtext';
+import {BookSearcherComponent} from '../../../book/components/book-searcher/book-searcher.component';
+import {AsyncPipe, NgClass, NgStyle} from '@angular/common';
+import {NotificationEventService} from '../../../shared/websocket/notification-event.service';
+import {Button} from 'primeng/button';
+import {StyleClass} from 'primeng/styleclass';
+import {Divider} from 'primeng/divider';
+import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
+import {AuthService} from '../../../core/service/auth.service';
+import {UserService} from '../../../settings/user-management/user.service';
+import {Popover} from 'primeng/popover';
+import {MetadataProgressService} from '../../../core/service/metadata-progress-service';
+import {takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {MetadataBatchProgressNotification} from '../../../core/model/metadata-batch-progress.model';
+import {UnifiedNotificationBoxComponent} from '../../../core/component/unified-notification-popover-component/unified-notification-popover-component';
+import {BookdropFileService} from '../../../bookdrop/bookdrop-file.service';
+import {DialogLauncherService} from '../../../dialog-launcher.service';
 
 @Component({
   selector: 'app-topbar',
@@ -62,9 +60,13 @@ export class AppTopBarComponent implements OnDestroy {
   hasActiveOrCompletedTasks = false;
   showPulse = false;
   hasAnyTasks = false;
+  hasPendingBookdropFiles = false;
 
   private eventTimer: any;
   private destroy$ = new Subject<void>();
+
+  private latestTasks: { [taskId: string]: MetadataBatchProgressNotification } = {};
+  private latestHasPendingFiles = false;
 
   constructor(
     public layoutService: LayoutService,
@@ -73,7 +75,9 @@ export class AppTopBarComponent implements OnDestroy {
     private router: Router,
     private authService: AuthService,
     protected userService: UserService,
-    private metadataProgressService: MetadataProgressService
+    private metadataProgressService: MetadataProgressService,
+    private bookdropFileService: BookdropFileService,
+    private dialogLauncher: DialogLauncherService
   ) {
     this.subscribeToMetadataProgress();
     this.subscribeToNotifications();
@@ -81,9 +85,19 @@ export class AppTopBarComponent implements OnDestroy {
     this.metadataProgressService.activeTasks$
       .pipe(takeUntil(this.destroy$))
       .subscribe((tasks) => {
+        this.latestTasks = tasks;
         this.hasAnyTasks = Object.keys(tasks).length > 0;
-        this.updateCompletedTaskCount(tasks);
+        this.updateCompletedTaskCount();
         this.updateTaskVisibility(tasks);
+      });
+
+    this.bookdropFileService.hasPendingFiles$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((hasPending) => {
+        this.latestHasPendingFiles = hasPending;
+        this.hasPendingBookdropFiles = hasPending;
+        this.updateCompletedTaskCount();
+        this.updateTaskVisibilityWithBookdrop();
       });
   }
 
@@ -100,19 +114,19 @@ export class AppTopBarComponent implements OnDestroy {
   }
 
   openGithubSupportDialog(): void {
-    this.openDialog(GithubSupportDialog, 'Support BookLore on GitHub', '25%');
+    this.dialogLauncher.openGithubSupportDialog();
   }
 
   openLibraryCreatorDialog(): void {
-    this.openDialog(LibraryCreatorComponent, 'Create New Library', '15%');
+    this.dialogLauncher.openLibraryCreatorDialog();
   }
 
   openFileUploadDialog(): void {
-    this.openDialog(BookUploaderComponent, 'Book Uploader', '10%');
+    this.dialogLauncher.openFileUploadDialog();
   }
 
   openUserProfileDialog(): void {
-    this.openDialog(UserProfileDialogComponent, 'User Profile Information', '10%');
+    this.dialogLauncher.openUserProfileDialog();
   }
 
   navigateToSettings() {
@@ -121,15 +135,6 @@ export class AppTopBarComponent implements OnDestroy {
 
   logout() {
     this.authService.logout();
-  }
-
-  private openDialog(component: any, header: string, top: string) {
-    this.ref = this.dialogService.open(component, {
-      header,
-      modal: true,
-      closable: true,
-      style: { position: 'absolute', top },
-    });
   }
 
   private subscribeToMetadataProgress() {
@@ -156,40 +161,45 @@ export class AppTopBarComponent implements OnDestroy {
     }, 4000);
   }
 
-  private updateCompletedTaskCount(tasks: { [taskId: string]: MetadataBatchProgressNotification }) {
-    this.completedTaskCount = Object.values(tasks).filter(task => task.status === 'COMPLETED').length;
+  private updateCompletedTaskCount() {
+    const completedMetadataTasks = Object.values(this.latestTasks).filter(task => task.status === 'COMPLETED').length;
+    const bookdropFileTaskCount = this.latestHasPendingFiles ? 1 : 0;
+    this.completedTaskCount = completedMetadataTasks + bookdropFileTaskCount;
   }
 
   private updateTaskVisibility(tasks: { [taskId: string]: MetadataBatchProgressNotification }) {
     this.hasActiveOrCompletedTasks =
       this.progressHighlight || this.completedTaskCount > 0 || Object.keys(tasks).length > 0;
+    this.updateTaskVisibilityWithBookdrop();
+  }
+
+  private updateTaskVisibilityWithBookdrop() {
+    this.hasActiveOrCompletedTasks = this.hasActiveOrCompletedTasks || this.hasPendingBookdropFiles;
   }
 
   get iconClass(): string {
-    if (!this.hasAnyTasks) return 'pi-wave-pulse';
     if (this.progressHighlight) return 'pi-spinner spin';
-    if (this.showPulse) return 'pi-wave-pulse';
-    if (this.completedTaskCount > 0) return 'pi-bell';
+    if (this.iconPulsating) return 'pi-wave-pulse';
+    if (this.completedTaskCount > 0 || this.hasPendingBookdropFiles) return 'pi-bell';
     return 'pi-wave-pulse';
   }
 
   get iconColor(): string {
     if (this.progressHighlight) return 'yellow';
     if (this.showPulse) return 'red';
-    if (this.completedTaskCount > 0) return 'red';
-    return 'inherit'; // Default to theme/parent styling
+    if (this.completedTaskCount > 0 || this.hasPendingBookdropFiles) return 'orange';
+    return 'inherit';
   }
 
   get iconPulsating(): boolean {
-    return !this.progressHighlight && this.showPulse;
+    return !this.progressHighlight && (this.showPulse);
   }
 
   get shouldShowNotificationBadge(): boolean {
     return (
-      this.completedTaskCount > 0 &&
+      (this.completedTaskCount > 0 || this.hasPendingBookdropFiles) &&
       !this.progressHighlight &&
-      !this.showPulse &&
-      this.hasAnyTasks
+      !this.showPulse
     );
   }
 }

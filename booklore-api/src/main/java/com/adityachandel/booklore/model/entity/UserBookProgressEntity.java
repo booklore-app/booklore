@@ -63,4 +63,7 @@ public class UserBookProgressEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "read_status")
     private ReadStatus readStatus;
+
+    @Column(name = "date_finished")
+    private Instant dateFinished;
 }

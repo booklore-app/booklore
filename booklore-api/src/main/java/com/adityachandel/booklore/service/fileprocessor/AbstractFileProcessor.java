@@ -18,7 +18,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Slf4j
-public abstract class AbstractFileProcessor implements FileProcessor {
+public abstract class AbstractFileProcessor implements BookFileProcessor {
 
     protected final BookRepository bookRepository;
     protected final BookCreatorService bookCreatorService;
@@ -38,35 +38,30 @@ public abstract class AbstractFileProcessor implements FileProcessor {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public Book processFile(LibraryFile libraryFile, boolean forceProcess) {
+    public Book processFile(LibraryFile libraryFile) {
         Path filePath = libraryFile.getFullPath();
         String fileName = filePath.getFileName().toString();
         String hash = FileFingerprint.generateHash(filePath);
 
-        Optional<Book> existing = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, forceProcess, bookRepository, bookMapper);
+        Optional<Book> existing = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, bookRepository, bookMapper);
         if (existing.isPresent()) {
             return existing.get();
         }
-        if (!forceProcess) {
-            Optional<BookEntity> byName = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
-            if (byName.isPresent()) {
-                return bookMapper.toBook(byName.get());
-            }
+        Optional<BookEntity> byName = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
+        if (byName.isPresent()) {
+            return bookMapper.toBook(byName.get());
         }
-        return processNewFile(libraryFile);
+
+        BookEntity book = processNewFile(libraryFile);
+        book.setCurrentHash(hash);
+
+        Float score = metadataMatchService.calculateMatchScore(book);
+        book.setMetadataMatchScore(score);
+
+        bookCreatorService.saveConnections(book);
+
+        return bookMapper.toBook(book);
     }
 
-    protected abstract Book processNewFile(LibraryFile libraryFile);
-
-    protected Book finishAndReturnBook(BookEntity bookEntity) {
-        String hash = FileFingerprint.generateHash(bookEntity.getFullFilePath());
-        bookEntity.setCurrentHash(hash);
-
-        Float score = metadataMatchService.calculateMatchScore(bookEntity);
-        bookEntity.setMetadataMatchScore(score);
-
-        bookCreatorService.saveConnections(bookEntity);
-
-        return bookMapper.toBook(bookEntity);
-    }
+    protected abstract BookEntity processNewFile(LibraryFile libraryFile);
 }

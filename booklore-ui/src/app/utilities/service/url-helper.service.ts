@@ -17,4 +17,8 @@ export class UrlHelperService {
   getBackupCoverUrl(bookId: number): string {
     return `${this.baseUrl}/api/v1/books/${bookId}/backup-cover`;
   }
+
+  getBookdropCoverUrl(bookdropId: number): string {
+    return `${this.baseUrl}/api/bookdrop/${bookdropId}/cover`;
+  }
 }

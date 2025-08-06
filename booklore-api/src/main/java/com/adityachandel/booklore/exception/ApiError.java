@@ -47,7 +47,8 @@ public enum ApiError {
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "%s"),
     FILE_DELETION_DISABLED(HttpStatus.BAD_REQUEST, "File deletion is disabled"),
     UNSUPPORTED_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "%s"),
-    CONFLICT(HttpStatus.CONFLICT, "%s");
+    CONFLICT(HttpStatus.CONFLICT, "%s"),
+    FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "File not found: %s");
 
     private final HttpStatus status;
     private final String message;

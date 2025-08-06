@@ -63,7 +63,7 @@ export class BookService {
     return currentState.books.filter(book => idSet.has(+book.id));
   }
 
-  updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
+  updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | null | undefined>, shelvesToUnassign: Set<number | null | undefined>): Observable<Book[]> {
     const requestPayload = {
       bookIds: Array.from(bookIds),
       shelvesToAssign: Array.from(shelvesToAssign),
@@ -408,18 +408,18 @@ export class BookService {
     );
   }
 
-  updateBookReadStatus(bookIds: number | number[], status: ReadStatus): Observable<void> {
+  updateBookReadStatus(bookIds: number | number[], status: ReadStatus): Observable<Book[]> {
     const ids = Array.isArray(bookIds) ? bookIds : [bookIds];
-    return this.http.put<void>(`${this.url}/read-status`, {ids, status}).pipe(
-      tap(() => {
-        const currentState = this.bookStateSubject.value;
-        if (!currentState.books) return;
-        const updatedBooks = currentState.books.map(book =>
-          ids.includes(book.id) ? {...book, readStatus: status} : book
-        );
-        this.bookStateSubject.next({...currentState, books: updatedBooks});
+    return this.http.put<Book[]>(`${this.url}/read-status`, {ids, status}).pipe(
+      tap(updatedBooks => {
+        // Update the books in the state with the actual response from the API
+        updatedBooks.forEach(updatedBook => this.handleBookUpdate(updatedBook));
       })
     );
+  }
+
+  getMagicShelfBookCount(number: number) {
+
   }
 
 

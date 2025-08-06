@@ -1,4 +1,4 @@
-<div class="h-[calc(100vh-6.1rem)] rounded-xl bg-[var(--card-background)] flex flex-col">
+<div class="h-[calc(100dvh-6.1rem)] rounded-xl bg-[var(--card-background)] flex flex-col">
 
   <div class="flex items-center justify-between px-4 py-4">
     <span class="text font-semibold">Filter Mode</span>
@@ -12,7 +12,6 @@
       styleClass="h-8"></p-selectButton>
   </div>
 
-  <!-- Outer scroll -->
   <div class="flex-1 overflow-y-auto pb-4 pr-1" style="overscroll-behavior: contain;">
     <p-accordion [value]="expandedPanels">
       @for (filterType of filterTypes; track filterType; let i = $index) {
@@ -30,7 +29,6 @@
 
           <p-accordion-content>
             @if (filterStreams[filterType] | async; as filters) {
-              <!-- Inner scrollable content with nested scroll behavior -->
               <div
                 class="max-h-[27.5rem] overflow-y-auto overscroll-contain pr-1"
                 style="overscroll-behavior: contain;">
@@ -38,8 +36,7 @@
                   <div
                     class="cursor-pointer transition-colors duration-200 ease-in-out pb-1 flex items-center gap-2"
                     [ngClass]="{
-                      'text-[var(--primary-color)]':
-                        activeFilters[filterType]?.includes(filter.value?.id || filter.value)
+                      'text-[var(--primary-color)]': activeFilters[filterType]?.includes(filter.value?.id || filter.value)
                     }"
                     (click)="handleFilterClick(filterType, filter.value?.id || filter.value)">
                     <p-badge [value]="filter.bookCount"></p-badge>

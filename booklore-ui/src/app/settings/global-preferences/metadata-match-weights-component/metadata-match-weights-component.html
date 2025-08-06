@@ -36,15 +36,16 @@
     <form [formGroup]="form">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6">
         @for (key of orderedKeys; track key) {
-          <div class="flex items-center gap-2">
+          <div class="flex text-sm items-center gap-2">
             <label class="capitalize w-full max-w-[150px]">
               {{ labelMap[key] }}
             </label>
-            <input
-              type="number"
-              pInputText
+            <p-inputNumber
               [formControlName]="key"
-              class="w-20 text-center"
+              [min]="0"
+              [max]="10"
+              fluid
+              [showButtons]="true"
             />
           </div>
         }

@@ -11,7 +11,7 @@ export enum FetchedMetadataProposalStatus {
   REJECTED = 'REJECTED',
 }
 
-export interface FetchedProposalDto {
+export interface FetchedProposal {
   proposalId: number;
   taskId: string;
   bookId: number;
@@ -32,7 +32,7 @@ export interface MetadataFetchTask {
   initiatedBy: string;
   errorMessage: string | null;
 
-  proposals: FetchedProposalDto[];
+  proposals: FetchedProposal[];
 }
 
 @Injectable({

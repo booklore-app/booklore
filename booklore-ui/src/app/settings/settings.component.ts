@@ -11,6 +11,7 @@ import {AuthenticationSettingsComponent} from '../core/security/oauth2-managemen
 import {ViewPreferencesParentComponent} from './view-preferences-parent/view-preferences-parent.component';
 import {ReaderPreferences} from './reader-preferences/reader-preferences.component';
 import {MetadataSettingsComponent} from './metadata-settings-component/metadata-settings-component';
+import {OpdsSettingsComponent} from './global-preferences/opds-settings/opds-settings.component';
 
 export enum SettingsTab {
   ReaderSettings = 'reader-settings',
@@ -19,7 +20,8 @@ export enum SettingsTab {
   EmailSettings = 'email-settings',
   MetadataSettings = 'metadata-settings',
   ApplicationSettings = 'app-settings',
-  AuthenticationSettings = 'auth-settings'
+  AuthenticationSettings = 'auth-settings',
+  Opds = 'opds-settings'
 }
 
 @Component({
@@ -37,8 +39,9 @@ export enum SettingsTab {
     AuthenticationSettingsComponent,
     ViewPreferencesParentComponent,
     ReaderPreferences,
-    MetadataSettingsComponent
-],
+    MetadataSettingsComponent,
+    OpdsSettingsComponent
+  ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })

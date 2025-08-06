@@ -1,0 +1,31 @@
+.thumbnail {
+  width: 10.46875rem;
+  height: 14.65625rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+}
+
+.arrow-button {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.green-outlined-button {
+  --p-button-outlined-primary-border-color: forestgreen;
+  --p-button-outlined-primary-color: forestgreen;
+}
+
+.red-outlined-button {
+  --p-button-outlined-primary-border-color: #E32636;
+  --p-button-outlined-primary-color: #E32636;
+}
+
+.outlined-input-green {
+  border: 0.75px solid forestgreen !important;
+}
+
+::ng-deep .p-inputchips {
+  width: 100% !important;
+}

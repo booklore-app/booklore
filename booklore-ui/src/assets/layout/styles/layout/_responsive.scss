@@ -21,7 +21,7 @@
         transform: translateX(-100%);
         left: 0;
         top: 0;
-        height: 100vh;
+        height: 100dvh;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
       }
@@ -65,14 +65,14 @@
 
   .layout-wrapper {
     .layout-main-container {
-      padding: 4.75rem 0.75rem 0.75rem 0.75rem;
+      padding: 4.4rem 0.5rem 0.5rem 0.5rem;
     }
 
     .layout-sidebar {
       transform: translateX(-100%);
       left: 0;
       top: 0;
-      height: 100vh;
+      height: 100dvh;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
     }

@@ -37,11 +37,7 @@ public class MonitoringService {
     private int pauseCount = 0;
     private final Object pauseLock = new Object();
 
-    public MonitoringService(
-            LibraryFileEventProcessor libraryFileEventProcessor,
-            WatchService watchService,
-            MonitoringTask monitoringTask
-    ) {
+    public MonitoringService(LibraryFileEventProcessor libraryFileEventProcessor, WatchService watchService, MonitoringTask monitoringTask) {
         this.libraryFileEventProcessor = libraryFileEventProcessor;
         this.watchService = watchService;
         this.monitoringTask = monitoringTask;

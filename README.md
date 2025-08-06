@@ -4,6 +4,8 @@
 ![Issues](https://img.shields.io/github/issues/adityachandelgit/BookLore)
 ![Stars](https://img.shields.io/github/stars/adityachandelgit/BookLore?style=social)
 [![Join us on Discord](https://img.shields.io/badge/Chat-Discord-blue?logo=discord&style=flat)](https://discord.gg/Ee5hd458Uz)
+[![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/booklore?label=Open%20Collective&logo=opencollective&color=blue)](https://opencollective.com/booklore)
+[![Venmo](https://img.shields.io/badge/Venmo-Donate-blue?logo=venmo)](https://venmo.com/AdityaChandel)
 
 BookLore is a self-hosted web app for organizing and managing your personal book collection. It provides an intuitive interface to browse, read, and track your progress across PDFs and eBooks. With robust metadata management, multi-user support, and a sleek, modern UI, BookLore makes it easy to build and explore your personal library.
 
@@ -11,23 +13,48 @@ BookLore is a self-hosted web app for organizing and managing your personal book
 
 ## ✨ Key Features
 
-- 📚 **Organized Book Management** - Categorize books with **Libraries** and **Shelves** for easy discovery and structured organization.
-- 🧠 **Smart Metadata Handling** - Automatically fetch book details from **Goodreads**, **Amazon**, and **Google Books**, or edit them manually with fine-grained control.
-- 👥 **Multi-User Support** - Admins can create accounts, assign libraries, and manage permissions for metadata edits, uploads, and downloads.
-- 📖 **Built-in PDF & ePub Reader** - A fast, feature-rich reader for PDFs and ePubs, with customizable reading settings and a clean UI.
-- 🌐 **OPDS 1.2 Support** - Browse and download books through the **Open Publication Distribution System** – compatible with many reading apps.
-- 🔐 **Optional OIDC Authentication** - Secure access with **OpenID Connect**, supporting both local JWT authentication and external providers like **Authentik**.
-- 📤 **Multi-Book Uploads** - Upload multiple books at once with metadata auto-detection and file organization.
-- 📧 **Send Books via Email** - Share books directly with others by sending them via email – quick and easy.
-- 🚀 **Continuous Improvements** - Frequent updates with new features, performance enhancements, and UI improvements. BookLore is perfect for self-hosters who want complete control over their digital library. Stay tuned for updates!
-## 🎥 Video Guides & Tutorials
+- 📚 **Powerful Book Organization**: Keep your library organized with Libraries and Shelves. Sort by genre, author, or mood to find books easily.
+- 🧠 **Intelligent Metadata Management**: Fetch rich metadata from Goodreads, Amazon, Google Books, Hardcover, and more, or fine-tune details with the advanced editor.
+- 👥 **Multi-User Access with Permissions**: Add users, assign libraries, and control who can edit, upload, or download. Great for families, friends, or teams.
+- 📖 **Built-in PDF, ePub, and CBX Reader**: Enjoy a smooth, distraction-free reading experience in your browser, with theme and setting options.
+- 🌐 **OPDS 1.2 Integration**: Connect BookLore to favorite reading apps with full OPDS support for seamless downloads.
+- 🔐 **Flexible Authentication**: Secure your library with optional OIDC login (Authentik, Pocket ID) or local JWT, your choice.
+- 📤 **Smart Batch Upload with BookDrop Folder**: Drop dozens of books into the BookDrop folder; BookLore scans, organizes, and fetches metadata automatically.
+- 📧 **Send Books by Email**: Easily share books by sending them directly via email from within BookLore—one click delivery.
+- 📱 **Mobile-Optimized UI**: Responsive design for phones and tablets lets you manage your library anywhere.
+- 🔄 **Open Source & Self-Hosted**: Full control of your digital library with open-source, self-hosted BookLore.
+- 🚀 **Active Development**: Continuous improvements with regular updates to features, UI, and performance.
 
-For a step-by-step walkthrough, check out the official BookLore video guides on YouTube:
+## 💖 Support the Project
 
-📺 [BookLore Tutorials – YouTube](https://www.youtube.com/watch?v=UMrn_fIeFRo&list=PLi0fq0zaM7lqY7dX0R66jQtKW64z4_Tdz)
+If you find **BookLore** helpful, please consider supporting its development:
 
-These videos cover deployment, configuration, and feature highlights to help you get started quickly.
+- ⭐ Star this repository to show your appreciation and help others discover it.
+- 💸 Contribute via [Open Collective](https://opencollective.com/booklore) to help fund development, hosting, and testing costs.
+  > 📌 Currently raising funds for a **Kobo device** to implement and test native Kobo sync support.  
+  > 💡 [Support the Kobo Sync Bounty →](https://opencollective.com/booklore/projects/kobo-device-for-testing)
+- ⚡ Prefer one-time support? You can also donate via [Venmo](https://venmo.com/AdityaChandel).
 
+## 🌐 Live Demo: Experience BookLore in Action
+
+Explore the full capabilities of BookLore firsthand at [booklore-demo.adityachandel.top](https://booklore-demo.adityachandel.top).
+
+**Access Credentials:**
+- **Username:** `booklore`
+- **Password:** `9HC20PGGfitvWaZ1`
+
+Log in, explore the features, and discover how BookLore can transform personal library management.
+
+## 🚀 Getting Started with BookLore
+
+
+Kick off your BookLore journey with our official documentation and helpful video guides.
+
+📘 [BookLore Documentation: Getting Started](https://booklore-app.github.io/booklore-docs/docs/getting-started/)  
+Our up-to-date docs walk you through installation, setup, configuration, and key features, everything you need to get up and running smoothly.
+
+🎥 [BookLore Tutorials: YouTube](https://www.youtube.com/watch?v=UMrn_fIeFRo&list=PLi0fq0zaM7lqY7dX0R66jQtKW64z4_Tdz)  
+These older videos provide useful walkthroughs and visual guidance, but note that some content may be outdated compared to the current docs.
 
 ## 🐳 Deploy with Docker
 
@@ -50,18 +77,20 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore # Only modify this if you're familiar with JDBC and your database setup
-      - DATABASE_USERNAME=booklore # Must match MYSQL_USER defined in the mariadb container
-      - DATABASE_PASSWORD=your_secure_password # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
-      - SWAGGER_ENABLED=false # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore   # Only modify this if you're familiar with JDBC and your database setup
+      - DATABASE_USERNAME=booklore                          # Must match MYSQL_USER defined in the mariadb container
+      - DATABASE_PASSWORD=your_secure_password              # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
+      - SWAGGER_ENABLED=false                               # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
     depends_on:
       mariadb:
         condition: service_healthy
     ports:
       - "6060:6060"
     volumes:
-      - /your/local/path/to/booklore/data:/app/data
-      - /your/local/path/to/booklore/books:/books
+      - /your/local/path/to/booklore/data:/app/data       # Internal app data (settings, metadata, cache)
+      - /your/local/path/to/booklore/books1:/books1       # Book library folder — point to one of your collections
+      - /your/local/path/to/booklore/books2:/books2       # Another book library — you can mount multiple library folders this way
+      - /your/local/path/to/booklore/bookdrop:/bookdrop   # Bookdrop folder — drop new files here for automatic import into libraries
     restart: unless-stopped
 
   mariadb:
@@ -71,10 +100,10 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - MYSQL_ROOT_PASSWORD=super_secure_password # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD=super_secure_password  # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
       - MYSQL_DATABASE=booklore
-      - MYSQL_USER=booklore # Must match DATABASE_USERNAME defined in the booklore container
-      - MYSQL_PASSWORD=your_secure_password # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
+      - MYSQL_USER=booklore                        # Must match DATABASE_USERNAME defined in the booklore container
+      - MYSQL_PASSWORD=your_secure_password        # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
     volumes:
       - /your/local/path/to/mariadb/config:/config
     restart: unless-stopped
@@ -103,7 +132,31 @@ Once the containers are up, access BookLore in your browser at:
 ```ini
 http://localhost:6060
 ```
+## 📥 Bookdrop Folder: Auto-Import Files (New)
 
+BookLore now supports a **Bookdrop folder**, a special directory where you can drop your book files (`.pdf`, `.epub`, `.cbz`, etc.), and BookLore will automatically detect, process, and prepare them for import. This makes it easy to bulk add new books without manually uploading each one.
+
+### 🔍 How It Works
+
+1. **File Watcher:** A background process continuously monitors the Bookdrop folder.
+2. **File Detection:** When new files are added, BookLore automatically reads them and extracts basic metadata (title, author, etc.) from filenames or embedded data.
+3. **Optional Metadata Fetching:** If enabled, BookLore can query metadata sources like Google Books or Open Library to enrich the book information.
+4. **Review & Finalize:** You can then review the detected books in the Bookdrop UI, edit metadata if needed, and assign each book to a library and folder structure before finalizing the import.
+
+### ⚙️ Configuration (Docker Setup)
+
+To enable the Bookdrop feature in Docker:
+
+```yaml
+services:
+  booklore:
+    ...
+    volumes:
+      - /your/local/path/to/booklore/data:/app/data
+      - /your/local/path/to/booklore/books:/books
+      - /your/local/path/to/booklore/bookdrop:/bookdrop # 👈 Bookdrop directory
+```      
+      
 ## 🔑 OIDC/OAuth2 Authentication (Authentik, Pocket ID, etc.)
 
 
@@ -115,31 +168,6 @@ For detailed instructions on setting up OIDC authentication:
 
 - 📺 [YouTube video on configuring Authentik with BookLore](https://www.youtube.com/watch?v=r6Ufh9ldF9M)
 - 📘 [Step-by-step setup guide for Pocket ID](docs/OIDC-Setup-With-PocketID.md)
-
-## 🔐 Remote Authentication (Trusted Header SSO, Forward Auth)
-
-If you run BookLore behind a reverse proxy with remote authentication (middleware),
-you can enable automatic login by setting `REMOTE_AUTH_ENABLED` to `true`.
-
-This allows you to use your existing authentication system (e.g., OAuth, SAML) to log in to BookLore.
-
-The following remote auth environment variables can be configured:
-
-| Variable Name                | Description                             | Default Value                                                       |
-|------------------------------|-----------------------------------------|---------------------------------------------------------------------|
-| REMOTE_AUTH_ENABLED          | Enable remote authentication            | `false`                                                             |
-| REMOTE_AUTH_CREATE_NEW_USERS | Auto-create users from remote auth      | `true`                                                              |
-| REMOTE_AUTH_HEADER_NAME      | HTTP header containing user's name      | `Remote-Name`                                                       |
-| REMOTE_AUTH_HEADER_USER      | HTTP header containing username         | `Remote-User`                                                       |
-| REMOTE_AUTH_HEADER_EMAIL     | HTTP header containing user's email     | `Remote-Email`                                                      |
-| REMOTE_AUTH_HEADER_GROUPS    | HTTP header containing user's groups    | `Remote-Groups`                                                     |
-| REMOTE_AUTH_ADMIN_GROUP      | Group name that grants admin privileges | -                                                                   |
-
-Example implementations:
-- https://www.authelia.com/integration/trusted-header-sso/introduction/
-- https://caddyserver.com/docs/caddyfile/directives/forward_auth
-- https://doc.traefik.io/traefik/middlewares/http/forwardauth/
-- https://github.com/sevensolutions/traefik-oidc-auth (Traefik OIDC Auth)
 
 ## 🤝 Community & Support
 
@@ -153,19 +181,6 @@ Example implementations:
 Thanks to all the amazing people who contribute to Booklore.
 
 [![Contributors List](https://contrib.rocks/image?repo=adityachandelgit/BookLore)](https://github.com/adityachandelgit/BookLore/graphs/contributors)
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=adityachandelgit/BookLore&type=Date&theme=dark)](https://star-history.com/#adityachandelgit/BookLore&Date&theme=dark)
-
-## 💖 Support the Project
-
-If you find BookLore helpful, consider ⭐ starring the repo!
-
-Or support the project via [Venmo](https://venmo.com/AdityaChandel):
-
-[![Venmo](https://img.shields.io/badge/Venmo-Donate-blue?logo=venmo)](https://venmo.com/AdityaChandel)
-
 
 ## 🧰 Tech Stack
 

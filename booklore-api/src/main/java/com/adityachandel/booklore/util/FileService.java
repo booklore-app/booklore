@@ -84,25 +84,6 @@ public class FileService {
         }
     }
 
-    public Resource getBackupBookCover(String thumbnailPath) {
-        Path thumbPath;
-        if (thumbnailPath == null || thumbnailPath.isEmpty()) {
-            thumbPath = Paths.get(getMissingThumbnailPath());
-        } else {
-            thumbPath = Paths.get(thumbnailPath);
-        }
-        try {
-            Resource resource = new UrlResource(thumbPath.toUri());
-            if (resource.exists() && resource.isReadable()) {
-                return resource;
-            } else {
-                throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
-            }
-        } catch (IOException e) {
-            throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
-        }
-    }
-
     public String createThumbnail(long bookId, String thumbnailUrl) throws IOException {
         String newFilename = "f.jpg";
         resizeAndSaveImage(thumbnailUrl, new File(getThumbnailPath(bookId)), newFilename);
@@ -169,5 +150,13 @@ public class FileService {
 
     public String getMissingThumbnailPath() {
         return appProperties.getPathConfig() + "/thumbs/missing/m.jpg";
+    }
+
+    public String getTempBookdropCoverImagePath(long bookdropFileId) {
+        return Paths.get(appProperties.getPathConfig(), "bookdrop_temp", bookdropFileId + ".jpg").toString();
+    }
+
+    public String getBookdropPath() {
+        return appProperties.getBookdropFolder();
     }
 }

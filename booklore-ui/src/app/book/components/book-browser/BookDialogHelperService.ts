@@ -6,7 +6,7 @@ import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
 import {BulkMetadataUpdateComponent} from '../../../metadata/bulk-metadata-update-component/bulk-metadata-update-component';
 import {MultiBookMetadataEditorComponent} from '../../../metadata/multi-book-metadata-editor-component/multi-book-metadata-editor-component';
-import {FileMoverComponent} from '../../../file-mover-component/file-mover-component';
+import {FileMoverComponent} from '../../../utilities/component/file-mover-component/file-mover-component';
 import {count} from 'rxjs';
 import {MultiBookMetadataFetchComponent} from '../../../metadata/multi-book-metadata-fetch-component/multi-book-metadata-fetch-component';
 

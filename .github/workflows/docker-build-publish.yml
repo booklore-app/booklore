@@ -20,8 +20,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU for multi-arch builds
         uses: docker/setup-qemu-action@v3
@@ -113,13 +123,14 @@ jobs:
           git tag ${{ env.new_tag }}
           git push origin ${{ env.new_tag }}
 
-      - name: Build and Push Docker Image
+      - name: Build and Push Docker Image (Docker Hub & GHCR)
         run: |
           docker buildx create --use
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.image_tag }} \
-            --tag ghcr.io/${{ github.actor }}/booklore-app:${{ env.image_tag }} \
+            --tag booklore/booklore-app:${{ env.image_tag }} \
+            --tag ghcr.io/${{ github.repository }}/booklore-app:${{ env.image_tag }} \
             --push .
 
       - name: Push Latest Tag (Only for Master)
@@ -128,7 +139,8 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.new_tag }} \
-            --tag ghcr.io/${{ github.actor }}/booklore-app:latest \
+            --tag booklore/booklore-app:latest \
+            --tag ghcr.io/${{ github.repository }}/booklore-app:latest \
             --push .
 
       - name: Update Release Draft (Only for Master)
@@ -146,3 +158,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release edit ${{ env.new_tag }} --draft=false
+
+      - name: Notify Discord of New Release
+        if: github.ref == 'refs/heads/master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          release_json=$(gh release view ${{ env.new_tag }} --json name,body,url)
+          release_name=$(echo "$release_json" | jq -r '.name')
+          release_body=$(echo "$release_json" | jq -r '.body')
+          release_url=$(echo "$release_json" | jq -r '.url')
+          dockerhub_image="https://hub.docker.com/r/booklore/booklore-app/tags"
+          ghcr_image="https://github.com/${{ github.repository }}/packages"
+          content=":tada: **New Release:** [$release_name]($release_url)\n\n$release_body\n\n**Docker Images:**\n- Docker Hub: \`booklore/booklore-app:${{ env.new_tag }}\` ([View]($dockerhub_image))\n- GHCR: \`ghcr.io/${{ github.repository }}/booklore-app:${{ env.new_tag }}\` ([View]($ghcr_image))"
+          payload="{\"content\": \"$content\"}"
+          curl -H "Content-Type: application/json" -X POST -d "$payload" $DISCORD_WEBHOOK_URL
+
