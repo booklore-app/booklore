@@ -13,17 +13,17 @@ BookLore is a self-hosted web app for organizing and managing your personal book
 
 ## ✨ Key Features
 
-- 📚 **Powerful Book Organization**: Keep your library organized with Libraries and Shelves. Sort by genre, author, or mood to find books easily.
-- 🧠 **Intelligent Metadata Management**: Fetch rich metadata from Goodreads, Amazon, Google Books, Hardcover, and more, or fine-tune details with the advanced editor.
-- 👥 **Multi-User Access with Permissions**: Add users, assign libraries, and control who can edit, upload, or download. Great for families, friends, or teams.
-- 📖 **Built-in PDF, ePub, and CBX Reader**: Enjoy a smooth, distraction-free reading experience in your browser, with theme and setting options.
-- 🌐 **OPDS 1.2 Integration**: Connect BookLore to favorite reading apps with full OPDS support for seamless downloads.
-- 🔐 **Flexible Authentication**: Secure your library with optional OIDC login (Authentik, Pocket ID) or local JWT, your choice.
-- 📤 **Smart Batch Upload with BookDrop Folder**: Drop dozens of books into the BookDrop folder; BookLore scans, organizes, and fetches metadata automatically.
-- 📧 **Send Books by Email**: Easily share books by sending them directly via email from within BookLore—one click delivery.
-- 📱 **Mobile-Optimized UI**: Responsive design for phones and tablets lets you manage your library anywhere.
-- 🔄 **Open Source & Self-Hosted**: Full control of your digital library with open-source, self-hosted BookLore.
-- 🚀 **Active Development**: Continuous improvements with regular updates to features, UI, and performance.
+- 📚 **Book Organization**: Organize with Libraries and Shelves. Sort by genre, author, or mood.
+- 🧠 **Smart Metadata**: Auto-fetch from Goodreads, Amazon, Google Books, Hardcover, and more.
+- 👥 **Multi-User with Permissions**: Add users, assign libraries, control edit/upload/download access.
+- 📖 **Built-in Reader**: Read PDFs, ePubs, and CBX files in your browser with customizable themes.
+- 🌐 **OPDS 1.2 Support**: Connect to reading apps for seamless downloads.
+- 🔐 **Flexible Auth**: Optional OIDC login (Authentik, Pocket ID) or local JWT.
+- 📤 **BookDrop Auto-Import**: Drop books in a folder for automatic scanning and metadata fetching.
+- 📧 **Email Sharing**: Send books directly via email with one click.
+- 📱 **Mobile-Optimized**: Responsive design for phones and tablets.
+- 🔄 **Open Source & Self-Hosted**: Full control of your digital library.
+- 🚀 **Active Development**: Regular updates to features, UI, and performance.
 
 ## 💖 Support the Project
 
@@ -35,15 +35,19 @@ If you find **BookLore** helpful, please consider supporting its development:
   > 💡 [Support the Kobo Sync Bounty →](https://opencollective.com/booklore/projects/kobo-device-for-testing)
 - ⚡ Prefer one-time support? You can also donate via [Venmo](https://venmo.com/AdityaChandel).
 
-## 🌐 Live Demo: Experience BookLore in Action
+## 🌐 Live Demo: Explore BookLore in Action
 
-Explore the full capabilities of BookLore firsthand at [booklore-demo.adityachandel.top](https://booklore-demo.adityachandel.top).
+Evaluate BookLore’s features and user experience in a live environment:
 
-**Access Credentials:**
-- **Username:** `booklore`
-- **Password:** `9HC20PGGfitvWaZ1`
+**Demo Access:**  
+- 🌐 **URL:** [demo.booklore.dev](https://demo.booklore.dev)
+- 👤 **Username:** `booklore`
+- 🔑 **Password:** `9HC20PGGfitvWaZ1`
 
-Log in, explore the features, and discover how BookLore can transform personal library management.
+> ⚠️ **Note:**
+> The demo account has standard user permissions only.
+> - **Admin features** (user management, library setup, advanced configuration) are not available in this demo.
+> - To explore all capabilities, including administration and multi-user management, please deploy your own instance as described below.
 
 ## 🚀 Getting Started with BookLore
 
@@ -188,10 +192,6 @@ For detailed setup instructions and configuration examples:
 Thanks to all the amazing people who contribute to Booklore.
 
 [![Contributors List](https://contrib.rocks/image?repo=adityachandelgit/BookLore)](https://github.com/adityachandelgit/BookLore/graphs/contributors)
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=adityachandelgit/BookLore&type=Date&theme=dark)](https://star-history.com/#adityachandelgit/BookLore&Date&theme=dark)
 
 ## 🧰 Tech Stack
 

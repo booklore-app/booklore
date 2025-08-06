@@ -1,5 +1,5 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
-import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {Component, inject, OnInit} from '@angular/core';
+import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Book} from '../../model/book.model';
 import {MessageService, PrimeTemplate} from 'primeng/api';
 import {ShelfService} from '../../service/shelf.service';
@@ -7,14 +7,14 @@ import {Observable} from 'rxjs';
 import {BookService} from '../../service/book.service';
 import {map, tap} from 'rxjs/operators';
 import {Shelf} from '../../model/shelf.model';
-import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
 import {ShelfState} from '../../model/state/shelf-state.model';
 import {Button} from 'primeng/button';
-import { AsyncPipe } from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {Checkbox} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {Dialog} from 'primeng/dialog';
 import {InputText} from 'primeng/inputtext';
+import {IconPickerService} from '../../../utilities/services/icon-picker.service';
 
 @Component({
   selector: 'app-shelf-assigner',
@@ -25,7 +25,6 @@ import {InputText} from 'primeng/inputtext';
     Checkbox,
     AsyncPipe,
     FormsModule,
-    IconPickerComponent,
     Dialog,
     InputText,
     PrimeTemplate
@@ -39,6 +38,7 @@ export class ShelfAssignerComponent implements OnInit {
   private dynamicDialogRef = inject(DynamicDialogRef);
   private messageService = inject(MessageService);
   private bookService = inject(BookService);
+  private iconPickerService = inject(IconPickerService);
 
   shelfState$: Observable<ShelfState> = this.shelfService.shelfState$;
   book: Book = this.dynamicDialogConfig.data.book;
@@ -48,8 +48,6 @@ export class ShelfAssignerComponent implements OnInit {
   bookIds: Set<number> = this.dynamicDialogConfig.data.bookIds;
   isMultiBooks: boolean = this.dynamicDialogConfig.data.isMultiBooks;
   selectedIcon: string | null = null;
-
-  @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
 
   ngOnInit(): void {
     if (!this.isMultiBooks && this.book.shelves) {
@@ -124,16 +122,14 @@ export class ShelfAssignerComponent implements OnInit {
   }
 
   openIconPicker() {
-    if (this.iconPicker) {
-      this.iconPicker.open();
-    }
+    this.iconPickerService.open().subscribe(icon => {
+      if (icon) {
+        this.selectedIcon = icon;
+      }
+    })
   }
 
   clearSelectedIcon() {
     this.selectedIcon = null;
-  }
-
-  onIconSelected(icon: string) {
-    this.selectedIcon = icon;
   }
 }

@@ -91,6 +91,15 @@
                   [style.--p-rating-icon-active-color]="getStarColorScaled(book?.metadata!.personalRating, 10)">
                 </p-rating>
               </div>
+              <p-button
+                text
+                size="small"
+                icon="pi pi-undo"
+                severity="warn"
+                (onClick)="resetPersonalRating(book)"
+                pTooltip="Reset Rating"
+                tooltipPosition="top">
+              </p-button>
             </div>
 
             @if (book?.metadata?.amazonRating || book?.metadata?.goodreadsRating || book?.metadata?.hardcoverRating || book?.metadata?.googleId) {
@@ -172,8 +181,24 @@
                   />
                 </a>
               }
+
+              @if (book?.metadata?.comicvineId) {
+                <a
+                  class="flex items-center gap-1"
+                  [href]="'https://comicvine.gamespot.com/' + book.metadata!.comicvineId"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://www.comicvine.com/favicon.ico"
+                    alt="Comic Vine"
+                    class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"
+                  />
+                </a>
+              }
             </div>
           </div>
+
 
           @if (book?.metadata?.categories?.length) {
             <div class="overflow-x-auto scrollbar-hide max-w-7xl pt-2 md:pt-0">
@@ -231,6 +256,11 @@
                   {{ getStatusLabel(selectedReadStatus) }}
               </span>
                 <p-menu #menu [popup]="true" [model]="readStatusMenuItems"></p-menu>
+                @if (selectedReadStatus === 'READ' && book?.dateFinished) {
+                  <span class="text-xs text-gray-400 ml-2">
+                    Finished on {{ formatDate(book.dateFinished) }}
+                  </span>
+                }
               </p>
               <p class="whitespace-nowrap flex items-center">
                 <span class="font-bold mr-2">Progress:</span>

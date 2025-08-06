@@ -12,11 +12,11 @@ import {LibraryService} from '../book/service/library.service';
 import {Library} from '../book/model/library.model';
 import {MagicShelfService} from '../magic-shelf-service';
 import {MessageService} from 'primeng/api';
-import {IconPickerV2Component} from '../icon-picker-v2-component/icon-picker-v2-component';
-import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {DynamicDialogConfig} from 'primeng/dynamicdialog';
 import {Chips} from 'primeng/chips';
 import {MultiSelect} from 'primeng/multiselect';
 import {EMPTY_CHECK_OPERATORS, MULTI_VALUE_OPERATORS, parseValue, removeNulls, serializeDateRules} from '../magic-shelf-utils';
+import { IconPickerService } from '../utilities/services/icon-picker.service';
 
 export type RuleOperator =
   | 'equals'
@@ -59,6 +59,7 @@ export type RuleField =
   | 'fileType'
   | 'fileSize'
   | 'readStatus'
+  | 'dateFinished'
   | 'metadataScore';
 
 
@@ -107,6 +108,7 @@ export type GroupFormGroup = FormGroup<{
 const FIELD_CONFIGS: Record<RuleField, FullFieldConfig> = {
   library: {label: 'Library'},
   readStatus: {label: 'Read Status'},
+  dateFinished: {label: 'Date Finished', type: 'date'},
   metadataScore: {label: 'Metadata Score', type: 'decimal', max: 100},
   title: {label: 'Title'},
   authors: {label: 'Authors'},
@@ -189,11 +191,11 @@ export class MagicShelfComponent implements OnInit {
 
   shelfId: number | null = null;
 
-  libraryService = inject(LibraryService);
+  libraryService    = inject(LibraryService);
   magicShelfService = inject(MagicShelfService);
-  messageService = inject(MessageService);
-  dialogService = inject(DialogService);
-  config = inject(DynamicDialogConfig);
+  messageService    = inject(MessageService);
+  config            = inject(DynamicDialogConfig);
+  private iconPicker = inject(IconPickerService);
 
   trackByFn(ruleCtrl: AbstractControl, index: number): any {
     return ruleCtrl;
@@ -388,21 +390,7 @@ export class MagicShelfComponent implements OnInit {
   }
 
   openIconPicker() {
-    const isMobile = window.innerWidth <= 768;
-    const ref: DynamicDialogRef = this.dialogService.open(IconPickerV2Component, {
-      header: 'Choose an Icon',
-      style: {
-        position: 'absolute',
-        top: '10%',
-        bottom: '10%',
-        width: isMobile ? '90vw' : '800px',
-        maxWidth: isMobile ? '90vw' : '800px',
-        minWidth: isMobile ? '90vw' : '800px',
-      },
-      dismissableMask: true,
-    });
-
-    ref.onClose.subscribe((icon: string) => {
+    this.iconPicker.open().subscribe(icon => {
       if (icon) {
         this.form.get('icon')?.setValue(icon);
       }

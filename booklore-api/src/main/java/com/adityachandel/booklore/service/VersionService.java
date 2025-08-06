@@ -21,7 +21,7 @@ public class VersionService {
     @Value("${app.version:unknown}")
     private String appVersion;
 
-    private static final String GITHUB_REPO = "adityachandelgit/BookLore";
+    private static final String GITHUB_REPO = "booklore-app/booklore";
 
     public VersionInfo getVersionInfo() {
         String latestVersion = fetchLatestGitHubReleaseVersion();

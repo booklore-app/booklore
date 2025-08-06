@@ -81,59 +81,26 @@ const SORT_DIRECTION = {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule, DropdownModule, Checkbox, Popover, Slider, Select, Divider, MultiSelect, TieredMenu],
+  imports: [
+    Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule,
+    BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule,
+    DropdownModule, Checkbox, Popover, Slider, Select, Divider, MultiSelect, TieredMenu
+  ],
   providers: [SeriesCollapseFilter],
   animations: [
     trigger('slideInOut', [
-      state('void', style({
-        transform: 'translateY(100%)'
-      })),
-      state('*', style({
-        transform: 'translateY(0)'
-      })),
-      transition(':enter', [
-        animate('0.1s ease-in')
-      ]),
-      transition(':leave', [
-        animate('0.1s ease-out')
-      ])
+      state('void', style({ transform: 'translateY(100%)' })),
+      state('*', style({ transform: 'translateY(0)' })),
+      transition(':enter', [ animate('0.1s ease-in') ]),
+      transition(':leave', [ animate('0.1s ease-out') ])
     ])
   ]
 })
 export class BookBrowserComponent implements OnInit, AfterViewInit {
-  bookState$: Observable<BookState> | undefined;
-  entity$: Observable<Library | Shelf | MagicShelf | null> | undefined;
-  entityType$: Observable<EntityType> | undefined;
-  searchTerm$ = new BehaviorSubject<string>('');
-
-  entity: Library | Shelf | MagicShelf | null = null;
-  entityType: EntityType | undefined;
-  bookTitle: string = '';
-  entityOptions: MenuItem[] | undefined;
-  selectedBooks = new Set<number>();
-  isDrawerVisible: boolean = false;
-  dynamicDialogRef: DynamicDialogRef | undefined;
-  EntityType = EntityType;
-  currentFilterLabel: string | null = null;
-  rawFilterParamFromUrl: string | null = null;
-  hasSearchTerm: boolean = false;
-
-  @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
-  @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
-
-  visibleColumns: { field: string; header: string }[] = [];
-
-  selectedFilter = new BehaviorSubject<Record<string, any> | null>(null);
-  selectedFilterMode = new BehaviorSubject<'and' | 'or'>('and');
-  protected resetFilterSubject = new Subject<void>();
-
-  entityViewPreferences!: EntityViewPreferences;
-
   protected userService = inject(UserService);
   protected coverScalePreferenceService = inject(CoverScalePreferenceService);
   protected filterSortPreferenceService = inject(FilterSortPreferenceService);
   protected columnPreferenceService = inject(TableColumnPreferenceService);
-
   private activatedRoute = inject(ActivatedRoute);
   private messageService = inject(MessageService);
   private libraryService = inject(LibraryService);
@@ -150,47 +117,53 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   protected magicShelfService = inject(MagicShelfService);
   protected bookRuleEvaluatorService = inject(BookRuleEvaluatorService);
 
-  private sideBarFilter = new SideBarFilter(this.selectedFilter, this.selectedFilterMode);
-  private headerFilter = new HeaderFilter(this.searchTerm$);
-  protected bookSorter = new BookSorter((selectedSort) => this.applySortOption(selectedSort));
-
-  currentViewMode: string | undefined = undefined;
+  bookState$: Observable<BookState> | undefined;
+  entity$: Observable<Library | Shelf | MagicShelf | null> | undefined;
+  entityType$: Observable<EntityType> | undefined;
+  searchTerm$ = new BehaviorSubject<string>('');
+  selectedFilter = new BehaviorSubject<Record<string, any> | null>(null);
+  selectedFilterMode = new BehaviorSubject<'and' | 'or'>('and');
+  protected resetFilterSubject = new Subject<void>();
+  entity: Library | Shelf | MagicShelf | null = null;
+  entityType: EntityType | undefined;
+  bookTitle = '';
+  entityOptions: MenuItem[] | undefined;
+  selectedBooks = new Set<number>();
+  isDrawerVisible = false;
+  dynamicDialogRef: DynamicDialogRef | undefined;
+  EntityType = EntityType;
+  currentFilterLabel: string | null = null;
+  rawFilterParamFromUrl: string | null = null;
+  hasSearchTerm = false;
+  visibleColumns: { field: string; header: string }[] = [];
+  entityViewPreferences!: EntityViewPreferences;
+  currentViewMode: string | undefined;
   lastAppliedSort: SortOption | null = null;
   private settingFiltersFromUrl = false;
   protected metadataMenuItems: MenuItem[] | undefined;
   protected tieredMenuItems: MenuItem[] | undefined;
   currentBooks: Book[] = [];
   lastSelectedIndex: number | null = null;
-  showFilter: boolean = false;
+  showFilter = false;
 
+  private sideBarFilter = new SideBarFilter(this.selectedFilter, this.selectedFilterMode);
+  private headerFilter = new HeaderFilter(this.searchTerm$);
+  protected bookSorter = new BookSorter(selectedSort => this.applySortOption(selectedSort));
 
-  get currentCardSize() {
-    return this.coverScalePreferenceService.currentCardSize;
-  }
+  @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
+  @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
 
-  get gridColumnMinWidth(): string {
-    return this.coverScalePreferenceService.gridColumnMinWidth;
-  }
-
-  updateScale(): void {
-    this.coverScalePreferenceService.setScale(this.coverScalePreferenceService.scaleFactor);
-  }
-
-  onVisibleColumnsChange(selected: any[]) {
-    const allFields = this.bookTableComponent.allColumns.map(col => col.field);
-    this.visibleColumns = selected.sort(
-      (a, b) => allFields.indexOf(a.field) - allFields.indexOf(b.field)
-    );
-  }
+  get currentCardSize() { return this.coverScalePreferenceService.currentCardSize; }
+  get gridColumnMinWidth(): string { return this.coverScalePreferenceService.gridColumnMinWidth; }
+  get viewIcon(): string { return this.currentViewMode === VIEW_MODES.GRID ? 'pi pi-objects-column' : 'pi pi-table'; }
+  get hasSidebarFilters(): boolean { return !!this.selectedFilter.value && Object.keys(this.selectedFilter.value).length > 0; }
+  get isFilterActive(): boolean { return this.selectedFilter.value !== null; }
 
   ngOnInit(): void {
-
     this.coverScalePreferenceService.scaleChange$.pipe(debounceTime(1000)).subscribe();
-
     this.bookService.loadBooks();
 
     const currentPath = this.activatedRoute.snapshot.routeConfig?.path;
-
     if (currentPath === 'all-books' || currentPath === 'unshelved-books') {
       const entityType = currentPath === 'all-books' ? EntityType.ALL_BOOKS : EntityType.UNSHELVED;
       this.entityType = entityType;
@@ -198,12 +171,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.entity$ = of(null);
     } else {
       const routeEntityInfo$ = this.getEntityInfoFromRoute();
-
       this.entityType$ = routeEntityInfo$.pipe(map(info => info.entityType));
       this.entity$ = routeEntityInfo$.pipe(
         switchMap(({entityId, entityType}) => this.fetchEntity(entityId, entityType))
       );
-
       this.entity$.subscribe(entity => {
         this.entity = entity ?? null;
         this.entityOptions = entity
@@ -228,12 +199,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       () => this.bulkEditMetadata(),
       () => this.multiBookEditMetadata()
     );
-
     this.tieredMenuItems = this.bookMenuService.getTieredMenuItems(this.selectedBooks);
   }
 
-  ngAfterViewInit() {
-
+  ngAfterViewInit(): void {
     combineLatest({
       paramMap: this.activatedRoute.queryParamMap,
       user: this.userService.userState$.pipe(
@@ -378,172 +347,14 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private isLibrary(entity: Library | Shelf | MagicShelf): entity is Library {
-    return (entity as Library).paths !== undefined;
+  updateScale(): void {
+    this.coverScalePreferenceService.setScale(this.coverScalePreferenceService.scaleFactor);
   }
 
-  private isMagicShelf(entity: any): entity is MagicShelf {
-    return entity && 'filterJson' in entity;
-  }
-
-  get viewIcon(): string {
-    return this.currentViewMode === VIEW_MODES.GRID ? 'pi pi-objects-column' : 'pi pi-table';
-  }
-
-  private getEntityInfoFromRoute(): Observable<{ entityId: number; entityType: EntityType }> {
-    return this.activatedRoute.paramMap.pipe(
-      map(params => {
-        const libraryId = Number(params.get('libraryId') || NaN);
-        const shelfId = Number(params.get('shelfId') || NaN);
-        const magicShelfId = Number(params.get('magicShelfId') || NaN);
-
-        if (!isNaN(libraryId)) {
-          this.entityType = EntityType.LIBRARY;
-          return {entityId: libraryId, entityType: EntityType.LIBRARY};
-        } else if (!isNaN(shelfId)) {
-          this.entityType = EntityType.SHELF;
-          return {entityId: shelfId, entityType: EntityType.SHELF};
-        } else if (!isNaN(magicShelfId)) {
-          this.entityType = EntityType.MAGIC_SHELF;
-          return {entityId: magicShelfId, entityType: EntityType.MAGIC_SHELF};
-        } else {
-          this.entityType = EntityType.ALL_BOOKS;
-          return {entityId: NaN, entityType: EntityType.ALL_BOOKS};
-        }
-      })
-    );
-  }
-
-  private fetchEntity(entityId: number, entityType: EntityType): Observable<Library | Shelf | MagicShelf | null> {
-    switch (entityType) {
-      case EntityType.LIBRARY:
-        return this.fetchLibrary(entityId);
-      case EntityType.SHELF:
-        return this.fetchShelf(entityId);
-      case EntityType.MAGIC_SHELF:
-        return this.fetchMagicShelf(entityId);
-      default:
-        return of(null);
-    }
-  }
-
-  private fetchBooksByEntity(entityId: number, entityType: EntityType): Observable<BookState> {
-    switch (entityType) {
-      case EntityType.LIBRARY:
-        return this.fetchBooks(book => book.libraryId === entityId);
-      case EntityType.SHELF:
-        return this.fetchBooks(book =>
-          book.shelves?.some(shelf => shelf.id === entityId) ?? false
-        );
-      case EntityType.MAGIC_SHELF:
-        return this.fetchBooksMagicShelfBooks(entityId);
-      case EntityType.ALL_BOOKS:
-      default:
-        return this.fetchAllBooks();
-    }
-  }
-
-  private fetchAllBooks(): Observable<BookState> {
-    return this.bookService.bookState$.pipe(
-      map(bookState => this.processBookState(bookState)),
-      switchMap(bookState => this.applyBookFilters(bookState))
-    );
-  }
-
-  private fetchUnshelvedBooks(): Observable<BookState> {
-    return this.bookService.bookState$.pipe(
-      map(bookState => ({
-        ...bookState,
-        books: (bookState.books || []).filter(book => !book.shelves || book.shelves.length === 0)
-      })),
-      map(bookState => this.processBookState(bookState)),
-      switchMap(bookState => this.applyBookFilters(bookState))
-    );
-  }
-
-  private fetchBooksMagicShelfBooks(magicShelfId: number): Observable<BookState> {
-    return combineLatest([
-      this.bookService.bookState$,
-      this.magicShelfService.getShelf(magicShelfId)
-    ]).pipe(
-      map(([bookState, magicShelf]) => {
-        if (!bookState.loaded || bookState.error || !magicShelf?.filterJson) {
-          return bookState;
-        }
-        const filteredBooks: Book[] | undefined = bookState.books?.filter(book =>
-          this.bookRuleEvaluatorService.evaluateGroup(book, JSON.parse(magicShelf.filterJson!) as GroupRule)
-        );
-        const sortedBooks = this.sortService.applySort(filteredBooks ?? [], this.bookSorter.selectedSort!);
-        return {...bookState, books: sortedBooks};
-      }),
-      switchMap(bookState => this.applyBookFilters(bookState))
-    );
-  }
-
-  private fetchBooks(bookFilter: (book: Book) => boolean): Observable<BookState> {
-    return this.bookService.bookState$.pipe(
-      map(bookState => {
-        if (bookState.loaded && !bookState.error) {
-          const filteredBooks = bookState.books?.filter(bookFilter) || [];
-          const sortedBooks = this.sortService.applySort(filteredBooks, this.bookSorter.selectedSort!);
-          return {...bookState, books: sortedBooks};
-        }
-        return bookState;
-      }),
-      switchMap(bookState => this.applyBookFilters(bookState))
-    );
-  }
-
-  private applyBookFilters(bookState: BookState): Observable<BookState> {
-    return this.headerFilter.filter(bookState).pipe(
-      switchMap(filtered => this.sideBarFilter.filter(filtered)),
-      switchMap(filtered => this.seriesCollapseFilter.filter(filtered))
-    );
-  }
-
-  private processBookState(bookState: BookState): BookState {
-    if (bookState.loaded && !bookState.error) {
-      const sortedBooks = this.sortService.applySort(bookState.books || [], this.bookSorter.selectedSort!);
-      return {...bookState, books: sortedBooks};
-    }
-    return bookState;
-  }
-
-  private fetchLibrary(libraryId: number): Observable<Library | null> {
-    return this.libraryService.libraryState$.pipe(
-      map(libraryState => {
-        if (libraryState.libraries) {
-          return libraryState.libraries.find(lib => lib.id === libraryId) || null;
-        }
-        return null;
-      })
-    );
-  }
-
-  private fetchShelf(shelfId: number): Observable<Shelf | null> {
-    return this.shelfService.shelfState$.pipe(
-      map(shelfState => {
-        if (shelfState.shelves) {
-          return shelfState.shelves.find(shelf => shelf.id === shelfId) || null;
-        }
-        return null;
-      })
-    );
-  }
-
-  private fetchMagicShelf(magicShelfId: number): Observable<MagicShelf | null> {
-    return this.magicShelfService.shelvesState$.pipe(
-      take(1),
-      switchMap((state) => {
-        const cached = state.shelves?.find(s => s.id === magicShelfId) ?? null;
-        if (cached) {
-          return of(cached);
-        }
-        return this.magicShelfService.getShelf(magicShelfId).pipe(
-          map(shelf => shelf ?? null),
-          catchError(() => of(null))
-        );
-      })
+  onVisibleColumnsChange(selected: any[]) {
+    const allFields = this.bookTableComponent.allColumns.map(col => col.field);
+    this.visibleColumns = selected.sort(
+      (a, b) => allFields.indexOf(a.field) - allFields.indexOf(b.field)
     );
   }
 
@@ -659,23 +470,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.resetFilterSubject.next();
   }
 
-  get hasSidebarFilters(): boolean {
-    return this.selectedFilter && Object.keys(this.selectedFilter.getValue() || {}).length > 0;
-  }
-
-  get isFilterActive(): boolean {
-    return this.selectedFilter.value !== null;
-  }
-
   clearFilter() {
     if (this.selectedFilter.value !== null) {
       this.selectedFilter.next(null);
     }
     this.clearSearch();
-  }
-
-  private capitalize(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   toggleFilterSidebar() {
@@ -739,5 +538,185 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   moveFiles() {
     this.dialogHelperService.openFileMoverDialog(this.selectedBooks);
+  }
+
+  private isLibrary(entity: Library | Shelf | MagicShelf): entity is Library {
+    return (entity as Library).paths !== undefined;
+  }
+
+  private isMagicShelf(entity: any): entity is MagicShelf {
+    return entity && 'filterJson' in entity;
+  }
+
+  private getEntityInfoFromRoute(): Observable<{ entityId: number; entityType: EntityType }> {
+    return this.activatedRoute.paramMap.pipe(
+      map(params => {
+        const libraryId = Number(params.get('libraryId') || NaN);
+        const shelfId = Number(params.get('shelfId') || NaN);
+        const magicShelfId = Number(params.get('magicShelfId') || NaN);
+
+        if (!isNaN(libraryId)) {
+          this.entityType = EntityType.LIBRARY;
+          return {entityId: libraryId, entityType: EntityType.LIBRARY};
+        } else if (!isNaN(shelfId)) {
+          this.entityType = EntityType.SHELF;
+          return {entityId: shelfId, entityType: EntityType.SHELF};
+        } else if (!isNaN(magicShelfId)) {
+          this.entityType = EntityType.MAGIC_SHELF;
+          return {entityId: magicShelfId, entityType: EntityType.MAGIC_SHELF};
+        } else {
+          this.entityType = EntityType.ALL_BOOKS;
+          return {entityId: NaN, entityType: EntityType.ALL_BOOKS};
+        }
+      })
+    );
+  }
+
+  private fetchEntity(entityId: number, entityType: EntityType): Observable<Library | Shelf | MagicShelf | null> {
+    switch (entityType) {
+      case EntityType.LIBRARY:
+        return this.fetchLibrary(entityId);
+      case EntityType.SHELF:
+        return this.fetchShelf(entityId);
+      case EntityType.MAGIC_SHELF:
+        return this.fetchMagicShelf(entityId);
+      default:
+        return of(null);
+    }
+  }
+
+  private fetchBooksByEntity(entityId: number, entityType: EntityType): Observable<BookState> {
+    switch (entityType) {
+      case EntityType.LIBRARY:
+        return this.fetchBooks(book => book.libraryId === entityId);
+      case EntityType.SHELF:
+        return this.fetchBooks(book =>
+          book.shelves?.some(shelf => shelf.id === entityId) ?? false
+        );
+      case EntityType.MAGIC_SHELF:
+        return this.fetchBooksMagicShelfBooks(entityId);
+      case EntityType.ALL_BOOKS:
+      default:
+        return this.fetchAllBooks();
+    }
+  }
+
+  private fetchAllBooks(): Observable<BookState> {
+    return this.bookService.bookState$.pipe(
+      map(bookState => this.processBookState(bookState)),
+      switchMap(bookState => this.applyBookFilters(bookState))
+    );
+  }
+
+  private fetchUnshelvedBooks(): Observable<BookState> {
+    return this.bookService.bookState$.pipe(
+      map(bookState => ({
+        ...bookState,
+        books: (bookState.books || []).filter(book => !book.shelves || book.shelves.length === 0)
+      })),
+      map(bookState => this.processBookState(bookState)),
+      switchMap(bookState => this.applyBookFilters(bookState))
+    );
+  }
+
+  private fetchBooksMagicShelfBooks(magicShelfId: number): Observable<BookState> {
+    return combineLatest([
+      this.bookService.bookState$,
+      this.magicShelfService.getShelf(magicShelfId)
+    ]).pipe(
+      map(([bookState, magicShelf]) => {
+        if (!bookState.loaded || bookState.error || !magicShelf?.filterJson) {
+          return bookState;
+        }
+        const filteredBooks: Book[] | undefined = bookState.books?.filter(book =>
+          this.bookRuleEvaluatorService.evaluateGroup(book, JSON.parse(magicShelf.filterJson!) as GroupRule)
+        );
+        const sortedBooks = this.sortService.applySort(filteredBooks ?? [], this.bookSorter.selectedSort!);
+        return {...bookState, books: sortedBooks};
+      }),
+      switchMap(bookState => this.applyBookFilters(bookState))
+    );
+  }
+
+  private fetchBooks(bookFilter: (book: Book) => boolean): Observable<BookState> {
+    return this.bookService.bookState$.pipe(
+      map(bookState => {
+        if (bookState.loaded && !bookState.error) {
+          const filteredBooks = bookState.books?.filter(bookFilter) || [];
+          const sortedBooks = this.sortService.applySort(filteredBooks, this.bookSorter.selectedSort!);
+          return {...bookState, books: sortedBooks};
+        }
+        return bookState;
+      }),
+      switchMap(bookState => this.applyBookFilters(bookState))
+    );
+  }
+
+  private shouldForceExpandSeries(): boolean {
+    const queryParams = this.activatedRoute.snapshot.queryParams;
+    const filterParam = queryParams[QUERY_PARAMS.FILTER];
+    return (
+      filterParam &&
+      typeof filterParam === 'string' &&
+      filterParam.split(',').some(pair => pair.trim().startsWith('series:'))
+    );
+  }
+
+  private applyBookFilters(bookState: BookState): Observable<BookState> {
+    const forceExpandSeries = this.shouldForceExpandSeries();
+    return this.headerFilter.filter(bookState).pipe(
+      switchMap(filtered => this.sideBarFilter.filter(filtered)),
+      switchMap(filtered => this.seriesCollapseFilter.filter(filtered, forceExpandSeries))
+    );
+  }
+
+  private processBookState(bookState: BookState): BookState {
+    if (bookState.loaded && !bookState.error) {
+      const sortedBooks = this.sortService.applySort(bookState.books || [], this.bookSorter.selectedSort!);
+      return {...bookState, books: sortedBooks};
+    }
+    return bookState;
+  }
+
+  private fetchLibrary(libraryId: number): Observable<Library | null> {
+    return this.libraryService.libraryState$.pipe(
+      map(libraryState => {
+        if (libraryState.libraries) {
+          return libraryState.libraries.find(lib => lib.id === libraryId) || null;
+        }
+        return null;
+      })
+    );
+  }
+
+  private fetchShelf(shelfId: number): Observable<Shelf | null> {
+    return this.shelfService.shelfState$.pipe(
+      map(shelfState => {
+        if (shelfState.shelves) {
+          return shelfState.shelves.find(shelf => shelf.id === shelfId) || null;
+        }
+        return null;
+      })
+    );
+  }
+
+  private fetchMagicShelf(magicShelfId: number): Observable<MagicShelf | null> {
+    return this.magicShelfService.shelvesState$.pipe(
+      take(1),
+      switchMap((state) => {
+        const cached = state.shelves?.find(s => s.id === magicShelfId) ?? null;
+        if (cached) {
+          return of(cached);
+        }
+        return this.magicShelfService.getShelf(magicShelfId).pipe(
+          map(shelf => shelf ?? null),
+          catchError(() => of(null))
+        );
+      })
+    );
+  }
+
+  private capitalize(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }

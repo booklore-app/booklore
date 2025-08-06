@@ -10,28 +10,30 @@
   </div>
 
   @if (loading) {
+
     <div class="absolute inset-0 flex items-center justify-center z-50 rounded-xl">
       <div class="flex flex-col items-center space-y-3">
         <p-progressSpinner styleClass="w-8 h-8" strokeWidth="4"/>
-        <span class="text-gray-300">
-        Loading Bookdrop files. Please wait...
-      </span>
+        <span class="text-gray-300">Loading Bookdrop files. Please wait...</span>
       </div>
     </div>
+
   } @else {
+
     <div class="px-6 pb-2">
       @if (saving) {
         <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50 rounded-xl space-y-3">
           <p-progressSpinner styleClass="w-8 h-8" strokeWidth="4"/>
           <div class="bg-gray-900/90 px-4 py-2 rounded-md">
-          <span class="text-sm text-gray-200 text-center">
-            Organizing and moving files to their designated libraries. Please wait...
-          </span>
+            <span class="text-sm text-gray-200 text-center">
+              Organizing and moving files to their designated libraries. Please wait...
+            </span>
           </div>
         </div>
       }
 
       @if (bookdropFileUis.length !== 0) {
+
         <div class="flex gap-2 items-center px-1 pb-4 w-full">
           <label for="uploadPatternInput" class="text-sm text-gray-300 font-medium">File Naming Pattern:</label>
           <input
@@ -42,17 +44,16 @@
             type="text"
             pInputText
             [(ngModel)]="uploadPattern"
-            placeholder="e.g., {title} - {authors}"
-          />
+            placeholder="e.g., {title} - {authors}"/>
           <i
             class="pi pi-info-circle text-blue-500 cursor-help"
             pTooltip="Sets the filename pattern used when moving files from bookdrop folder to the library, using metadata placeholders like {title}, {authors}, etc."
             tooltipPosition="top"
-            style="font-size: 1rem; margin-left: 0.25rem;"
-          ></i>
+            style="font-size: 1rem; margin-left: 0.25rem;"></i>
         </div>
 
         <div class="flex justify-between items-center gap-4 px-1">
+
           <div class="flex gap-4 items-center">
             <span class="text-sm text-gray-300 font-medium">Library for All Files:</span>
             <p-select
@@ -109,6 +110,7 @@
               pTooltip="For all files, replace current metadata with fetched metadata, excluding cover images"
               tooltipPosition="top">
             </p-button>
+
             <p-button
               size="small"
               outlined
@@ -123,6 +125,7 @@
         </div>
       }
     </div>
+
     <div class="flex-1 overflow-y-auto px-6 space-y-2 pb-4">
       @if (bookdropFileUis.length === 0) {
         <div class="h-full w-full flex items-center justify-center text-gray-400 italic py-8">
@@ -130,68 +133,60 @@
         </div>
       } @else {
         @for (file of bookdropFileUis; track file) {
+
           <div class="flex flex-col">
             <div class="flex items-center gap-4 custom-border rounded-xl px-4 py-2">
 
-              @if (file.file.fetchedMetadata) {
-                <i
-                  class="pi pi-circle-fill"
-                  style="color: green; font-size: 0.75rem"
-                  pTooltip="Fetched metadata is available."
-                  tooltipPosition="top">
-                </i>
-              } @else {
-                <i
-                  class="pi pi-circle-fill"
-                  style="color: darkorange; font-size: 0.75rem"
-                  pTooltip="No fetched metadata available."
-                  tooltipPosition="top">
-                </i>
-              }
+              <p-checkbox
+                [binary]="true"
+                [(ngModel)]="file.selected"
+                (ngModelChange)="toggleFileSelection(file.file.id, $event)">
+              </p-checkbox>
+
+              <i
+                class="pi pi-circle-fill"
+                [ngStyle]="{'color': file.file.fetchedMetadata ? 'green' : 'darkorange'}"
+                style="font-size: 0.75rem"
+                pTooltip="{{file.file.fetchedMetadata ? 'Fetched metadata is available.' : 'No fetched metadata available.'}}"
+                tooltipPosition="top">
+              </i>
 
               @if (file.metadataForm.get('thumbnailUrl')?.value) {
                 <img
                   [src]="file.metadataForm.get('thumbnailUrl')?.value"
                   alt="Cover"
                   title="Original cover"
-                  (click)="file.showDetails = !file.showDetails"
-                  class="w-6 h-8 flex-shrink-0 rounded-sm object-cover cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-md"
-                />
+                  class="w-6 h-8 rounded-sm object-cover cursor-pointer hover:scale-105 hover:shadow-md transition-transform duration-200"
+                  (click)="file.showDetails = !file.showDetails"/>
               }
 
               @if (file.file.fetchedMetadata?.thumbnailUrl) {
                 <img
                   [src]="file.file.fetchedMetadata?.thumbnailUrl"
-                  alt="Cover"
+                  alt="Fetched Cover"
                   title="Fetched cover"
-                  (click)="file.showDetails = !file.showDetails"
-                  class="w-6 h-8 flex-shrink-0 rounded-sm object-cover cursor-pointer transition-transform duration-200 hover:scale-105 hover:shadow-md"
-                />
+                  class="w-6 h-8 rounded-sm object-cover cursor-pointer hover:scale-105 hover:shadow-md transition-transform duration-200"
+                  (click)="file.showDetails = !file.showDetails"/>
               }
 
               <div class="flex-1 font-medium text-sm truncate" (click)="file.showDetails = !file.showDetails">
                 {{ file.file.fileName }}
               </div>
 
-              @if (copiedFlags[file.file.id]) {
-                <i
-                  class="pi pi-check-circle text-green-500"
-                  pTooltip="Fetched metadata has been applied."
-                  tooltipPosition="top">
-                </i>
-              } @else if (!file.file.fetchedMetadata) {
-                <i
-                  class="pi pi-check-circle text-blue-500"
-                  pTooltip="No fetched metadata available. Original metadata will used."
-                  tooltipPosition="top">
-                </i>
-              } @else {
-                <i
-                  class="pi pi-exclamation-triangle text-red-500"
-                  pTooltip="Fetched metadata hasn’t been applied yet. You can open the metadata picker using the dropdown on the right, or skip and keep the original metadata."
-                  tooltipPosition="top">
-                </i>
-              }
+              <i
+                class="pi"
+                [ngClass]="{
+                  'pi-check-circle text-green-500': copiedFlags[file.file.id],
+                  'pi-check-circle text-blue-500': !file.file.fetchedMetadata,
+                  'pi-exclamation-triangle text-red-500': file.file.fetchedMetadata && !copiedFlags[file.file.id]
+                }"
+                [pTooltip]="copiedFlags[file.file.id]
+                  ? 'Fetched metadata has been applied.'
+                  : !file.file.fetchedMetadata
+                    ? 'No fetched metadata available. Original metadata will be used.'
+                    : 'Fetched metadata hasn’t been applied yet. Open metadata picker to review.'"
+                tooltipPosition="top">
+              </i>
 
               <p-select
                 size="small"
@@ -223,12 +218,9 @@
               </p-button>
             </div>
 
-
             @if (file.showDetails) {
               <app-bookdrop-file-metadata-picker-component
                 class="px-12 py-8 custom-border1"
-                style="transition: opacity 0.3s ease"
-                #metadataPicker
                 [originalMetadata]="file.file.originalMetadata"
                 [fetchedMetadata]="file.file.fetchedMetadata!"
                 [metadataForm]="file.metadataForm"
@@ -242,29 +234,72 @@
         }
       }
     </div>
+
     <p-divider></p-divider>
-    <div class="pb-4 px-6 gap-4 flex justify-end">
-      @if (bookdropFileUis.length !== 0) {
+
+    <div class="pb-2 px-4 flex items-center justify-between gap-4">
+
+      <div class="flex gap-4 items-center min-w-[160px] justify-start">
+        @if (bookdropFileUis.length > 0) {
+          <p-button
+            label="Select All"
+            icon="pi pi-check-square"
+            severity="info"
+            (click)="selectAll(true)"
+            outlined
+            pTooltip="Select all files across all pages you have navigated"
+            tooltipPosition="top">
+          </p-button>
+
+          <p-button
+            label="Clear All"
+            icon="pi pi-times-circle"
+            severity="warn"
+            (click)="selectAll(false)"
+            outlined
+            pTooltip="Deselect all files across all pages you have navigated"
+            tooltipPosition="top">
+          </p-button>
+        } @else {
+          <div class="min-w-[160px]"></div>
+        }
+      </div>
+
+      <!-- Center container: paginator, flex-grow and centered -->
+      <div class="flex-grow flex justify-center">
+        <p-paginator
+          [rows]="pageSize"
+          [totalRecords]="totalRecords"
+          [first]="currentPage * pageSize"
+          (onPageChange)="loadPage($event.page ?? 0)"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Showing files {first} - {last} of {totalRecords}">
+        </p-paginator>
+      </div>
+
+      <!-- Right container: fixed width, right aligned -->
+      <div class="flex gap-4 items-center min-w-[200px] justify-end">
         <p-button
-          label="Delete Files"
+          [label]="'Delete ' + selectedCount + ' File' + (selectedCount !== 1 ? 's' : '')"
           icon="pi pi-times"
           severity="danger"
+          [disabled]="!hasSelectedFiles"
           outlined
-          pTooltip="Permanently delete all Bookdrop files and discard any changes"
-          tooltipPosition="top"
-          (click)="confirmDelete()">
+          (click)="confirmDelete()"
+          pTooltip="Permanently delete selected Bookdrop files and discard any changes"
+          tooltipPosition="top">
         </p-button>
-      }
+        <p-button
+          [label]="saving ? ('Finalizing ' + selectedCount + ' File' + (selectedCount !== 1 ? 's' : '') + '...') : ('Finalize ' + selectedCount + ' File' + (selectedCount !== 1 ? 's' : ''))"
+          [icon]="saving ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
+          severity="success"
+          outlined
+          [disabled]="!canFinalize || saving"
+          (click)="confirmFinalize()"
+          pTooltip="Move selected files into the chosen library and subpath">
+        </p-button>
+      </div>
 
-      <p-button
-        [label]="saving ? 'Finalize Imports...' : 'Finalize Imports'"
-        [icon]="saving ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
-        severity="success"
-        outlined
-        pTooltip="This will move all staged files into the selected library and subpath."
-        (click)="confirmFinalize()"
-        [disabled]="!canFinalize || saving">
-      </p-button>
     </div>
   }
 </div>
