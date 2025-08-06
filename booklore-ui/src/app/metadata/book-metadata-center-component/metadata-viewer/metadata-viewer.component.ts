@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, Input, OnChanges, OnInit, Optional, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {AsyncPipe, DecimalPipe, NgClass} from '@angular/common';
 import {Observable} from 'rxjs';
@@ -24,7 +24,7 @@ import {MetadataFetchOptionsComponent} from '../../metadata-options-dialog/metad
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {Router} from '@angular/router';
-import {filter, map, take} from 'rxjs/operators';
+import {filter, map, switchMap, take, tap} from 'rxjs/operators';
 import {Menu} from 'primeng/menu';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {BookCardLiteComponent} from '../../../book/components/book-card-lite/book-card-lite-component';
@@ -37,7 +37,6 @@ import {BookCardLiteComponent} from '../../../book/components/book-card-lite/boo
   imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
-
   @Input() book$!: Observable<Book | null>;
   @Input() recommendedBooks: BookRecommendation[] = [];
   @ViewChild(Editor) quillEditor!: Editor;
@@ -49,39 +48,33 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   private bookService = inject(BookService);
   protected urlHelper = inject(UrlHelperService);
   protected userService = inject(UserService);
-  private destroyRef = inject(DestroyRef);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
-
+  private destroyRef = inject(DestroyRef);
   private dialogRef?: DynamicDialogRef;
-
-  constructor(@Optional() dialogRef?: DynamicDialogRef) {
-    this.dialogRef = dialogRef;
-  }
 
   emailMenuItems$!: Observable<MenuItem[]>;
   readMenuItems$!: Observable<MenuItem[]>;
   refreshMenuItems$!: Observable<MenuItem[]>;
   otherItems$!: Observable<MenuItem[]>;
-  bookInSeries: Book[] = [];
 
+  bookInSeries: Book[] = [];
   isExpanded = false;
   showFilePath = false;
   isAutoFetching = false;
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
-
-  readStatusOptions = [
-    {label: 'Unread', value: ReadStatus.UNREAD},
-    {label: 'Reading', value: ReadStatus.READING},
-    {label: 'Re-reading', value: ReadStatus.RE_READING},
-    {label: 'Partially Read', value: ReadStatus.PARTIALLY_READ},
-    {label: 'Paused', value: ReadStatus.PAUSED},
-    {label: 'Read', value: ReadStatus.READ},
-    {label: 'Won’t Read', value: ReadStatus.WONT_READ},
-    {label: 'Abandoned', value: ReadStatus.ABANDONED}
-  ];
-
   selectedReadStatus: ReadStatus = ReadStatus.UNREAD;
+
+  readStatusOptions: { value: ReadStatus, label: string }[] = [
+    {value: ReadStatus.UNREAD, label: 'Unread'},
+    {value: ReadStatus.PAUSED, label: 'Paused'},
+    {value: ReadStatus.READING, label: 'Reading'},
+    {value: ReadStatus.RE_READING, label: 'Re-reading'},
+    {value: ReadStatus.READ, label: 'Read'},
+    {value: ReadStatus.PARTIALLY_READ, label: 'Partially Read'},
+    {value: ReadStatus.ABANDONED, label: 'Abandoned'},
+    {value: ReadStatus.WONT_READ, label: 'Won\'t Read'},
+  ];
 
   ngOnInit(): void {
     this.emailMenuItems$ = this.book$.pipe(
@@ -195,17 +188,24 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['recommendedBooks']) {
       this.originalRecommendedBooks = [...this.recommendedBooks];
-      this.book$.pipe(take(1)).subscribe(book => this.filterRecommendations(book));
+      this.withCurrentBook(book => this.filterRecommendations(book));
     }
   }
 
+  private withCurrentBook(callback: (book: Book | null) => void): void {
+    this.book$.pipe(take(1)).subscribe(callback);
+  }
+
   private loadBooksInSeriesAndFilterRecommended(bookId: number): void {
-    this.bookService.getBooksInSeries(bookId).subscribe(bookInSeries => {
-      bookInSeries.sort((a, b) => (a.metadata?.seriesNumber ?? 0) - (b.metadata?.seriesNumber ?? 0));
-      this.bookInSeries = bookInSeries;
-      this.originalRecommendedBooks = [...this.recommendedBooks];
-      this.book$.pipe(take(1)).subscribe(book => this.filterRecommendations(book));
-    });
+    this.bookService.getBooksInSeries(bookId).pipe(
+      tap(series => {
+        series.sort((a, b) => (a.metadata?.seriesNumber ?? 0) - (b.metadata?.seriesNumber ?? 0));
+        this.bookInSeries = series;
+        this.originalRecommendedBooks = [...this.recommendedBooks];
+      }),
+      switchMap(() => this.book$.pipe(take(1))),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(book => this.filterRecommendations(book));
   }
 
   private filterRecommendations(book: Book | null): void {
@@ -266,6 +266,157 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
       style: {position: 'absolute', top: '15%'},
       data: {book: this.bookService.getBookByIdFromState(bookId)}
     });
+  }
+
+  updateReadStatus(status: ReadStatus): void {
+    if (!status) {
+      return;
+    }
+
+    this.book$.pipe(take(1)).subscribe(book => {
+      if (!book || !book.id) {
+        return;
+      }
+
+      this.bookService.updateBookReadStatus(book.id, status).subscribe({
+        next: (updatedBooks) => {
+          this.selectedReadStatus = status;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Read Status Updated',
+            detail: `Marked as "${this.getStatusLabel(status)}"`,
+            life: 2000
+          });
+        },
+        error: (err) => {
+          console.error('Failed to update read status:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Update Failed',
+            detail: 'Could not update read status.',
+            life: 3000
+          });
+        }
+      });
+    });
+  }
+
+  resetProgress(book: Book): void {
+    this.confirmationService.confirm({
+      message: `Reset reading progress for "${book.metadata?.title}"?`,
+      header: 'Confirm Reset',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.bookService.resetProgress(book.id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Progress Reset',
+              detail: 'Reading progress has been reset.',
+              life: 1500
+            });
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: 'Could not reset progress.',
+              life: 1500
+            });
+          }
+        });
+      }
+    });
+  }
+
+  onPersonalRatingChange(book: Book, {value: personalRating}: RatingRateEvent): void {
+    if (!book?.metadata) return;
+    const updatedMetadata = {...book.metadata, personalRating};
+    this.bookService.updateBookMetadata(book.id, {
+      metadata: updatedMetadata,
+      clearFlags: {personalRating: false}
+    }, false).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Rating Saved',
+          detail: 'Personal rating updated successfully'
+        });
+      },
+      error: err => {
+        console.error('Failed to update personal rating:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: 'Could not update personal rating'
+        });
+      }
+    });
+  }
+
+  resetPersonalRating(book: Book): void {
+    if (!book?.metadata) return;
+    const updatedMetadata = {...book.metadata, personalRating: null};
+    this.bookService.updateBookMetadata(book.id, {
+      metadata: updatedMetadata,
+      clearFlags: {personalRating: true}
+    }, false).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Rating Reset',
+          detail: 'Personal rating has been cleared.'
+        });
+      },
+      error: err => {
+        console.error('Failed to reset personal rating:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Reset Failed',
+          detail: 'Could not reset personal rating'
+        });
+      }
+    });
+  }
+
+  goToAuthorBooks(author: string): void {
+    this.handleMetadataClick('author', author);
+  }
+
+  goToCategory(category: string): void {
+    this.handleMetadataClick('category', category);
+  }
+
+  goToSeries(seriesName: string): void {
+    this.handleMetadataClick('series', seriesName);
+  }
+
+  goToPublisher(publisher: string): void {
+    this.handleMetadataClick('publisher', publisher);
+  }
+
+  private navigateToFilteredBooks(filterKey: string, filterValue: string): void {
+    this.router.navigate(['/all-books'], {
+      queryParams: {
+        view: 'grid',
+        sort: 'title',
+        direction: 'asc',
+        sidebar: true,
+        filter: `${filterKey}:${filterValue}`
+      }
+    });
+  }
+
+  private handleMetadataClick(filterKey: string, filterValue: string): void {
+    if (this.metadataCenterViewMode === 'dialog') {
+      this.dialogRef?.close();
+      setTimeout(() => this.navigateToFilteredBooks(filterKey, filterValue), 200);
+    } else {
+      this.navigateToFilteredBooks(filterKey, filterValue);
+    }
   }
 
   isMetadataFullyLocked(metadata: BookMetadata): boolean {
@@ -369,70 +520,6 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return 'bg-blue-500';
   }
 
-  onPersonalRatingChange(book: Book, {value: personalRating}: RatingRateEvent): void {
-    if (!book?.metadata) return;
-
-    const updatedMetadata = {...book.metadata, personalRating};
-
-    this.bookService.updateBookMetadata(book.id, {
-      metadata: updatedMetadata,
-      clearFlags: {personalRating: false}
-    }, false).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Rating Saved',
-          detail: 'Personal rating updated successfully'
-        });
-      },
-      error: err => {
-        console.error('Failed to update personal rating:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Update Failed',
-          detail: 'Could not update personal rating'
-        });
-      }
-    });
-  }
-
-  goToAuthorBooks(author: string): void {
-    this.handleMetadataClick('author', author);
-  }
-
-  goToCategory(category: string): void {
-    this.handleMetadataClick('category', category);
-  }
-
-  goToSeries(seriesName: string): void {
-    this.handleMetadataClick('series', seriesName);
-  }
-
-  goToPublisher(publisher: string): void {
-    this.handleMetadataClick('publisher', publisher);
-  }
-
-  private navigateToFilteredBooks(filterKey: string, filterValue: string): void {
-    this.router.navigate(['/all-books'], {
-      queryParams: {
-        view: 'grid',
-        sort: 'title',
-        direction: 'asc',
-        sidebar: true,
-        filter: `${filterKey}:${filterValue}`
-      }
-    });
-  }
-
-  private handleMetadataClick(filterKey: string, filterValue: string): void {
-    if (this.metadataCenterViewMode === 'dialog') {
-      this.dialogRef?.close();
-      setTimeout(() => this.navigateToFilteredBooks(filterKey, filterValue), 200);
-    } else {
-      this.navigateToFilteredBooks(filterKey, filterValue);
-    }
-  }
-
   getRatingTooltip(book: Book, source: 'amazon' | 'goodreads' | 'hardcover'): string {
     const meta = book?.metadata;
     if (!meta) return '';
@@ -469,70 +556,6 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return this.readStatusOptions.find(o => o.value === value)?.label.toUpperCase() ?? 'UNSET';
   }
 
-  updateReadStatus(status: ReadStatus): void {
-    if (!status) {
-      return;
-    }
-
-    this.book$.pipe(take(1)).subscribe(book => {
-      if (!book || !book.id) {
-        return;
-      }
-
-      this.bookService.updateBookReadStatus(book.id, status).subscribe({
-        next: (updatedBooks) => {
-          this.selectedReadStatus = status;
-          // The book state will be updated automatically by the service
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Read Status Updated',
-            detail: `Marked as "${this.getStatusLabel(status)}"`,
-            life: 2000
-          });
-        },
-        error: (err) => {
-          console.error('Failed to update read status:', err);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Update Failed',
-            detail: 'Could not update read status.',
-            life: 3000
-          });
-        }
-      });
-    });
-  }
-
-  resetProgress(book: Book): void {
-    this.confirmationService.confirm({
-      message: `Reset reading progress for "${book.metadata?.title}"?`,
-      header: 'Confirm Reset',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Yes',
-      rejectLabel: 'Cancel',
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => {
-        this.bookService.resetProgress(book.id).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Progress Reset',
-              detail: 'Reading progress has been reset.',
-              life: 1500
-            });
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Failed',
-              detail: 'Could not reset progress.',
-              life: 1500
-            });
-          }
-        });
-      }
-    });
-  }
 
   formatDate(dateString: string | undefined): string {
     if (!dateString) return '';

@@ -9,7 +9,7 @@
 
       <p-step-panel [value]="1">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="flex flex-col justify-between w-full md:w-[40rem] max-w-[50rem] mx-auto">
+          <div class="flex flex-col justify-between w-full md:w-[45rem] max-w-[50rem] mx-auto">
 
             <div class="flex-grow flex items-center justify-center">
               <div class="grid grid-cols-[auto,1fr] gap-x-6 gap-y-10 border border-[var(--border-color)] p-6 rounded-xl w-full">
@@ -46,7 +46,6 @@
                     tooltipPosition="right"></i>
                 </div>
               </div>
-              <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>
             </div>
 
             <div class="flex justify-end pt-6">
@@ -63,7 +62,7 @@
 
       <p-step-panel [value]="2">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="flex flex-col justify-between w-[24rem] md:w-[40rem] max-w-[50rem] mx-auto">
+          <div class="flex flex-col justify-between w-[24rem] md:w-[45rem] max-w-[50rem] mx-auto">
 
             <div class="flex-grow flex items-center justify-center">
               <div class="flex flex-col gap-6 border border-[var(--border-color)] px-2 py-4 md:p-6 rounded-xl w-full">

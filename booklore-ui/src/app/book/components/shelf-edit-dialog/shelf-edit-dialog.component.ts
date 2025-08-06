@@ -1,19 +1,18 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {ShelfService} from '../../service/shelf.service';
-import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Button} from 'primeng/button';
-import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
 import {InputText} from 'primeng/inputtext';
 
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Shelf} from '../../model/shelf.model';
 import {MessageService} from 'primeng/api';
+import {IconPickerService} from '../../../utilities/services/icon-picker.service';
 
 @Component({
   selector: 'app-shelf-edit-dialog',
   imports: [
     Button,
-    IconPickerComponent,
     InputText,
     ReactiveFormsModule,
     FormsModule
@@ -28,12 +27,11 @@ export class ShelfEditDialogComponent implements OnInit{
   private dynamicDialogConfig = inject(DynamicDialogConfig);
   private dynamicDialogRef = inject(DynamicDialogRef);
   private messageService = inject(MessageService);
+  private iconPickerService = inject(IconPickerService);
 
   shelfName: string = '';
   selectedIcon: string | null = null;
   shelf!: Shelf | undefined;
-
-  @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
 
   ngOnInit(): void {
     const shelfId = this.dynamicDialogConfig?.data.shelfId;
@@ -45,17 +43,15 @@ export class ShelfEditDialogComponent implements OnInit{
   }
 
   openIconPicker() {
-    if (this.iconPicker) {
-      this.iconPicker.open();
-    }
+    this.iconPickerService.open().subscribe(icon => {
+      if (icon) {
+        this.selectedIcon = icon;
+      }
+    })
   }
 
   clearSelectedIcon() {
     this.selectedIcon = null;
-  }
-
-  onIconSelected(icon: string) {
-    this.selectedIcon = icon;
   }
 
   save() {

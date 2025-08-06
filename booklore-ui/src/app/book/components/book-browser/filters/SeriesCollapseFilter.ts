@@ -44,10 +44,11 @@ export class SeriesCollapseFilter implements BookFilter {
     this.seriesCollapseSubject.next(value);
   }
 
-  filter(bookState: BookState): Observable<BookState> {
+  filter(bookState: BookState, forceExpandSeries?: boolean): Observable<BookState> {
     return this.seriesCollapse$.pipe(
       map(isCollapsed => {
-        if (!isCollapsed || !bookState.books) return bookState;
+        const shouldCollapse = forceExpandSeries ? false : isCollapsed;
+        if (!shouldCollapse || !bookState.books) return bookState;
 
         const books = [...bookState.books];
 
