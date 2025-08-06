@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.model.dto;
+package com.adityachandel.booklore.model.dto.progress;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class PdfProgress {
+public class CbxProgress {
     @NotNull
     Integer page;
     @NotNull

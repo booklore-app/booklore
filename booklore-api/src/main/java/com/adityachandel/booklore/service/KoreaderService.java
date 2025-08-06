@@ -1,11 +1,12 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.security.KoreaderUserDetails;
-import com.adityachandel.booklore.model.dto.KoreaderProgress;
+import com.adityachandel.booklore.model.dto.progress.KoreaderProgress;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.KoreaderUserEntity;
 import com.adityachandel.booklore.model.entity.UserBookProgressEntity;
+import com.adityachandel.booklore.model.enums.ReadStatus;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.KoreaderUserRepository;
 import com.adityachandel.booklore.repository.UserBookProgressRepository;
@@ -79,8 +80,8 @@ public class KoreaderService {
                 .document(bookHash)
                 .progress(progress.getKoreaderProgress())
                 .percentage(progress.getKoreaderProgressPercent())
-                .device(progress.getKoreaderDevice())
-                .device_id(progress.getKoreaderDeviceId())
+                .device("BookLore")
+                .device_id("BookLore")
                 .build();
     }
 
@@ -100,8 +101,11 @@ public class KoreaderService {
         progress.setKoreaderProgressPercent(koreaderProgress.getPercentage());
         progress.setKoreaderDevice(koreaderProgress.getDevice());
         progress.setKoreaderDeviceId(koreaderProgress.getDevice_id());
+        progress.setKoreaderLastSyncTime(Instant.now());
+        if(koreaderProgress.getPercentage() * 100 >= 0.5) {
+            progress.setReadStatus(ReadStatus.READING);
+        }
         progress.setLastReadTime(Instant.now());
-
         progressRepository.save(progress);
     }
 }

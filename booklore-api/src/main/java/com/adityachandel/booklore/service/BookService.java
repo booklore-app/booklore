@@ -4,6 +4,10 @@ import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.*;
+import com.adityachandel.booklore.model.dto.progress.CbxProgress;
+import com.adityachandel.booklore.model.dto.progress.EpubProgress;
+import com.adityachandel.booklore.model.dto.progress.KoProgress;
+import com.adityachandel.booklore.model.dto.progress.PdfProgress;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.response.BookDeletionResponse;
 import com.adityachandel.booklore.model.entity.*;
@@ -143,6 +147,12 @@ public class BookService {
                     .cfi(userProgress.getEpubProgress())
                     .percentage(userProgress.getEpubProgressPercent())
                     .build());
+            if (userProgress.getKoreaderProgressPercent() != null) {
+                if (book.getKoreaderProgress() == null) {
+                    book.setKoreaderProgress(new KoProgress());
+                }
+                book.getKoreaderProgress().setPercentage(userProgress.getKoreaderProgressPercent() * 100);
+            }
         }
         if (bookEntity.getBookType() == BookFileType.CBX) {
             book.setCbxProgress(CbxProgress.builder()

@@ -1,12 +1,13 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.config.security.KoreaderUserDetails;
-import com.adityachandel.booklore.model.dto.KoreaderProgress;
+import com.adityachandel.booklore.model.dto.progress.KoreaderProgress;
 import com.adityachandel.booklore.service.KoreaderService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,6 @@ public class KoreaderController {
 
     private final KoreaderService koreaderService;
 
-
     @GetMapping("/users/auth")
     public ResponseEntity<Map<String, String>> authorizeUser() {
         return koreaderService.authorizeUser();
@@ -34,14 +34,15 @@ public class KoreaderController {
     }
 
     @GetMapping("/syncs/progress/{bookHash}")
-    public ResponseEntity<?> getProgress(@PathVariable String bookHash) {
+    public ResponseEntity<KoreaderProgress> getProgress(@PathVariable String bookHash) {
         KoreaderProgress progress = koreaderService.getProgress(bookHash);
-        return ResponseEntity.ok(progress);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(progress);
     }
 
     @PutMapping("/syncs/progress")
     public ResponseEntity<?> updateProgress(@Valid @RequestBody KoreaderProgress koreaderProgress) {
-        log.info(koreaderProgress.toString());
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!(principal instanceof KoreaderUserDetails)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "User not authenticated or invalid principal type"));

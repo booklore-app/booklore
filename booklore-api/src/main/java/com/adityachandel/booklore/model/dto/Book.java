@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto;
 
+import com.adityachandel.booklore.model.dto.progress.*;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
@@ -27,6 +28,7 @@ public class Book {
     private PdfProgress pdfProgress;
     private EpubProgress epubProgress;
     private CbxProgress cbxProgress;
+    private KoProgress koreaderProgress;
     private Set<Shelf> shelves;
     private String readStatus;
     private Instant dateFinished;

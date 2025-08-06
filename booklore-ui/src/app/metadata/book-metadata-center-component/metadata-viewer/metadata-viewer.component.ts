@@ -74,6 +74,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     {value: ReadStatus.PARTIALLY_READ, label: 'Partially Read'},
     {value: ReadStatus.ABANDONED, label: 'Abandoned'},
     {value: ReadStatus.WONT_READ, label: 'Won\'t Read'},
+    {value: ReadStatus.UNSET, label: 'Unset'},
   ];
 
   ngOnInit(): void {
@@ -520,6 +521,11 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return 'bg-blue-500';
   }
 
+  getKOReaderPercentage(book: Book): number | null {
+    const p = book?.koreaderProgress?.percentage;
+    return p != null ? Math.round(p) : null;
+  }
+
   getRatingTooltip(book: Book, source: 'amazon' | 'goodreads' | 'hardcover'): string {
     const meta = book?.metadata;
     if (!meta) return '';
@@ -566,4 +572,6 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
       day: 'numeric'
     });
   }
+
+  protected readonly Math = Math;
 }

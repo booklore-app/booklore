@@ -14,6 +14,7 @@ export interface Book {
   epubProgress?: EpubProgress;
   pdfProgress?: PdfProgress;
   cbxProgress?: CbxProgress;
+  koreaderProgress?: KoReaderProgress;
   filePath?: string;
   fileSubPath?: string;
   fileName?: string;
@@ -37,6 +38,10 @@ export interface PdfProgress {
 
 export interface CbxProgress {
   page: number;
+  percentage: number;
+}
+
+export interface KoReaderProgress {
   percentage: number;
 }
 

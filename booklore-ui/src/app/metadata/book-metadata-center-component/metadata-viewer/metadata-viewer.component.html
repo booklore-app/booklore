@@ -197,7 +197,7 @@
           }
 
           <div class="px-1 md:px-0">
-            <div class="grid md:grid-cols-3 gap-y-2.5 text-sm pt-2 md:pt-4 pb-2 text-gray-300 max-w-6xl">
+            <div class="grid md:grid-cols-4 gap-y-2.5 text-sm pt-2 md:pt-4 pb-2 text-gray-300 max-w-7xl">
               <p class="whitespace-nowrap max-w-[250px] overflow-hidden text-ellipsis">
                 <span class="font-bold">Publisher: </span>
                 @if (book?.metadata?.publisher) {
@@ -210,6 +210,7 @@
               </p>
               <p><strong>Published:</strong> {{ book?.metadata!.publishedDate || '-' }}</p>
               <p><strong>Language:</strong> {{ book?.metadata!.language || '-' }}</p>
+              <p><strong>File Size:</strong> {{ getFileSizeInMB(book) }}</p>
               <p class="whitespace-nowrap flex items-center gap-2">
                 <span class="font-bold">File Type:</span>
                 <span
@@ -218,36 +219,8 @@
                   {{ getFileExtension(book?.filePath) || '-' }}
                 </span>
               </p>
-              <p><strong>File Size:</strong> {{ getFileSizeInMB(book) }}</p>
-              <p>
-                <strong>ISBN:</strong>
-                @if (book?.metadata?.isbn13 || book?.metadata?.isbn10) {
-                  {{ book.metadata!.isbn13 }}
-                  @if (book?.metadata?.isbn13 && book?.metadata?.isbn10) {
-                    /
-                  }
-                  {{ book.metadata!.isbn10 }}
-                } @else {
-                  <span>-</span>
-                }
-              </p>
-              <p class="whitespace-nowrap flex items-center gap-2">
-                <span class="font-bold">Read Status:</span>
-                <span
-                  class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white cursor-pointer"
-                  [ngClass]="getStatusSeverityClass(selectedReadStatus)"
-                  (click)="menu.toggle($event)">
-                  {{ getStatusLabel(selectedReadStatus) }}
-              </span>
-                <p-menu #menu [popup]="true" [model]="readStatusMenuItems"></p-menu>
-                @if (selectedReadStatus === 'READ' && book?.dateFinished) {
-                  <span class="text-xs text-gray-400 ml-2">
-                    Finished on {{ formatDate(book.dateFinished) }}
-                  </span>
-                }
-              </p>
               <p class="whitespace-nowrap flex items-center">
-                <span class="font-bold mr-2">Progress:</span>
+                <span class="font-bold mr-2">BookLore Progress:</span>
                 <span class="inline-flex items-center">
                   <span
                     class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
@@ -280,6 +253,45 @@
                   <span>-</span>
                 }
               </p>
+              <p>
+                <strong>ISBN:</strong>
+                @if (book?.metadata?.isbn13 || book?.metadata?.isbn10) {
+                  {{ book.metadata!.isbn13 }}
+                  @if (book?.metadata?.isbn13 && book?.metadata?.isbn10) {
+                    /
+                  }
+                  {{ book.metadata!.isbn10 }}
+                } @else {
+                  <span>-</span>
+                }
+              </p>
+              <p class="whitespace-nowrap flex items-center gap-2">
+                <span class="font-bold">Read Status:</span>
+                <span
+                  class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white cursor-pointer"
+                  [ngClass]="getStatusSeverityClass(selectedReadStatus)"
+                  (click)="menu.toggle($event)">
+                  {{ getStatusLabel(selectedReadStatus) }}
+              </span>
+                <p-menu #menu [popup]="true" [model]="readStatusMenuItems"></p-menu>
+                @if (selectedReadStatus === 'READ' && book?.dateFinished) {
+                  <span class="text-xs text-gray-400 ml-2">
+                    Finished on {{ formatDate(book.dateFinished) }}
+                  </span>
+                }
+              </p>
+              @if (book?.koreaderProgress && book.koreaderProgress?.percentage != null) {
+                <p class="whitespace-nowrap flex items-center">
+                  <span class="font-bold mr-2">KOReader Progress:</span>
+                  <span class="inline-flex items-center">
+                  <span
+                    class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                    [ngClass]="getProgressColorClass(getKOReaderPercentage(book))">
+                    {{ getKOReaderPercentage(book) + '%' }}
+                  </span>
+                </span>
+                </p>
+              }
             </div>
 
             <div class="flex items-center gap-2">

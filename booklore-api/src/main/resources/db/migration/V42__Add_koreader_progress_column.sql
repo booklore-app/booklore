@@ -1,5 +1,6 @@
 ALTER TABLE user_book_progress
-    ADD koreader_progress         varchar(1000) null,
-    ADD koreader_progress_percent float         null,
-    ADD koreader_device           varchar(100)  null,
-    ADD koreader_device_id        varchar(100)  null;
+    ADD COLUMN IF NOT EXISTS koreader_progress VARCHAR(1000),
+    ADD COLUMN IF NOT EXISTS koreader_progress_percent FLOAT,
+    ADD COLUMN IF NOT EXISTS koreader_device VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS koreader_device_id VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS koreader_last_sync_time TIMESTAMP;

@@ -1,8 +1,8 @@
 package com.adityachandel.booklore.model.dto.request;
 
-import com.adityachandel.booklore.model.dto.CbxProgress;
-import com.adityachandel.booklore.model.dto.EpubProgress;
-import com.adityachandel.booklore.model.dto.PdfProgress;
+import com.adityachandel.booklore.model.dto.progress.CbxProgress;
+import com.adityachandel.booklore.model.dto.progress.EpubProgress;
+import com.adityachandel.booklore.model.dto.progress.PdfProgress;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

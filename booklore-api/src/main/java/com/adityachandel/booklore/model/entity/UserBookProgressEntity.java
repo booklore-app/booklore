@@ -66,4 +66,7 @@ public class UserBookProgressEntity {
 
     @Column(name = "date_finished")
     private Instant dateFinished;
+
+    @Column(name = "koreader_last_sync_time")
+    private Instant koreaderLastSyncTime;
 }
