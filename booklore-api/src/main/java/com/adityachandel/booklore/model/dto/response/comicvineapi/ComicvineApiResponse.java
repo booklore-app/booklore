@@ -2,15 +2,10 @@ package com.adityachandel.booklore.model.dto.response.comicvineapi;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 import java.util.List;
-
 
 @Data
 @NoArgsConstructor
@@ -30,5 +25,4 @@ public class ComicvineApiResponse {
     private int statusCode;
     private List<Comic> results;
     private String version;
-
 }
