@@ -83,8 +83,9 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
           distinctUntilChanged(([prevBook], [currBook]) => prevBook?.id === currBook?.id)
         )
         .subscribe(([book, settings]) => {
-          this.providers = Object.entries(settings!.metadataProviderSettings)
-            .filter(([_, value]) => value.enabled)
+          const providerSettings = settings?.metadataProviderSettings ?? {};
+          this.providers = Object.entries(providerSettings)
+            .filter(([_, value]) => !!value && typeof value === 'object' && 'enabled' in value && (value as any).enabled)
             .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));
 
           this.resetFormFromBook(book!);
@@ -183,7 +184,14 @@ export class MetadataSearcherComponent implements OnInit, OnDestroy {
     } else if (metadata.hardcoverId) {
       return `<a href="https://hardcover.app/books/${metadata.hardcoverId}" target="_blank">Hardcover</a>`;
     }
-
+    else if (metadata.comicvineId) {
+      if( metadata.comicvineId.startsWith('4000')) {
+        const name = metadata.seriesName ? metadata.seriesName.replace(/ /g, '-').toLowerCase() + "-" + metadata.seriesNumber : '';
+        return `<a href="https://comicvine.gamespot.com/${name}/${metadata.comicvineId}" target="_blank">Comicvine</a>`;
+      }
+      const name = metadata.seriesName;
+      return `<a href="https://comicvine.gamespot.com/volume/${metadata.comicvineId}" target="_blank">Comicvine</a>`;
+    }
     throw new Error("No provider ID found in metadata.");
   }
 }

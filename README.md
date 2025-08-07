@@ -7,23 +7,31 @@
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/booklore?label=Open%20Collective&logo=opencollective&color=blue)](https://opencollective.com/booklore)
 [![Venmo](https://img.shields.io/badge/Venmo-Donate-blue?logo=venmo)](https://venmo.com/AdityaChandel)
 
+> 🚨 **Important Announcement:**  
+> Docker images have moved to new repositories:
+> - Docker Hub: `https://hub.docker.com/r/booklore/booklore`
+> - GitHub Container Registry: `https://ghcr.io/booklore-app/booklore`
+>
+> The legacy repo (`https://ghcr.io/adityachandelgit/booklore-app`) will remain available for existing images but will not receive further updates.
+
+
 BookLore is a self-hosted web app for organizing and managing your personal book collection. It provides an intuitive interface to browse, read, and track your progress across PDFs and eBooks. With robust metadata management, multi-user support, and a sleek, modern UI, BookLore makes it easy to build and explore your personal library.
 
 ![BookLore Demo](assets/demo.gif)
 
 ## ✨ Key Features
 
-- 📚 **Powerful Book Organization**: Keep your library organized with Libraries and Shelves. Sort by genre, author, or mood to find books easily.
-- 🧠 **Intelligent Metadata Management**: Fetch rich metadata from Goodreads, Amazon, Google Books, Hardcover, and more, or fine-tune details with the advanced editor.
-- 👥 **Multi-User Access with Permissions**: Add users, assign libraries, and control who can edit, upload, or download. Great for families, friends, or teams.
-- 📖 **Built-in PDF, ePub, and CBX Reader**: Enjoy a smooth, distraction-free reading experience in your browser, with theme and setting options.
-- 🌐 **OPDS 1.2 Integration**: Connect BookLore to favorite reading apps with full OPDS support for seamless downloads.
-- 🔐 **Flexible Authentication**: Secure your library with optional OIDC login (Authentik, Pocket ID) or local JWT, your choice.
-- 📤 **Smart Batch Upload with BookDrop Folder**: Drop dozens of books into the BookDrop folder; BookLore scans, organizes, and fetches metadata automatically.
-- 📧 **Send Books by Email**: Easily share books by sending them directly via email from within BookLore—one click delivery.
-- 📱 **Mobile-Optimized UI**: Responsive design for phones and tablets lets you manage your library anywhere.
-- 🔄 **Open Source & Self-Hosted**: Full control of your digital library with open-source, self-hosted BookLore.
-- 🚀 **Active Development**: Continuous improvements with regular updates to features, UI, and performance.
+- 📚 **Book Organization**: Organize with Libraries and Shelves. Sort by genre, author, or mood.
+- 🧠 **Smart Metadata**: Auto-fetch from Goodreads, Amazon, Google Books, Hardcover, and more.
+- 👥 **Multi-User with Permissions**: Add users, assign libraries, control edit/upload/download access.
+- 📖 **Built-in Reader**: Read PDFs, ePubs, and CBX files in your browser with customizable themes.
+- 🌐 **OPDS 1.2 Support**: Connect to reading apps for seamless downloads.
+- 🔐 **Flexible Auth**: Optional OIDC login (Authentik, Pocket ID) or local JWT.
+- 📤 **BookDrop Auto-Import**: Drop books in a folder for automatic scanning and metadata fetching.
+- 📧 **Email Sharing**: Send books directly via email with one click.
+- 📱 **Mobile-Optimized**: Responsive design for phones and tablets.
+- 🔄 **Open Source & Self-Hosted**: Full control of your digital library.
+- 🚀 **Active Development**: Regular updates to features, UI, and performance.
 
 ## 💖 Support the Project
 
@@ -35,15 +43,19 @@ If you find **BookLore** helpful, please consider supporting its development:
   > 💡 [Support the Kobo Sync Bounty →](https://opencollective.com/booklore/projects/kobo-device-for-testing)
 - ⚡ Prefer one-time support? You can also donate via [Venmo](https://venmo.com/AdityaChandel).
 
-## 🌐 Live Demo: Experience BookLore in Action
+## 🌐 Live Demo: Explore BookLore in Action
 
-Explore the full capabilities of BookLore firsthand at [booklore-demo.adityachandel.top](https://booklore-demo.adityachandel.top).
+Evaluate BookLore’s features and user experience in a live environment:
 
-**Access Credentials:**
-- **Username:** `booklore`
-- **Password:** `9HC20PGGfitvWaZ1`
+**Demo Access:**  
+- 🌐 **URL:** [demo.booklore.dev](https://demo.booklore.dev)
+- 👤 **Username:** `booklore`
+- 🔑 **Password:** `9HC20PGGfitvWaZ1`
 
-Log in, explore the features, and discover how BookLore can transform personal library management.
+> ⚠️ **Note:**
+> The demo account has standard user permissions only.
+> - **Admin features** (user management, library setup, advanced configuration) are not available in this demo.
+> - To explore all capabilities, including administration and multi-user management, please deploy your own instance as described below.
 
 ## 🚀 Getting Started with BookLore
 
@@ -64,6 +76,12 @@ You can quickly set up and run BookLore using Docker.
 
 Ensure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
+**Image Repositories:**
+- Docker Hub: `https://hub.docker.com/r/booklore/booklore`
+- GitHub Container Registry: `https://ghcr.io/booklore-app/booklore`
+
+> **Note:** Legacy images under `https://ghcr.io/adityachandelgit/booklore-app` will remain available but will not receive new updates.
+
 ### 2️⃣ Create docker-compose.yml
 
 Create a `docker-compose.yml` file with content:
@@ -71,7 +89,10 @@ Create a `docker-compose.yml` file with content:
 ```yaml
 services:
   booklore:
-    image: ghcr.io/adityachandelgit/booklore-app:latest
+    # Official Docker Hub image:
+    image: booklore/booklore:latest
+    # Or the GHCR image:
+    # image: ghcr.io/booklore-app/booklore:latest
     container_name: booklore
     environment:
       - PUID=1000
@@ -155,8 +176,8 @@ services:
       - /your/local/path/to/booklore/data:/app/data
       - /your/local/path/to/booklore/books:/books
       - /your/local/path/to/booklore/bookdrop:/bookdrop # 👈 Bookdrop directory
-```      
-      
+```
+
 ## 🔑 OIDC/OAuth2 Authentication (Authentik, Pocket ID, etc.)
 
 
@@ -168,6 +189,13 @@ For detailed instructions on setting up OIDC authentication:
 
 - 📺 [YouTube video on configuring Authentik with BookLore](https://www.youtube.com/watch?v=r6Ufh9ldF9M)
 - 📘 [Step-by-step setup guide for Pocket ID](docs/OIDC-Setup-With-PocketID.md)
+
+## 🛡️ Forward Auth with Reverse Proxy
+
+BookLore also supports **Forward Auth** (also known as Remote Auth) for authentication through reverse proxies like **Traefik**, **Nginx**, or **Caddy**. Forward Auth works by having your reverse proxy handle authentication and pass user information via HTTP headers to BookLore. This can be set up with providers like **Authelia** and **Authentik**.
+
+For detailed setup instructions and configuration examples:
+- 📘 [Complete Forward Auth Setup Guide](docs/forward-auth-with-proxy.md)
 
 ## 🤝 Community & Support
 
@@ -195,4 +223,3 @@ Thanks to all the amazing people who contribute to Booklore.
 
 * [GNU GPL v3](http://www.gnu.org/licenses/gpl.html)
 * Copyright 2024-2025
-

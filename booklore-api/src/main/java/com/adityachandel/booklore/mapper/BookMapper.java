@@ -6,7 +6,10 @@ import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.CategoryEntity;
 import com.adityachandel.booklore.model.entity.LibraryPathEntity;
-import org.mapstruct.*;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.Set;
 import java.util.stream.Collectors;

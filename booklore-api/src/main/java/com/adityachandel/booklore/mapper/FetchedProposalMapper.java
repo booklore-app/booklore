@@ -5,7 +5,10 @@ import com.adityachandel.booklore.model.dto.FetchedProposal;
 import com.adityachandel.booklore.model.entity.MetadataFetchProposalEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.*;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")

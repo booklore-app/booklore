@@ -80,14 +80,18 @@
                   <div class="flex flex-col md:flex-row gap-2 md:gap-4 justify-between">
                     <p class="font-bold">{{ truncateText(metadata['title']!, 90) }}</p>
                     <div class="flex flex-wrap gap-2 text-sm">
-                      <p>ISBN: {{ metadata['isbn10'] || metadata['asin'] }}</p>
-                      <span class="hidden md:inline">|</span>
+                      @if (metadata['isbn10'] || metadata['asin']) {
+                        <p>ISBN: {{ metadata['isbn10'] || metadata['asin'] }}</p>
+                        <span class="hidden md:inline">|</span>
+                      }
                       <p>Published: {{ metadata['publishedDate'] }}</p>
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2 text-sm">
-                    <p>by {{ truncateText(metadata['authors']!.join(', '), 70) }}</p>
-                    <span class="hidden md:inline">|</span>
+                    @if (metadata['authors'] && metadata['authors'].length > 0) {
+                      <p>by {{ truncateText(metadata['authors'].join(', '), 70) }}</p>
+                      <span class="hidden md:inline">|</span>
+                    }
                     <p>Source: <span [innerHTML]="buildProviderLink(metadata)"></span></p>
                   </div>
                   <p class="mt-4 truncate-text p-secondary">
