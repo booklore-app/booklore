@@ -80,8 +80,48 @@
   z-index: 3;
 }
 
+.cover-progress-bar,
+.cover-progress-bar-ko-both,
+.cover-progress-bar-ko-only {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cover-progress-bar {
+  bottom: 0;
+}
+
+.cover-progress-bar-ko-both {
+  bottom: 0;
+  height: 12px;
+  z-index: 3;
+}
+
+.cover-progress-bar-ko-only {
+  bottom: 0;
+}
+
 ::ng-deep .p-inputchips {
   width: 100%;
+}
+
+::ng-deep .progress-incomplete .p-progressbar-value {
+  background-color: #3b82f6;
+}
+
+::ng-deep .progress-complete .p-progressbar-value {
+  background-color: #22c55e;
+}
+
+::ng-deep .progress-incomplete-ko .p-progressbar-value {
+  background-color: #fbbf24;
+}
+
+::ng-deep .progress-complete-ko .p-progressbar-value {
+  background-color: #8b5cf6;
 }
 
 ::ng-deep .custom-button-padding .p-button {

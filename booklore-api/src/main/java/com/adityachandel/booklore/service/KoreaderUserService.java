@@ -1,62 +1,71 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.security.AuthenticationService;
+import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.KoreaderUserMapper;
-import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.KoreaderUser;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.KoreaderUserEntity;
 import com.adityachandel.booklore.repository.KoreaderUserRepository;
 import com.adityachandel.booklore.repository.UserRepository;
-import com.adityachandel.booklore.service.user.UserService;
 import com.adityachandel.booklore.util.Md5Util;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KoreaderUserService {
 
-    private final AuthenticationService authenticationService;
+    private final AuthenticationService authService;
     private final UserRepository userRepository;
     private final KoreaderUserRepository koreaderUserRepository;
     private final KoreaderUserMapper koreaderUserMapper;
 
     @Transactional
-    public KoreaderUser createUser(String username, String rawPassword, String displayName) {
+    public KoreaderUser upsertUser(String username, String rawPassword) {
+        Long ownerId = authService.getAuthenticatedUser().getId();
+        BookLoreUserEntity owner = userRepository.findById(ownerId)
+            .orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(ownerId));
 
-        Long id = authenticationService.getAuthenticatedUser().getId();
-        Optional<BookLoreUserEntity> bookLoreUser = userRepository.findById(id);
-
-
-        if (koreaderUserRepository.findByUsername(username).isPresent()) {
-            throw new IllegalArgumentException("Username already exists: " + username);
-        }
         String md5Password = Md5Util.md5Hex(rawPassword);
-        KoreaderUserEntity user = new KoreaderUserEntity();
-        user.setBookLoreUser(bookLoreUser.get());
+        Optional<KoreaderUserEntity> existing = koreaderUserRepository.findByBookLoreUserId(ownerId);
+        boolean isUpdate = existing.isPresent();
+        KoreaderUserEntity user = existing.orElseGet(() -> {
+            KoreaderUserEntity u = new KoreaderUserEntity();
+            u.setBookLoreUser(owner);
+            return u;
+        });
+
         user.setUsername(username);
-        user.setPassword(md5Password);
-        user.setDisplayName(displayName);
-        KoreaderUserEntity savedUser = koreaderUserRepository.save(user);
-        return koreaderUserMapper.toDto(savedUser);
+        user.setPassword(rawPassword);
+        user.setPasswordMD5(md5Password);
+        KoreaderUserEntity saved = koreaderUserRepository.save(user);
+
+        log.info("upsertUser: {} KoreaderUser [id={}, username='{}'] for BookLoreUser='{}'",
+                 isUpdate ? "Updated" : "Created",
+                 saved.getId(), saved.getUsername(),
+                 authService.getAuthenticatedUser().getUsername());
+
+        return koreaderUserMapper.toDto(saved);
     }
 
-    @Transactional(readOnly = true)
-    public KoreaderUser findUserDtoByUsername(String username) {
-        KoreaderUserEntity user = koreaderUserRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
+    public KoreaderUser getUser() {
+        Long id = authService.getAuthenticatedUser().getId();
+        KoreaderUserEntity user = koreaderUserRepository.findByBookLoreUserId(id)
+                .orElseThrow(() -> ApiError.GENERIC_NOT_FOUND.createException("Koreader user not found for BookLore user ID: " + id));
         return koreaderUserMapper.toDto(user);
     }
 
-    @Transactional(readOnly = true)
-    public List<KoreaderUser> findAllUsers() {
-        List<KoreaderUserEntity> users = koreaderUserRepository.findAll();
-        return koreaderUserMapper.toDtoList(users);
+    public void toggleSync(boolean enabled) {
+        Long id = authService.getAuthenticatedUser().getId();
+        KoreaderUserEntity user = koreaderUserRepository.findByBookLoreUserId(id)
+                .orElseThrow(() -> ApiError.GENERIC_NOT_FOUND.createException("Koreader user not found for BookLore user ID: " + id));
+        user.setSyncEnabled(enabled);
+        koreaderUserRepository.save(user);
     }
 }

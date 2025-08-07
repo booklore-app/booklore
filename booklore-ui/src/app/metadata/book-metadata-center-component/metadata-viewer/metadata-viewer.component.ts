@@ -28,6 +28,7 @@ import {filter, map, switchMap, take, tap} from 'rxjs/operators';
 import {Menu} from 'primeng/menu';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {BookCardLiteComponent} from '../../../book/components/book-card-lite/book-card-lite-component';
+import {ResetProgressType, ResetProgressTypes} from '../../../shared/constants/reset-progress-type';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -302,7 +303,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     });
   }
 
-  resetProgress(book: Book): void {
+  resetProgress(book: Book, type: ResetProgressType): void {
     this.confirmationService.confirm({
       message: `Reset reading progress for "${book.metadata?.title}"?`,
       header: 'Confirm Reset',
@@ -311,7 +312,7 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
       rejectLabel: 'Cancel',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.bookService.resetProgress(book.id).subscribe({
+        this.bookService.resetProgress(book.id, type).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
@@ -430,11 +431,24 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return sizeKb != null ? `${(sizeKb / 1024).toFixed(2)} MB` : '-';
   }
 
-  getProgressPercent(book: Book | null): number | undefined {
-    if (!book) return;
-    return book.bookType === 'PDF' ? book.pdfProgress?.percentage
-      : book.bookType === 'CBX' ? book.cbxProgress?.percentage
-        : book.epubProgress?.percentage;
+  getProgressPercent(book: Book): number | null {
+    if (book.epubProgress?.percentage != null) {
+      return book.epubProgress.percentage;
+    }
+    if (book.pdfProgress?.percentage != null) {
+      return book.pdfProgress.percentage;
+    }
+    if (book.cbxProgress?.percentage != null) {
+      return book.cbxProgress.percentage;
+    }
+    return null;
+  }
+
+  getKoProgressPercent(book: Book): number | null {
+    if (book.koreaderProgress?.percentage != null) {
+      return book.koreaderProgress.percentage;
+    }
+    return null;
   }
 
   getFileExtension(filePath?: string): string | null {
@@ -521,9 +535,14 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     return 'bg-blue-500';
   }
 
+  getKoProgressColorClass(progress: number | null | undefined): string {
+    if (progress == null) return 'bg-gray-600';
+    return 'bg-amber-500';
+  }
+
   getKOReaderPercentage(book: Book): number | null {
     const p = book?.koreaderProgress?.percentage;
-    return p != null ? Math.round(p) : null;
+    return p != null ? Math.round(p * 10) / 10 : null;
   }
 
   getRatingTooltip(book: Book, source: 'amazon' | 'goodreads' | 'hardcover'): string {
@@ -573,5 +592,5 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     });
   }
 
-  protected readonly Math = Math;
+  protected readonly ResetProgressTypes = ResetProgressTypes;
 }

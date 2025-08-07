@@ -160,7 +160,7 @@ jobs:
           gh release edit ${{ env.new_tag }} --draft=false
 
       - name: Notify Discord of New Release
-        if: github.ref == 'refs/heads/master' && secrets.DISCORD_WEBHOOK_URL != ''
+        if: github.ref == 'refs/heads/master'
         shell: bash
         env:
           GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
@@ -168,6 +168,10 @@ jobs:
           NEW_TAG:            ${{ env.new_tag }}
         run: |
           set -euo pipefail
+          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
+            echo "DISCORD_WEBHOOK_URL not set, skipping Discord notification."
+            exit 0
+          fi
           echo "Preparing Discord notification for release $NEW_TAG"
 
           # fetch release info

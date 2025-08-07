@@ -32,7 +32,7 @@ public class LibraryAccessAspect {
         Long libraryId = extractLibraryId(methodSignature.getParameterNames(), joinPoint.getArgs(), annotation.libraryIdParam());
 
         if (libraryId == null) {
-            throw ApiError.BAD_REQUEST.createException("Library ID not found in method parameters.");
+            throw ApiError.GENERIC_BAD_REQUEST.createException("Library ID not found in method parameters.");
         }
 
         BookLoreUser user = authenticationService.getAuthenticatedUser();

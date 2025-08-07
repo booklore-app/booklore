@@ -205,7 +205,7 @@ public class BookDropService {
             } else {
                 if (defaultLibraryId == null || defaultPathId == null) {
                     log.warn("Missing default metadata for fileId={}", fileEntity.getId());
-                    throw ApiError.BAD_REQUEST.createException("Missing metadata and defaults for fileId=" + fileEntity.getId());
+                    throw ApiError.GENERIC_BAD_REQUEST.createException("Missing metadata and defaults for fileId=" + fileEntity.getId());
                 }
 
                 metadata = fileEntity.getFetchedMetadata() != null

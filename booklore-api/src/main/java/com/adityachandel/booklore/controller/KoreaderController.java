@@ -1,6 +1,5 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.config.security.KoreaderUserDetails;
 import com.adityachandel.booklore.model.dto.progress.KoreaderProgress;
 import com.adityachandel.booklore.service.KoreaderService;
 import jakarta.validation.Valid;
@@ -9,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -43,12 +41,7 @@ public class KoreaderController {
 
     @PutMapping("/syncs/progress")
     public ResponseEntity<?> updateProgress(@Valid @RequestBody KoreaderProgress koreaderProgress) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(principal instanceof KoreaderUserDetails)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "User not authenticated or invalid principal type"));
-        }
-        Long userId = ((KoreaderUserDetails) principal).getBookLoreUserId();
-        koreaderService.saveProgress(koreaderProgress.getDocument(), koreaderProgress, userId);
+        koreaderService.saveProgress(koreaderProgress.getDocument(), koreaderProgress);
         return ResponseEntity.ok(Map.of("status", "progress updated"));
     }
 }

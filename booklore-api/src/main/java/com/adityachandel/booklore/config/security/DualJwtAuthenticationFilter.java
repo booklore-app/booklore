@@ -97,7 +97,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
             Date expirationTime = claimsSet.getExpirationTime();
             if (expirationTime == null || expirationTime.before(new Date())) {
                 log.warn("OIDC token is expired or missing exp claim");
-                throw ApiError.UNAUTHORIZED.createException("Token has expired or is invalid.");
+                throw ApiError.GENERIC_UNAUTHORIZED.createException("Token has expired or is invalid.");
             }
 
             OidcProviderDetails.ClaimMapping claimMapping = providerDetails.getClaimMapping();
@@ -112,7 +112,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
                     .orElseGet(() -> {
                         if (!autoProvision) {
                             log.warn("User '{}' not found and auto-provisioning is disabled.", username);
-                            throw ApiError.UNAUTHORIZED.createException("User not found and auto-provisioning is disabled.");
+                            throw ApiError.GENERIC_UNAUTHORIZED.createException("User not found and auto-provisioning is disabled.");
                         }
                         Object lock = userLocks.computeIfAbsent(username, k -> new Object());
                         try {
@@ -137,7 +137,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             log.error("OIDC authentication failed", e);
-            throw ApiError.UNAUTHORIZED.createException("OIDC JWT validation failed");
+            throw ApiError.GENERIC_UNAUTHORIZED.createException("OIDC JWT validation failed");
         }
     }
 

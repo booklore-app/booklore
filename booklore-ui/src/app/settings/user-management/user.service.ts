@@ -88,6 +88,7 @@ export interface UserSettings {
   metadataCenterViewMode: 'route' | 'dialog';
   entityViewPreferences: EntityViewPreferences;
   tableColumnPreference?: TableColumnPreference[];
+  koReaderEnabled: boolean;
 }
 
 export interface User {
@@ -104,6 +105,7 @@ export interface User {
     canDeleteBook: boolean;
     canEditMetadata: boolean;
     canManipulateLibrary: boolean;
+    canSyncKoReader: boolean;
   };
   userSettings: UserSettings;
   provisioningMethod?: 'LOCAL' | 'OIDC' | 'REMOTE';
@@ -197,6 +199,12 @@ export class UserService {
         this.userStateSubject.next(updatedUser);
       }
     });
+  }
+
+
+  updateUserSettingV2(userId: number, key: string, value: any): Observable<void> {
+    const payload = { key, value };
+    return this.http.put<void>(`${this.userUrl}/${userId}/settings`, payload);
   }
 
   private startWebSocket(): void {

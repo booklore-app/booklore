@@ -77,8 +77,23 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <p-checkbox formControlName="permissionManipulateLibrary" [binary]="true"></p-checkbox>
+        <label>Manage Library</label>
+      </div>
+
+      <div class="flex items-center gap-2">
         <p-checkbox formControlName="permissionEmailBook" [binary]="true"></p-checkbox>
         <label>Email Book</label>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox formControlName="permissionDeleteBook" [binary]="true"></p-checkbox>
+        <label>Delete Book</label>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-checkbox formControlName="permissionSyncKoreader" [binary]="true"></p-checkbox>
+        <label>KOReader Sync</label>
       </div>
 
       <div class="flex items-center gap-2">

@@ -9,6 +9,7 @@ import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.request.ReadStatusUpdateRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.model.dto.response.BookDeletionResponse;
+import com.adityachandel.booklore.model.enums.ResetProgressType;
 import com.adityachandel.booklore.service.BookService;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import com.adityachandel.booklore.service.recommender.BookRecommendationService;
@@ -126,11 +127,11 @@ public class BookController {
     }
 
     @PostMapping("/reset-progress")
-    public ResponseEntity<List<Book>> resetProgress(@RequestBody List<Long> bookIds) {
+    public ResponseEntity<List<Book>> resetProgress(@RequestBody List<Long> bookIds, @RequestParam ResetProgressType type) {
         if (bookIds == null || bookIds.isEmpty()) {
-            throw ApiError.BAD_REQUEST.createException("No book IDs provided");
+            throw ApiError.GENERIC_BAD_REQUEST.createException("No book IDs provided");
         }
-        List<Book> updatedBooks = bookService.resetProgress(bookIds);
+        List<Book> updatedBooks = bookService.resetProgress(bookIds, type);
         return ResponseEntity.ok(updatedBooks);
     }
 }

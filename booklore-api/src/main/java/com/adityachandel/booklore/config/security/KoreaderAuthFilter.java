@@ -39,7 +39,7 @@ public class KoreaderAuthFilter extends OncePerRequestFilter {
 
         if (username != null && key != null) {
             koreaderUserRepository.findByUsername(username).ifPresentOrElse(user -> {
-                if (user.getPassword().equalsIgnoreCase(key)) {
+                if (user.getPasswordMD5().equalsIgnoreCase(key)) {
                     Long bookLoreUserId = null;
                     if (user.getBookLoreUser() != null) {
                         bookLoreUserId = user.getBookLoreUser().getId();
@@ -47,7 +47,8 @@ public class KoreaderAuthFilter extends OncePerRequestFilter {
 
                     UserDetails userDetails = new KoreaderUserDetails(
                             user.getUsername(),
-                            user.getPassword(),
+                            user.getPasswordMD5(),
+                            user.isSyncEnabled(),
                             bookLoreUserId,
                             List.of(new SimpleGrantedAuthority("ROLE_USER"))
                     );

@@ -20,5 +20,6 @@ public class UserUpdateRequest {
         private boolean canManipulateLibrary;
         private boolean canEmailBook;
         private boolean canDeleteBook;
+        private boolean canSyncKoReader;
     }
 }

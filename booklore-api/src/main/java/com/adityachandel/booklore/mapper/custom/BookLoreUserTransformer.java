@@ -32,6 +32,7 @@ public class BookLoreUserTransformer {
         permissions.setCanEmailBook(userEntity.getPermissions().isPermissionEmailBook());
         permissions.setCanDeleteBook(userEntity.getPermissions().isPermissionDeleteBook());
         permissions.setCanManipulateLibrary(userEntity.getPermissions().isPermissionManipulateLibrary());
+        permissions.setCanSyncKoReader(userEntity.getPermissions().isPermissionSyncKoreader());
 
         BookLoreUser bookLoreUser = new BookLoreUser();
         bookLoreUser.setId(userEntity.getId());

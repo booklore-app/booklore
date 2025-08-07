@@ -53,6 +53,7 @@ public class UserProvisioningService {
         perms.setPermissionManipulateLibrary(true);
         perms.setPermissionEmailBook(true);
         perms.setPermissionDeleteBook(true);
+        perms.setPermissionSyncKoreader(true);
 
         user.setPermissions(perms);
         createUser(user);
@@ -78,8 +79,10 @@ public class UserProvisioningService {
         permissions.setPermissionUpload(request.isPermissionUpload());
         permissions.setPermissionDownload(request.isPermissionDownload());
         permissions.setPermissionEditMetadata(request.isPermissionEditMetadata());
+        permissions.setPermissionManipulateLibrary(request.isPermissionManipulateLibrary());
         permissions.setPermissionEmailBook(request.isPermissionEmailBook());
         permissions.setPermissionDeleteBook(request.isPermissionDeleteBook());
+        permissions.setPermissionSyncKoreader(request.isPermissionSyncKoreader());
         permissions.setPermissionAdmin(request.isPermissionAdmin());
         user.setPermissions(permissions);
 
@@ -110,6 +113,7 @@ public class UserProvisioningService {
             perms.setPermissionManipulateLibrary(defaultPermissions.contains("permissionManipulateLibrary"));
             perms.setPermissionEmailBook(defaultPermissions.contains("permissionEmailBook"));
             perms.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBook"));
+            perms.setPermissionSyncKoreader(defaultPermissions.contains("permissionSyncKoreader"));
         }
         user.setPermissions(perms);
 
@@ -157,6 +161,7 @@ public class UserProvisioningService {
             permissions.setPermissionManipulateLibrary(defaultPermissions.contains("permissionManipulateLibrary"));
             permissions.setPermissionEmailBook(defaultPermissions.contains("permissionEmailBook"));
             permissions.setPermissionDeleteBook(defaultPermissions.contains("permissionDeleteBook"));
+            permissions.setPermissionDeleteBook(defaultPermissions.contains("permissionSyncKoreader"));
         } else {
             permissions.setPermissionUpload(true);
             permissions.setPermissionDownload(true);
@@ -164,6 +169,7 @@ public class UserProvisioningService {
             permissions.setPermissionManipulateLibrary(false);
             permissions.setPermissionEmailBook(true);
             permissions.setPermissionDeleteBook(true);
+            permissions.setPermissionSyncKoreader(true);
         }
 
         permissions.setPermissionAdmin(isAdmin);

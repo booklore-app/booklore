@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface KoreaderUserRepository extends JpaRepository<KoreaderUserEntity, Long> {
     Optional<KoreaderUserEntity> findByUsername(String username);
+
+    Optional<KoreaderUserEntity> findByBookLoreUserId(Long bookLoreUserId);
 }

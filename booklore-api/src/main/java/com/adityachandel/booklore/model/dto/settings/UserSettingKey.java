@@ -13,8 +13,10 @@ public enum UserSettingKey {
     SIDEBAR_SHELF_SORTING("sidebarShelfSorting", true),
     ENTITY_VIEW_PREFERENCES("entityViewPreferences", true),
     TABLE_COLUMN_PREFERENCE("tableColumnPreference", true),
+
     FILTER_SORTING_MODE("filterSortingMode", false),
     METADATA_CENTER_VIEW_MODE("metadataCenterViewMode", false);
+
 
     private final String dbKey;
     private final boolean isJson;

@@ -36,7 +36,7 @@ public class BookAccessAspect {
 
         Long bookId = extractBookId(joinPoint.getArgs(), methodSignature.getParameterNames(), annotation.bookIdParam());
         if (bookId == null) {
-            throw ApiError.BAD_REQUEST.createException("Missing or invalid book ID in method parameters.");
+            throw ApiError.GENERIC_BAD_REQUEST.createException("Missing or invalid book ID in method parameters.");
         }
 
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));

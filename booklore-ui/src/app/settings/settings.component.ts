@@ -12,10 +12,12 @@ import {ViewPreferencesParentComponent} from './view-preferences-parent/view-pre
 import {ReaderPreferences} from './reader-preferences/reader-preferences.component';
 import {MetadataSettingsComponent} from './metadata-settings-component/metadata-settings-component';
 import {OpdsSettingsComponent} from './global-preferences/opds-settings/opds-settings.component';
+import {DeviceSettingsComponent} from './device-settings-component/device-settings-component';
 
 export enum SettingsTab {
   ReaderSettings = 'reader-settings',
   ViewPreferences = 'view-settings',
+  DeviceSettings = 'device-settings',
   UserManagement = 'user-management',
   EmailSettings = 'email-settings',
   MetadataSettings = 'metadata-settings',
@@ -40,7 +42,8 @@ export enum SettingsTab {
     ViewPreferencesParentComponent,
     ReaderPreferences,
     MetadataSettingsComponent,
-    OpdsSettingsComponent
+    OpdsSettingsComponent,
+    DeviceSettingsComponent
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'

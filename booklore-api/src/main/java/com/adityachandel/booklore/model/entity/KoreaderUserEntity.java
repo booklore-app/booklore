@@ -24,14 +24,17 @@ public class KoreaderUserEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "display_name")
-    private String displayName;
+    @Column(name = "password_md5", nullable = false)
+    private String passwordMD5;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "sync_enabled", nullable = false)
+    private boolean syncEnabled = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booklore_user_id")
