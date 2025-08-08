@@ -150,7 +150,7 @@ export class BookService {
         return;
     }
 
-    window.open(url, '_blank');
+    window.location.href = url;
     this.updateLastReadTime(book.id);
   }
 
