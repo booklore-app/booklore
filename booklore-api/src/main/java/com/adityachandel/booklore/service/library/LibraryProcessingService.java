@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.service.library;
 
 import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,6 +38,7 @@ public class LibraryProcessingService {
     private final NotificationService notificationService;
     private final BookRepository bookRepository;
     private final FileService fileService;
+    private final BookMapper bookMapper;
     private final LibraryFileProcessorRegistry fileProcessorRegistry;
 
     @Transactional
@@ -53,10 +56,45 @@ public class LibraryProcessingService {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + libraryEntity.getName()));
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
-        deleteRemovedBooks(detectDeletedBookIds(libraryFiles, libraryEntity));
+        List<Long> bookIds = detectDeletedBookIds(libraryFiles, libraryEntity);
+        if (!bookIds.isEmpty()) {
+            log.info("Detected {} removed books in library: {}", bookIds.size(), libraryEntity.getName());
+            deleteRemovedBooks(bookIds);
+        }
+        restoreDeletedBooks(libraryFiles);
         LibraryFileProcessor processor = fileProcessorRegistry.getProcessor(libraryEntity);
         processor.processLibraryFiles(detectNewBookPaths(libraryFiles, libraryEntity), libraryEntity);
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + libraryEntity.getName()));
+    }
+
+    private void restoreDeletedBooks(List<LibraryFile> libraryFiles) {
+        if (libraryFiles.isEmpty()) return;
+
+        LibraryEntity libraryEntity = libraryFiles.get(0).getLibraryEntity();
+        Set<Path> currentPaths = libraryFiles.stream()
+                .map(LibraryFile::getFullPath)
+                .collect(Collectors.toSet());
+
+        List<BookEntity> toRestore = libraryEntity.getBookEntities().stream()
+                .filter(book -> Boolean.TRUE.equals(book.getDeleted()))
+                .filter(book -> currentPaths.contains(book.getFullFilePath()))
+                .collect(Collectors.toList());
+
+        if (toRestore.isEmpty()) return;
+
+        toRestore.forEach(book -> {
+            book.setDeleted(false);
+            book.setDeletedAt(null);
+            book.setAddedOn(Instant.now());
+            notificationService.sendMessage(Topic.BOOK_ADD, bookMapper.toBookWithDescription(book, false));
+        });
+        bookRepository.saveAll(toRestore);
+
+        List<Long> restoredIds = toRestore.stream()
+                .map(BookEntity::getId)
+                .toList();
+
+        log.info("Restored {} books in library: {}", restoredIds.size(), libraryEntity.getName());
     }
 
     public void processLibraryFiles(List<LibraryFile> libraryFiles, LibraryEntity libraryEntity) {

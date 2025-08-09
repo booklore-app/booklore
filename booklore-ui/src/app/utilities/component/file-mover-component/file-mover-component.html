@@ -11,7 +11,7 @@
       <code class="bg-gray-800 px-1 py-0.5 rounded text-[var(--primary-color)] font-mono text-xs">{{ '{authors}' }}</code>
       to automatically insert metadata. <br>
       A preview below shows how files will be renamed and moved.
-      Once you're satisfied, click <span class="font-semibold text-green-400">Apply</span> to proceed.
+      Once you're satisfied, click <span class="font-semibold text-green-400">Move Files</span> to proceed.
       <span class="text-yellow-500 font-medium flex items-center gap-2">
         <i class="pi pi-exclamation-triangle text-yellow-400"></i>
         Files will be physically moved on your system when you apply changes.
@@ -57,7 +57,7 @@
     }
   </div>
 
-  <div class="flex gap-2 mb-4 px-2 items-center w-full">
+  <div class="flex gap-4 mb-4 px-2 items-center w-full">
     <input
       type="text"
       pInputText
@@ -116,7 +116,7 @@
 
   <p-divider></p-divider>
 
-  <div class="flex justify-end items-center gap-4 flex-shrink-0 px-4">
+  <div class="flex justify-end items-center gap-4 flex-shrink-0 px-4 pt-4">
     @if (movedFileCount > 0) {
       <span class="text-green-500 flex items-center font-semibold drop-shadow-sm select-none">
         {{ movedFileCount }} file{{ movedFileCount > 1 ? 's' : '' }} successfully moved

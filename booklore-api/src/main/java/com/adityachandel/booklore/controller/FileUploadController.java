@@ -28,4 +28,13 @@ public class FileUploadController {
         }
         return ResponseEntity.ok(fileUploadService.uploadFile(file, libraryId, pathId));
     }
+
+    @PreAuthorize("@securityUtil.isAdmin() or @securityUtil.canUpload()")
+    @PostMapping(value = "/upload/bookdrop", consumes = "multipart/form-data")
+    public ResponseEntity<Book> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Uploaded file is missing.");
+        }
+        return ResponseEntity.ok(fileUploadService.uploadFileBookDrop(file));
+    }
 }
