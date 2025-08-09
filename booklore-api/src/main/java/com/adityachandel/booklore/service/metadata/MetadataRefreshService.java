@@ -10,37 +10,36 @@ import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
-import com.adityachandel.booklore.model.entity.*;
-import com.adityachandel.booklore.model.enums.BookFileExtension;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.model.entity.MetadataFetchJobEntity;
+import com.adityachandel.booklore.model.entity.MetadataFetchProposalEntity;
 import com.adityachandel.booklore.model.enums.FetchedMetadataProposalStatus;
 import com.adityachandel.booklore.model.enums.MetadataFetchTaskStatus;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.model.websocket.Topic;
-import com.adityachandel.booklore.repository.BookdropFileRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.MetadataFetchJobRepository;
 import com.adityachandel.booklore.repository.MetadataFetchProposalRepository;
 import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
-import com.adityachandel.booklore.service.metadata.extractor.EpubMetadataExtractor;
-import com.adityachandel.booklore.service.metadata.extractor.PdfMetadataExtractor;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import java.io.File;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import static com.adityachandel.booklore.model.entity.BookdropFileEntity.Status.PENDING_REVIEW;
 import static com.adityachandel.booklore.model.enums.MetadataProvider.*;
 import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
 
@@ -56,12 +55,12 @@ public class MetadataRefreshService {
     private final BookMetadataUpdater bookMetadataUpdater;
     private final NotificationService notificationService;
     private final AppSettingService appSettingService;
-    private final BookQueryService bookQueryService;
     private final Map<MetadataProvider, BookParser> parserMap;
     private final ObjectMapper objectMapper;
+    private final BookRepository bookRepository;
+    private final PlatformTransactionManager transactionManager;
 
 
-    @Transactional
     public void refreshMetadata(MetadataRefreshRequest request, Long userId) {
         log.info("Refresh Metadata task started!");
 
@@ -71,11 +70,11 @@ public class MetadataRefreshService {
         }
 
         List<MetadataProvider> providers = prepareProviders(request);
-        List<BookEntity> books = getBookEntities(request);
+        Set<Long> bookIds = getBookEntities(request);
 
         boolean isReviewMode = Boolean.TRUE.equals(request.getRefreshOptions().getReviewBeforeApply());
-        MetadataFetchJobEntity task = null;
-        String taskId = null;
+        MetadataFetchJobEntity task;
+        String taskId;
 
         if (isReviewMode) {
             taskId = UUID.randomUUID().toString();
@@ -84,53 +83,52 @@ public class MetadataRefreshService {
                     .userId(userId)
                     .status(MetadataFetchTaskStatus.IN_PROGRESS)
                     .startedAt(Instant.now())
-                    .totalBooksCount(books.size())
+                    .totalBooksCount(bookIds.size())
                     .completedBooks(0)
                     .build();
             metadataFetchJobRepository.save(task);
+        } else {
+            taskId = null;
+            task = null;
         }
 
+        TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
         int completedCount = 0;
         try {
-            for (BookEntity book : books) {
-                try {
-                    if (book.getMetadata().areAllFieldsLocked()) {
-                        log.info("Skipping locked book: {}", book.getFileName());
-                        notificationService.sendMessage(Topic.LOG, createLogNotification("Book '" + book.getMetadata().getTitle() + "' is locked."));
-                        continue;
+            for (Long bookId : bookIds) {
+                int finalCompletedCount = completedCount;
+                txTemplate.execute(status -> {
+                    BookEntity book = bookRepository.findAllWithMetadataByIds(Collections.singleton(bookId))
+                            .stream().findFirst()
+                            .orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+                    try {
+                        if (book.getMetadata().areAllFieldsLocked()) {
+                            log.info("Skipping locked book: {}", book.getFileName());
+                            notificationService.sendMessage(Topic.LOG,
+                                createLogNotification("Book '" + book.getMetadata().getTitle() + "' is locked."));
+                            return null;
+                        }
+                        reportProgressIfNeeded(task, taskId, finalCompletedCount, bookIds.size(), book);
+                        Map<MetadataProvider, BookMetadata> metadataMap = fetchMetadataForBook(providers, book);
+                        if (providers.contains(GoodReads)) Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1500));
+                        BookMetadata fetched = buildFetchMetadata(book.getId(), request, metadataMap);
+                        if (isReviewMode) saveProposal(taskId, book.getId(), fetched);
+                        else updateBookMetadata(book, fetched, request.getRefreshOptions().isRefreshCovers(),
+                            request.getRefreshOptions().isMergeCategories());
+                    } catch (Exception e) {
+                        log.error("Metadata update failed for book: {}", book.getFileName(), e);
                     }
-
-                    reportProgressIfNeeded(task, taskId, completedCount, books.size(), book);
-                    Map<MetadataProvider, BookMetadata> metadataMap = fetchMetadataForBook(providers, book);
-                    if (providers.contains(GoodReads)) {
-                        Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1500));
-                    }
-                    BookMetadata fetched = buildFetchMetadata(book.getId(), request, metadataMap);
-                    if (isReviewMode) {
-                        saveProposal(taskId, book.getId(), fetched);
-                    } else {
-                        updateBookMetadata(book, fetched, request.getRefreshOptions().isRefreshCovers(), request.getRefreshOptions().isMergeCategories());
-                    }
-
-                    completedCount++;
-
-                } catch (Exception e) {
-                    log.error("Metadata update failed for book: {}", book.getFileName(), e);
-                }
+                    bookRepository.saveAndFlush(book);
+                    return null;
+                });
+                completedCount++;
             }
-
-            if (isReviewMode) {
-                completeTask(task, completedCount, books.size());
-            }
-
+            if (isReviewMode) completeTask(task, completedCount, bookIds.size());
         } catch (Exception fatal) {
             log.error("Fatal error during metadata refresh", fatal);
-            if (isReviewMode) {
-                failTask(task, books.size(), fatal.getMessage());
-            }
+            if (isReviewMode) failTask(task, bookIds.size(), fatal.getMessage());
             throw fatal;
         }
-
         log.info("Metadata refresh task completed!");
     }
 
@@ -188,7 +186,7 @@ public class MetadataRefreshService {
         metadataFetchProposalRepository.save(proposal);
     }
 
-    @Transactional
+
     public void updateBookMetadata(BookEntity bookEntity, BookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
         if (metadata != null) {
             MetadataUpdateWrapper metadataUpdateWrapper = MetadataUpdateWrapper.builder()
@@ -202,13 +200,11 @@ public class MetadataRefreshService {
         }
     }
 
-    @Transactional
     public List<MetadataProvider> prepareProviders(MetadataRefreshRequest request) {
         Set<MetadataProvider> allProviders = new HashSet<>(getAllProvidersUsingIndividualFields(request));
         return new ArrayList<>(allProviders);
     }
 
-    @Transactional
     protected Set<MetadataProvider> getAllProvidersUsingIndividualFields(MetadataRefreshRequest request) {
         MetadataRefreshOptions.FieldOptions fieldOptions = request.getRefreshOptions().getFieldOptions();
         Set<MetadataProvider> uniqueProviders = new HashSet<>();
@@ -224,7 +220,6 @@ public class MetadataRefreshService {
         return uniqueProviders;
     }
 
-    @Transactional
     protected void addProviderToSet(MetadataRefreshOptions.FieldProvider fieldProvider, Set<MetadataProvider> providerSet) {
         if (fieldProvider != null) {
             if (fieldProvider.getP4() != null) providerSet.add(fieldProvider.getP4());
@@ -234,7 +229,6 @@ public class MetadataRefreshService {
         }
     }
 
-    @Transactional
     public Map<MetadataProvider, BookMetadata> fetchMetadataForBook(List<MetadataProvider> providers, Book book) {
         return providers.stream()
                 .map(provider -> CompletableFuture.supplyAsync(() -> fetchTopMetadataFromAProvider(provider, book))
@@ -251,7 +245,6 @@ public class MetadataRefreshService {
                 ));
     }
 
-    @Transactional
     protected Map<MetadataProvider, BookMetadata> fetchMetadataForBook(List<MetadataProvider> providers, BookEntity bookEntity) {
         return providers.stream()
                 .map(provider -> CompletableFuture.supplyAsync(() -> fetchTopMetadataFromAProvider(provider, bookMapper.toBook(bookEntity)))
@@ -291,7 +284,6 @@ public class MetadataRefreshService {
                 .build();
     }
 
-    @Transactional
     public BookMetadata buildFetchMetadata(Long bookId, MetadataRefreshRequest request, Map<MetadataProvider, BookMetadata> metadataMap) {
         BookMetadata metadata = BookMetadata.builder().bookId(bookId).build();
         MetadataRefreshOptions.FieldOptions fieldOptions = request.getRefreshOptions().getFieldOptions();
@@ -309,11 +301,10 @@ public class MetadataRefreshService {
         if (metadataMap.containsKey(Google)) {
             metadata.setGoogleId(metadataMap.get(Google).getGoogleId());
         }
-        if (metadataMap.containsKey(Comicvine)){
+        if (metadataMap.containsKey(Comicvine)) {
             metadata.setComicvineId(metadataMap.get(Comicvine).getComicvineId());
         }
-        
-        
+
 
         if (request.getRefreshOptions().isMergeCategories()) {
             metadata.setCategories(getAllCategories(metadataMap, fieldOptions.getCategories(), BookMetadata::getCategories));
@@ -338,7 +329,7 @@ public class MetadataRefreshService {
         return metadata;
     }
 
-    @Transactional
+
     protected void setOtherUnspecifiedMetadata(Map<MetadataProvider, BookMetadata> metadataMap, BookMetadata metadataCombined, MetadataProvider provider) {
         if (metadataMap.containsKey(provider)) {
             BookMetadata metadata = metadataMap.get(provider);
@@ -373,7 +364,7 @@ public class MetadataRefreshService {
         Set<String> extract(BookMetadata metadata);
     }
 
-    @Transactional
+
     protected String resolveFieldAsString(Map<MetadataProvider, BookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractor fieldValueExtractor) {
         String value = null;
         if (fieldProvider.getP4() != null && metadataMap.containsKey(fieldProvider.getP4())) {
@@ -395,7 +386,7 @@ public class MetadataRefreshService {
         return value;
     }
 
-    @Transactional
+
     protected Set<String> resolveFieldAsList(Map<MetadataProvider, BookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractorList fieldValueExtractor) {
         Set<String> values = new HashSet<>();
         if (fieldProvider.getP4() != null && metadataMap.containsKey(fieldProvider.getP4())) {
@@ -439,23 +430,17 @@ public class MetadataRefreshService {
     }
 
 
-    @Transactional
-    protected List<BookEntity> getBookEntities(MetadataRefreshRequest request) {
+    protected Set<Long> getBookEntities(MetadataRefreshRequest request) {
         MetadataRefreshRequest.RefreshType refreshType = request.getRefreshType();
         if (refreshType != MetadataRefreshRequest.RefreshType.LIBRARY && refreshType != MetadataRefreshRequest.RefreshType.BOOKS) {
             throw ApiError.INVALID_REFRESH_TYPE.createException();
         }
-
-        List<BookEntity> books = switch (refreshType) {
+        return switch (refreshType) {
             case LIBRARY -> {
-                LibraryEntity libraryEntity = libraryRepository.findById(request.getLibraryId())
-                        .orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(request.getLibraryId()));
-                yield libraryEntity.getBookEntities();
+                LibraryEntity libraryEntity = libraryRepository.findById(request.getLibraryId()).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(request.getLibraryId()));
+                yield bookRepository.findBookIdsByLibraryId(libraryEntity.getId());
             }
-            case BOOKS -> bookQueryService.findAllWithMetadataByIds(request.getBookIds());
+            case BOOKS -> request.getBookIds();
         };
-
-        books.sort(Comparator.comparing(BookEntity::getFileName, Comparator.nullsLast(String::compareTo)));
-        return books;
     }
 }
