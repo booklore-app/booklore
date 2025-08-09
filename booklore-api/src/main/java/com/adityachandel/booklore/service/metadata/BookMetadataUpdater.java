@@ -11,6 +11,7 @@ import com.adityachandel.booklore.model.entity.CategoryEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.CategoryRepository;
+import com.adityachandel.booklore.service.FileFingerprint;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestore;
 import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestoreFactory;
@@ -114,7 +115,7 @@ public class BookMetadataUpdater {
 
                     File file = new File(bookEntity.getFullFilePath().toUri());
                     writer.writeMetadataToFile(file, metadata, thumbnailUrl, false, clearFlags);
-                    String newHash = FileUtils.computeFileHash(bookEntity);
+                    String newHash = FileFingerprint.generateHash(bookEntity.getFullFilePath());
                     bookEntity.setCurrentHash(newHash);
                     log.info("Metadata written for book ID {}", bookId);
 
@@ -138,6 +139,7 @@ public class BookMetadataUpdater {
         handleFieldUpdate(e.getIsbn10Locked(), clear.isIsbn10(), m.getIsbn10(), v -> e.setIsbn10(nullIfBlank(v)));
         handleFieldUpdate(e.getAsinLocked(), clear.isAsin(), m.getAsin(), v -> e.setAsin(nullIfBlank(v)));
         handleFieldUpdate(e.getGoodreadsIdLocked(), clear.isGoodreadsId(), m.getGoodreadsId(), v -> e.setGoodreadsId(nullIfBlank(v)));
+        handleFieldUpdate(e.getComicvineIdLocked(), clear.isComicvineId(), m.getComicvineId(), v -> e.setComicvineId(nullIfBlank(v)));
         handleFieldUpdate(e.getHardcoverIdLocked(), clear.isHardcoverId(), m.getHardcoverId(), v -> e.setHardcoverId(nullIfBlank(v)));
         handleFieldUpdate(e.getGoogleIdLocked(), clear.isGoogleId(), m.getGoogleId(), v -> e.setGoogleId(nullIfBlank(v)));
         handleFieldUpdate(e.getPageCountLocked(), clear.isPageCount(), m.getPageCount(), e::setPageCount);
@@ -227,6 +229,7 @@ public class BookMetadataUpdater {
                 Pair.of(m.getIsbn10Locked(), e::setIsbn10Locked),
                 Pair.of(m.getAsinLocked(), e::setAsinLocked),
                 Pair.of(m.getGoodreadsIdLocked(), e::setGoodreadsIdLocked),
+                Pair.of(m.getComicvineIdLocked(), e::setComicvineIdLocked),
                 Pair.of(m.getHardcoverIdLocked(), e::setHardcoverIdLocked),
                 Pair.of(m.getGoogleIdLocked(), e::setGoogleIdLocked),
                 Pair.of(m.getPageCountLocked(), e::setPageCountLocked),

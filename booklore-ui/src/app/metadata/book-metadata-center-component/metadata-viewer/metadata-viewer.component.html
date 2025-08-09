@@ -6,7 +6,7 @@
         <div class="relative w-[175px] md:w-[250px]">
           <img
             [attr.src]="urlHelper.getCoverUrl(book?.metadata!.bookId, book?.metadata!.coverUpdatedOn)"
-            class="rounded-xl w-full object-cover"
+            class="rounded-lg w-full object-cover"
             alt="Cover of {{ book?.metadata!.title }}"
             loading="lazy"
           />
@@ -17,19 +17,32 @@
             </div>
           }
 
-          @if (getProgressPercent(book) !== null) {
-            <div class="absolute bottom-0 left-0 right-0">
-              <p-progressBar
-                [value]="getProgressPercent(book)"
-                [showValue]="false"
-                [ngClass]="{
-                  'rounded-b-xl': true,
-                  'progress-complete': getProgressPercent(book) === 100,
-                  'progress-incomplete': getProgressPercent(book)! < 100
-                }"
-                [style]="{ height: '8px' }">
-              </p-progressBar>
-            </div>
+          @let progress = getProgressPercent(book);
+          @if (progress !== null) {
+            <p-progressBar
+              [value]="progress"
+              [showValue]="false"
+              class="cover-progress-bar"
+              [ngClass]="{
+                'rounded-b-xl': false,
+                'progress-complete': progress === 100,
+                'progress-incomplete': progress < 100
+              }"
+              [style]="{ height: '6px' }"
+            ></p-progressBar>
+          }
+
+          @if (getKoProgressPercent(book) !== null) {
+            <p-progressBar
+              [value]="getKoProgressPercent(book)"
+              [showValue]="false"
+              [ngClass]="[
+                getProgressPercent(book) == null ? 'cover-progress-bar-ko-only' : 'cover-progress-bar-ko-both',
+                getKoProgressPercent(book) === 100 ? 'progress-complete-ko' : 'progress-incomplete-ko'
+              ]"
+              [style]="{ height: '6px' }"
+            >
+            </p-progressBar>
           }
         </div>
       </div>
@@ -181,8 +194,24 @@
                   />
                 </a>
               }
+
+              @if (book?.metadata?.comicvineId) {
+                <a
+                  class="flex items-center gap-1"
+                  [href]="'https://comicvine.gamespot.com/' + book.metadata!.comicvineId"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://www.comicvine.com/favicon.ico"
+                    alt="Comic Vine"
+                    class="w-5 h-5 object-contain transform transition duration-200 hover:scale-125 hover:drop-shadow-lg"
+                  />
+                </a>
+              }
             </div>
           </div>
+
 
           @if (book?.metadata?.categories?.length) {
             <div class="overflow-x-auto scrollbar-hide max-w-7xl pt-2 md:pt-0">
@@ -197,7 +226,7 @@
           }
 
           <div class="px-1 md:px-0">
-            <div class="grid md:grid-cols-3 gap-y-2.5 text-sm pt-2 md:pt-4 pb-2 text-gray-300 max-w-6xl">
+            <div class="grid md:grid-cols-4 gap-y-2.5 text-sm pt-2 md:pt-4 pb-2 text-gray-300 max-w-7xl">
               <p class="whitespace-nowrap max-w-[250px] overflow-hidden text-ellipsis">
                 <span class="font-bold">Publisher: </span>
                 @if (book?.metadata?.publisher) {
@@ -210,6 +239,7 @@
               </p>
               <p><strong>Published:</strong> {{ book?.metadata!.publishedDate || '-' }}</p>
               <p><strong>Language:</strong> {{ book?.metadata!.language || '-' }}</p>
+              <p><strong>File Size:</strong> {{ getFileSizeInMB(book) }}</p>
               <p class="whitespace-nowrap flex items-center gap-2">
                 <span class="font-bold">File Type:</span>
                 <span
@@ -218,7 +248,40 @@
                   {{ getFileExtension(book?.filePath) || '-' }}
                 </span>
               </p>
-              <p><strong>File Size:</strong> {{ getFileSizeInMB(book) }}</p>
+              <p class="whitespace-nowrap flex items-center">
+                <span class="font-bold mr-2">BookLore Progress:</span>
+                <span class="inline-flex items-center">
+                  <span
+                    class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                    [ngClass]="getProgressColorClass(getProgressPercent(book))">
+                    {{ getProgressPercent(book) !== null ? getProgressPercent(book) + '%' : 'N/A' }}
+                  </span>
+                  @if (getProgressPercent(book) !== null) {
+                    <p-button
+                      pTooltip="Reset progress"
+                      tooltipPosition="bottom"
+                      icon="pi pi-refresh"
+                      size="small"
+                      severity="danger"
+                      text
+                      class="ml-1 custom-button-padding"
+                      (onClick)="resetProgress(book, ResetProgressTypes.BOOKLORE)">
+                    </p-button>
+                  }
+                </span>
+              </p>
+              <p class="whitespace-nowrap flex items-center gap-2">
+                <span class="font-bold">Metadata Match:</span>
+                @if (book?.metadataMatchScore != null) {
+                  <span
+                    class="inline-block px-2 py-0.5 rounded-lg text-xs font-bold text-gray-200 border"
+                    [ngClass]="getMatchScoreColorClass(book?.metadataMatchScore!)">
+                    {{ (book?.metadataMatchScore!) | number:'1.0-0' }}%
+                  </span>
+                } @else {
+                  <span>-</span>
+                }
+              </p>
               <p>
                 <strong>ISBN:</strong>
                 @if (book?.metadata?.isbn13 || book?.metadata?.isbn10) {
@@ -246,40 +309,30 @@
                   </span>
                 }
               </p>
-              <p class="whitespace-nowrap flex items-center">
-                <span class="font-bold mr-2">Progress:</span>
-                <span class="inline-flex items-center">
+              @if (book?.koreaderProgress && book.koreaderProgress?.percentage != null) {
+                <p class="whitespace-nowrap flex items-center">
+                  <span class="font-bold mr-2">KOReader Progress:</span>
+                  <span class="inline-flex items-center">
                   <span
                     class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
-                    [ngClass]="getProgressColorClass(getProgressPercent(book))">
-                    {{ getProgressPercent(book) !== null ? getProgressPercent(book) + '%' : 'N/A' }}
+                    [ngClass]="getKoProgressColorClass(getKOReaderPercentage(book))">
+                    {{ getKOReaderPercentage(book) + '%' }}
                   </span>
-                  @if (getProgressPercent(book) !== null) {
-                    <p-button
-                      pTooltip="Reset progress"
-                      tooltipPosition="bottom"
-                      icon="pi pi-refresh"
-                      size="small"
-                      severity="danger"
-                      text
-                      class="ml-1 custom-button-padding"
-                      (onClick)="resetProgress(book)">
+                    @if (getKOReaderPercentage(book) !== null) {
+                      <p-button
+                        pTooltip="Reset progress"
+                        tooltipPosition="bottom"
+                        icon="pi pi-refresh"
+                        size="small"
+                        severity="danger"
+                        text
+                        class="ml-1 custom-button-padding"
+                        (onClick)="resetProgress(book, ResetProgressTypes.KOREADER)">
                     </p-button>
-                  }
+                    }
                 </span>
-              </p>
-              <p class="whitespace-nowrap flex items-center gap-2">
-                <span class="font-bold">Metadata Match:</span>
-                @if (book?.metadataMatchScore != null) {
-                  <span
-                    class="inline-block px-2 py-0.5 rounded-lg text-xs font-bold text-gray-200 border"
-                    [ngClass]="getMatchScoreColorClass(book?.metadataMatchScore!)">
-                    {{ (book?.metadataMatchScore!) | number:'1.0-0' }}%
-                  </span>
-                } @else {
-                  <span>-</span>
-                }
-              </p>
+                </p>
+              }
             </div>
 
             <div class="flex items-center gap-2">

@@ -57,7 +57,7 @@ public class AuthenticationService {
 
     public ResponseEntity<Map<String, String>> loginRemote(String name, String username, String email, String groups) {
         if (username == null || username.isEmpty()) {
-            throw ApiError.BAD_REQUEST.createException("Remote-User header is missing");
+            throw ApiError.GENERIC_BAD_REQUEST.createException("Remote-User header is missing");
         }
 
         Optional<BookLoreUserEntity> user = userRepository.findByUsername(username);

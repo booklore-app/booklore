@@ -14,8 +14,10 @@ public class UserCreateRequest {
     private boolean permissionUpload;
     private boolean permissionDownload;
     private boolean permissionEditMetadata;
+    private boolean permissionManipulateLibrary;
     private boolean permissionEmailBook;
     private boolean permissionDeleteBook;
+    private boolean permissionSyncKoreader;
     private boolean permissionAdmin;
 
     private Set<Long> selectedLibraries;

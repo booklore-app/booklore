@@ -1,5 +1,16 @@
 package com.adityachandel.booklore.model.dto;
 
 
-public record VersionInfo(String current, String latest) {
+import lombok.Getter;
+
+
+@Getter
+public class VersionInfo {
+    private final String current;
+    private final String latest;
+
+    public VersionInfo(String current, String latest) {
+        this.current = current;
+        this.latest = latest;
+    }
 }

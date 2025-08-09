@@ -19,33 +19,42 @@ import java.util.List;
 public class VersionService {
 
     @Value("${app.version:unknown}")
-    private String appVersion;
+    String appVersion;
 
     private static final String GITHUB_REPO = "booklore-app/booklore";
+    private static final String BASE_URI = "https://api.github.com/repos/" + GITHUB_REPO;
+    private static final int MAX_RELEASES = 15;
+    private static final RestClient REST_CLIENT = RestClient.builder()
+            .defaultHeader("Accept", "application/vnd.github+json")
+            .defaultHeader("User-Agent", "BookLore-Version-Checker")
+            .build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
 
     public VersionInfo getVersionInfo() {
-        String latestVersion = fetchLatestGitHubReleaseVersion();
-        return new VersionInfo(appVersion, latestVersion);
+        String latest = "unknown";
+        try {
+            latest = fetchLatestGitHubReleaseVersion();
+        } catch (Exception e) {
+            log.error("Error fetching latest release version", e);
+        }
+        return new VersionInfo(appVersion, latest);
     }
 
     public List<ReleaseNote> getChangelogSinceCurrentVersion() {
         return fetchReleaseNotesSince(appVersion);
     }
 
-    private String fetchLatestGitHubReleaseVersion() {
-        try {
-            RestClient restClient = RestClient.builder()
-                    .defaultHeader("Accept", "application/vnd.github+json")
-                    .defaultHeader("User-Agent", "BookLore-Version-Checker")
-                    .build();
 
-            String response = restClient.get()
-                    .uri("https://api.github.com/repos/" + GITHUB_REPO + "/releases/latest")
+    public String fetchLatestGitHubReleaseVersion() {
+        try {
+            String response = REST_CLIENT.get()
+                    .uri(BASE_URI + "/releases/latest")
                     .retrieve()
                     .body(String.class);
 
-            JsonNode root = new ObjectMapper().readTree(response);
-            return root.has("tag_name") ? root.get("tag_name").asText() : "unknown";
+            JsonNode root = MAPPER.readTree(response);
+            return root.path("tag_name").asText("unknown");
 
         } catch (Exception e) {
             log.error("Failed to fetch latest release version", e);
@@ -53,41 +62,38 @@ public class VersionService {
         }
     }
 
-    private List<ReleaseNote> fetchReleaseNotesSince(String currentVersion) {
+    public List<ReleaseNote> fetchReleaseNotesSince(String currentVersion) {
+        log.info("Fetching release notes since version: {}", currentVersion);
+
         List<ReleaseNote> updates = new ArrayList<>();
         try {
-            RestClient restClient = RestClient.builder()
-                    .defaultHeader("Accept", "application/vnd.github+json")
-                    .defaultHeader("User-Agent", "BookLore-Version-Checker")
-                    .build();
-
-            String response = restClient.get()
-                    .uri("https://api.github.com/repos/" + GITHUB_REPO + "/releases")
+            String response = REST_CLIENT.get()
+                    .uri(BASE_URI + "/releases?per_page=" + MAX_RELEASES)
                     .retrieve()
                     .body(String.class);
 
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode releases = mapper.readTree(response);
+            JsonNode releases = MAPPER.readTree(response);
+            if (!releases.isArray()) {
+                log.warn("Invalid releases response from GitHub API");
+                return updates;
+            }
 
             for (JsonNode release : releases) {
-                String tag = release.get("tag_name").asText();
-                if (isVersionGreater(tag, currentVersion)) {
-                    String url = "https://github.com/" + GITHUB_REPO + "/releases/tag/" + tag;
-                    String publishedAtStr = release.get("published_at").asText();
-                    LocalDateTime publishedAt = LocalDateTime.parse(publishedAtStr, DateTimeFormatter.ISO_DATE_TIME);
-
-                    updates.add(new ReleaseNote(
-                            tag,
-                            release.get("name").asText(),
-                            release.get("body").asText(),
-                            url,
-                            publishedAt
-                    ));
+                String tag = release.path("tag_name").asText(null);
+                if (tag == null || !isVersionGreater(tag, currentVersion)) {
+                    continue;
                 }
+                String url = BASE_URI + "/releases/tag/" + tag;
+                LocalDateTime published = LocalDateTime.parse(release.path("published_at").asText(), DateTimeFormatter.ISO_DATE_TIME);
+                updates.add(new ReleaseNote(tag, release.path("name").asText(tag), release.path("body").asText(""), url, published));
             }
+
+            log.info("Returning {} newer releases", updates.size());
+
         } catch (Exception e) {
             log.error("Failed to fetch release notes", e);
         }
+
         return updates;
     }
 

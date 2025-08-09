@@ -23,6 +23,7 @@ import {ProgressBar} from 'primeng/progressbar';
 import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center-component/book-metadata-center.component';
 import {takeUntil} from 'rxjs/operators';
 import {readStatusLabels} from '../book-filter/book-filter.component';
+import {ResetProgressTypes} from '../../../../shared/constants/reset-progress-type';
 
 @Component({
   selector: 'app-book-card',
@@ -82,6 +83,16 @@ export class BookCardComponent implements OnInit, OnDestroy {
     }
     if (this.book.pdfProgress?.percentage != null) {
       return this.book.pdfProgress.percentage;
+    }
+    if (this.book.cbxProgress?.percentage != null) {
+      return this.book.cbxProgress.percentage;
+    }
+    return null;
+  }
+
+  get koProgressPercentage(): number | null {
+    if (this.book.koreaderProgress?.percentage != null) {
+      return this.book.koreaderProgress.percentage;
     }
     return null;
   }
@@ -266,7 +277,7 @@ export class BookCardComponent implements OnInit, OnDestroy {
     if (this.hasEditMetadataPermission()) {
       items.push({
         label: 'More Actions',
-        icon: 'pi pi-ellipsis-v',
+        icon: 'pi pi-ellipsis-h',
         items: [
           {
             label: 'Read Status',
@@ -296,15 +307,15 @@ export class BookCardComponent implements OnInit, OnDestroy {
             }))
           },
           {
-            label: 'Reset Progress',
+            label: 'Reset Booklore Progress',
             icon: 'pi pi-undo',
             command: () => {
-              this.bookService.resetProgress(this.book.id).subscribe({
+              this.bookService.resetProgress(this.book.id, ResetProgressTypes.BOOKLORE).subscribe({
                 next: () => {
                   this.messageService.add({
                     severity: 'success',
                     summary: 'Progress Reset',
-                    detail: 'Reading progress has been reset.',
+                    detail: 'Booklore reading progress has been reset.',
                     life: 1500
                   });
                 },
@@ -312,7 +323,31 @@ export class BookCardComponent implements OnInit, OnDestroy {
                   this.messageService.add({
                     severity: 'error',
                     summary: 'Failed',
-                    detail: 'Could not reset progress.',
+                    detail: 'Could not reset Booklore progress.',
+                    life: 1500
+                  });
+                }
+              });
+            },
+          },
+          {
+            label: 'Reset KOReader Progress',
+            icon: 'pi pi-undo',
+            command: () => {
+              this.bookService.resetProgress(this.book.id, ResetProgressTypes.KOREADER).subscribe({
+                next: () => {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Progress Reset',
+                    detail: 'KOReader reading progress has been reset.',
+                    life: 1500
+                  });
+                },
+                error: () => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Could not reset KOReader progress.',
                     life: 1500
                   });
                 }

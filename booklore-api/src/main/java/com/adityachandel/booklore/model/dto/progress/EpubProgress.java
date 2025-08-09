@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.model.dto;
+package com.adityachandel.booklore.model.dto.progress;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Builder
 @Data
-public class CbxProgress {
+public class EpubProgress {
     @NotNull
-    Integer page;
+    String cfi;
     @NotNull
     Float percentage;
 }

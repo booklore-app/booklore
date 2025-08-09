@@ -4,6 +4,7 @@ import {MenuItem} from 'primeng/api';
 import {BookService} from './book.service';
 import {readStatusLabels} from '../components/book-browser/book-filter/book-filter.component';
 import {ReadStatus} from '../model/book.model';
+import {ResetProgressTypes} from '../../shared/constants/reset-progress-type';
 
 @Injectable({
   providedIn: 'root'
@@ -74,22 +75,55 @@ export class BookMenuService {
         }))
       },
       {
-        label: 'Reset Progress',
+        label: 'Reset Booklore Progress',
         icon: 'pi pi-undo',
         command: () => {
           this.confirmationService.confirm({
-            message: 'Are you sure you want to reset progress for selected books?',
+            message: 'Are you sure you want to reset Booklore reading progress for selected books?',
             header: 'Confirm Reset',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Yes',
             rejectLabel: 'No',
             accept: () => {
-              this.bookService.resetProgress(Array.from(selectedBooks)).subscribe({
+              this.bookService.resetProgress(Array.from(selectedBooks), ResetProgressTypes.BOOKLORE).subscribe({
                 next: () => {
                   this.messageService.add({
                     severity: 'success',
                     summary: 'Progress Reset',
-                    detail: 'Reading progress has been reset.',
+                    detail: 'Booklore reading progress has been reset.',
+                    life: 1500
+                  });
+                },
+                error: () => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Could not reset progress.',
+                    life: 1500
+                  });
+                }
+              });
+            }
+          });
+        }
+      },
+      {
+        label: 'Reset KOReader Progress',
+        icon: 'pi pi-undo',
+        command: () => {
+          this.confirmationService.confirm({
+            message: 'Are you sure you want to reset KOReader reading progress for selected books?',
+            header: 'Confirm Reset',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'No',
+            accept: () => {
+              this.bookService.resetProgress(Array.from(selectedBooks), ResetProgressTypes.KOREADER).subscribe({
+                next: () => {
+                  this.messageService.add({
+                    severity: 'success',
+                    summary: 'Progress Reset',
+                    detail: 'KOReader reading progress has been reset.',
                     life: 1500
                   });
                 },

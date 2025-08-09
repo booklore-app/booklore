@@ -38,7 +38,10 @@ export class AuthenticationSettingsComponent implements OnInit {
     {label: 'Upload Books', value: 'permissionUpload', selected: false},
     {label: 'Download Books', value: 'permissionDownload', selected: false},
     {label: 'Edit Book Metadata', value: 'permissionEditMetadata', selected: false},
-    {label: 'Email Book', value: 'permissionEmailBook', selected: false}
+    {label: 'Manage Library', value: 'permissionManipulateLibrary', selected: false},
+    {label: 'Email Book', value: 'permissionEmailBook', selected: false},
+    {label: 'Delete Book', value: 'permissionDeleteBook', selected: false},
+    {label: 'KOReader Sync', value: 'permissionSyncKoreader', selected: false}
   ];
 
   internalAuthEnabled = true;

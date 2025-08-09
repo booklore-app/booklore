@@ -1,7 +1,7 @@
 <div class="book-card"
-  [class.selected]="isSelected"
-  (mouseover)="isHovered = true"
-  (mouseout)="isHovered = false">
+     [class.selected]="isSelected"
+     (mouseover)="isHovered = true"
+     (mouseout)="isHovered = false">
 
   <div class="cover-container" [ngClass]="{ 'shimmer': !isImageLoaded, 'center-info-btn': readButtonHidden }">
     <div
@@ -16,7 +16,7 @@
         [class.loaded]="isImageLoaded"
         alt="Cover of {{ book.metadata?.title }}"
         loading="lazy"
-        (load)="onImageLoad()" />
+        (load)="onImageLoad()"/>
     </div>
 
     @if (book.metadata?.seriesNumber != null) {
@@ -50,6 +50,16 @@
         [showValue]="false"
         class="cover-progress-bar"
         [ngClass]="{ 'progress-complete': progressPercentage === 100, 'progress-incomplete': progressPercentage < 100 }">
+      </p-progressBar>
+    }
+    @if (koProgressPercentage !== null) {
+      <p-progressBar
+        [value]="koProgressPercentage"
+        [showValue]="false"
+        [ngClass]="[
+          progressPercentage == null ? 'cover-progress-bar-ko-only' : 'cover-progress-bar-ko-both',
+          koProgressPercentage === 100 ? 'progress-complete-ko' : 'progress-incomplete-ko'
+        ]">
       </p-progressBar>
     }
   </div>

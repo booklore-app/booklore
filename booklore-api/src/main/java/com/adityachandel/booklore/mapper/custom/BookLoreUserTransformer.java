@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,6 +32,7 @@ public class BookLoreUserTransformer {
         permissions.setCanEmailBook(userEntity.getPermissions().isPermissionEmailBook());
         permissions.setCanDeleteBook(userEntity.getPermissions().isPermissionDeleteBook());
         permissions.setCanManipulateLibrary(userEntity.getPermissions().isPermissionManipulateLibrary());
+        permissions.setCanSyncKoReader(userEntity.getPermissions().isPermissionSyncKoreader());
 
         BookLoreUser bookLoreUser = new BookLoreUser();
         bookLoreUser.setId(userEntity.getId());

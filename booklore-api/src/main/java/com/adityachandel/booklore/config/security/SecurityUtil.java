@@ -45,6 +45,11 @@ public class SecurityUtil {
         return user != null && user.getPermissions().isCanManipulateLibrary();
     }
 
+    public boolean canSyncKoReader() {
+        var user = getCurrentUser();
+        return user != null && user.getPermissions().isCanSyncKoReader();
+    }
+
     public boolean canEditMetadata() {
         var user = getCurrentUser();
         return user != null && user.getPermissions().isCanEditMetadata();
@@ -54,11 +59,11 @@ public class SecurityUtil {
         var user = getCurrentUser();
         return user != null && user.getPermissions().isCanEmailBook();
     }
+
     public boolean canDeleteBook() {
         var user = getCurrentUser();
         return user != null && user.getPermissions().isCanDeleteBook();
     }
-
 
     public boolean canViewUserProfile(Long userId) {
         var user = getCurrentUser();

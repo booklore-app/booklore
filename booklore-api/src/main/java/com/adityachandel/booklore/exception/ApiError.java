@@ -6,6 +6,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ApiError {
+    GENERIC_NOT_FOUND(HttpStatus.NOT_FOUND, "%s"),
+    GENERIC_BAD_REQUEST(HttpStatus.BAD_REQUEST, "%s"),
+    GENERIC_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "%s"),
+
     BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "Book not found with ID: %d"),
     EMAIL_PROVIDER_NOT_FOUND(HttpStatus.NOT_FOUND, "Email provider with ID %s not found"),
     DEFAULT_EMAIL_PROVIDER_NOT_FOUND(HttpStatus.NOT_FOUND, "Default email provider not found"),
@@ -34,9 +38,7 @@ public enum ApiError {
     USERNAME_ALREADY_TAKEN(HttpStatus.BAD_REQUEST, "Username already taken: %s"),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "User not found: %s"),
     CANNOT_DELETE_ADMIN(HttpStatus.FORBIDDEN, "Admin user cannot be deleted"),
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "%s"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "%s"),
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "%s"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "%s"),
     PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "Incorrect current password"),
     PASSWORD_TOO_SHORT(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters long"),
@@ -47,6 +49,7 @@ public enum ApiError {
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "%s"),
     FILE_DELETION_DISABLED(HttpStatus.BAD_REQUEST, "File deletion is disabled"),
     UNSUPPORTED_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "%s"),
+    CONFLICT(HttpStatus.CONFLICT, "%s"),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "File not found: %s");
 
     private final HttpStatus status;

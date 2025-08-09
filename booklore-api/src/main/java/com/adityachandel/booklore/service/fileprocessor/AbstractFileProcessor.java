@@ -7,6 +7,7 @@ import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookCreatorService;
+import com.adityachandel.booklore.service.FileFingerprint;
 import com.adityachandel.booklore.service.metadata.MetadataMatchService;
 import com.adityachandel.booklore.util.FileUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public abstract class AbstractFileProcessor implements BookFileProcessor {
     public Book processFile(LibraryFile libraryFile) {
         Path filePath = libraryFile.getFullPath();
         String fileName = filePath.getFileName().toString();
-        String hash = FileUtils.computeFileHash(filePath);
+        String hash = FileFingerprint.generateHash(filePath);
 
         Optional<Book> existing = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, bookRepository, bookMapper);
         if (existing.isPresent()) {
@@ -63,5 +64,4 @@ public abstract class AbstractFileProcessor implements BookFileProcessor {
     }
 
     protected abstract BookEntity processNewFile(LibraryFile libraryFile);
-
 }

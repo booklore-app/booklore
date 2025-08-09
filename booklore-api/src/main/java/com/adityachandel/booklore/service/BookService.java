@@ -4,11 +4,16 @@ import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.*;
+import com.adityachandel.booklore.model.dto.progress.CbxProgress;
+import com.adityachandel.booklore.model.dto.progress.EpubProgress;
+import com.adityachandel.booklore.model.dto.progress.KoProgress;
+import com.adityachandel.booklore.model.dto.progress.PdfProgress;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.response.BookDeletionResponse;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.enums.ReadStatus;
+import com.adityachandel.booklore.model.enums.ResetProgressType;
 import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
@@ -58,10 +63,15 @@ public class BookService {
 
     private void setBookProgress(Book book, UserBookProgressEntity progress) {
         switch (book.getBookType()) {
-            case EPUB -> book.setEpubProgress(EpubProgress.builder()
-                    .cfi(progress.getEpubProgress())
-                    .percentage(progress.getEpubProgressPercent())
-                    .build());
+            case EPUB -> {
+                book.setEpubProgress(EpubProgress.builder()
+                        .cfi(progress.getEpubProgress())
+                        .percentage(progress.getEpubProgressPercent())
+                        .build());
+                book.setKoreaderProgress(KoProgress.builder()
+                        .percentage(progress.getKoreaderProgressPercent() != null ? progress.getKoreaderProgressPercent() * 100 : null)
+                        .build());
+            }
             case PDF -> book.setPdfProgress(PdfProgress.builder()
                     .page(progress.getPdfProgress())
                     .percentage(progress.getPdfProgressPercent())
@@ -143,6 +153,12 @@ public class BookService {
                     .cfi(userProgress.getEpubProgress())
                     .percentage(userProgress.getEpubProgressPercent())
                     .build());
+            if (userProgress.getKoreaderProgressPercent() != null) {
+                if (book.getKoreaderProgress() == null) {
+                    book.setKoreaderProgress(KoProgress.builder().build());
+                }
+                book.getKoreaderProgress().setPercentage(userProgress.getKoreaderProgressPercent() * 100);
+            }
         }
         if (bookEntity.getBookType() == BookFileType.CBX) {
             book.setCbxProgress(CbxProgress.builder()
@@ -350,7 +366,7 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public List<Book> resetProgress(List<Long> bookIds) {
+    public List<Book> resetProgress(List<Long> bookIds, ResetProgressType type) {
         BookLoreUser user = authenticationService.getAuthenticatedUser();
         List<Book> updatedBooks = new ArrayList<>();
         Optional<BookLoreUserEntity> userEntity = userRepository.findById(user.getId());
@@ -366,14 +382,21 @@ public class BookService {
             progress.setUser(userEntity.orElseThrow());
             progress.setReadStatus(null);
             progress.setLastReadTime(null);
-            progress.setPdfProgress(null);
-            progress.setPdfProgressPercent(null);
-            progress.setEpubProgress(null);
-            progress.setEpubProgressPercent(null);
-            progress.setCbxProgress(null);
-            progress.setCbxProgressPercent(null);
             progress.setDateFinished(null);
-
+            if (type == ResetProgressType.BOOKLORE) {
+                progress.setPdfProgress(null);
+                progress.setPdfProgressPercent(null);
+                progress.setEpubProgress(null);
+                progress.setEpubProgressPercent(null);
+                progress.setCbxProgress(null);
+                progress.setCbxProgressPercent(null);
+            } else if (type == ResetProgressType.KOREADER) {
+                progress.setKoreaderProgress(null);
+                progress.setKoreaderProgressPercent(null);
+                progress.setKoreaderDeviceId(null);
+                progress.setKoreaderDevice(null);
+                progress.setKoreaderLastSyncTime(null);
+            }
             userBookProgressRepository.save(progress);
             updatedBooks.add(bookMapper.toBook(bookEntity));
         }
@@ -389,10 +412,10 @@ public class BookService {
         Set<Long> userShelfIds = userEntity.getShelves().stream().map(ShelfEntity::getId).collect(Collectors.toSet());
 
         if (!userShelfIds.containsAll(shelfIdsToAssign)) {
-            throw ApiError.UNAUTHORIZED.createException("Cannot assign shelves that do not belong to the user.");
+            throw ApiError.GENERIC_UNAUTHORIZED.createException("Cannot assign shelves that do not belong to the user.");
         }
         if (!userShelfIds.containsAll(shelfIdsToUnassign)) {
-            throw ApiError.UNAUTHORIZED.createException("Cannot unassign shelves that do not belong to the user.");
+            throw ApiError.GENERIC_UNAUTHORIZED.createException("Cannot unassign shelves that do not belong to the user.");
         }
 
         List<BookEntity> bookEntities = bookQueryService.findAllWithMetadataByIds(bookIds);

@@ -8,6 +8,7 @@ import {API_CONFIG} from '../../config/api-config';
 import {FetchMetadataRequest} from '../../metadata/model/request/fetch-metadata-request.model';
 import {MetadataRefreshRequest} from '../../metadata/model/request/metadata-refresh-request.model';
 import {MessageService} from 'primeng/api';
+import {ResetProgressType, ResetProgressTypes} from '../../shared/constants/reset-progress-type';
 
 @Injectable({
   providedIn: 'root',
@@ -401,9 +402,10 @@ export class BookService {
     );
   }
 
-  resetProgress(bookIds: number | number[]): Observable<Book[]> {
+  resetProgress(bookIds: number | number[], type: ResetProgressType): Observable<Book[]> {
     const ids = Array.isArray(bookIds) ? bookIds : [bookIds];
-    return this.http.post<Book[]>(`${this.url}/reset-progress`, ids).pipe(
+    const params = new HttpParams().set('type', ResetProgressTypes[type]);
+    return this.http.post<Book[]>(`${this.url}/reset-progress`, ids, {params}).pipe(
       tap(updatedBooks => updatedBooks.forEach(book => this.handleBookUpdate(book)))
     );
   }
@@ -412,14 +414,9 @@ export class BookService {
     const ids = Array.isArray(bookIds) ? bookIds : [bookIds];
     return this.http.put<Book[]>(`${this.url}/read-status`, {ids, status}).pipe(
       tap(updatedBooks => {
-        // Update the books in the state with the actual response from the API
         updatedBooks.forEach(updatedBook => this.handleBookUpdate(updatedBook));
       })
     );
-  }
-
-  getMagicShelfBookCount(number: number) {
-
   }
 
 

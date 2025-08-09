@@ -129,8 +129,8 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.image_tag }} \
-            --tag booklore/booklore-app:${{ env.image_tag }} \
-            --tag ghcr.io/${{ github.repository }}/booklore-app:${{ env.image_tag }} \
+            --tag booklore/booklore:${{ env.image_tag }} \
+            --tag ghcr.io/booklore-app/booklore:${{ env.image_tag }} \
             --push .
 
       - name: Push Latest Tag (Only for Master)
@@ -139,8 +139,8 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.new_tag }} \
-            --tag booklore/booklore-app:latest \
-            --tag ghcr.io/${{ github.repository }}/booklore-app:latest \
+            --tag booklore/booklore:latest \
+            --tag ghcr.io/booklore-app/booklore:latest \
             --push .
 
       - name: Update Release Draft (Only for Master)
@@ -161,17 +161,49 @@ jobs:
 
       - name: Notify Discord of New Release
         if: github.ref == 'refs/heads/master'
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          NEW_TAG:            ${{ env.new_tag }}
         run: |
-          release_json=$(gh release view ${{ env.new_tag }} --json name,body,url)
-          release_name=$(echo "$release_json" | jq -r '.name')
-          release_body=$(echo "$release_json" | jq -r '.body')
-          release_url=$(echo "$release_json" | jq -r '.url')
-          dockerhub_image="https://hub.docker.com/r/booklore/booklore-app/tags"
-          ghcr_image="https://github.com/${{ github.repository }}/packages"
-          content=":tada: **New Release:** [$release_name]($release_url)\n\n$release_body\n\n**Docker Images:**\n- Docker Hub: \`booklore/booklore-app:${{ env.new_tag }}\` ([View]($dockerhub_image))\n- GHCR: \`ghcr.io/${{ github.repository }}/booklore-app:${{ env.new_tag }}\` ([View]($ghcr_image))"
-          payload="{\"content\": \"$content\"}"
-          curl -H "Content-Type: application/json" -X POST -d "$payload" $DISCORD_WEBHOOK_URL
+          set -euo pipefail
+          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
+            echo "DISCORD_WEBHOOK_URL not set, skipping Discord notification."
+            exit 0
+          fi
+          echo "Preparing Discord notification for release $NEW_TAG"
 
+          # fetch release info
+          release_json=$(gh release view "$NEW_TAG" --json name,body,url)
+          release_name=$(jq -r '.name' <<< "$release_json")
+          release_body=$(jq -r '.body' <<< "$release_json")
+          release_url=$(jq -r '.url'  <<< "$release_json")
+
+          # trim body if too long
+          clean_body=$(echo "$release_body" | tr -d '\r')
+          max_length=1800
+          if [ ${#clean_body} -gt $max_length ]; then
+            clean_body="${clean_body:0:$((max_length-12))}… [truncated]"
+          fi
+
+          # build JSON payload
+          payload=$(jq -n \
+            --arg title "New Release: $release_name" \
+            --arg url   "$release_url" \
+            --arg desc  "$clean_body" \
+            '{
+              content: null,
+              embeds: [{
+                title: $title,
+                url: $url,
+                description: $desc,
+                color: 3066993
+              }]
+            }')
+
+          echo "=== Discord payload ==="
+          echo "$payload"
+          echo "======================="
+
+          curl -H "Content-Type: application/json" -d "$payload" "$DISCORD_WEBHOOK_URL"

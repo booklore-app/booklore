@@ -28,6 +28,7 @@ public class BookLoreUser {
         private boolean canDownload;
         private boolean canEditMetadata;
         private boolean canManipulateLibrary;
+        private boolean canSyncKoReader;
         private boolean canEmailBook;
         private boolean canDeleteBook;
     }
@@ -45,6 +46,7 @@ public class BookLoreUser {
         public List<TableColumnPreference> tableColumnPreference;
         public String filterSortingMode;
         public String metadataCenterViewMode;
+        public boolean koReaderEnabled;
 
         @Data
         @Builder

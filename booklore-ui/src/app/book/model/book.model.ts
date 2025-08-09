@@ -14,6 +14,7 @@ export interface Book {
   epubProgress?: EpubProgress;
   pdfProgress?: PdfProgress;
   cbxProgress?: CbxProgress;
+  koreaderProgress?: KoReaderProgress;
   filePath?: string;
   fileSubPath?: string;
   fileName?: string;
@@ -40,6 +41,10 @@ export interface CbxProgress {
   percentage: number;
 }
 
+export interface KoReaderProgress {
+  percentage: number;
+}
+
 export interface BookMetadata {
   bookId: number;
   title?: string;
@@ -54,6 +59,7 @@ export interface BookMetadata {
   isbn10?: string;
   asin?: string;
   goodreadsId?: string;
+  comicvineId?: string;
   hardcoverId?: string;
   googleId?: string;
   pageCount?: number | null;
@@ -85,6 +91,7 @@ export interface BookMetadata {
   isbn13Locked?: boolean;
   isbn10Locked?: boolean;
   asinLocked?: boolean;
+  comicvineIdLocked?: boolean;
   goodreadsIdLocked?: boolean;
   hardcoverIdLocked?: boolean;
   googleIdLocked?: boolean;
@@ -118,6 +125,7 @@ export interface MetadataClearFlags {
   isbn10?: boolean;
   asin?: boolean;
   goodreadsId?: boolean;
+  comicvineId?: boolean;
   hardcoverId?: boolean;
   googleId?: boolean;
   pageCount?: boolean;

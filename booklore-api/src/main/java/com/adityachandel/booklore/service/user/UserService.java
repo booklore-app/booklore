@@ -53,6 +53,7 @@ public class UserService {
             user.getPermissions().setPermissionManipulateLibrary(updateRequest.getPermissions().isCanManipulateLibrary());
             user.getPermissions().setPermissionEmailBook(updateRequest.getPermissions().isCanEmailBook());
             user.getPermissions().setPermissionDeleteBook(updateRequest.getPermissions().isCanDeleteBook());
+            user.getPermissions().setPermissionSyncKoreader(updateRequest.getPermissions().isCanSyncKoReader());
         }
 
         if (updateRequest.getAssignedLibraries() != null && getMyself().getPermissions().isAdmin()) {
@@ -70,7 +71,7 @@ public class UserService {
         BookLoreUser currentUser = authenticationService.getAuthenticatedUser();
         boolean isAdmin = currentUser.getPermissions().isAdmin();
         if (!isAdmin) {
-            throw ApiError.UNAUTHORIZED.createException("You do not have permission to delete this User");
+            throw ApiError.GENERIC_UNAUTHORIZED.createException("You do not have permission to delete this User");
         }
         if (currentUser.getId().equals(userToDelete.getId())) {
             throw ApiError.SELF_DELETION_NOT_ALLOWED.createException();

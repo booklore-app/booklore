@@ -7,6 +7,7 @@ import com.adityachandel.booklore.model.entity.LibraryPathEntity;
 import com.adityachandel.booklore.model.enums.BookFileExtension;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.service.FileFingerprint;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.util.FileUtils;
 import jakarta.annotation.PostConstruct;
@@ -89,11 +90,7 @@ public class LibraryFileEventProcessor {
 
     private void handleFileCreate(LibraryEntity library, Path path) {
         log.info("[FILE_CREATE] '{}'", path);
-        String hash = FileUtils.computeFileHash(path);
-        if (hash == null) {
-            log.warn("[SKIP] Unable to compute hash for '{}'", path);
-            return;
-        }
+        String hash = FileFingerprint.generateHash(path);
         bookFileTransactionalHandler.handleNewBookFile(library.getId(), path, hash);
     }
 
@@ -127,10 +124,8 @@ public class LibraryFileEventProcessor {
                     .filter(p -> isBookFile(p.getFileName().toString()))
                     .forEach(p -> {
                         try {
-                            String hash = FileUtils.computeFileHash(p);
-                            if (hash != null) {
-                                bookFileTransactionalHandler.handleNewBookFile(library.getId(), p, hash);
-                            }
+                            String hash = FileFingerprint.generateHash(p);
+                            bookFileTransactionalHandler.handleNewBookFile(library.getId(), p, hash);
                         } catch (Exception e) {
                             log.warn("[ERROR] Processing file '{}': {}", p, e.getMessage());
                         }
