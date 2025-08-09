@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service.upload;
 
+import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
@@ -48,6 +49,7 @@ public class FileUploadService {
     private final BookFileProcessorRegistry processorRegistry;
     private final NotificationService notificationService;
     private final AppSettingService appSettingService;
+    private final AppProperties appProperties;
     private final PdfMetadataExtractor pdfMetadataExtractor;
     private final EpubMetadataExtractor epubMetadataExtractor;
     private final MonitoringService monitoringService;
@@ -61,8 +63,7 @@ public class FileUploadService {
     public Book uploadFile(MultipartFile file, long libraryId, long pathId) throws IOException {
         validateFile(file);
 
-        LibraryEntity libraryEntity = libraryRepository.findById(libraryId)
-                .orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
 
         LibraryPathEntity libraryPathEntity = libraryEntity.getLibraryPaths()
                 .stream()
@@ -81,20 +82,15 @@ public class FileUploadService {
 
         try {
             file.transferTo(tempPath);
-
             setTemporaryFileOwnership(tempPath);
-
             BookFileExtension fileExt = BookFileExtension.fromFileName(file.getOriginalFilename()).orElseThrow(() -> ApiError.INVALID_FILE_FORMAT.createException("Unsupported file extension"));
-
             BookMetadata metadata = extractMetadata(fileExt, tempPath.toFile());
-
             String uploadPattern = appSettingService.getAppSettings().getUploadPattern();
             if (uploadPattern.endsWith("/") || uploadPattern.endsWith("\\")) {
                 uploadPattern += "{currentFilename}";
             }
 
             String relativePath = PathPatternResolver.resolvePattern(metadata, uploadPattern, file.getOriginalFilename());
-
             Path finalPath = Paths.get(libraryPathEntity.getPath(), relativePath);
             File finalFile = finalPath.toFile();
 
@@ -132,6 +128,33 @@ public class FileUploadService {
         }
     }
 
+    public Book uploadFileBookDrop(MultipartFile file) throws IOException {
+        validateFile(file);
+
+        Path dropFolder = Paths.get(appProperties.getBookdropFolder());
+        Files.createDirectories(dropFolder);
+
+        String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
+        Path tempPath = Files.createTempFile("bookdrop-", originalFilename);
+
+        try {
+            file.transferTo(tempPath);
+            setTemporaryFileOwnership(tempPath);
+
+            Path finalPath = dropFolder.resolve(originalFilename);
+
+            if (Files.exists(finalPath)) {
+                throw ApiError.FILE_ALREADY_EXISTS.createException();
+            }
+            Files.move(tempPath, finalPath);
+
+            log.info("File moved to book-drop folder: {}", finalPath);
+            return null;
+        } finally {
+            Files.deleteIfExists(tempPath);
+        }
+    }
+
     private BookMetadata extractMetadata(BookFileExtension fileExt, File file) throws IOException {
         return switch (fileExt) {
             case PDF -> pdfMetadataExtractor.extractMetadata(file);
@@ -153,7 +176,7 @@ public class FileUploadService {
 
     private void setTemporaryFileOwnership(Path tempPath) throws IOException {
         UserPrincipalLookupService lookupService = FileSystems.getDefault()
-            .getUserPrincipalLookupService();
+                .getUserPrincipalLookupService();
         if (!userId.equals("0")) {
             UserPrincipal user = lookupService.lookupPrincipalByName(userId);
             Files.getFileAttributeView(tempPath, PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setOwner(user);
@@ -178,5 +201,4 @@ public class FileUploadService {
         BookFileProcessor processor = processorRegistry.getProcessorOrThrow(type);
         return processor.processFile(libraryFile);
     }
-
 }

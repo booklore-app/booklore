@@ -39,28 +39,42 @@ public abstract class AbstractFileProcessor implements BookFileProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Book processFile(LibraryFile libraryFile) {
-        Path filePath = libraryFile.getFullPath();
-        String fileName = filePath.getFileName().toString();
-        String hash = FileFingerprint.generateHash(filePath);
+        Path path = libraryFile.getFullPath();
+        String fileName = path.getFileName().toString();
+        String hash = FileFingerprint.generateHash(path);
 
-        Optional<Book> existing = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, bookRepository, bookMapper);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-        Optional<BookEntity> byName = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
-        if (byName.isPresent()) {
-            return bookMapper.toBook(byName.get());
+        Optional<Book> duplicate = fileProcessingUtils.checkForDuplicateAndUpdateMetadataIfNeeded(libraryFile, hash, bookRepository, bookMapper);
+        if (duplicate.isPresent()) {
+            return handleDuplicate(duplicate.get(), libraryFile);
         }
 
-        BookEntity book = processNewFile(libraryFile);
-        book.setCurrentHash(hash);
+        Long libraryId = libraryFile.getLibraryEntity().getId();
+        return bookRepository.findBookByFileNameAndLibraryId(fileName, libraryId)
+                .map(bookMapper::toBook)
+                .orElseGet(() -> createAndMapBook(libraryFile, hash));
+    }
 
-        Float score = metadataMatchService.calculateMatchScore(book);
-        book.setMetadataMatchScore(score);
+    private Book handleDuplicate(Book bookDto, LibraryFile libraryFile) {
+        bookRepository.findById(bookDto.getId())
+                .ifPresent(entity -> {
+                    entity.setFileSubPath(libraryFile.getFileSubPath());
+                    entity.setFileName(libraryFile.getFileName());
+                    entity.setLibraryPath(libraryFile.getLibraryPathEntity());
+                    log.info("Duplicate file handled: bookId={} fileName='{}' libraryId={} subPath='{}'",
+                            entity.getId(),
+                            libraryFile.getFileName(),
+                            libraryFile.getLibraryEntity().getId(),
+                            libraryFile.getFileSubPath());
+                });
+        return bookDto;
+    }
 
-        bookCreatorService.saveConnections(book);
-
-        return bookMapper.toBook(book);
+    private Book createAndMapBook(LibraryFile libraryFile, String hash) {
+        BookEntity entity = processNewFile(libraryFile);
+        entity.setCurrentHash(hash);
+        entity.setMetadataMatchScore(metadataMatchService.calculateMatchScore(entity));
+        bookCreatorService.saveConnections(entity);
+        return bookMapper.toBook(entity);
     }
 
     protected abstract BookEntity processNewFile(LibraryFile libraryFile);

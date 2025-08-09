@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {FileSelectEvent, FileUpload, FileUploadHandlerEvent} from 'primeng/fileupload';
 import {Button} from 'primeng/button';
-import { AsyncPipe } from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MessageService} from 'primeng/api';
 import {Select} from 'primeng/select';
@@ -17,6 +17,7 @@ import {Tooltip} from 'primeng/tooltip';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
 import {filter, take} from 'rxjs/operators';
 import {AppSettings} from '../../../core/model/app-settings.model';
+import {SelectButton} from 'primeng/selectbutton';
 
 interface UploadingFile {
   file: File;
@@ -34,8 +35,9 @@ interface UploadingFile {
     FormsModule,
     Select,
     Badge,
-    Tooltip
-],
+    Tooltip,
+    SelectButton
+  ],
   templateUrl: './book-uploader.component.html',
   styleUrl: './book-uploader.component.scss'
 })
@@ -53,6 +55,11 @@ export class BookUploaderComponent implements OnInit {
   readonly libraryState$: Observable<LibraryState> = this.libraryService.libraryState$;
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
   maxFileSizeBytes?: number;
+  stateOptions = [
+    {label: 'Library', value: 'library'},
+    {label: 'Bookdrop', value: 'bookdrop'}
+  ];
+  value = 'library';
 
   ngOnInit(): void {
     this.appSettings$
@@ -101,7 +108,7 @@ export class BookUploaderComponent implements OnInit {
   }
 
   uploadFiles(event: FileUploadHandlerEvent): void {
-    if (!this.selectedLibrary || !this.selectedPath) {
+    if (this.value === 'library' && (!this.selectedLibrary || !this.selectedPath)) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Missing Data',
@@ -111,34 +118,52 @@ export class BookUploaderComponent implements OnInit {
       return;
     }
 
-    const libraryId = this.selectedLibrary.id!.toString();
-    const pathId = this.selectedPath.id!.toString();
     const filesToUpload = this.files.filter(f => f.status === 'Pending');
-
     if (filesToUpload.length === 0) return;
 
     this.isUploading = true;
-    let pending = filesToUpload.length;
+    this.uploadBatch(filesToUpload, 0, 5);
+  }
 
-    for (const uploadFile of filesToUpload) {
+  private uploadBatch(files: UploadingFile[], startIndex: number, batchSize: number): void {
+    const batch = files.slice(startIndex, startIndex + batchSize);
+    if (batch.length === 0) {
+      this.isUploading = false;
+      return;
+    }
+
+    let pending = batch.length;
+
+    for (const uploadFile of batch) {
       uploadFile.status = 'Uploading';
 
       const formData = new FormData();
       formData.append('file', uploadFile.file);
-      formData.append('libraryId', libraryId);
-      formData.append('pathId', pathId);
 
-      this.http.post<Book>(`${API_CONFIG.BASE_URL}/api/v1/files/upload`, formData).subscribe({
+      let uploadUrl: string;
+      if (this.value === 'library') {
+        const libraryId = this.selectedLibrary!.id!.toString();
+        const pathId = this.selectedPath!.id!.toString();
+        formData.append('libraryId', libraryId);
+        formData.append('pathId', pathId);
+        uploadUrl = `${API_CONFIG.BASE_URL}/api/v1/files/upload`;
+      } else {
+        uploadUrl = `${API_CONFIG.BASE_URL}/api/v1/files/upload/bookdrop`;
+      }
+
+      this.http.post<Book>(uploadUrl, formData).subscribe({
         next: () => {
           uploadFile.status = 'Uploaded';
-          if (--pending === 0) this.isUploading = false;
+          if (--pending === 0) {
+            this.uploadBatch(files, startIndex + batchSize, batchSize);
+          }
         },
         error: (err) => {
           uploadFile.status = 'Failed';
           uploadFile.errorMessage = err?.error?.message || 'Upload failed due to unknown error.';
           console.error('Upload failed for', uploadFile.file.name, err);
           if (--pending === 0) {
-            this.isUploading = false;
+            this.uploadBatch(files, startIndex + batchSize, batchSize);
           }
         }
       });
@@ -146,11 +171,14 @@ export class BookUploaderComponent implements OnInit {
   }
 
   isChooseDisabled(): boolean {
+    if (this.value === 'bookdrop') {
+      return this.isUploading;
+    }
     return !this.selectedLibrary || !this.selectedPath || this.isUploading;
   }
 
   isUploadDisabled(): boolean {
-    return this.isChooseDisabled() || !this.filesPresent() || !this.hasPendingFiles;
+    return this.isChooseDisabled() || !this.filesPresent() || !this.hasPendingFiles();
   }
 
   formatSize(bytes: number): string {
