@@ -11,7 +11,6 @@ import {DropdownModule} from 'primeng/dropdown';
 import {FormControl, FormGroup, FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {Select} from 'primeng/select';
-import {InputText} from 'primeng/inputtext';
 import {Tooltip} from 'primeng/tooltip';
 import {Divider} from 'primeng/divider';
 import {ConfirmationService, MessageService} from 'primeng/api';
@@ -55,7 +54,6 @@ export interface BookdropFileUI {
     BookdropFileMetadataPickerComponent,
     Tooltip,
     Divider,
-    InputText,
     Checkbox,
     NgStyle,
     NgClass,
@@ -425,7 +423,6 @@ export class BookdropFileReviewComponent implements OnInit {
     });
 
     const payload: BookdropFinalizePayload = {
-      uploadPattern: this.uploadPattern,
       selectAll: this.selectAllAcrossPages,
       excludedIds: this.selectAllAcrossPages ? Array.from(this.excludedFiles) : undefined,
       defaultLibraryId: this.defaultLibraryId ? Number(this.defaultLibraryId) : undefined,

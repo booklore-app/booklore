@@ -5,6 +5,7 @@ export interface Library {
   name: string;
   icon: string;
   watch: boolean;
+  fileNamingPattern?: string;
   sort?: SortOption;
   paths: LibraryPath[];
 }

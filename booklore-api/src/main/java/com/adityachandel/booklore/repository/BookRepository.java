@@ -14,12 +14,14 @@ import java.util.Set;
 
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpecificationExecutor<BookEntity> {
-
     Optional<BookEntity> findBookByIdAndLibraryId(long id, long libraryId);
 
     Optional<BookEntity> findBookByFileNameAndLibraryId(String fileName, long libraryId);
 
     Optional<BookEntity> findByCurrentHash(String currentHash);
+
+    @Query("SELECT b.id FROM BookEntity b WHERE b.library.id = :libraryId AND (b.deleted IS NULL OR b.deleted = false)")
+    Set<Long> findBookIdsByLibraryId(@Param("libraryId") long libraryId);
 
     List<BookEntity> findAllByLibraryPathIdAndFileSubPathStartingWith(Long libraryPathId, String fileSubPathPrefix);
 
@@ -30,9 +32,6 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
 
     @Query("SELECT b.id FROM BookEntity b WHERE b.libraryPath.id IN :libraryPathIds AND (b.deleted IS NULL OR b.deleted = false)")
     List<Long> findAllBookIdsByLibraryPathIdIn(@Param("libraryPathIds") Collection<Long> libraryPathIds);
-
-    @Query("SELECT b FROM BookEntity b WHERE b.id IN :bookIds AND (b.deleted IS NULL OR b.deleted = false)")
-    List<BookEntity> findAllNonDeletedByIds(@Param("bookIds") Collection<Long> bookIds);
 
     @EntityGraph(attributePaths = {"metadata", "shelves", "libraryPath"})
     @Query("SELECT b FROM BookEntity b WHERE (b.deleted IS NULL OR b.deleted = false)")

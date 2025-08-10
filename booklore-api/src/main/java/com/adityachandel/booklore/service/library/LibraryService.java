@@ -231,4 +231,10 @@ public class LibraryService {
         List<BookEntity> bookEntities = bookRepository.findAllWithMetadataByLibraryId(libraryId);
         return bookEntities.stream().map(bookMapper::toBook).toList();
     }
+
+    public Library setFileNamingPattern(long libraryId, String pattern) {
+        LibraryEntity library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        library.setFileNamingPattern(pattern);
+        return libraryMapper.toLibrary(libraryRepository.save(library));
+    }
 }

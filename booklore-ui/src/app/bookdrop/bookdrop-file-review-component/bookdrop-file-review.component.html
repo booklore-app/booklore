@@ -33,25 +33,6 @@
       }
 
       @if (bookdropFileUis.length !== 0) {
-
-        <div class="flex gap-2 items-center px-1 pb-4 w-full">
-          <label for="uploadPatternInput" class="text-sm text-gray-300 font-medium">File Naming Pattern:</label>
-          <input
-            id="uploadPatternInput"
-            fluid
-            class="min-w-[20rem] max-w-[45.5rem]"
-            pSize="small"
-            type="text"
-            pInputText
-            [(ngModel)]="uploadPattern"
-            placeholder="e.g., {title} - {authors}"/>
-          <i
-            class="pi pi-info-circle text-blue-500 cursor-help"
-            pTooltip="Sets the filename pattern used when moving files from bookdrop folder to the library, using metadata placeholders like {title}, {authors}, etc."
-            tooltipPosition="top"
-            style="font-size: 1rem; margin-left: 0.25rem;"></i>
-        </div>
-
         <div class="flex justify-between items-center gap-4 px-1">
 
           <div class="flex gap-4 items-center">
@@ -126,7 +107,7 @@
       }
     </div>
 
-    <div class="flex-1 overflow-y-auto px-6 space-y-2 pb-4">
+    <div class="flex-1 overflow-y-auto px-6 pt-4 space-y-2 pb-4">
       @if (bookdropFileUis.length === 0) {
         <div class="h-full w-full flex items-center justify-center text-gray-400 italic py-8">
           No bookdrop files to review.

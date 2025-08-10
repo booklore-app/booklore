@@ -122,14 +122,27 @@ export class LibraryService {
 
   getLibraryPathById(pathId: number): string | undefined {
     const libraries = this.libraryStateSubject.value.libraries || [];
-
     for (const library of libraries) {
       const match = library.paths.find(p => p.id === pathId);
       if (match) {
         return match.path;
       }
     }
-
     return undefined;
+  }
+
+  updateLibraryFileNamingPattern(libraryId: number, fileNamingPattern: string): Observable<Library> {
+    return this.http.patch<Library>(`${this.url}/${libraryId}/file-naming-pattern`, { fileNamingPattern }).pipe(
+      map(updatedLibrary => {
+        const currentState = this.libraryStateSubject.value;
+        const updatedLibraries = currentState.libraries ? currentState.libraries.map(existingLibrary =>
+          existingLibrary.id === updatedLibrary.id ? updatedLibrary : existingLibrary) : [updatedLibrary];
+        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
+        return updatedLibrary;
+      }),
+      catchError(error => {
+        throw error;
+      })
+    );
   }
 }

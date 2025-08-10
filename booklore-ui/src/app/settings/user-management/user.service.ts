@@ -6,6 +6,8 @@ import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {Library} from '../../book/model/library.model';
 import {catchError} from 'rxjs/operators';
 import {CbxPageSpread, CbxPageViewMode, PdfPageSpread, PdfPageViewMode} from '../../book/model/book.model';
+import {filter, take} from 'rxjs/operators';
+import {AuthService} from '../../core/service/auth.service';
 
 export interface EntityViewPreferences {
   global: EntityViewPreference;
@@ -119,18 +121,12 @@ export class UserService {
   private readonly userUrl = `${API_CONFIG.BASE_URL}/api/v1/users`;
 
   private http = inject(HttpClient);
-  private injector = inject(Injector);
-
-  private rxStompService?: RxStompService;
 
   private userStateSubject = new BehaviorSubject<User | null>(null);
   userState$ = this.userStateSubject.asObservable();
 
-  constructor() {
-    this.getMyself().subscribe(user => {
-      this.userStateSubject.next(user);
-      this.startWebSocket();
-    });
+  public setInitialUser(user: User): void {
+    this.userStateSubject.next(user);
   }
 
   getCurrentUser(): User | null {
@@ -199,30 +195,5 @@ export class UserService {
         this.userStateSubject.next(updatedUser);
       }
     });
-  }
-
-
-  updateUserSettingV2(userId: number, key: string, value: any): Observable<void> {
-    const payload = { key, value };
-    return this.http.put<void>(`${this.userUrl}/${userId}/settings`, payload);
-  }
-
-  private startWebSocket(): void {
-    const token = this.getToken();
-    if (token) {
-      const rxStompService = this.getRxStompService();
-      rxStompService.activate();
-    }
-  }
-
-  private getRxStompService(): RxStompService {
-    if (!this.rxStompService) {
-      this.rxStompService = this.injector.get(RxStompService);
-    }
-    return this.rxStompService;
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem('accessToken');
   }
 }

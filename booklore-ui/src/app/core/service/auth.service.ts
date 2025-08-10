@@ -1,11 +1,10 @@
 import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable, tap} from 'rxjs';
+import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {API_CONFIG} from '../../config/api-config';
 import {createRxStompConfig} from '../../shared/websocket/rx-stomp.config';
 import {OAuthService} from 'angular-oauth2-oidc';
-import {AppSettingsService} from './app-settings.service';
 import {Router} from '@angular/router';
 
 @Injectable({
@@ -20,6 +19,9 @@ export class AuthService {
   private injector = inject(Injector);
   private oAuthService = inject(OAuthService);
   private router = inject(Router);
+
+  private tokenSubject = new BehaviorSubject<string | null>(this.getOidcAccessToken() || this.getInternalAccessToken());
+  public token$ = this.tokenSubject.asObservable();
 
   internalLogin(credentials: { username: string; password: string }): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
     return this.http.post<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/login`, credentials).pipe(
@@ -57,6 +59,7 @@ export class AuthService {
   saveInternalTokens(accessToken: string, refreshToken: string): void {
     localStorage.setItem('accessToken_Internal', accessToken);
     localStorage.setItem('refreshToken_Internal', refreshToken);
+    this.tokenSubject.next(accessToken);
   }
 
   getInternalAccessToken(): string | null {
@@ -74,6 +77,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('accessToken_Internal');
     localStorage.removeItem('refreshToken_Internal');
+    this.tokenSubject.next(null);
     this.getRxStompService().deactivate();
     if (this.oAuthService.clientId) {
       this.oAuthService.logOut();

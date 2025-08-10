@@ -14,6 +14,7 @@ public class Library {
     private String name;
     private Sort sort;
     private String icon;
+    private String fileNamingPattern;
     private boolean watch;
     private List<LibraryPath> paths;
 }
