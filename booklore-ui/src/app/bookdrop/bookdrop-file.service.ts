@@ -1,7 +1,8 @@
 import {inject, Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Subscription} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, filter, take} from 'rxjs/operators';
 import {BookdropFileApiService} from './bookdrop-file-api.service';
+import {AuthService} from '../core/service/auth.service';
 
 export interface BookdropFileNotification {
   pendingCount: number;
@@ -25,14 +26,13 @@ export class BookdropFileService implements OnDestroy {
   );
 
   private apiService = inject(BookdropFileApiService);
+  private authService = inject(AuthService);
   private subscriptions = new Subscription();
 
   constructor() {
-    const sub = this.apiService.getNotification().subscribe({
-      next: summary => this.summarySubject.next(summary),
-      error: err => console.warn('Failed to fetch bookdrop file summary:', err)
-    });
-    this.subscriptions.add(sub);
+    this.authService.token$
+      .pipe(filter(t => !!t), take(1))
+      .subscribe(() => this.refresh());
   }
 
   handleIncomingFile(summary: BookdropFileNotification): void {
