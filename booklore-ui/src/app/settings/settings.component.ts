@@ -13,17 +13,19 @@ import {ReaderPreferences} from './reader-preferences/reader-preferences.compone
 import {MetadataSettingsComponent} from './metadata-settings-component/metadata-settings-component';
 import {OpdsSettingsComponent} from './global-preferences/opds-settings/opds-settings.component';
 import {DeviceSettingsComponent} from './device-settings-component/device-settings-component';
+import {FileNamingPatternComponent} from './file-naming-pattern/file-naming-pattern.component';
 
 export enum SettingsTab {
-  ReaderSettings = 'reader-settings',
-  ViewPreferences = 'view-settings',
-  DeviceSettings = 'device-settings',
-  UserManagement = 'user-management',
-  EmailSettings = 'email-settings',
-  MetadataSettings = 'metadata-settings',
-  ApplicationSettings = 'app-settings',
-  AuthenticationSettings = 'auth-settings',
-  Opds = 'opds-settings'
+  ReaderSettings = 'reader',
+  ViewPreferences = 'view',
+  DeviceSettings = 'device',
+  UserManagement = 'user',
+  EmailSettings = 'email',
+  NamingPattern = 'naming-pattern',
+  MetadataSettings = 'metadata',
+  ApplicationSettings = 'application',
+  AuthenticationSettings = 'authentication',
+  Opds = 'opds'
 }
 
 @Component({
@@ -43,7 +45,8 @@ export enum SettingsTab {
     ReaderPreferences,
     MetadataSettingsComponent,
     OpdsSettingsComponent,
-    DeviceSettingsComponent
+    DeviceSettingsComponent,
+    FileNamingPatternComponent
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'

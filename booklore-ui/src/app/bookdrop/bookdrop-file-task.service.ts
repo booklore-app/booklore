@@ -5,13 +5,11 @@ import {BookMetadata} from '../book/model/book.model';
 import {API_CONFIG} from '../config/api-config';
 
 export enum BookdropFileStatus {
-  PENDING_REVIEW = 'PENDING_REVIEW',
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
 }
 
 export interface BookdropFinalizePayload {
-  uploadPattern: string;
   selectAll?: boolean;
   excludedIds?: number[];
   defaultLibraryId?: number;

@@ -14,7 +14,6 @@ import {AppSettingsService} from '../../core/service/app-settings.service';
 import {BookService} from '../../book/service/book.service';
 import {AppSettingKey, AppSettings} from '../../core/model/app-settings.model';
 import {filter, take} from 'rxjs/operators';
-import {FileUploadPatternComponent} from './file-upload-pattern/file-upload-pattern.component';
 import {InputText} from 'primeng/inputtext';
 
 @Component({
@@ -28,7 +27,6 @@ import {InputText} from 'primeng/inputtext';
     Tooltip,
     ToggleSwitch,
     FormsModule,
-    FileUploadPatternComponent,
     InputText
   ],
   templateUrl: './global-preferences.component.html',

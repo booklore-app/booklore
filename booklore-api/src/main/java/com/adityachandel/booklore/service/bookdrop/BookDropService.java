@@ -22,6 +22,7 @@ import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.BookdropFileRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.NotificationService;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.fileprocessor.BookFileProcessor;
 import com.adityachandel.booklore.service.fileprocessor.BookFileProcessorRegistry;
 import com.adityachandel.booklore.service.metadata.MetadataRefreshService;
@@ -70,6 +71,7 @@ public class BookDropService {
     private final AppProperties appProperties;
     private final BookdropFileMapper mapper;
     private final ObjectMapper objectMapper;
+    AppSettingService appSettingService;
 
     public BookdropFileNotification getFileNotificationSummary() {
         long pendingCount = bookdropFileRepository.countByStatus(BookdropFileEntity.Status.PENDING_REVIEW);
@@ -127,7 +129,7 @@ public class BookDropService {
                         failedCount.incrementAndGet();
                         continue;
                     }
-                    processFile(file, metadataById.get(id), defaultLibraryId, defaultPathId, request.getUploadPattern(), results, failedCount);
+                    processFile(file, metadataById.get(id), defaultLibraryId, defaultPathId, results, failedCount);
                 }
             }
         } else {
@@ -156,7 +158,7 @@ public class BookDropService {
                         failedCount.incrementAndGet();
                         continue;
                     }
-                    processFile(file, metadataById.get(id), defaultLibraryId, defaultPathId, request.getUploadPattern(), results, failedCount);
+                    processFile(file, metadataById.get(id), defaultLibraryId, defaultPathId, results, failedCount);
                 }
             }
         }
@@ -188,7 +190,6 @@ public class BookDropService {
             BookdropFinalizeRequest.BookdropFinalizeFile fileReq,
             Long defaultLibraryId,
             Long defaultPathId,
-            String uploadPattern,
             BookdropFinalizeResult results,
             AtomicInteger failedCount
     ) {
@@ -217,13 +218,7 @@ public class BookDropService {
                 log.debug("Processing fileId={}, fileName={} with default metadata, libraryId={}, pathId={}", fileEntity.getId(), fileEntity.getFileName(), libraryId, pathId);
             }
 
-            BookdropFileResult result = moveFile(
-                    libraryId,
-                    pathId,
-                    uploadPattern,
-                    metadata,
-                    fileEntity
-            );
+            BookdropFileResult result = moveFile(libraryId, pathId, metadata, fileEntity);
 
             results.getResults().add(result);
             if (!result.isSuccess()) {
@@ -241,7 +236,7 @@ public class BookDropService {
         }
     }
 
-    private BookdropFileResult moveFile(long libraryId, long pathId, String filePattern, BookMetadata metadata, BookdropFileEntity bookdropFile) throws Exception {
+    private BookdropFileResult moveFile(long libraryId, long pathId, BookMetadata metadata, BookdropFileEntity bookdropFile) throws Exception {
         LibraryEntity library = libraryRepository.findById(libraryId)
                 .orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
 
@@ -249,6 +244,11 @@ public class BookDropService {
                 .filter(p -> p.getId() == pathId)
                 .findFirst()
                 .orElseThrow(() -> ApiError.INVALID_LIBRARY_PATH.createException(libraryId));
+
+        String filePattern = library.getFileNamingPattern();
+        if (filePattern == null || filePattern.isBlank()) {
+            filePattern = appSettingService.getAppSettings().getUploadPattern();
+        }
 
         if (filePattern.endsWith("/") || filePattern.endsWith("\\")) {
             filePattern += "{currentFilename}";

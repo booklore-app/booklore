@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/libraries")
@@ -71,5 +72,14 @@ public class LibraryController {
     public ResponseEntity<?> rescanLibrary(@PathVariable long libraryId) {
         libraryService.rescanLibrary(libraryId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{libraryId}/file-naming-pattern")
+    @CheckLibraryAccess(libraryIdParam = "libraryId")
+    @PreAuthorize("@securityUtil.canManipulateLibrary() or @securityUtil.isAdmin()")
+    public ResponseEntity<Library> setFileNamingPattern(@PathVariable long libraryId, @RequestBody Map<String, String> body) {
+        String pattern = body.get("fileNamingPattern");
+        Library updated = libraryService.setFileNamingPattern(libraryId, pattern);
+        return ResponseEntity.ok(updated);
     }
 }
