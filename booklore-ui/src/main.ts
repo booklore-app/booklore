@@ -16,6 +16,7 @@ import {AuthService, websocketInitializer} from './app/core/service/auth.service
 import {provideOAuthClient} from 'angular-oauth2-oidc';
 import {APP_INITIALIZER, provideAppInitializer} from '@angular/core';
 import {initializeAuthFactory} from './app/auth-initializer';
+import {StartupService} from './app/core/service/startup.service';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -23,6 +24,12 @@ bootstrapApplication(AppComponent, {
       provide: APP_INITIALIZER,
       useFactory: websocketInitializer,
       deps: [AuthService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (startup: StartupService) => () => startup.load(),
+      deps: [StartupService],
       multi: true
     },
     provideHttpClient(withInterceptors([AuthInterceptorService])),

@@ -37,4 +37,7 @@ public class LibraryEntity {
     private boolean watch;
 
     private String icon;
+
+    @Column(name = "file_naming_pattern")
+    private String fileNamingPattern;
 }
