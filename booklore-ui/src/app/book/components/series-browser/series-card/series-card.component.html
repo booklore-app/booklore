@@ -1,5 +1,5 @@
-<div class="series-card">
-  <div class="cover-container" [ngClass]="{ 'loaded': isImageLoaded }">
+<div class="series-card" (click)="goToFirstBook()">
+  <div class="cover-container center-info-btn" [ngClass]="{ 'loaded': isImageLoaded }">
     <img
       class="series-cover"
       [src]="urlHelper.getCoverUrl(series.firstBookId, series.coverUpdatedOn)"
@@ -9,6 +9,12 @@
       (load)="onImageLoad()"/>
 
     <div class="series-count-overlay">{{ series.bookCount }}</div>
+
+    <p-button
+      [rounded]="true"
+      icon="pi pi-info"
+      class="info-btn"
+      (click)="openSeriesInfo($event)"></p-button>
   </div>
 
   <div>
