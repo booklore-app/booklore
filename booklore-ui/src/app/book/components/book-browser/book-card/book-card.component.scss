@@ -112,6 +112,9 @@
   transition: opacity 0.2s ease, visibility 0.2s ease;
   z-index: 2;
 }
+.select-checkbox .p-checkbox {
+  vertical-align: top;
+}
 
 .cover-container:hover .select-checkbox,
 .book-card.selected .select-checkbox {
@@ -144,8 +147,8 @@
 
 .series-number-overlay {
   position: absolute;
-  top: 4px;
-  left: 4px;
+  bottom: 8px;
+  left: 8px;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
   font-size: 0.75rem;
@@ -156,8 +159,8 @@
 
 .series-count-overlay {
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: 8px;
+  left: 8px;
   background-color: var(--primary-color);
   color: var(--primary-text-color-dark);
   font-size: 0.75rem;
@@ -169,6 +172,10 @@
   font-weight: 600;
   text-align: center;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+}
+
+.series-number-overlay + .series-count-overlay {
+  top: calc(8px + 1.5rem)
 }
 
 ::ng-deep .progress-incomplete .p-progressbar-value {
