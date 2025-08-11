@@ -17,18 +17,35 @@ categories:
       - 'refactor'
       - 'cleanup'
       - 'chore'
-  - title: '📖 Documentation'
+  - title: '📦 Dependencies'
     labels:
-      - 'docs'
-      - 'documentation'
+      - 'dependencies'
+      - 'dependency'
+      - 'deps'
   - title: '⚙️ CI/CD'
     labels:
       - 'ci'
       - 'cd'
       - 'workflow'
+  - title: '📖 Documentation'
+    labels:
+      - 'docs'
+      - 'documentation'
+  - title: '🧪 Experimental'
+    labels:
+      - 'exploration'
+      - 'experimental'
 
 change-template: '- $TITLE (#$NUMBER) by @$AUTHOR'
 
 template: |
-  ## 🌟 Changes in this release:
+  ## 🌟 What's New in v$NEXT_PATCH_VERSION
+
   $CHANGES
+
+  ### 🐳 Docker Images
+
+  - **Docker Hub:** `booklore/booklore:v$NEXT_PATCH_VERSION`
+  - **GitHub Container Registry:** `ghcr.io/booklore-app/booklore:v$NEXT_PATCH_VERSION`
+
+  **Full Changelog**: https://github.com/booklore-app/booklore/compare/$PREVIOUS_TAG...v$NEXT_PATCH_VERSION

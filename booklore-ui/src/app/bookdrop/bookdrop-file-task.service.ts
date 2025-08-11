@@ -28,7 +28,7 @@ export interface BookdropFile {
   fileName: string;
   filePath: string;
   fileSize: number;
-  originalMetadata: BookMetadata;
+  originalMetadata?: BookMetadata;
   fetchedMetadata?: BookMetadata;
   createdAt: string;
   updatedAt: string;

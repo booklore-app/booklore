@@ -27,7 +27,7 @@ import {Textarea} from 'primeng/textarea';
 export class BookdropFileMetadataPickerComponent {
 
   @Input() fetchedMetadata!: BookMetadata;
-  @Input() originalMetadata!: BookMetadata;
+  @Input() originalMetadata?: BookMetadata;
   @Input() metadataForm!: FormGroup;
   @Input() copiedFields: Record<string, boolean> = {};
   @Input() savedFields: Record<string, boolean> = {};
@@ -127,7 +127,7 @@ export class BookdropFileMetadataPickerComponent {
   }
 
   resetField(field: string) {
-    this.metadataForm.get(field)?.setValue(this.originalMetadata[field]);
+    this.metadataForm.get(field)?.setValue(this.originalMetadata?.[field]);
     this.copiedFields[field] = false;
     this.hoveredFields[field] = false;
   }
