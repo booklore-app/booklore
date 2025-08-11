@@ -46,7 +46,6 @@ export class MainDashboardComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.bookService.loadBooks();
 
     this.lastReadBooks$ = this.bookService.bookState$.pipe(
       map((state: BookState) => (

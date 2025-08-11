@@ -10,7 +10,7 @@ import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dia
 import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
 import {LibraryCreatorComponent} from '../components/library-creator/library-creator.component';
 import {ShelfEditDialogComponent} from '../components/shelf-edit-dialog/shelf-edit-dialog.component';
-import {MagicShelf, MagicShelfService} from '../../magic-shelf-service';
+import {MagicShelf, MagicShelfService} from '../../magic-shelf.service';
 import {MagicShelfComponent} from '../../magic-shelf-component/magic-shelf-component';
 
 @Injectable({

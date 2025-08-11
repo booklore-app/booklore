@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 
 import {MessageService} from 'primeng/api';
@@ -8,10 +8,10 @@ import {Tooltip} from 'primeng/tooltip';
 import {User, UserService} from '../../user-management/user.service';
 import {LibraryService} from '../../../book/service/library.service';
 import {ShelfService} from '../../../book/service/shelf.service';
-import {combineLatest} from 'rxjs';
+import {combineLatest, Subject} from 'rxjs';
 import {FormsModule} from '@angular/forms';
 import {ToastModule} from 'primeng/toast';
-import {filter, take} from 'rxjs/operators';
+import {filter, take, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-view-preferences',
@@ -27,7 +27,7 @@ import {filter, take} from 'rxjs/operators';
   templateUrl: './view-preferences.component.html',
   styleUrl: './view-preferences.component.scss'
 })
-export class ViewPreferencesComponent implements OnInit {
+export class ViewPreferencesComponent implements OnInit, OnDestroy {
   sortOptions = [
     {label: 'Title', field: 'title'},
     {label: 'Title + Series', field: 'titleSeries'},
@@ -78,6 +78,7 @@ export class ViewPreferencesComponent implements OnInit {
   }[] = [];
 
   private user: User | null = null;
+  private readonly destroy$ = new Subject<void>();
 
   private libraryService = inject(LibraryService);
   private shelfService = inject(ShelfService);
@@ -86,13 +87,15 @@ export class ViewPreferencesComponent implements OnInit {
 
   ngOnInit(): void {
     combineLatest([
-      this.userService.userState$.pipe(filter(user => !!user), take(1)),
+      this.userService.userState$.pipe(filter(userState => !!userState?.user && userState.loaded), take(1)),
       this.libraryService.libraryState$.pipe(filter(libraryState => !!libraryState?.libraries && libraryState.loaded), take(1)),
       this.shelfService.shelfState$.pipe(filter(shelfState => !!shelfState?.shelves && shelfState.loaded), take(1)),
-    ]).subscribe(([userState, librariesState, shelfState]) => {
+    ]).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(([userState, librariesState, shelfState]) => {
 
-      this.user = userState;
-      const prefs = userState?.userSettings?.entityViewPreferences;
+      this.user = userState.user;
+      const prefs = userState.user?.userSettings?.entityViewPreferences;
       const global = prefs?.global;
       this.selectedSort = global?.sortKey ?? 'title';
       this.selectedSortDir = global?.sortDir ?? 'ASC';
@@ -116,6 +119,11 @@ export class ViewPreferencesComponent implements OnInit {
         value: s.id!
       }));
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getAvailableEntities(index: number, type: 'LIBRARY' | 'SHELF') {

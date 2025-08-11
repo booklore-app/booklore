@@ -5,9 +5,9 @@ import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {Book} from '../../book/model/book.model';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {BookService} from '../../book/service/book.service';
-import {BehaviorSubject, combineLatest, Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, Subject} from 'rxjs';
 import {UserService} from '../../settings/user-management/user.service';
-import {distinctUntilChanged, filter, map, shareReplay, switchMap} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-multi-book-metadata-editor-component',
@@ -41,13 +41,16 @@ export class MultiBookMetadataEditorComponent implements OnInit, OnDestroy {
   private readonly bookService = inject(BookService);
   private readonly userService = inject(UserService);
 
-  private userSubscription: Subscription = Subscription.EMPTY;
+  private readonly destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     this.bookIds = this.config.data?.bookIds ?? [];
 
-    this.userSubscription = this.userService.userState$.subscribe(userData => {
-      const userPermissions = userData?.permissions;
+    this.userService.userState$.pipe(
+      filter(userState => !!userState?.user && userState.loaded),
+      takeUntil(this.destroy$)
+    ).subscribe(userState => {
+      const userPermissions = userState.user?.permissions;
       this.canEditMetadata = userPermissions?.canEditMetadata ?? false;
       this.admin = userPermissions?.admin ?? false;
     });
@@ -60,7 +63,8 @@ export class MultiBookMetadataEditorComponent implements OnInit, OnDestroy {
       map(books => {
         this.filteredBooks = books;
         return books;
-      })
+      }),
+      takeUntil(this.destroy$)
     );
 
     this.book$ = combineLatest([filteredBooks$, this.currentIndex$]).pipe(
@@ -70,12 +74,14 @@ export class MultiBookMetadataEditorComponent implements OnInit, OnDestroy {
       switchMap(book =>
         this.bookService.getBookByIdFromAPI(book.id, true)
       ),
-      shareReplay(1)
+      shareReplay(1),
+      takeUntil(this.destroy$)
     );
   }
 
   ngOnDestroy(): void {
-    this.userSubscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
     this.currentIndex$.complete();
   }
 

@@ -7,7 +7,7 @@
       <div>
         @if (isLibrariesEmpty$ | async) {
           <div class="dashboard-no-library">
-            @if ((userService.userState$ | async)?.permissions; as permissions) {
+            @if ((userService.userState$ | async)?.user?.permissions; as permissions) {
               <div>
                 @if (permissions.admin || permissions.canManipulateLibrary) {
                   <div>

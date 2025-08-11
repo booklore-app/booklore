@@ -1,10 +1,11 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Tooltip} from 'primeng/tooltip';
 import {RadioButton} from 'primeng/radiobutton';
 import {FormsModule} from '@angular/forms';
 import {UserService} from '../../user-management/user.service';
 import {MessageService} from 'primeng/api';
-import {take} from 'rxjs/operators';
+import {filter, take, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-meta-center-view-mode-component',
@@ -16,19 +17,29 @@ import {take} from 'rxjs/operators';
   templateUrl: './meta-center-view-mode-component.html',
   styleUrl: './meta-center-view-mode-component.scss'
 })
-export class MetaCenterViewModeComponent implements OnInit {
+export class MetaCenterViewModeComponent implements OnInit, OnDestroy {
   viewMode: 'route' | 'dialog' = 'route';
 
   private userService = inject(UserService);
   private messageService = inject(MessageService);
+  private readonly destroy$ = new Subject<void>();
 
   ngOnInit(): void {
-    this.userService.userState$.pipe(take(1)).subscribe(user => {
-      const preference = user?.userSettings?.metadataCenterViewMode;
+    this.userService.userState$.pipe(
+      filter(userState => !!userState?.user && userState.loaded),
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(userState => {
+      const preference = userState.user?.userSettings?.metadataCenterViewMode;
       if (preference === 'dialog' || preference === 'route') {
         this.viewMode = preference;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onViewModeChange(value: 'route' | 'dialog'): void {

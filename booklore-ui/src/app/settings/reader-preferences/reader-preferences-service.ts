@@ -1,15 +1,26 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, OnDestroy} from '@angular/core';
 import {User, UserService, UserSettings} from '../user-management/user.service';
 import {MessageService} from 'primeng/api';
+import {filter, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
-export class ReaderPreferencesService {
+@Injectable({providedIn: 'root'})
+export class ReaderPreferencesService implements OnDestroy {
   private readonly userService = inject(UserService);
   private readonly messageService = inject(MessageService);
   private currentUser: User | null = null;
+  private readonly destroy$ = new Subject<void>();
 
   constructor() {
-    this.userService.userState$.subscribe(user => this.currentUser = user);
+    this.userService.userState$.pipe(
+      filter(userState => !!userState?.user && userState.loaded),
+      takeUntil(this.destroy$)
+    ).subscribe(userState => this.currentUser = userState.user);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   updatePreference(path: string[], value: any): void {

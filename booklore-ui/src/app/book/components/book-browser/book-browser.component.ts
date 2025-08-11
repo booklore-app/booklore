@@ -45,7 +45,7 @@ import {MultiSelect} from 'primeng/multiselect';
 import {TableColumnPreferenceService} from './table-column-preference-service';
 import {TieredMenu} from 'primeng/tieredmenu';
 import {BookMenuService} from '../../service/book-menu.service';
-import {MagicShelf, MagicShelfService} from '../../../magic-shelf-service';
+import {MagicShelf, MagicShelfService} from '../../../magic-shelf.service';
 import {BookRuleEvaluatorService} from '../../../book-rule-evaluator.service';
 import {GroupRule} from '../../../magic-shelf-component/magic-shelf-component';
 
@@ -136,7 +136,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   rawFilterParamFromUrl: string | null = null;
   hasSearchTerm = false;
   visibleColumns: { field: string; header: string }[] = [];
-  entityViewPreferences!: EntityViewPreferences;
+  entityViewPreferences: EntityViewPreferences | undefined;
   currentViewMode: string | undefined;
   lastAppliedSort: SortOption | null = null;
   private settingFiltersFromUrl = false;
@@ -161,7 +161,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.coverScalePreferenceService.scaleChange$.pipe(debounceTime(1000)).subscribe();
-    this.bookService.loadBooks();
 
     const currentPath = this.activatedRoute.snapshot.routeConfig?.path;
     if (currentPath === 'all-books' || currentPath === 'unshelved-books') {
@@ -206,7 +205,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     combineLatest({
       paramMap: this.activatedRoute.queryParamMap,
       user: this.userService.userState$.pipe(
-        filter((user): user is NonNullable<typeof user> => !!user),
+        filter(userState => !!userState?.user && userState.loaded),
         take(1)
       )
     }).subscribe(({paramMap, user}) => {
@@ -250,12 +249,12 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         this.currentFilterLabel = 'All Books';
       }
 
-      this.entityViewPreferences = user.userSettings?.entityViewPreferences;
+      this.entityViewPreferences = user.user?.userSettings?.entityViewPreferences;
       const globalPrefs = this.entityViewPreferences?.global;
       const currentEntityTypeStr = this.entityType ? this.entityType.toString().toUpperCase() : undefined;
       this.coverScalePreferenceService.initScaleValue(this.coverScalePreferenceService.scaleFactor);
-      this.filterSortPreferenceService.initValue(user?.userSettings?.filterSortingMode);
-      this.columnPreferenceService.initPreferences(user.userSettings?.tableColumnPreference);
+      this.filterSortPreferenceService.initValue(user.user?.userSettings?.filterSortingMode);
+      this.columnPreferenceService.initPreferences(user.user?.userSettings?.tableColumnPreference);
       this.visibleColumns = this.columnPreferenceService.visibleColumns;
 
 

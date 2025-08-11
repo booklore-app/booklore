@@ -75,11 +75,11 @@ export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     this.userService.userState$
       .pipe(
-        filter(user => !!user),
+        filter(userState => !!userState),
         takeUntil(this.destroy$)
       )
-      .subscribe(user => {
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+      .subscribe(userState => {
+        this.metadataCenterViewMode = userState?.user?.userSettings.metadataCenterViewMode ?? 'route';
       });
 
     this.setScrollHeight();

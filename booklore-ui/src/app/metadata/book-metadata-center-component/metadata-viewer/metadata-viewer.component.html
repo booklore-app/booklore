@@ -350,7 +350,7 @@
           </div>
         </div>
 
-        @if (userService.userState$ | async; as userData) {
+        @if (userService.userState$ | async; as userState) {
           <div class="flex flex-wrap gap-3 pt-6">
             @if (book!.bookType === 'PDF') {
               @if (readMenuItems$ | async; as readItems) {
@@ -376,28 +376,28 @@
               outlined
               (onClick)="assignShelf(book.id)">
             </p-button>
-            @if (userData.permissions.canDownload || userData.permissions.admin) {
+            @if (userState.user!.permissions.canDownload || userState.user!.permissions.admin) {
               <p-button
                 label="Download"
                 icon="pi pi-download"
                 severity="success"
                 outlined
-                (onClick)="download(book.id)">
+                (onClick)="download(book!.id)">
               </p-button>
             }
-            @if (userData.permissions.canEmailBook || userData.permissions.admin) {
+            @if (userState.user!.permissions.canEmailBook || userState.user!.permissions.admin) {
               @if (emailMenuItems$ | async; as emailItems) {
                 <p-splitbutton
                   label="Quick Send"
                   icon="pi pi-send"
                   [model]="emailItems"
-                  (onClick)="quickSend(book.id)"
+                  (onClick)="quickSend(book!.id)"
                   outlined
                   severity="info">
                 </p-splitbutton>
               }
             }
-            @if (userData.permissions.canEditMetadata || userData.permissions.admin) {
+            @if (userState.user!.permissions.canEditMetadata || userState.user!.permissions.admin) {
               @if (refreshMenuItems$ | async; as refreshItems) {
                 <p-splitbutton
                   [label]="isAutoFetching ? 'Fetching...' : 'Auto Fetch'"
@@ -405,14 +405,14 @@
                   [outlined]="true"
                   [model]="refreshItems"
                   severity="warn"
-                  (onClick)="quickRefresh(book.id)"
+                  (onClick)="quickRefresh(book!.id)"
                   [disabled]="isAutoFetching"
                   pTooltip="Automatically fetch metadata using default sources"
                   tooltipPosition="top">
                 </p-splitbutton>
               }
             }
-            @if (userData.permissions.canDeleteBook || userData.permissions.admin) {
+            @if (userState.user!.permissions.canDeleteBook || userState.user!.permissions.admin) {
               @if (otherItems$ | async; as otherItems) {
                 <p-button icon="pi pi-ellipsis-v" outlined severity="danger" (click)="entitymenu.toggle($event)"></p-button>
                 <p-menu #entitymenu [model]="otherItems" [popup]="true" appendTo="body"></p-menu>

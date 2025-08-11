@@ -1,6 +1,6 @@
 import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable, tap} from 'rxjs';
+import {BehaviorSubject, Observable, Subject, tap} from 'rxjs';
 import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {API_CONFIG} from '../../config/api-config';
 import {createRxStompConfig} from '../../shared/websocket/rx-stomp.config';
@@ -22,6 +22,9 @@ export class AuthService {
 
   private tokenSubject = new BehaviorSubject<string | null>(this.getOidcAccessToken() || this.getInternalAccessToken());
   public token$ = this.tokenSubject.asObservable();
+
+  private logoutSubject = new Subject<void>();
+  public logout$ = this.logoutSubject.asObservable();
 
   internalLogin(credentials: { username: string; password: string }): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
     return this.http.post<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/login`, credentials).pipe(
@@ -78,6 +81,7 @@ export class AuthService {
     localStorage.removeItem('accessToken_Internal');
     localStorage.removeItem('refreshToken_Internal');
     this.tokenSubject.next(null);
+    this.logoutSubject.next();
     this.getRxStompService().deactivate();
     if (this.oAuthService.clientId) {
       this.oAuthService.logOut();

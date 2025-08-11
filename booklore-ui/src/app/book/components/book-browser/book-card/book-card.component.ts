@@ -67,12 +67,12 @@ export class BookCardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userService.userState$
       .pipe(
-        filter(user => !!user),
+        filter(userState => !!userState),
         takeUntil(this.destroy$)
       )
-      .subscribe(user => {
-        this.userPermissions = user.permissions;
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+      .subscribe(userState => {
+        this.userPermissions = userState.user?.permissions;
+        this.metadataCenterViewMode = userState?.user?.userSettings.metadataCenterViewMode ?? 'route';
         this.initMenu();
       });
   }
