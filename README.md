@@ -95,8 +95,8 @@ services:
     # image: ghcr.io/booklore-app/booklore:latest
     container_name: booklore
     environment:
-      - PUID=1000
-      - PGID=1000
+      - USER_ID=0  # Modify this if the volume's ownership is not root
+      - GROUP_ID=0 # Modify this if the volume's ownership is not root
       - TZ=Etc/UTC
       - DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore   # Only modify this if you're familiar with JDBC and your database setup
       - DATABASE_USERNAME=booklore                          # Must match MYSQL_USER defined in the mariadb container

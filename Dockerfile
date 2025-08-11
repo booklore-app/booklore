@@ -36,4 +36,4 @@ COPY --from=springboot-build /springboot-app/build/libs/booklore-api-0.0.1-SNAPS
 EXPOSE 8080 80
 
 CMD /usr/sbin/nginx -g "daemon off;" & \
-    su-exec ${PUID:-0}:${PGID:-0} java -jar /app/app.jar
+    su-exec ${USER_ID:-0}:${GROUP_ID:-0} java -jar /app/app.jar
