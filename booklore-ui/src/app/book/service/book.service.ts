@@ -282,6 +282,31 @@ export class BookService {
     return this.http.post<void>(`${this.url}/progress`, body);
   }
 
+  updateDateFinished(bookId: number, dateFinished: string | null): Observable<void> {
+    const body = {
+      bookId: bookId,
+      dateFinished: dateFinished
+    };
+    return this.http.post<void>(`${this.url}/progress`, body).pipe(
+      tap(() => {
+        // Update the book in the state
+        const currentState = this.bookStateSubject.value;
+        if (currentState.books) {
+          const updatedBooks = currentState.books.map(book => {
+            if (book.id === bookId) {
+              return { ...book, dateFinished: dateFinished || undefined };
+            }
+            return book;
+          });
+          this.bookStateSubject.next({
+            ...currentState,
+            books: updatedBooks
+          });
+        }
+      })
+    );
+  }
+
   regenerateCovers(): Observable<void> {
     return this.http.post<void>(`${this.url}/regenerate-covers`, {});
   }
