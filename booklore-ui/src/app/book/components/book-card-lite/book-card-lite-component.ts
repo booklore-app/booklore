@@ -24,6 +24,7 @@ import {BookMetadataHostService} from '../../../utilities/service/book-metadata-
 })
 export class BookCardLiteComponent implements OnInit {
   @Input() book!: Book;
+  @Input() isActive!: boolean;
 
   private router = inject(Router);
   protected urlHelper = inject(UrlHelperService);
@@ -32,6 +33,7 @@ export class BookCardLiteComponent implements OnInit {
 
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
   isHovered: boolean = false;
+  // isActive: boolean = false;
 
   ngOnInit(): void {
     this.userService.userState$

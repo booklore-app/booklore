@@ -8,11 +8,13 @@
     loading="lazy"
   />
 
-  <p-button
-    icon="pi pi-info"
-    class="info-btn"
-    [rounded]="true"
-    [ngClass]="{ 'visible': isHovered }"
-    (onClick)="openBookInfo(book)">
-  </p-button>
+  @if (!this.isActive) {
+    <p-button
+      icon="pi pi-info"
+      class="info-btn"
+      [rounded]="true"
+      [ngClass]="{ 'visible': isHovered }"
+      (onClick)="openBookInfo(book)">
+    </p-button>
+  }
 </div>

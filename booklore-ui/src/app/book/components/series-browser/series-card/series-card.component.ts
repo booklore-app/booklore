@@ -26,10 +26,5 @@ export class SeriesCardComponent {
   goToFirstBook(): void {
     this.router.navigate(['/book', this.series.firstBookId], { queryParams: { tab: 'view' } });
   }
-
-  openSeriesInfo(event: MouseEvent): void {
-    event.stopPropagation();
-    this.goToFirstBook();
-  }
 }
 

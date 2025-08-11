@@ -1,19 +1,18 @@
 <div class="relative flex flex-row">
     <div class="flex flex-col w-full">
-        <div
-            class="flex items-center justify-between w-full gap-4 py-2 px-2 md:px-4 rounded-t-xl md:mb-4 mb-2 bg-[var(--card-background)]">
+
+        <div class="flex items-center justify-between w-full gap-4 py-2 px-2 md:px-4 rounded-t-xl md:mb-4 mb-2 bg-[var(--card-background)]">
             <div class="flex items-center min-w-0 max-w-full flex-shrink">
                 <p class="text-xl whitespace-nowrap overflow-hidden text-ellipsis w-full">
                     All Series
                 </p>
-
             </div>
-        </div>
 
-        <div class="series-grid">
-            <div *ngFor="let s of series$ | async" class="series-item">
-                <app-series-card [series]="s"></app-series-card>
-            </div>
         </div>
+            <div class="series-grid">
+                <div *ngFor="let s of series$ | async" class="series-item">
+                    <app-series-card [series]="s"></app-series-card>
+                </div>
+            </div>        
     </div>
 </div>
