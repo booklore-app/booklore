@@ -10,14 +10,9 @@
             </div>
         </div>
 
-        <div class="series-browser">
-            <div *ngFor="let s of series$ | async">
-                <a class="series-card">
-                    <div class="series-meta">
-                        <h3>{{ s.name }}</h3>
-                        <span>{{ s.bookCount }} books</span>
-                    </div>
-                </a>
+        <div class="series-grid">
+            <div *ngFor="let s of series$ | async" class="series-item">
+                <app-series-card [series]="s"></app-series-card>
             </div>
         </div>
     </div>
