@@ -27,7 +27,7 @@ RUN gradle clean build
 # Stage 3: Final image
 FROM eclipse-temurin:21-jre-alpine
 
-RUN apk update && apk add nginx su-exec
+RUN apk update && apk add nginx
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY --from=angular-build /angular-app/dist/booklore/browser /usr/share/nginx/html
@@ -36,4 +36,4 @@ COPY --from=springboot-build /springboot-app/build/libs/booklore-api-0.0.1-SNAPS
 EXPOSE 8080 80
 
 CMD /usr/sbin/nginx -g "daemon off;" & \
-    su-exec ${PUID:-0}:${PGID:-0} java -jar /app/app.jar
+    java -jar /app/app.jar
