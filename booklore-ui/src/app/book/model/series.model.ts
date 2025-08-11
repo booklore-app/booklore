@@ -1,5 +1,6 @@
 export interface Series {
   name: string;
   bookCount: number;
-  coverUrl?: string;
+  firstBookId: number;
+  coverUpdatedOn?: string;
 }
