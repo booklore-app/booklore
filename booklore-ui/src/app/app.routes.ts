@@ -1,5 +1,6 @@
 import {Routes} from '@angular/router';
 import {BookBrowserComponent} from './book/components/book-browser/book-browser.component';
+import {SeriesBrowserComponent} from './book/components/series-browser/series-browser.component';
 import {AppLayoutComponent} from './layout/component/layout-main/app.layout.component';
 import {LoginComponent} from './core/component/login/login.component';
 import {AuthGuard} from './auth.guard';
@@ -38,6 +39,7 @@ export const routes: Routes = [
     children: [
       {path: 'dashboard', component: MainDashboardComponent, canActivate: [AuthGuard]},
       {path: 'all-books', component: BookBrowserComponent, canActivate: [AuthGuard]},
+      {path: 'all-series', component: SeriesBrowserComponent, canActivate: [AuthGuard]},
       {path: 'settings', component: SettingsComponent, canActivate: [AuthGuard]},
       {path: 'library/:libraryId/books', component: BookBrowserComponent, canActivate: [AuthGuard]},
       {path: 'shelf/:shelfId/books', component: BookBrowserComponent, canActivate: [AuthGuard]},
