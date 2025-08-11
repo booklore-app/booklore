@@ -1,7 +1,7 @@
 import {BookFilter} from './BookFilter';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {BookState} from '../../../model/state/book-state.model';
-import {debounceTime, filter, map, takeUntil} from 'rxjs/operators';
+import {debounceTime, filter, map, take, takeUntil} from 'rxjs/operators';
 import {Book} from '../../../model/book.model';
 import {inject, Injectable, OnDestroy} from '@angular/core';
 import {MessageService} from 'primeng/api';
@@ -21,7 +21,8 @@ export class SeriesCollapseFilter implements BookFilter, OnDestroy {
   constructor() {
     this.userService.userState$
       .pipe(
-        filter(userState => !!userState),
+        filter(userState => !!userState?.user && userState.loaded),
+        take(1),
         takeUntil(this.destroy$)
       )
       .subscribe(user => {
