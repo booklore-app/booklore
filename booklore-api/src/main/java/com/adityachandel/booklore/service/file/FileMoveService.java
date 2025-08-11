@@ -4,10 +4,14 @@ import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.request.FileMoveRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.model.entity.LibraryPathEntity;
+import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.library.LibraryService;
 import com.adityachandel.booklore.service.monitoring.MonitoringService;
 import com.adityachandel.booklore.util.PathPatternResolver;
@@ -31,113 +35,172 @@ public class FileMoveService {
     private final NotificationService notificationService;
     private final LibraryService libraryService;
     private final MonitoringService monitoringService;
+    private final AppSettingService appSettingService;
 
     public void moveFiles(FileMoveRequest request) {
         Set<Long> bookIds = request.getBookIds();
-        String pattern = request.getPattern();
         List<BookEntity> books = bookQueryService.findAllWithMetadataByIds(bookIds);
+        String defaultPattern = appSettingService.getAppSettings().getUploadPattern();
 
-        log.info("Starting file move for {} books using pattern: '{}'", books.size(), pattern);
+        log.info("Starting file move for {} books", books.size());
 
         Set<Long> libraryIds = new HashSet<>();
         List<Book> updatedBooks = new ArrayList<>();
-        boolean didPause = false;
-
-        if (!monitoringService.isPaused()) {
-            monitoringService.pauseMonitoring();
-            didPause = true;
-        }
+        boolean didPause = pauseMonitoringIfNeeded();
 
         try {
             for (BookEntity book : books) {
-                if (book.getMetadata() == null) continue;
-
-                if (book.getLibraryPath() == null || book.getLibraryPath().getPath() == null
-                        || book.getFileSubPath() == null || book.getFileName() == null) {
-                    log.error("Missing required path components for book id {}. Skipping.", book.getId());
-                    continue;
-                }
-
-                Path oldFilePath = book.getFullFilePath();
-                if (!Files.exists(oldFilePath)) {
-                    log.warn("File does not exist for book id {}: {}", book.getId(), oldFilePath);
-                    continue;
-                }
-
-                log.info("Processing book id {}: '{}'", book.getId(), book.getMetadata().getTitle());
-
-                String newRelativePathStr = generatePathFromPattern(book, pattern);
-                if (newRelativePathStr.startsWith("/") || newRelativePathStr.startsWith("\\")) {
-                    newRelativePathStr = newRelativePathStr.substring(1);
-                }
-
-                Path libraryRoot = Paths.get(book.getLibraryPath().getPath()).toAbsolutePath().normalize();
-                Path newFilePath = libraryRoot.resolve(newRelativePathStr).normalize();
-
-                if (oldFilePath.equals(newFilePath)) {
-                    log.info("Source and destination paths are identical for book id {}. Skipping.", book.getId());
-                    continue;
-                }
-
-                try {
-                    if (newFilePath.getParent() != null) {
-                        Files.createDirectories(newFilePath.getParent());
-                    }
-
-                    log.info("Moving file from {} to {}", oldFilePath, newFilePath);
-                    Files.move(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
-
-                    String newFileName = newFilePath.getFileName().toString();
-                    Path newRelativeSubPath = libraryRoot.relativize(newFilePath.getParent());
-                    String newFileSubPath = newRelativeSubPath.toString().replace('\\', '/');
-
-                    book.setFileSubPath(newFileSubPath);
-                    book.setFileName(newFileName);
-                    bookRepository.save(book);
-
-                    updatedBooks.add(bookMapper.toBook(book));
-                    log.info("Updated book id {} with new path", book.getId());
-
-                    deleteEmptyParentDirsUpToLibraryFolders(oldFilePath.getParent(), Set.of(libraryRoot));
-
-                    if (book.getLibraryPath().getLibrary().getId() != null) {
-                        libraryIds.add(book.getLibraryPath().getLibrary().getId());
-                    }
-                } catch (IOException e) {
-                    log.error("Failed to move file for book id {}: {}", book.getId(), e.getMessage(), e);
-                }
+                processBookMove(book, defaultPattern, updatedBooks, libraryIds);
             }
 
             log.info("Completed file move for {} books.", books.size());
-
-            if (!updatedBooks.isEmpty()) {
-                notificationService.sendMessage(Topic.BOOK_METADATA_BATCH_UPDATE, updatedBooks);
-            }
-
-            for (Long libraryId : libraryIds) {
-                try {
-                    libraryService.rescanLibrary(libraryId);
-                    log.info("Rescanned library id {} after file move", libraryId);
-                } catch (Exception e) {
-                    log.error("Failed to rescan library id {}: {}", libraryId, e.getMessage(), e);
-                }
-            }
+            sendUpdateNotifications(updatedBooks);
+            rescanLibraries(libraryIds);
 
         } finally {
-            if (didPause && !monitoringService.isPaused()) {
-                log.info("Monitoring already resumed by another thread.");
-            } else if (didPause) {
-                Thread.startVirtualThread(() -> {
-                    try {
-                        Thread.sleep(5_000);
-                        monitoringService.resumeMonitoring();
-                        log.info("Monitoring resumed after 5s delay");
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        log.warn("Interrupted while delaying resume of monitoring");
-                    }
-                });
+            resumeMonitoringWithDelay(didPause);
+        }
+    }
+
+    private boolean pauseMonitoringIfNeeded() {
+        if (!monitoringService.isPaused()) {
+            monitoringService.pauseMonitoring();
+            return true;
+        }
+        return false;
+    }
+
+    private void processBookMove(BookEntity book, String defaultPattern, List<Book> updatedBooks, Set<Long> libraryIds) {
+        if (book.getMetadata() == null) return;
+
+        String pattern = getFileNamingPattern(book, defaultPattern);
+        if (pattern == null) return;
+
+        if (!hasRequiredPathComponents(book)) return;
+
+        Path oldFilePath = book.getFullFilePath();
+        if (!Files.exists(oldFilePath)) {
+            log.warn("File does not exist for book id {}: {}", book.getId(), oldFilePath);
+            return;
+        }
+
+        log.info("Processing book id {}: '{}'", book.getId(), book.getMetadata().getTitle());
+
+        Path newFilePath = generateNewFilePath(book, pattern);
+        if (oldFilePath.equals(newFilePath)) {
+            log.info("Source and destination paths are identical for book id {}. Skipping.", book.getId());
+            return;
+        }
+
+        try {
+            moveFileAndUpdateBook(book, oldFilePath, newFilePath, updatedBooks, libraryIds);
+        } catch (IOException e) {
+            log.error("Failed to move file for book id {}: {}", book.getId(), e.getMessage(), e);
+        }
+    }
+
+    private String getFileNamingPattern(BookEntity book, String defaultPattern) {
+        if (book.getLibraryPath() == null || book.getLibraryPath().getLibrary() == null) {
+            log.error("Book id {} has no library associated. Skipping.", book.getId());
+            return null;
+        }
+        LibraryEntity library = book.getLibraryPath().getLibrary();
+        String pattern = library.getFileNamingPattern();
+        if (pattern == null || pattern.trim().isEmpty()) {
+            pattern = defaultPattern;
+            log.info("Using default pattern for library {} as no custom pattern is set", library.getName());
+        }
+        if (pattern == null || pattern.trim().isEmpty()) {
+            log.error("No file naming pattern available for book id {}. Skipping.", book.getId());
+            return null;
+        }
+
+        return pattern;
+    }
+
+    private boolean hasRequiredPathComponents(BookEntity book) {
+        if (book.getLibraryPath() == null || book.getLibraryPath().getPath() == null ||
+                book.getFileSubPath() == null || book.getFileName() == null) {
+            log.error("Missing required path components for book id {}. Skipping.", book.getId());
+            return false;
+        }
+        return true;
+    }
+
+    private Path generateNewFilePath(BookEntity book, String pattern) {
+        String newRelativePathStr = generatePathFromPattern(book, pattern);
+        if (newRelativePathStr.startsWith("/") || newRelativePathStr.startsWith("\\")) {
+            newRelativePathStr = newRelativePathStr.substring(1);
+        }
+
+        Path libraryRoot = Paths.get(book.getLibraryPath().getPath()).toAbsolutePath().normalize();
+        return libraryRoot.resolve(newRelativePathStr).normalize();
+    }
+
+    private void moveFileAndUpdateBook(BookEntity book, Path oldFilePath, Path newFilePath,
+                                       List<Book> updatedBooks, Set<Long> libraryIds) throws IOException {
+        if (newFilePath.getParent() != null) {
+            Files.createDirectories(newFilePath.getParent());
+        }
+
+        log.info("Moving file from {} to {}", oldFilePath, newFilePath);
+        Files.move(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+        updateBookPaths(book, newFilePath);
+        bookRepository.save(book);
+        updatedBooks.add(bookMapper.toBook(book));
+
+        log.info("Updated book id {} with new path", book.getId());
+
+        Path libraryRoot = Paths.get(book.getLibraryPath().getPath()).toAbsolutePath().normalize();
+        deleteEmptyParentDirsUpToLibraryFolders(oldFilePath.getParent(), Set.of(libraryRoot));
+
+        if (book.getLibraryPath().getLibrary().getId() != null) {
+            libraryIds.add(book.getLibraryPath().getLibrary().getId());
+        }
+    }
+
+    private void updateBookPaths(BookEntity book, Path newFilePath) {
+        String newFileName = newFilePath.getFileName().toString();
+        Path libraryRoot = Paths.get(book.getLibraryPath().getPath()).toAbsolutePath().normalize();
+        Path newRelativeSubPath = libraryRoot.relativize(newFilePath.getParent());
+        String newFileSubPath = newRelativeSubPath.toString().replace('\\', '/');
+
+        book.setFileSubPath(newFileSubPath);
+        book.setFileName(newFileName);
+    }
+
+    private void sendUpdateNotifications(List<Book> updatedBooks) {
+        if (!updatedBooks.isEmpty()) {
+            notificationService.sendMessage(Topic.BOOK_METADATA_BATCH_UPDATE, updatedBooks);
+        }
+    }
+
+    private void rescanLibraries(Set<Long> libraryIds) {
+        for (Long libraryId : libraryIds) {
+            try {
+                libraryService.rescanLibrary(libraryId);
+                log.info("Rescanned library id {} after file move", libraryId);
+            } catch (Exception e) {
+                log.error("Failed to rescan library id {}: {}", libraryId, e.getMessage(), e);
             }
+        }
+    }
+
+    private void resumeMonitoringWithDelay(boolean didPause) {
+        if (didPause && !monitoringService.isPaused()) {
+            log.info("Monitoring already resumed by another thread.");
+        } else if (didPause) {
+            Thread.startVirtualThread(() -> {
+                try {
+                    Thread.sleep(5_000);
+                    monitoringService.resumeMonitoring();
+                    log.info("Monitoring resumed after 5s delay");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.warn("Interrupted while delaying resume of monitoring");
+                }
+            });
         }
     }
 
@@ -155,19 +218,7 @@ public class FileMoveService {
         }
 
         while (currentDir != null) {
-            boolean isLibraryRoot = false;
-            for (Path root : normalizedRoots) {
-                try {
-                    if (Files.isSameFile(root, currentDir)) {
-                        isLibraryRoot = true;
-                        break;
-                    }
-                } catch (IOException e) {
-                    log.warn("Failed to compare paths: {} and {}", root, currentDir);
-                }
-            }
-
-            if (isLibraryRoot) {
+            if (isLibraryRoot(currentDir, normalizedRoots)) {
                 log.debug("Reached library root: {}. Stopping cleanup.", currentDir);
                 break;
             }
@@ -178,35 +229,53 @@ public class FileMoveService {
                 break;
             }
 
-            boolean hasImportantFiles = false;
-            for (File file : files) {
-                if (!ignoredFilenames.contains(file.getName())) {
-                    hasImportantFiles = true;
-                    break;
-                }
-            }
-
-            if (!hasImportantFiles) {
-                for (File file : files) {
-                    try {
-                        Files.delete(file.toPath());
-                        log.info("Deleted ignored file: {}", file.getAbsolutePath());
-                    } catch (IOException e) {
-                        log.warn("Failed to delete ignored file: {}", file.getAbsolutePath());
-                    }
-                }
-                try {
-                    Files.delete(currentDir);
-                    log.info("Deleted empty directory: {}", currentDir);
-                } catch (IOException e) {
-                    log.warn("Failed to delete directory: {}", currentDir, e);
-                    break;
-                }
+            if (hasOnlyIgnoredFiles(files, ignoredFilenames)) {
+                deleteIgnoredFilesAndDirectory(files, currentDir);
                 currentDir = currentDir.getParent();
             } else {
                 log.debug("Directory {} contains important files. Stopping cleanup.", currentDir);
                 break;
             }
+        }
+    }
+
+    private boolean isLibraryRoot(Path currentDir, Set<Path> normalizedRoots) {
+        for (Path root : normalizedRoots) {
+            try {
+                if (Files.isSameFile(root, currentDir)) {
+                    return true;
+                }
+            } catch (IOException e) {
+                log.warn("Failed to compare paths: {} and {}", root, currentDir);
+            }
+        }
+        return false;
+    }
+
+    private boolean hasOnlyIgnoredFiles(File[] files, Set<String> ignoredFilenames) {
+        for (File file : files) {
+            if (!ignoredFilenames.contains(file.getName())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void deleteIgnoredFilesAndDirectory(File[] files, Path currentDir) {
+        for (File file : files) {
+            try {
+                Files.delete(file.toPath());
+                log.info("Deleted ignored file: {}", file.getAbsolutePath());
+            } catch (IOException e) {
+                log.warn("Failed to delete ignored file: {}", file.getAbsolutePath());
+            }
+        }
+
+        try {
+            Files.delete(currentDir);
+            log.info("Deleted empty directory: {}", currentDir);
+        } catch (IOException e) {
+            log.warn("Failed to delete directory: {}", currentDir, e);
         }
     }
 }

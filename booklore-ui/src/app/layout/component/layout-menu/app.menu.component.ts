@@ -12,7 +12,7 @@ import {AppVersion, VersionService} from '../../../core/service/version.service'
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {VersionChangelogDialogComponent} from './version-changelog-dialog/version-changelog-dialog.component';
 import {UserService} from '../../../settings/user-management/user.service';
-import {MagicShelf, MagicShelfService, MagicShelfState} from '../../../magic-shelf-service';
+import {MagicShelfService, MagicShelfState} from '../../../magic-shelf.service';
 
 @Component({
   selector: 'app-menu',
@@ -50,15 +50,15 @@ export class AppMenuComponent implements OnInit {
     });
 
     this.userService.userState$.pipe(
-      filter(settings => !!settings))
-      .subscribe(user => {
-        if (user?.userSettings.sidebarLibrarySorting) {
-          this.librarySortField = this.validateSortField(user.userSettings.sidebarLibrarySorting.field);
-          this.librarySortOrder = this.validateSortOrder(user.userSettings.sidebarLibrarySorting.order);
+      filter(userState => !!userState?.user && userState.loaded))
+      .subscribe(userState => {
+        if (userState.user?.userSettings.sidebarLibrarySorting) {
+          this.librarySortField = this.validateSortField(userState.user.userSettings.sidebarLibrarySorting.field);
+          this.librarySortOrder = this.validateSortOrder(userState.user.userSettings.sidebarLibrarySorting.order);
         }
-        if (user?.userSettings.sidebarShelfSorting) {
-          this.shelfSortField = this.validateSortField(user.userSettings.sidebarShelfSorting.field);
-          this.shelfSortOrder = this.validateSortOrder(user.userSettings.sidebarShelfSorting.order);
+        if (userState.user?.userSettings.sidebarShelfSorting) {
+          this.shelfSortField = this.validateSortField(userState.user.userSettings.sidebarShelfSorting.field);
+          this.shelfSortOrder = this.validateSortOrder(userState.user.userSettings.sidebarShelfSorting.order);
         }
         this.initMenus();
       });

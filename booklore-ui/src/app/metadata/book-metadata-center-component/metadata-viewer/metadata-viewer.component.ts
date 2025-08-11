@@ -164,11 +164,11 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
 
     this.userService.userState$
       .pipe(
-        filter(user => !!user),
+        filter(userState => !!userState?.user && userState.loaded),
         take(1)
       )
-      .subscribe(user => {
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+      .subscribe(userState => {
+        this.metadataCenterViewMode = userState.user?.userSettings.metadataCenterViewMode ?? 'route';
       });
 
     this.book$

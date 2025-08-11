@@ -21,7 +21,7 @@ import {BookSenderComponent} from '../../book-sender/book-sender.component';
 import {Router} from '@angular/router';
 import {ProgressBar} from 'primeng/progressbar';
 import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center-component/book-metadata-center.component';
-import {takeUntil} from 'rxjs/operators';
+import {take, takeUntil} from 'rxjs/operators';
 import {readStatusLabels} from '../book-filter/book-filter.component';
 import {ResetProgressTypes} from '../../../../shared/constants/reset-progress-type';
 
@@ -67,12 +67,13 @@ export class BookCardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userService.userState$
       .pipe(
-        filter(user => !!user),
+        filter(userState => !!userState?.user && userState.loaded),
+        take(1),
         takeUntil(this.destroy$)
       )
-      .subscribe(user => {
-        this.userPermissions = user.permissions;
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+      .subscribe(userState => {
+        this.userPermissions = userState.user?.permissions;
+        this.metadataCenterViewMode = userState?.user?.userSettings.metadataCenterViewMode ?? 'route';
         this.initMenu();
       });
   }

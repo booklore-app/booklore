@@ -1,10 +1,11 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Select} from 'primeng/select';
 import {Tooltip} from 'primeng/tooltip';
-import {SidebarLibrarySorting, SidebarShelfSorting, User, UserService, UserSettings} from '../../user-management/user.service';
+import {SidebarLibrarySorting, SidebarShelfSorting, User, UserService, UserSettings, UserState} from '../../user-management/user.service';
 import {MessageService} from 'primeng/api';
-import {Observable, Subscription} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {FormsModule} from '@angular/forms';
+import {filter, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar-sorting-preferences',
@@ -30,22 +31,24 @@ export class SidebarSortingPreferencesComponent implements OnInit, OnDestroy {
 
   private readonly userService = inject(UserService);
   private readonly messageService = inject(MessageService);
+  private readonly destroy$ = new Subject<void>();
 
-  userData$: Observable<User | null> = this.userService.userState$;
-  private subscription?: Subscription;
+  userData$: Observable<UserState> = this.userService.userState$;
   private currentUser: User | null = null;
 
   ngOnInit(): void {
-    this.subscription = this.userData$.subscribe(user => {
-      if (user) {
-        this.currentUser = user;
-        this.loadPreferences(user.userSettings);
-      }
+    this.userData$.pipe(
+      filter(userState => !!userState?.user && userState.loaded),
+      takeUntil(this.destroy$)
+    ).subscribe(userState => {
+      this.currentUser = userState.user;
+      this.loadPreferences(userState.user!.userSettings);
     });
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private loadPreferences(settings: UserSettings): void {

@@ -20,9 +20,9 @@
             }
           </p>
 
-          @if (userService.userState$ | async; as userData) {
+          @if (userService.userState$ | async; as userState) {
             @if (entityType !== EntityType.ALL_BOOKS && entityType !== EntityType.UNSHELVED &&
-            (userData.permissions.admin || userData.permissions.canManipulateLibrary)) {
+            (userState.user!.permissions.admin || userState.user!.permissions.canManipulateLibrary)) {
               <div class="ml-2 flex-shrink-0">
                 <p-button
                   icon="pi pi-ellipsis-v"
@@ -286,13 +286,13 @@
             }
           }
           @if (selectedBooks.size > 0) {
-            @if (userService.userState$ | async; as userData) {
+            @if (userService.userState$ | async; as userState) {
               <div class="book-browser-footer bg-[var(--card-background)] bg-opacity-10" [@slideInOut]>
                 <div class="flex justify-between items-center">
                   <div class="flex">
                     @if (entityType$ | async; as entityType) {
                       <div class="flex gap-2 md:gap-6 pr-2">
-                        @if (userData.permissions.canEditMetadata) {
+                        @if (userState.user!.permissions.canEditMetadata) {
                           <p-menu #menu [model]="metadataMenuItems" [popup]="true" appendTo="body" class="hidden"/>
                           <p-button
                             (click)="menu.toggle($event)"
@@ -323,7 +323,7 @@
                             tooltipPosition="top">
                           </p-button>
                         }
-                        @if (userData.permissions.canEditMetadata) {
+                        @if (userState.user!.permissions.canEditMetadata) {
                           <p-button
                             outlined="true"
                             icon="pi pi-lock"
@@ -375,7 +375,7 @@
                     </div>
                   </div>
 
-                  @if (userData?.permissions?.admin || userData?.permissions?.canDeleteBook) {
+                  @if (userState?.user?.permissions?.admin || userState?.user?.permissions?.canDeleteBook) {
                     <p-divider layout="vertical"></p-divider>
                     <p-button
                       outlined="true"

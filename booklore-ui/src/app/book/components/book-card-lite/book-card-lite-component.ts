@@ -1,17 +1,13 @@
-import {Component, inject, Input, OnInit} from '@angular/core';
+import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import {Book} from '../../model/book.model';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {Button} from 'primeng/button';
-import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-center-component/book-metadata-center.component';
-import {BookService} from '../../service/book.service';
-import {DialogService} from 'primeng/dynamicdialog';
 import {UserService} from '../../../settings/user-management/user.service';
-import {EmailService} from '../../../settings/email/email.service';
-import {ConfirmationService, MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
-import {filter} from 'rxjs';
+import {filter, Subject} from 'rxjs';
 import {NgClass} from '@angular/common';
 import {BookMetadataHostService} from '../../../utilities/service/book-metadata-host-service';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-book-card-lite-component',
@@ -22,7 +18,7 @@ import {BookMetadataHostService} from '../../../utilities/service/book-metadata-
   templateUrl: './book-card-lite-component.html',
   styleUrl: './book-card-lite-component.scss'
 })
-export class BookCardLiteComponent implements OnInit {
+export class BookCardLiteComponent implements OnInit, OnDestroy {
   @Input() book!: Book;
   @Input() isActive!: boolean;
 
@@ -31,15 +27,20 @@ export class BookCardLiteComponent implements OnInit {
   private userService = inject(UserService);
   private bookMetadataHostService = inject(BookMetadataHostService);
 
+  private destroy$ = new Subject<void>();
+
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
   isHovered: boolean = false;
   // isActive: boolean = false;
 
   ngOnInit(): void {
     this.userService.userState$
-      .pipe(filter(user => !!user))
+      .pipe(
+        filter(userState => !!userState),
+        takeUntil(this.destroy$)
+      )
       .subscribe((user) => {
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+        this.metadataCenterViewMode = user?.user?.userSettings.metadataCenterViewMode ?? 'route';
       });
   }
 
@@ -51,5 +52,10 @@ export class BookCardLiteComponent implements OnInit {
     } else {
       this.bookMetadataHostService.requestBookSwitch(book.id);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

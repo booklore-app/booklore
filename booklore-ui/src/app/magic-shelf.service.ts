@@ -2,10 +2,11 @@ import {inject, Injectable} from '@angular/core';
 import {API_CONFIG} from './config/api-config';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, switchMap, tap, shareReplay, finalize, distinctUntilChanged} from 'rxjs/operators';
 import {BookService} from './book/service/book.service';
 import {GroupRule} from './magic-shelf-component/magic-shelf-component';
 import {BookRuleEvaluatorService} from './book-rule-evaluator.service';
+import {AuthService} from './core/service/auth.service';
 
 export interface MagicShelf {
   id?: number | null;
@@ -15,7 +16,7 @@ export interface MagicShelf {
 }
 
 export interface MagicShelfState {
-  shelves: MagicShelf[];
+  shelves: MagicShelf[] | null;
   loaded: boolean;
   error: string | null;
 }
@@ -29,28 +30,64 @@ export class MagicShelfService {
   private readonly http = inject(HttpClient);
   private readonly bookService = inject(BookService);
   private readonly ruleEvaluatorService = inject(BookRuleEvaluatorService);
+  private readonly authService = inject(AuthService);
 
   private readonly shelvesStateSubject = new BehaviorSubject<MagicShelfState>({
-    shelves: [],
+    shelves: null,
     loaded: false,
     error: null,
   });
-  public readonly shelvesState$ = this.shelvesStateSubject.asObservable();
+
+  private loading$: Observable<MagicShelf[]> | null = null;
 
   constructor() {
-    this.loadUserShelves().subscribe();
+    this.authService.token$.pipe(
+      distinctUntilChanged()
+    ).subscribe(token => {
+      if (token === null) {
+        this.shelvesStateSubject.next({
+          shelves: null,
+          loaded: true,
+          error: null,
+        });
+        this.loading$ = null;
+      } else {
+        const current = this.shelvesStateSubject.value;
+        if (current.loaded && !current.shelves) {
+          this.shelvesStateSubject.next({
+            shelves: null,
+            loaded: false,
+            error: null,
+          });
+          this.loading$ = null;
+        }
+      }
+    });
   }
+
+  public readonly shelvesState$ = this.shelvesStateSubject.asObservable().pipe(
+    tap(state => {
+      if (!state.loaded && !state.error && !this.loading$) {
+        this.loading$ = this.fetchMagicShelves().pipe(
+          shareReplay(1),
+          finalize(() => (this.loading$ = null))
+        );
+        this.loading$.subscribe();
+      }
+    })
+  );
 
   private get state(): MagicShelfState {
     return this.shelvesStateSubject.value;
   }
 
-  loadUserShelves(): Observable<MagicShelf[]> {
+  private fetchMagicShelves(): Observable<MagicShelf[]> {
     return this.http.get<MagicShelf[]>(this.url).pipe(
-      tap((shelves) => this.updateShelves(shelves)),
-      catchError((error) => {
-        this.updateError(error.message);
-        return of([]);
+      tap(shelves => this.shelvesStateSubject.next({shelves, loaded: true, error: null})),
+      catchError(err => {
+        const curr = this.shelvesStateSubject.value;
+        this.shelvesStateSubject.next({shelves: curr.shelves, loaded: true, error: err.message});
+        throw err;
       })
     );
   }
@@ -65,12 +102,13 @@ export class MagicShelfService {
 
     return this.http.post<MagicShelf>(this.url, payload).pipe(
       tap((newShelf) => {
-        const shelves = this.state.shelves;
+        const curr = this.state;
+        const shelves = curr.shelves || [];
         const updated = shelves.some((s) => s.id === newShelf.id)
           ? shelves.map((s) => (s.id === newShelf.id ? newShelf : s))
           : [...shelves, newShelf];
 
-        this.updateShelves(updated);
+        this.shelvesStateSubject.next({...curr, shelves: updated});
       }),
       catchError((error) => {
         this.updateError(error.message);
@@ -81,29 +119,22 @@ export class MagicShelfService {
 
   getShelf(id: number): Observable<MagicShelf | undefined> {
     return this.shelvesState$.pipe(
-      map(state => state.shelves.find(shelf => shelf.id === id))
+      map(state => (state.shelves || []).find(shelf => shelf.id === id))
     );
   }
 
   deleteShelf(id: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}`).pipe(
       tap(() => {
-        const updated = this.state.shelves.filter((s) => s.id !== id);
-        this.updateShelves(updated);
+        const curr = this.state;
+        const updated = (curr.shelves || []).filter((s) => s.id !== id);
+        this.shelvesStateSubject.next({...curr, shelves: updated});
       }),
       catchError((error) => {
         this.updateError(error.message);
         throw error;
       })
     );
-  }
-
-  private updateShelves(shelves: MagicShelf[]): void {
-    this.shelvesStateSubject.next({
-      shelves,
-      loaded: true,
-      error: null,
-    });
   }
 
   private updateError(error: string): void {

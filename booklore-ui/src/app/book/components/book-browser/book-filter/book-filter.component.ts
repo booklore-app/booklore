@@ -13,7 +13,7 @@ import {FormsModule} from '@angular/forms';
 import {SelectButton} from 'primeng/selectbutton';
 import {UserService} from '../../../../settings/user-management/user.service';
 import {FilterSortPreferenceService} from '../filters/filter-sorting-preferences.service';
-import {MagicShelf} from '../../../../magic-shelf-service';
+import {MagicShelf} from '../../../../magic-shelf.service';
 import {GroupRule} from '../../../../magic-shelf-component/magic-shelf-component';
 import {BookRuleEvaluatorService} from '../../../../book-rule-evaluator.service';
 

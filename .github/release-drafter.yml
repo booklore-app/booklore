@@ -2,36 +2,36 @@ name-template: 'v$NEXT_PATCH_VERSION 🌟'
 tag-template: 'v$NEXT_PATCH_VERSION'
 
 categories:
-  - title: '### 🚀 New Features'
+  - title: '🚀 New Features'
     labels:
       - 'feature'
-  - title: '### ✨ Enhancements'
+  - title: '✨ Enhancements'
     labels:
       - 'enhancement'
-  - title: '### 🐛 Bug Fixes'
+  - title: '🐛 Bug Fixes'
     labels:
       - 'bug'
       - 'fix'
-  - title: '### 🛠️ Refactoring & Maintenance'
+  - title: '🛠️ Refactoring & Maintenance'
     labels:
       - 'refactor'
       - 'cleanup'
       - 'chore'
-  - title: '### 📦 Dependencies'
+  - title: '📦 Dependencies'
     labels:
       - 'dependencies'
       - 'dependency'
       - 'deps'
-  - title: '### ⚙️ CI/CD'
+  - title: '⚙️ CI/CD'
     labels:
       - 'ci'
       - 'cd'
       - 'workflow'
-  - title: '### 📖 Documentation'
+  - title: '📖 Documentation'
     labels:
       - 'docs'
       - 'documentation'
-  - title: '### 🧪 Experimental'
+  - title: '🧪 Experimental'
     labels:
       - 'exploration'
       - 'experimental'
@@ -40,8 +40,6 @@ change-template: '- $TITLE (#$NUMBER) by @$AUTHOR'
 
 template: |
   ## 🌟 What's New in v$NEXT_PATCH_VERSION
-
-  Welcome to another exciting release of Booklore! 📚✨
 
   $CHANGES
 

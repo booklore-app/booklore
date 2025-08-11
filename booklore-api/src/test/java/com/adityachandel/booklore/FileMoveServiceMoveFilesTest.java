@@ -1,14 +1,18 @@
 package com.adityachandel.booklore;
 
 import com.adityachandel.booklore.mapper.BookMapper;
+import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.request.FileMoveRequest;
+import com.adityachandel.booklore.model.dto.settings.AppSettings;
 import com.adityachandel.booklore.model.entity.*;
+import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookQueryService;
 import com.adityachandel.booklore.service.NotificationService;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.file.FileMoveService;
+import com.adityachandel.booklore.service.library.LibraryService;
 import com.adityachandel.booklore.service.monitoring.MonitoringService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -26,7 +30,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FileMoveServiceMoveFilesTest {
@@ -46,6 +51,12 @@ class FileMoveServiceMoveFilesTest {
     @Mock
     private MonitoringService monitoringService;
 
+    @Mock
+    private AppSettingService appSettingService;
+
+    @Mock
+    private LibraryService libraryService;
+
     @InjectMocks
     private FileMoveService fileMoveService;
 
@@ -56,6 +67,7 @@ class FileMoveServiceMoveFilesTest {
         LibraryEntity library = LibraryEntity.builder()
                 .id(42L)
                 .name("Test Library")
+                .fileNamingPattern(null)
                 .build();
 
         LibraryPathEntity libraryPathEntity = LibraryPathEntity.builder()
@@ -65,7 +77,8 @@ class FileMoveServiceMoveFilesTest {
 
         BookMetadataEntity metadata = BookMetadataEntity.builder()
                 .title("Test Book")
-                .authors(new HashSet<>(List.of(new AuthorEntity(1L, "Author Name", new ArrayList<>()))))
+                .authors(new HashSet<>(List.of(new AuthorEntity(1L, "Author Name", new ArrayList<>())))
+                )
                 .publishedDate(LocalDate.of(2020, 1, 1))
                 .build();
 
@@ -85,43 +98,20 @@ class FileMoveServiceMoveFilesTest {
     }
 
     @Test
-    void testMoveFiles_successfulMove() throws IOException {
-        String fileName = "testbook.epub";
-        String fileSubPath = "oldfolder";
-
-        BookEntity book = createBookWithFile(tempLibraryRoot, fileSubPath, fileName);
-
-        when(bookQueryService.findAllWithMetadataByIds(Set.of(1L))).thenReturn(List.of(book));
-
-        FileMoveRequest request = new FileMoveRequest();
-        request.setBookIds(Set.of(1L));
-        request.setPattern("NewFolder/{title}");
-
-        Path oldFilePath = book.getFullFilePath();
-
-        fileMoveService.moveFiles(request);
-
-        Path expectedNewPath = tempLibraryRoot.resolve("NewFolder").resolve("Test Book.epub");
-        assertThat(Files.exists(expectedNewPath))
-                .withFailMessage("Expected the file to be moved to %s", expectedNewPath)
-                .isTrue();
-
-        assertThat(Files.exists(oldFilePath))
-                .withFailMessage("Original file path should no longer exist: %s", oldFilePath)
-                .isFalse();
-
-        Files.deleteIfExists(expectedNewPath);
-        Files.deleteIfExists(expectedNewPath.getParent());
-    }
-
-    @Test
     void testMoveFiles_skipsNonexistentFile() {
         BookMetadataEntity metadata = BookMetadataEntity.builder()
                 .title("NoFile")
                 .build();
 
+        LibraryEntity library = LibraryEntity.builder()
+                .id(43L)
+                .name("Test Library")
+                .fileNamingPattern("Moved/{title}")
+                .build();
+
         LibraryPathEntity libraryPathEntity = LibraryPathEntity.builder()
                 .path(tempLibraryRoot.toString())
+                .library(library)
                 .build();
 
         BookEntity book = BookEntity.builder()
@@ -133,10 +123,12 @@ class FileMoveServiceMoveFilesTest {
                 .build();
 
         when(bookQueryService.findAllWithMetadataByIds(Set.of(2L))).thenReturn(List.of(book));
+        AppSettings appSettings = new AppSettings();
+        appSettings.setUploadPattern("Moved/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(appSettings);
 
         FileMoveRequest request = new FileMoveRequest();
         request.setBookIds(Set.of(2L));
-        request.setPattern("Moved/{title}");
 
         fileMoveService.moveFiles(request);
 
@@ -165,10 +157,12 @@ class FileMoveServiceMoveFilesTest {
         Files.createFile(fakeOldFile);
 
         when(bookQueryService.findAllWithMetadataByIds(Set.of(3L))).thenReturn(List.of(book));
+        AppSettings appSettings = new AppSettings();
+        appSettings.setUploadPattern("Moved/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(appSettings);
 
         FileMoveRequest request = new FileMoveRequest();
         request.setBookIds(Set.of(3L));
-        request.setPattern("Moved/{title}");
 
         fileMoveService.moveFiles(request);
 
@@ -184,194 +178,20 @@ class FileMoveServiceMoveFilesTest {
     }
 
     @Test
-    void testMoveFiles_handlesEmptyPattern() throws IOException {
-        String fileName = "emptypattern.epub";
-        String fileSubPath = "folder";
-
-        BookEntity book = createBookWithFile(tempLibraryRoot, fileSubPath, fileName);
-
-        when(bookQueryService.findAllWithMetadataByIds(Set.of(4L))).thenReturn(List.of(book));
-
-        FileMoveRequest request = new FileMoveRequest();
-        request.setBookIds(Set.of(4L));
-        request.setPattern("");
-
-        Path oldFilePath = book.getFullFilePath();
-
-        fileMoveService.moveFiles(request);
-
-        Path expectedNewPath = tempLibraryRoot.resolve(fileName);
-        assertThat(Files.exists(expectedNewPath))
-                .withFailMessage("File should be moved to the original filename path when pattern is empty")
-                .isTrue();
-
-        assertThat(Files.exists(oldFilePath))
-                .withFailMessage("Original file path should no longer exist")
-                .isFalse();
-
-        Files.deleteIfExists(expectedNewPath);
-    }
-
-    @Test
-    void testMoveFiles_removesIllegalCharactersFromPath() throws IOException {
-        String fileName = "badchars.epub";
-        String fileSubPath = "folder";
-
-        BookEntity book = createBookWithFile(tempLibraryRoot, fileSubPath, fileName);
-        book.getMetadata().setTitle("Bad|Title:Test*?");
-
-        when(bookQueryService.findAllWithMetadataByIds(Set.of(5L))).thenReturn(List.of(book));
-
-        FileMoveRequest request = new FileMoveRequest();
-        request.setBookIds(Set.of(5L));
-        request.setPattern("{title}");
-
-        Path oldFilePath = book.getFullFilePath();
-
-        fileMoveService.moveFiles(request);
-
-        Path expectedNewPath = tempLibraryRoot.resolve("BadTitleTest.epub");
-        assertThat(Files.exists(expectedNewPath))
-                .withFailMessage("Illegal characters should be removed from generated path")
-                .isTrue();
-
-        assertThat(Files.exists(oldFilePath))
-                .withFailMessage("Original file path should no longer exist")
-                .isFalse();
-
-        Files.deleteIfExists(expectedNewPath);
-    }
-
-    @Test
-    void testMoveFiles_deletesEmptyOldDirectories() throws IOException {
-        String fileName = "deleteold.epub";
-        String fileSubPath = "folder/emptydir";
-
-        BookEntity book = createBookWithFile(tempLibraryRoot, fileSubPath, fileName);
-
-        when(bookQueryService.findAllWithMetadataByIds(Set.of(6L))).thenReturn(List.of(book));
-
-        FileMoveRequest request = new FileMoveRequest();
-        request.setBookIds(Set.of(6L));
-        request.setPattern("NewFolder/{title}");
-
-        Path oldDir = tempLibraryRoot.resolve(fileSubPath).normalize();
-        assertThat(Files.exists(oldDir))
-                .withFailMessage("Precondition failed: old directory must exist before move")
-                .isTrue();
-
-        fileMoveService.moveFiles(request);
-
-        Path expectedNewPath = tempLibraryRoot.resolve("NewFolder").resolve("Test Book.epub");
-        assertThat(Files.exists(expectedNewPath))
-                .withFailMessage("Expected file to be moved to new location")
-                .isTrue();
-
-        assertThat(Files.exists(oldDir))
-                .withFailMessage("Expected old empty directory to be deleted after move")
-                .isFalse();
-
-        assertThat(Files.exists(oldDir.getParent()))
-                .withFailMessage("Expected parent directory of old directory to be deleted if empty")
-                .isFalse();
-
-        Files.deleteIfExists(expectedNewPath);
-        Files.deleteIfExists(expectedNewPath.getParent());
-    }
-
-    @Test
-    void testMoveFiles_keepsOldDirectoryIfNotEmpty() throws IOException {
-        String fileName = "keepold.epub";
-        String fileSubPath = "folder/notempty";
-
-        BookEntity book = createBookWithFile(tempLibraryRoot, fileSubPath, fileName);
-
-        Path oldDir = tempLibraryRoot.resolve(fileSubPath).normalize();
-        Files.createDirectories(oldDir);
-
-        Path otherFile = oldDir.resolve("otherfile.txt");
-        Files.createFile(otherFile);
-
-        when(bookQueryService.findAllWithMetadataByIds(Set.of(7L))).thenReturn(List.of(book));
-
-        FileMoveRequest request = new FileMoveRequest();
-        request.setBookIds(Set.of(7L));
-        request.setPattern("NewFolder/{title}");
-
-        Path oldFilePath = book.getFullFilePath();
-
-        fileMoveService.moveFiles(request);
-
-        Path expectedNewPath = tempLibraryRoot.resolve("NewFolder").resolve("Test Book.epub");
-
-        assertThat(Files.exists(expectedNewPath))
-                .withFailMessage("Expected file to be moved to new location")
-                .isTrue();
-        assertThat(Files.exists(oldFilePath))
-                .withFailMessage("Original file path should no longer exist")
-                .isFalse();
-
-        assertThat(Files.exists(oldDir))
-                .withFailMessage("Old directory should remain if it contains other files")
-                .isTrue();
-        assertThat(Files.exists(otherFile))
-                .withFailMessage("Other files in old directory should remain intact")
-                .isTrue();
-
-        Files.deleteIfExists(otherFile);
-        Files.deleteIfExists(expectedNewPath);
-        Files.deleteIfExists(expectedNewPath.getParent());
-    }
-
-    @Test
-    void testMoveFiles_handlesMultipleBooks() throws IOException {
-        BookEntity book1 = createBookWithFile(tempLibraryRoot, "folder1", "book1.epub");
-        book1.getMetadata().setTitle("Book One");
-
-        BookEntity book2 = createBookWithFile(tempLibraryRoot, "folder2", "book2.epub");
-        book2.getMetadata().setTitle("Book Two");
-
-        when(bookQueryService.findAllWithMetadataByIds(Set.of(8L, 9L))).thenReturn(List.of(book1, book2));
-
-        FileMoveRequest request = new FileMoveRequest();
-        request.setBookIds(Set.of(8L, 9L));
-        request.setPattern("Moved/{title}");
-
-        Path oldPath1 = book1.getFullFilePath();
-        Path oldPath2 = book2.getFullFilePath();
-
-        fileMoveService.moveFiles(request);
-
-        Path expectedPath1 = tempLibraryRoot.resolve("Moved").resolve("Book One.epub");
-        Path expectedPath2 = tempLibraryRoot.resolve("Moved").resolve("Book Two.epub");
-
-        assertThat(Files.exists(expectedPath1))
-                .withFailMessage("Expected first book to be moved to new location")
-                .isTrue();
-        assertThat(Files.exists(expectedPath2))
-                .withFailMessage("Expected second book to be moved to new location")
-                .isTrue();
-
-        assertThat(Files.exists(oldPath1))
-                .withFailMessage("Original path for first book should no longer exist")
-                .isFalse();
-        assertThat(Files.exists(oldPath2))
-                .withFailMessage("Original path for second book should no longer exist")
-                .isFalse();
-
-        Files.deleteIfExists(expectedPath1);
-        Files.deleteIfExists(expectedPath2);
-        Files.deleteIfExists(expectedPath1.getParent());
-    }
-
-    @Test
     void testMoveFiles_skipsBookWithNullFileName() throws IOException {
         BookMetadataEntity metadata = BookMetadataEntity.builder()
                 .title("NullFileName")
                 .build();
 
+        LibraryEntity library = LibraryEntity.builder()
+                .id(46L)
+                .name("Test Library")
+                .fileNamingPattern("Moved/{title}")
+                .build();
+
         LibraryPathEntity libraryPathEntity = LibraryPathEntity.builder()
                 .path(tempLibraryRoot.toString())
+                .library(library)
                 .build();
 
         BookEntity book = BookEntity.builder()
@@ -383,10 +203,12 @@ class FileMoveServiceMoveFilesTest {
                 .build();
 
         when(bookQueryService.findAllWithMetadataByIds(Set.of(10L))).thenReturn(List.of(book));
+        AppSettings appSettings = new AppSettings();
+        appSettings.setUploadPattern("Moved/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(appSettings);
 
         FileMoveRequest request = new FileMoveRequest();
         request.setBookIds(Set.of(10L));
-        request.setPattern("Moved/{title}");
 
         fileMoveService.moveFiles(request);
 
@@ -402,8 +224,15 @@ class FileMoveServiceMoveFilesTest {
                 .title("EmptyFileName")
                 .build();
 
+        LibraryEntity library = LibraryEntity.builder()
+                .id(47L)
+                .name("Test Library")
+                .fileNamingPattern("Moved/{title}")
+                .build();
+
         LibraryPathEntity libraryPathEntity = LibraryPathEntity.builder()
                 .path(tempLibraryRoot.toString())
+                .library(library)
                 .build();
 
         BookEntity book = BookEntity.builder()
@@ -415,10 +244,12 @@ class FileMoveServiceMoveFilesTest {
                 .build();
 
         when(bookQueryService.findAllWithMetadataByIds(Set.of(11L))).thenReturn(List.of(book));
+        AppSettings appSettings = new AppSettings();
+        appSettings.setUploadPattern("Moved/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(appSettings);
 
         FileMoveRequest request = new FileMoveRequest();
         request.setBookIds(Set.of(11L));
-        request.setPattern("Moved/{title}");
 
         fileMoveService.moveFiles(request);
 
@@ -434,8 +265,15 @@ class FileMoveServiceMoveFilesTest {
                 .title("NullSubPath")
                 .build();
 
+        LibraryEntity library = LibraryEntity.builder()
+                .id(48L)
+                .name("Test Library")
+                .fileNamingPattern("Moved/{title}")
+                .build();
+
         LibraryPathEntity libraryPathEntity = LibraryPathEntity.builder()
                 .path(tempLibraryRoot.toString())
+                .library(library)
                 .build();
 
         BookEntity book = BookEntity.builder()
@@ -450,10 +288,12 @@ class FileMoveServiceMoveFilesTest {
         Files.createFile(oldFile);
 
         when(bookQueryService.findAllWithMetadataByIds(Set.of(12L))).thenReturn(List.of(book));
+        AppSettings appSettings = new AppSettings();
+        appSettings.setUploadPattern("Moved/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(appSettings);
 
         FileMoveRequest request = new FileMoveRequest();
         request.setBookIds(Set.of(12L));
-        request.setPattern("Moved/{title}");
 
         fileMoveService.moveFiles(request);
 
@@ -467,8 +307,15 @@ class FileMoveServiceMoveFilesTest {
 
     @Test
     void testMoveFiles_skipsBookWithNullMetadata() throws IOException {
+        LibraryEntity library = LibraryEntity.builder()
+                .id(49L)
+                .name("Test Library")
+                .fileNamingPattern("Moved/{title}")
+                .build();
+
         LibraryPathEntity libraryPathEntity = LibraryPathEntity.builder()
                 .path(tempLibraryRoot.toString())
+                .library(library)
                 .build();
 
         BookEntity book = BookEntity.builder()
@@ -484,10 +331,12 @@ class FileMoveServiceMoveFilesTest {
         Files.createFile(oldFile);
 
         when(bookQueryService.findAllWithMetadataByIds(Set.of(13L))).thenReturn(List.of(book));
+        AppSettings appSettings = new AppSettings();
+        appSettings.setUploadPattern("Moved/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(appSettings);
 
         FileMoveRequest request = new FileMoveRequest();
         request.setBookIds(Set.of(13L));
-        request.setPattern("Moved/{title}");
 
         fileMoveService.moveFiles(request);
 
@@ -499,26 +348,191 @@ class FileMoveServiceMoveFilesTest {
         Files.deleteIfExists(oldFile);
     }
 
-    @Disabled
     @Test
-    void testMoveFiles_patternWithUnknownPlaceholder() throws IOException {
-        BookEntity book = createBookWithFile(tempLibraryRoot, "folder", "unknown.epub");
-        book.getMetadata().setTitle("UnknownPlaceholder");
+    void testMoveFiles_successfulMove() throws IOException {
+        BookEntity book = createBookWithFile(tempLibraryRoot, "sub", "mybook.epub");
+        Path oldFilePath = book.getFullFilePath();
 
-        when(bookQueryService.findAllWithMetadataByIds(Set.of(14L))).thenReturn(List.of(book));
+        when(bookQueryService.findAllWithMetadataByIds(Set.of(book.getId()))).thenReturn(List.of(book));
+        AppSettings settings = new AppSettings();
+        settings.setUploadPattern("X/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(settings);
+        Book dto = Book.builder().id(book.getId()).build();
+        when(bookMapper.toBook(book)).thenReturn(dto);
 
-        FileMoveRequest request = new FileMoveRequest();
-        request.setBookIds(Set.of(14L));
-        request.setPattern("Moved/{title}/{foo}");
+        FileMoveRequest req = new FileMoveRequest();
+        req.setBookIds(Set.of(book.getId()));
+        fileMoveService.moveFiles(req);
 
-        fileMoveService.moveFiles(request);
+        Path newPath = tempLibraryRoot.resolve("X").resolve("Test Book.epub");
+        assertThat(Files.exists(newPath)).isTrue();
+        assertThat(Files.exists(oldFilePath)).isFalse();
 
-        Path expectedNewPath = tempLibraryRoot.resolve("Moved").resolve("UnknownPlaceholder").resolve("{foo}.epub");
-        assertThat(Files.exists(expectedNewPath))
-                .withFailMessage("Unknown placeholders should remain in the generated path")
-                .isTrue();
+        verify(bookRepository).save(book);
+        verify(notificationService).sendMessage(eq(Topic.BOOK_METADATA_BATCH_UPDATE), anyList());
+        verify(libraryService).rescanLibrary(book.getLibraryPath().getLibrary().getId());
+    }
 
-        Files.deleteIfExists(expectedNewPath);
-        Files.deleteIfExists(expectedNewPath.getParent());
+    @Test
+    void testMoveFiles_usesDefaultPatternWhenLibraryPatternEmpty() throws IOException {
+        LibraryEntity lib = LibraryEntity.builder()
+                .id(99L).name("Lib").fileNamingPattern("   ").build();
+        LibraryPathEntity lp = LibraryPathEntity.builder()
+                .path(tempLibraryRoot.toString()).library(lib).build();
+
+        BookMetadataEntity meta = BookMetadataEntity.builder()
+                .title("DFT").build();
+        BookEntity book = BookEntity.builder()
+                .id(55L).fileSubPath("old").fileName("a.epub")
+                .libraryPath(lp).metadata(meta).build();
+
+        Path old = book.getFullFilePath();
+        Files.createDirectories(old.getParent());
+        Files.createFile(old);
+
+        when(bookQueryService.findAllWithMetadataByIds(Set.of(55L))).thenReturn(List.of(book));
+        AppSettings settings = new AppSettings();
+        settings.setUploadPattern("DEF/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(settings);
+        Book dto = Book.builder().id(book.getId()).build();
+        when(bookMapper.toBook(book)).thenReturn(dto);
+
+        FileMoveRequest req = new FileMoveRequest();
+        req.setBookIds(Set.of(55L));
+        fileMoveService.moveFiles(req);
+
+        Path moved = tempLibraryRoot.resolve("DEF").resolve("DFT.epub");
+        assertThat(Files.exists(moved)).isTrue();
+        verify(bookRepository).save(book);
+    }
+
+    @Test
+    void testMoveFiles_deletesEmptyParentDirectories() throws IOException {
+        LibraryEntity library = LibraryEntity.builder()
+                .id(100L).name("Lib").fileNamingPattern(null).build();
+        LibraryPathEntity lp = LibraryPathEntity.builder()
+                .path(tempLibraryRoot.toString()).library(library).build();
+        BookMetadataEntity meta = BookMetadataEntity.builder()
+                .title("Nested").build();
+        BookEntity book = BookEntity.builder()
+                .id(101L).fileSubPath("a/b/c").fileName("nested.epub")
+                .libraryPath(lp).metadata(meta).build();
+        Path old = book.getFullFilePath();
+        Files.createDirectories(old.getParent());
+        Files.createFile(old);
+
+        when(bookQueryService.findAllWithMetadataByIds(Set.of(101L))).thenReturn(List.of(book));
+        AppSettings settings = new AppSettings();
+        settings.setUploadPattern("Z/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(settings);
+        when(bookMapper.toBook(book)).thenReturn(Book.builder().id(book.getId()).build());
+
+        FileMoveRequest req = new FileMoveRequest();
+        req.setBookIds(Set.of(101L));
+        fileMoveService.moveFiles(req);
+
+        Path newPath = tempLibraryRoot.resolve("Z").resolve("Nested.epub");
+        assertThat(Files.exists(newPath)).isTrue();
+        assertThat(Files.notExists(tempLibraryRoot.resolve("a"))).isTrue();
+    }
+
+    @Test
+    void testMoveFiles_overwritesExistingDestination() throws IOException {
+        LibraryEntity library = LibraryEntity.builder()
+                .id(102L).name("Lib").fileNamingPattern(null).build();
+        LibraryPathEntity lp = LibraryPathEntity.builder()
+                .path(tempLibraryRoot.toString()).library(library).build();
+        BookMetadataEntity meta = BookMetadataEntity.builder()
+                .title("Overwrite").build();
+        BookEntity book = BookEntity.builder()
+                .id(103L).fileSubPath("sub").fileName("file.epub")
+                .libraryPath(lp).metadata(meta).build();
+        Path old = book.getFullFilePath();
+        Files.createDirectories(old.getParent());
+        Files.write(old, "SRC".getBytes());
+        Path destDir = tempLibraryRoot.resolve("DEST");
+        Files.createDirectories(destDir);
+        Path dest = destDir.resolve("Overwrite.epub");
+        Files.write(dest, "OLD".getBytes());
+
+        when(bookQueryService.findAllWithMetadataByIds(Set.of(103L))).thenReturn(List.of(book));
+        AppSettings settings = new AppSettings();
+        settings.setUploadPattern("DEST/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(settings);
+        when(bookMapper.toBook(book)).thenReturn(Book.builder().id(book.getId()).build());
+
+        FileMoveRequest req = new FileMoveRequest();
+        req.setBookIds(Set.of(103L));
+        fileMoveService.moveFiles(req);
+
+        assertThat(Files.exists(dest)).isTrue();
+        String content = Files.readString(dest);
+        assertThat(content).isEqualTo("SRC");
+    }
+
+    @Test
+    void testMoveFiles_usesLibraryPatternWhenSet() throws IOException {
+        LibraryEntity library = LibraryEntity.builder()
+                .id(104L).name("Lib").fileNamingPattern("LIBY/{title}").build();
+        LibraryPathEntity lp = LibraryPathEntity.builder()
+                .path(tempLibraryRoot.toString()).library(library).build();
+        BookMetadataEntity meta = BookMetadataEntity.builder()
+                .title("LibTest").build();
+        BookEntity book = BookEntity.builder()
+                .id(105L).fileSubPath("x").fileName("file.epub")
+                .libraryPath(lp).metadata(meta).build();
+        Path old = book.getFullFilePath();
+        Files.createDirectories(old.getParent());
+        Files.createFile(old);
+
+        when(bookQueryService.findAllWithMetadataByIds(Set.of(105L))).thenReturn(List.of(book));
+        AppSettings settings = new AppSettings();
+        settings.setUploadPattern("DEFAULT/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(settings);
+        when(bookMapper.toBook(book)).thenReturn(Book.builder().id(book.getId()).build());
+
+        FileMoveRequest req = new FileMoveRequest();
+        req.setBookIds(Set.of(105L));
+        fileMoveService.moveFiles(req);
+
+        Path newPath = tempLibraryRoot.resolve("LIBY").resolve("LibTest.epub");
+        assertThat(Files.exists(newPath)).isTrue();
+    }
+
+    @Test
+    void testMoveFiles_skipsWhenDestinationSameAsSource() throws IOException {
+        BookEntity book = createBookWithFile(tempLibraryRoot, "sub", "mybook.epub");
+        Path oldFilePath = book.getFullFilePath();
+
+        when(bookQueryService.findAllWithMetadataByIds(Set.of(book.getId())))
+                .thenReturn(List.of(book));
+        AppSettings settings = new AppSettings();
+        settings.setUploadPattern("sub/mybook.epub");
+        when(appSettingService.getAppSettings()).thenReturn(settings);
+
+        FileMoveRequest req = new FileMoveRequest();
+        req.setBookIds(Set.of(book.getId()));
+        fileMoveService.moveFiles(req);
+
+        assertThat(Files.exists(oldFilePath)).isTrue();
+        verify(bookRepository, never()).save(any());
+        verify(notificationService, never()).sendMessage(any(), anyList());
+        verify(libraryService, never()).rescanLibrary(anyLong());
+    }
+
+    @Test
+    void testMoveFiles_doesNotPauseMonitoringWhenAlreadyPaused() {
+        when(monitoringService.isPaused()).thenReturn(true);
+        when(bookQueryService.findAllWithMetadataByIds(anySet())).thenReturn(List.of());
+        AppSettings settings = new AppSettings();
+        settings.setUploadPattern("X/{title}");
+        when(appSettingService.getAppSettings()).thenReturn(settings);
+
+        FileMoveRequest req = new FileMoveRequest();
+        req.setBookIds(Set.of(999L));
+        fileMoveService.moveFiles(req);
+
+        verify(monitoringService, never()).pauseMonitoring();
+        verify(monitoringService, never()).resumeMonitoring();
     }
 }

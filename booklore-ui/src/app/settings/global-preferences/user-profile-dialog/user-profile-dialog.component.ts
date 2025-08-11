@@ -1,14 +1,15 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
-import {FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 
 import {Password} from 'primeng/password';
 import {User, UserService} from '../../user-management/user.service';
 import {MessageService} from 'primeng/api';
-import {Subscription} from 'rxjs';
+import {Subject} from 'rxjs';
 import {Message} from 'primeng/message';
+import {filter, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-profile-dialog',
@@ -20,7 +21,7 @@ import {Message} from 'primeng/message';
     InputText,
     Password,
     Message
-],
+  ],
   templateUrl: './user-profile-dialog.component.html',
   styleUrls: ['./user-profile-dialog.component.scss']
 })
@@ -29,7 +30,7 @@ export class UserProfileDialogComponent implements OnInit, OnDestroy {
   isEditing = false;
   currentUser: User | null = null;
   editUserData: Partial<User> = {};
-  private userSubscription: Subscription | null = null;
+  private readonly destroy$ = new Subject<void>();
 
   changePasswordForm: FormGroup;
 
@@ -51,14 +52,18 @@ export class UserProfileDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.userSubscription = this.userService.userState$.subscribe(user => {
-      this.currentUser = user;
+    this.userService.userState$.pipe(
+      filter(userState => !!userState?.user && userState.loaded),
+      takeUntil(this.destroy$)
+    ).subscribe(userState => {
+      this.currentUser = userState.user;
       this.resetEditForm();
     });
   }
 
   ngOnDestroy(): void {
-    this.userSubscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   static passwordsMatchValidator(form: FormGroup) {

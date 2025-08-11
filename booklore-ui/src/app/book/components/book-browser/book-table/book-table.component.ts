@@ -14,7 +14,7 @@ import {filter, Subject} from 'rxjs';
 import {UserService} from '../../../../settings/user-management/user.service';
 import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center-component/book-metadata-center.component';
 import {DialogService} from 'primeng/dynamicdialog';
-import {takeUntil} from 'rxjs/operators';
+import {take, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-book-table',
@@ -75,11 +75,12 @@ export class BookTableComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     this.userService.userState$
       .pipe(
-        filter(user => !!user),
+        filter(userState => !!userState?.user && userState.loaded),
+        take(1),
         takeUntil(this.destroy$)
       )
-      .subscribe(user => {
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+      .subscribe(userState => {
+        this.metadataCenterViewMode = userState?.user?.userSettings.metadataCenterViewMode ?? 'route';
       });
 
     this.setScrollHeight();

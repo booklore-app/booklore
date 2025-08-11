@@ -67,7 +67,6 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.bookService.loadBooks();
     const bookIdFromDialog: number | undefined = this.config?.data?.bookId;
     if (bookIdFromDialog != null) {
       this.currentBookId$.next(bookIdFromDialog);
@@ -126,10 +125,13 @@ export class BookMetadataCenterComponent implements OnInit, OnDestroy {
       });
 
     this.userService.userState$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(userData => {
-        this.canEditMetadata = userData?.permissions?.canEditMetadata ?? false;
-        this.admin = userData?.permissions?.admin ?? false;
+      .pipe(
+        filter(userState => !!userState?.user && userState.loaded),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(userState => {
+        this.canEditMetadata = userState.user?.permissions?.canEditMetadata ?? false;
+        this.admin = userState.user?.permissions?.admin ?? false;
       });
   }
 
