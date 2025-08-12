@@ -312,6 +312,9 @@ public class BookService {
             userBookProgress.setCbxProgress(request.getCbxProgress().getPage());
             userBookProgress.setCbxProgressPercent(request.getCbxProgress().getPercentage());
         }
+        if (request.getDateFinished() != null) {
+            userBookProgress.setDateFinished(request.getDateFinished());
+        }
         userBookProgressRepository.save(userBookProgress);
     }
 
@@ -334,7 +337,7 @@ public class BookService {
             progress.setUser(userEntity);
             progress.setBook(book);
             progress.setReadStatus(readStatus);
-            
+
             // Set dateFinished when status is READ, clear it otherwise
             if (readStatus == ReadStatus.READ) {
                 progress.setDateFinished(Instant.now());

@@ -36,6 +36,9 @@ categories:
       - 'exploration'
       - 'experimental'
 
+exclude-labels:
+  - 'skip changelog'
+
 change-template: '- $TITLE (#$NUMBER) by @$AUTHOR'
 
 template: |

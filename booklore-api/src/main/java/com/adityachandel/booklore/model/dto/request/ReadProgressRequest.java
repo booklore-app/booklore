@@ -6,6 +6,7 @@ import com.adityachandel.booklore.model.dto.progress.PdfProgress;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import java.time.Instant;
 
 @Data
 public class ReadProgressRequest {
@@ -14,8 +15,9 @@ public class ReadProgressRequest {
     private EpubProgress epubProgress;
     private PdfProgress pdfProgress;
     private CbxProgress cbxProgress;
+    private Instant dateFinished;
 
-    @AssertTrue(message = "Either epubProgress or pdfProgress must be provided")
+    @AssertTrue(message = "At least one progress field must be provided")
     public boolean isProgressValid() {
         return epubProgress != null || pdfProgress != null || cbxProgress != null;
     }
