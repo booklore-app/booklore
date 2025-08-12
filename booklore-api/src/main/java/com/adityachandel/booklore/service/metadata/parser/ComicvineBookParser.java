@@ -97,7 +97,12 @@ public class ComicvineBookParser implements BookParser {
     private String getSearchTerm(Book book, FetchMetadataRequest request) {
         if (request.getTitle() != null && !request.getTitle().isEmpty()) {
             return request.getTitle();
-        } else if (book.getFileName() != null && !book.getFileName().isEmpty()) {
+        }
+        String comicTerm = BookUtils.buildComicSearchTerm(book);
+        if (comicTerm != null) {
+            return comicTerm;
+        }
+        if (book.getFileName() != null && !book.getFileName().isEmpty()) {
             return BookUtils.cleanFileName(book.getFileName());
         }
         return null;
