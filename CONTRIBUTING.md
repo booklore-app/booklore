@@ -41,6 +41,9 @@ cd booklore
 
 ## 🧱 Local Development Setup
 
+Either run  `docker compose -f dev.docker-compose.yml up` or install & run everything Locally (described below).
+
+
 ### 1. Prerequisites
 
 - **Java 21+**
