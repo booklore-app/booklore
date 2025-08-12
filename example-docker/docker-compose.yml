@@ -1,7 +1,7 @@
 name: booklore
 services:
   booklore:
-    image: ghcr.io/adityachandelgit/booklore-app:${BOOKLORE_IMAGE_TAG}
+    image: booklore/booklore:${BOOKLORE_IMAGE_TAG}
     container_name: booklore_server
     env_file:
       - .env
