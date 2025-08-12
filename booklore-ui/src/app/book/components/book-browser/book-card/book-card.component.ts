@@ -1,4 +1,5 @@
 import {Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {TooltipModule} from "primeng/tooltip";
 import {Book, ReadStatus} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
@@ -29,7 +30,7 @@ import {ResetProgressTypes} from '../../../../shared/constants/reset-progress-ty
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgClass, TieredMenu, ProgressBar],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgClass, TieredMenu, ProgressBar, TooltipModule],
   standalone: true
 })
 export class BookCardComponent implements OnInit, OnDestroy {
