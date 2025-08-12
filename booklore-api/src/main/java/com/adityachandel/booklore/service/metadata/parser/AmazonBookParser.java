@@ -182,7 +182,10 @@ public class AmazonBookParser implements BookParser {
                     .collect(Collectors.joining(" "));
             searchTerm.append(cleanedTitle);
         } else {
-            String filename = BookUtils.cleanAndTruncateSearchTerm(BookUtils.cleanFileName(book.getFileName()));
+            String comicTerm = BookUtils.buildComicSearchTerm(book);
+            String filename = comicTerm != null
+                    ? BookUtils.cleanAndTruncateSearchTerm(comicTerm)
+                    : BookUtils.cleanAndTruncateSearchTerm(BookUtils.cleanFileName(book.getFileName()));
             if (!filename.isEmpty()) {
                 String cleanedFilename = Arrays.stream(filename.split(" "))
                         .map(word -> word.replaceAll("[^a-zA-Z0-9]", "").trim())
