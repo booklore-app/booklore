@@ -215,6 +215,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const directionParam = paramMap.get(QUERY_PARAMS.DIRECTION);
       const filterParams = paramMap.get(QUERY_PARAMS.FILTER);
       const sidebarParam = paramMap.get(QUERY_PARAMS.SIDEBAR);
+      this.showFilter = sidebarParam === null ? true : sidebarParam === 'true';
 
       const parsedFilters: Record<string, string[]> = {};
 
@@ -297,8 +298,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           : VIEW_MODES.GRID)
         : (effectivePrefs.view?.toLowerCase() ?? VIEW_MODES.GRID);
 
-      //this.showFilter = sidebarParam === 'true' || (sidebarParam === null && filterParams !== filterParams);
-
       this.bookSorter.updateSortOptions();
 
       if (this.lastAppliedSort?.field !== this.bookSorter.selectedSort.field || this.lastAppliedSort?.direction !== this.bookSorter.selectedSort.direction) {
@@ -310,9 +309,12 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         [QUERY_PARAMS.VIEW]: this.currentViewMode,
         [QUERY_PARAMS.SORT]: this.bookSorter.selectedSort.field,
         [QUERY_PARAMS.DIRECTION]: this.bookSorter.selectedSort.direction === SortDirection.ASCENDING ? SORT_DIRECTION.ASCENDING : SORT_DIRECTION.DESCENDING,
-        [QUERY_PARAMS.SIDEBAR]: this.showFilter.toString(),
-        [QUERY_PARAMS.FILTER]: Object.entries(parsedFilters).map(([k, v]) => `${k}:${v.join('|')}`).join(',')
+        [QUERY_PARAMS.SIDEBAR]: this.showFilter.toString()
       };
+
+      if (Object.keys(parsedFilters).length > 0) {
+        queryParams[QUERY_PARAMS.FILTER] = Object.entries(parsedFilters).map(([k, v]) => `${k}:${v.join('|')}`).join(',');
+      }
 
       const currentParams = this.activatedRoute.snapshot.queryParams;
       const changed = Object.keys(queryParams).some(k => currentParams[k] !== queryParams[k]);
@@ -478,11 +480,12 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   toggleFilterSidebar() {
     this.showFilter = !this.showFilter;
+    const currentParams = this.activatedRoute.snapshot.queryParams;
     this.router.navigate([], {
       queryParams: {
+        ...currentParams,
         [QUERY_PARAMS.SIDEBAR]: this.showFilter.toString()
       },
-      queryParamsHandling: 'merge',
       replaceUrl: true
     });
   }
