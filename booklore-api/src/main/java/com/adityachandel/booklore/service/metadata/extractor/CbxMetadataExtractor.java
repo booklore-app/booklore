@@ -173,7 +173,101 @@ public class CbxMetadataExtractor implements FileMetadataExtractor {
 
     @Override
     public byte[] extractCover(File file) {
+        if (!file.getName().toLowerCase().endsWith(".cbz")) {
+            return generatePlaceholderCover(250, 350);
+        }
+
+        try (ZipFile zipFile = new ZipFile(file)) {
+            ZipEntry coverEntry = findFrontCoverEntry(zipFile);
+            if (coverEntry != null) {
+                try (InputStream is = zipFile.getInputStream(coverEntry)) {
+                    return is.readAllBytes();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to extract cover image from CBZ", e);
+        }
+
         return generatePlaceholderCover(250, 350);
+    }
+
+    private ZipEntry findFrontCoverEntry(ZipFile zipFile) {
+        ZipEntry comicInfoEntry = findComicInfoEntry(zipFile);
+        if (comicInfoEntry != null) {
+            try (InputStream is = zipFile.getInputStream(comicInfoEntry)) {
+                Document document = buildSecureDocument(is);
+                String imageName = findFrontCoverImageName(document);
+                if (imageName != null) {
+                    ZipEntry byName = zipFile.getEntry(imageName);
+                    if (byName != null) {
+                        return byName;
+                    }
+                    try {
+                        int index = Integer.parseInt(imageName);
+                        ZipEntry byIndex = findImageEntryByIndex(zipFile, index);
+                        if (byIndex != null) {
+                            return byIndex;
+                        }
+                    } catch (NumberFormatException ignore) {
+                        // ignore
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse ComicInfo.xml for cover", e);
+            }
+        }
+
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            if (!entry.isDirectory() && isImageEntry(entry.getName())) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    private ZipEntry findImageEntryByIndex(ZipFile zipFile, int index) {
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        int count = 0;
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            if (!entry.isDirectory() && isImageEntry(entry.getName())) {
+                if (count == index) {
+                    return entry;
+                }
+                count++;
+            }
+        }
+        return null;
+    }
+
+    private String findFrontCoverImageName(Document document) {
+        NodeList pages = document.getElementsByTagName("Page");
+        for (int i = 0; i < pages.getLength(); i++) {
+            org.w3c.dom.Node node = pages.item(i);
+            if (node instanceof org.w3c.dom.Element) {
+                org.w3c.dom.Element page = (org.w3c.dom.Element) node;
+                String type = page.getAttribute("Type");
+                if (type != null && type.equalsIgnoreCase("FrontCover")) {
+                    String imageFile = page.getAttribute("ImageFile");
+                    if (imageFile != null && !imageFile.isBlank()) {
+                        return imageFile.trim();
+                    }
+                    String image = page.getAttribute("Image");
+                    if (image != null && !image.isBlank()) {
+                        return image.trim();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isImageEntry(String name) {
+        String lower = name.toLowerCase();
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png")
+                || lower.endsWith(".gif") || lower.endsWith(".bmp") || lower.endsWith(".webp");
     }
 
     private byte[] generatePlaceholderCover(int width, int height) {
