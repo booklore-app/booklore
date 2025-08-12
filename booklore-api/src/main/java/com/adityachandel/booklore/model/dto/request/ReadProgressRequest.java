@@ -19,6 +19,6 @@ public class ReadProgressRequest {
 
     @AssertTrue(message = "At least one progress field must be provided")
     public boolean isProgressValid() {
-        return epubProgress != null || pdfProgress != null || cbxProgress != null;
+        return epubProgress != null || pdfProgress != null || cbxProgress != null || dateFinished != null;
     }
 }
