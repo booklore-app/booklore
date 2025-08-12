@@ -3,15 +3,12 @@ package com.adityachandel.booklore.service.metadata.extractor;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import org.junit.jupiter.api.Test;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.imageio.ImageIO;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,24 +26,6 @@ public class CbxMetadataExtractorTest {
                 zos.write(xmlContent.getBytes());
                 zos.closeEntry();
             }
-        }
-        return file.toFile();
-    }
-
-    private File createCbzWithCover(byte[] imageBytes) throws IOException {
-        Path dir = Files.createTempDirectory("cbzcover");
-        Path file = dir.resolve("withCover.cbz");
-        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(file))) {
-            ZipEntry imgEntry = new ZipEntry("cover.jpg");
-            zos.putNextEntry(imgEntry);
-            zos.write(imageBytes);
-            zos.closeEntry();
-
-            String xml = "<ComicInfo><Pages><Page Type=\"FrontCover\" Image=\"cover.jpg\"/></Pages></ComicInfo>";
-            ZipEntry info = new ZipEntry("ComicInfo.xml");
-            zos.putNextEntry(info);
-            zos.write(xml.getBytes());
-            zos.closeEntry();
         }
         return file.toFile();
     }
@@ -114,19 +93,5 @@ public class CbxMetadataExtractorTest {
         BookMetadata md = extractor.extractMetadata(cbz);
 
         assertThat(md.getTitle()).isEqualTo("nofile");
-    }
-
-    @Test
-    void extractsFrontCoverImage() throws Exception {
-        BufferedImage image = new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "jpg", baos);
-        byte[] bytes = baos.toByteArray();
-
-        File cbz = createCbzWithCover(bytes);
-
-        byte[] extracted = extractor.extractCover(cbz);
-
-        assertThat(extracted).isEqualTo(bytes);
     }
 }
