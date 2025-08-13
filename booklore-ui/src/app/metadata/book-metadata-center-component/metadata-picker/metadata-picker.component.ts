@@ -13,7 +13,6 @@ import {BookService} from '../../../book/service/book.service';
 import {Textarea} from 'primeng/textarea';
 import {filter, map} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {Chip} from 'primeng/chip';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -30,8 +29,7 @@ import {Chip} from 'primeng/chip';
     NgStyle,
     Tooltip,
     AsyncPipe,
-    Textarea,
-    Chip
+    Textarea
   ]
 })
 export class MetadataPickerComponent implements OnInit {

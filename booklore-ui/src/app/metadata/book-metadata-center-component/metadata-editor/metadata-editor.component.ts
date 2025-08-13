@@ -21,7 +21,6 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
-import {Chip} from 'primeng/chip';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -44,8 +43,7 @@ import {Chip} from 'primeng/chip';
     TabList,
     Tab,
     TabPanels,
-    TabPanel,
-    Chip
+    TabPanel
   ]
 })
 export class MetadataEditorComponent implements OnInit {
