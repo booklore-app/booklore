@@ -497,6 +497,9 @@
           <i class="pi pi-bookmark"></i> Similar Books
         </p-tab>
         <p-tab [value]="3">
+          <i class="pi pi-pen-to-square"></i> Notes
+        </p-tab>
+        <p-tab [value]="4">
           <i class="pi pi-comments"></i> Reviews
         </p-tab>
       </p-tablist>
@@ -540,6 +543,9 @@
           </div>
         </p-tabpanel>
         <p-tabpanel [value]="3">
+          <app-book-notes-component [bookId]="book.id"></app-book-notes-component>
+        </p-tabpanel>
+        <p-tabpanel [value]="4">
           <app-book-reviews [bookId]="book.id"></app-book-reviews>
         </p-tabpanel>
       </p-tabpanels>

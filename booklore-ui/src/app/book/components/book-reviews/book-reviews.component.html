@@ -36,7 +36,10 @@
                     <div class="flex items-center gap-2">
                       <span class="font-medium text-sm reviewer-name">{{ review.reviewerName || 'Anonymous' }}</span>
                       @if (review.metadataProvider) {
-                        <p-tag [rounded]="true" [value]="review.metadataProvider" severity="secondary"/>
+                        <p-tag
+                          [rounded]="true"
+                          [value]="review.metadataProvider"
+                          [severity]="getProviderSeverity(review.metadataProvider)"/>
                       }
                       @if (review.country) {
                         <p-tag [rounded]="true" [value]="review.country" severity="info"/>
@@ -45,9 +48,12 @@
                         <p-tag [rounded]="true" value="Spoiler" severity="warn" icon="pi pi-exclamation-triangle"/>
                       }
                     </div>
-                    @if (review.date) {
-                      <span class="text-sm text-gray-400">{{ formatDate(review.date) }}</span>
-                    }
+                    <div class="review-meta">
+                      <i class="pi pi-clock text-xs mr-1"></i>
+                      @if (review.date) {
+                        <span class="text-sm text-gray-400">{{ formatDate(review.date) }}</span>
+                      }
+                    </div>
                   </div>
 
                   <div class="flex items-center gap-2">
@@ -61,7 +67,7 @@
                       </div>
                     }
 
-                    @if (canDeleteReviews) {
+                    @if (hasPermission) {
                       @if (reviewsLocked) {
                         <div class="flex items-center justify-center w-8 h-8">
                           <i class="pi pi-lock text-amber-500 text-sm"
@@ -76,7 +82,8 @@
                           text
                           (onClick)="deleteReview(review)"
                           pTooltip="Delete Review"
-                          tooltipPosition="top"/>
+                          tooltipPosition="top"
+                          class="action-btn-hover"/>
                       }
                     }
                   </div>
@@ -84,7 +91,7 @@
               </div>
 
               @if (review.title && (!review.spoiler || isSpoilerRevealed(review.id!))) {
-                <div class="review-title-section px-3 pb-2">
+                <div class="review-title-section">
                   <h4 class="font-medium text-xl text-gray-200 leading-tight m-0 review-title"
                       [pTooltip]="review.title"
                       tooltipPosition="top">{{ review.title }}
@@ -92,7 +99,7 @@
                 </div>
               }
 
-              <div class="review-content-area px-3 pb-2">
+              <div class="review-content-area">
                 @if (review.spoiler && !isSpoilerRevealed(review.id!)) {
                   <div class="spoiler-blur-content">
                     @if (review.title) {
@@ -111,7 +118,9 @@
                     <div class="text-zinc-400 italic text-sm">No review content available</div>
                   }
                 }
+                <div class="review-fade-overlay"></div>
               </div>
+              <div class="review-bottom-glow"></div>
             </div>
           }
         </div>
@@ -121,30 +130,33 @@
 
   <div class="action-bar">
     <div class="action-buttons">
-      <p-button
-        outlined
-        [icon]="reviewsLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
-        size="small"
-        [severity]="reviewsLocked ? 'danger' : 'success'"
-        [disabled]="!reviewDownloadEnabled || loading"
-        (click)="toggleReviewsLock()"
-        [pTooltip]="loading ? 'Please wait while reviews are being fetched' : (!reviewDownloadEnabled ? 'Enable review downloads in settings to use this feature' : (reviewsLocked ? 'Unlock Reviews' : 'Lock Reviews'))"
-        tooltipPosition="left"
-        class="action-btn"/>
 
-      <p-button
-        outlined
-        icon="pi pi-refresh"
-        size="small"
-        severity="primary"
-        [loading]="loading"
-        [disabled]="reviewsLocked || !reviewDownloadEnabled || loading"
-        (click)="fetchNewReviews()"
-        [pTooltip]="loading ? 'Please wait while reviews are being fetched' : (!reviewDownloadEnabled ? 'Enable review downloads in settings to use this feature' : (reviewsLocked ? 'Reviews are locked' : 'Fetch New Reviews'))"
-        tooltipPosition="left"
-        class="action-btn"/>
+      @if (hasPermission) {
+        <p-button
+          outlined
+          [icon]="reviewsLocked ? 'pi pi-lock' : 'pi pi-lock-open'"
+          size="small"
+          [severity]="reviewsLocked ? 'danger' : 'success'"
+          [disabled]="!reviewDownloadEnabled || loading"
+          (click)="toggleReviewsLock()"
+          [pTooltip]="loading ? 'Please wait while reviews are being fetched' : (!reviewDownloadEnabled ? 'Enable review downloads in settings to use this feature' : (reviewsLocked ? 'Unlock Reviews' : 'Lock Reviews'))"
+          tooltipPosition="left"
+          class="action-btn"/>
 
-      @if (canDeleteReviews && reviews && reviews.length > 0) {
+        <p-button
+          outlined
+          icon="pi pi-refresh"
+          size="small"
+          severity="primary"
+          [loading]="loading"
+          [disabled]="reviewsLocked || !reviewDownloadEnabled || loading"
+          (click)="fetchNewReviews()"
+          [pTooltip]="loading ? 'Please wait while reviews are being fetched' : (!reviewDownloadEnabled ? 'Enable review downloads in settings to use this feature' : (reviewsLocked ? 'Reviews are locked' : 'Fetch New Reviews'))"
+          tooltipPosition="left"
+          class="action-btn"/>
+      }
+
+      @if (hasPermission && reviews && reviews.length > 0) {
         <p-button
           outlined
           icon="pi pi-trash"

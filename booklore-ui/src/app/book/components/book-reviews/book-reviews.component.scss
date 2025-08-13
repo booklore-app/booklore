@@ -26,7 +26,7 @@
       flex-direction: column;
       gap: 8px;
       padding: 16px 8px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(8px);
@@ -89,19 +89,33 @@
   width: 500px;
   height: 250px;
   flex-shrink: 0;
-  padding: 8px;
-  border-radius: 12px;
+  padding: 0;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @media (max-width: 768px) {
+    width: 340px;
+    height: 220px;
+  }
+
+  @media (max-width: 480px) {
+    width: 290px;
+    height: 200px;
+  }
 
   &:hover {
-    border-color: var(--primary-color);
-    transition: border-color 0.2s ease;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: color-mix(in srgb, var(--primary-color), transparent 50%);
+
+    .action-btn-hover {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   &.no-title {
@@ -130,12 +144,50 @@
 
   .review-header {
     flex-shrink: 0;
-    border-bottom: 1px solid var(--surface-border);
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.8), rgba(30, 30, 30, 0.8));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+
+    .reviewer-name {
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .review-meta {
+      display: flex;
+      align-items: center;
+      opacity: 0.8;
+
+      i {
+        color: #3b82f6;
+      }
+    }
+
+    .action-btn-hover {
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      transform: scale(0.9);
+
+      ::ng-deep .p-button {
+        border-radius: 8px;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
   }
 
   .review-title-section {
     flex-shrink: 0;
     border-bottom: 1px solid var(--surface-border);
+    padding: 8px 16px 4px 16px;
   }
 
   .review-content-area {
@@ -144,6 +196,17 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    padding: 8px 16px 16px 16px;
+
+    .review-fade-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(transparent, rgba(20, 20, 20, 0.9));
+      pointer-events: none;
+    }
   }
 }
 
@@ -154,7 +217,6 @@
   overflow-y: auto;
   word-wrap: break-word;
   white-space: pre-wrap;
-  padding-right: 8px;
   box-sizing: border-box;
 
   &::-webkit-scrollbar {
@@ -176,55 +238,10 @@
   }
 }
 
-.reviewer-name {
-  max-width: 120px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .review-title {
   max-width: 450px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: help;
-}
-
-/* For Firefox */
-.reviews-scroll-container {
-  scrollbar-width: thin;
-  scrollbar-color: var(--surface-border) var(--surface-ground);
-}
-
-.review-body {
-  scrollbar-width: thin;
-  scrollbar-color: var(--surface-border) var(--surface-ground);
-}
-
-.spoiler-overlay-button {
-  position: absolute !important;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
-  pointer-events: auto;
-}
-
-.spoiler-blur-content {
-  pointer-events: none;
-  user-select: none;
-  flex: 1;
-  overflow: hidden;
-  width: 100%;
-  max-height: 210px;
-  display: flex;
-  flex-direction: column;
-
-  .review-body {
-    flex: 1;
-    height: auto;
-    max-height: 210px;
-    overflow: hidden;
-  }
 }

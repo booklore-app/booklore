@@ -1,17 +1,17 @@
 import {Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {BookReview, BookReviewService} from '../../book-review-service';
+import {BookReview, BookReviewService} from '../../../book-review-service';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Rating} from 'primeng/rating';
 import {Tag} from 'primeng/tag';
 import {Button} from 'primeng/button';
 import {ConfirmationService, MessageService} from 'primeng/api';
-import {UserService} from '../../settings/user-management/user.service';
+import {UserService} from '../../../settings/user-management/user.service';
 import {FormsModule} from '@angular/forms';
 import {Tooltip} from 'primeng/tooltip';
-import {BookService} from '../../book/service/book.service';
-import {AppSettingsService} from '../../core/service/app-settings.service';
+import {BookService} from '../../service/book.service';
+import {AppSettingsService} from '../../../core/service/app-settings.service';
 
 @Component({
   selector: 'app-book-reviews',
@@ -34,7 +34,7 @@ export class BookReviewsComponent implements OnInit, OnChanges {
   private destroyRef = inject(DestroyRef);
 
   loading = false;
-  canDeleteReviews = false;
+  hasPermission = false;
   revealedSpoilers = new Set<number>();
   sortAscending = false;
   reviewsLocked = false;
@@ -246,7 +246,7 @@ export class BookReviewsComponent implements OnInit, OnChanges {
     this.userService.userState$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(userState => {
-        this.canDeleteReviews = userState?.user?.permissions?.admin ||
+        this.hasPermission = userState?.user?.permissions?.admin ||
           userState?.user?.permissions?.canEditMetadata || false;
       });
   }
@@ -319,5 +319,14 @@ export class BookReviewsComponent implements OnInit, OnChanges {
       .subscribe(settings => {
         this.reviewDownloadEnabled = settings?.metadataPublicReviewsSettings?.downloadEnabled ?? true;
       });
+  }
+
+  getProviderSeverity(provider: string): 'success' | 'warn' {
+    switch (provider?.toLowerCase()) {
+      case 'amazon':
+        return 'warn';
+      default:
+        return 'success';
+    }
   }
 }

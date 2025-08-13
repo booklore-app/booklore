@@ -7,14 +7,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Entity
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "user_settings", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "setting_key"})})
-public class UserSettingEntity {
+@AllArgsConstructor
+@Table(name = "book_notes")
+public class BookNoteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +27,18 @@ public class UserSettingEntity {
     @Column(name = "user_id", insertable = false, updatable = false)
     private Long userId;
 
-    @Column(name = "setting_key", nullable = false, length = 100)
-    private String settingKey;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    private BookEntity book;
 
-    @Column(name = "setting_value", nullable = false)
-    private String settingValue;
+    @Column(name = "book_id", insertable = false, updatable = false)
+    private Long bookId;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    private String content;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
