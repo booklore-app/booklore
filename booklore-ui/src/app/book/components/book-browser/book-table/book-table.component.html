@@ -48,7 +48,7 @@
             (click)="toggleMetadataLock(metadata)">
           </p-button>
         </td>
-        <td (click)="openMetadataCenter(book.id)">
+        <td (click)="openMetadataCenter(book.id)" class="cursor-pointer">
           <img [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn)" alt="Book Cover" class="size-7"/>
         </td>
 
@@ -68,7 +68,12 @@
               </span>
             </td>
           } @else {
-            <td [title]="getCellValue(metadata, book, col.field)" class="overflow-hidden truncate text-right min-w-[6rem] max-w-[12rem]">
+            <td [title]="getCellValue(metadata, book, col.field)"
+                tooltipPosition="right"
+                autoHide="false"
+                tooltipStyleClass="text-xs text-center"
+                [pTooltip]="getCellValue(metadata, book, col.field)?.toString()"
+                class="overflow-hidden truncate text-right min-w-[6rem] max-w-[12rem]">
               {{ getCellValue(metadata, book, col.field) }}
             </td>
           }

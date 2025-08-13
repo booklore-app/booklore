@@ -3,6 +3,7 @@ import {TableModule} from 'primeng/table';
 import {DatePipe} from '@angular/common';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
+import {TooltipModule} from "primeng/tooltip";
 import {Book, BookMetadata} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
@@ -24,7 +25,8 @@ import {take, takeUntil} from 'rxjs/operators';
     TableModule,
     Rating,
     FormsModule,
-    Button
+    Button,
+    TooltipModule
   ],
   styleUrls: ['./book-table.component.scss'],
   providers: [DatePipe]
