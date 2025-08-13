@@ -10,7 +10,7 @@ import {SlicePipe} from '@angular/common';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {Router} from '@angular/router';
-import {OverlayPanelModule} from 'primeng/overlaypanel';
+import {Popover} from 'primeng/popover';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 
@@ -23,7 +23,7 @@ import {InputIcon} from 'primeng/inputicon';
     Button,
     SlicePipe,
     Divider,
-    OverlayPanelModule,
+    Popover,
     IconField,
     InputIcon
   ],

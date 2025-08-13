@@ -3,7 +3,6 @@ import {FormsModule} from '@angular/forms';
 import {Observable} from 'rxjs';
 
 import {Divider} from 'primeng/divider';
-import {DropdownModule} from 'primeng/dropdown';
 import {Select} from 'primeng/select';
 import {Button} from 'primeng/button';
 import {Tooltip} from 'primeng/tooltip';
@@ -21,7 +20,6 @@ import {InputText} from 'primeng/inputtext';
   standalone: true,
   imports: [
     Divider,
-    DropdownModule,
     Select,
     Button,
     Tooltip,

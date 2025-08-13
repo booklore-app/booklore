@@ -6,7 +6,7 @@ import {Tooltip} from 'primeng/tooltip';
 import {InputText} from 'primeng/inputtext';
 import {BookMetadata} from '../../book/model/book.model';
 import {UrlHelperService} from '../../utilities/service/url-helper.service';
-import {Chips} from 'primeng/chips';
+import {Chip} from 'primeng/chip';
 import {Textarea} from 'primeng/textarea';
 
 @Component({
@@ -17,7 +17,7 @@ import {Textarea} from 'primeng/textarea';
     Tooltip,
     InputText,
     NgClass,
-    Chips,
+    Chip,
     FormsModule,
     Textarea
   ],

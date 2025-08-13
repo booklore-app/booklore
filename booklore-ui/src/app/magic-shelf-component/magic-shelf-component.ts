@@ -1,6 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DropdownModule} from 'primeng/dropdown';
 import {Button} from 'primeng/button';
 import {NgTemplateOutlet} from '@angular/common';
 import {InputText} from 'primeng/inputtext';
@@ -13,7 +12,7 @@ import {Library} from '../book/model/library.model';
 import {MagicShelfService} from '../magic-shelf.service';
 import {MessageService} from 'primeng/api';
 import {DynamicDialogConfig} from 'primeng/dynamicdialog';
-import {Chips} from 'primeng/chips';
+import {Chip} from 'primeng/chip';
 import {MultiSelect} from 'primeng/multiselect';
 import {EMPTY_CHECK_OPERATORS, MULTI_VALUE_OPERATORS, parseValue, removeNulls, serializeDateRules} from '../magic-shelf-utils';
 import { IconPickerService } from '../utilities/services/icon-picker.service';
@@ -138,14 +137,13 @@ const FIELD_CONFIGS: Record<RuleField, FullFieldConfig> = {
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    DropdownModule,
     NgTemplateOutlet,
     InputText,
     Select,
     Button,
     DatePicker,
     InputNumber,
-    Chips,
+    Chip,
     MultiSelect
   ]
 })

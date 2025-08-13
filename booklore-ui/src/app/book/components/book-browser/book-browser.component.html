@@ -173,7 +173,7 @@
             <i class="pi pi-search"></i>
           </button>
 
-          <p-overlayPanel #searchDropdown [dismissable]="true" appendTo="body" [style]="{ width: '18rem' }">
+          <p-popover #searchDropdown [dismissable]="true" appendTo="body" [style]="{ width: '18rem' }">
             <div class="relative w-full">
               <input
                 type="text"
@@ -192,7 +192,7 @@
                 (click)="clearSearch(); searchDropdown.hide()"
               ></p-button>
             </div>
-          </p-overlayPanel>
+          </p-popover>
         </div>
 
         <div class="hidden md:block relative">

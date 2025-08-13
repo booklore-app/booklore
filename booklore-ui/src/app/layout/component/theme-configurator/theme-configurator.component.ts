@@ -4,7 +4,6 @@ import {FormsModule} from '@angular/forms';
 import {$t} from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
 import {ButtonModule} from 'primeng/button';
-import {InputSwitchModule} from 'primeng/inputswitch';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {AppConfigService} from '../../../core/service/app-config.service';
@@ -27,7 +26,6 @@ interface Palette {
   imports: [
     CommonModule,
     FormsModule,
-    InputSwitchModule,
     ButtonModule,
     RadioButtonModule,
     ToggleSwitchModule

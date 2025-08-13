@@ -4,7 +4,7 @@ import {CommonModule} from '@angular/common';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {Tooltip} from 'primeng/tooltip';
-import {Chips} from 'primeng/chips';
+import {Chip} from 'primeng/chip';
 import {DatePicker} from 'primeng/datepicker';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
@@ -23,7 +23,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     InputText,
     Button,
     Tooltip,
-    Chips,
+    Chip,
     DatePicker,
     Checkbox,
     ProgressSpinner

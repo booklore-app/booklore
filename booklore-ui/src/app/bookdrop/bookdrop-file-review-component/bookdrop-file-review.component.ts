@@ -7,7 +7,6 @@ import {LibraryService} from '../../book/service/library.service';
 import {Library} from '../../book/model/library.model';
 
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {DropdownModule} from 'primeng/dropdown';
 import {FormControl, FormGroup, FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {Select} from 'primeng/select';
@@ -47,7 +46,6 @@ export interface BookdropFileUI {
   styleUrl: './bookdrop-file-review.component.scss',
   imports: [
     ProgressSpinner,
-    DropdownModule,
     FormsModule,
     Button,
     Select,
