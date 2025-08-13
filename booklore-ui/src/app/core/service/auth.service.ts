@@ -20,11 +20,9 @@ export class AuthService {
   private oAuthService = inject(OAuthService);
   private router = inject(Router);
 
-  private tokenSubject = new BehaviorSubject<string | null>(this.getOidcAccessToken() || this.getInternalAccessToken());
+  public tokenSubject = new BehaviorSubject<string | null>(this.getOidcAccessToken() || this.getInternalAccessToken());
   public token$ = this.tokenSubject.asObservable();
 
-  private logoutSubject = new Subject<void>();
-  public logout$ = this.logoutSubject.asObservable();
 
   internalLogin(credentials: { username: string; password: string }): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
     return this.http.post<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/login`, credentials).pipe(
@@ -43,17 +41,6 @@ export class AuthService {
       tap((response) => {
         if (response.accessToken && response.refreshToken) {
           this.saveInternalTokens(response.accessToken, response.refreshToken);
-        }
-      })
-    );
-  }
-
-  remoteLogin(): Observable<{ accessToken: string; refreshToken: string, isDefaultPassword: string }> {
-    return this.http.get<{ accessToken: string; refreshToken: string, isDefaultPassword: string }>(`${this.apiUrl}/remote`).pipe(
-      tap((response) => {
-        if (response.accessToken && response.refreshToken) {
-          this.saveInternalTokens(response.accessToken, response.refreshToken);
-          this.initializeWebSocketConnection();
         }
       })
     );
@@ -81,13 +68,8 @@ export class AuthService {
     localStorage.removeItem('accessToken_Internal');
     localStorage.removeItem('refreshToken_Internal');
     this.tokenSubject.next(null);
-    this.logoutSubject.next();
     this.getRxStompService().deactivate();
-    if (this.oAuthService.clientId) {
-      this.oAuthService.logOut();
-    } else {
-      this.router.navigate(['/login']);
-    }
+    this.router.navigate(['/login']);
   }
 
   getRxStompService(): RxStompService {
