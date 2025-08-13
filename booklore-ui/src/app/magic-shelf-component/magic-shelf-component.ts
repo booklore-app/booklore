@@ -86,7 +86,7 @@ export interface GroupRule {
   name: string;
   type: 'group';
   join: 'and' | 'or';
-  rules: Array<Rule | GroupRule>;
+  rules: (Rule | GroupRule)[];
 }
 
 export type RuleFormGroup = FormGroup<{
@@ -323,7 +323,7 @@ export class MagicShelfComponent implements OnInit {
     return new FormGroup({
       type: new FormControl<'group'>('group' as 'group'),
       join: new FormControl<'and' | 'or'>('and' as 'and' | 'or'),
-      rules: new FormArray([] as Array<GroupFormGroup | RuleFormGroup>),
+      rules: new FormArray([] as (GroupFormGroup | RuleFormGroup)[]),
     }) as GroupFormGroup;
   }
 
