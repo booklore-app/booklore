@@ -69,8 +69,8 @@
                     <p-inputNumber [formControl]="ruleCtrl.get('valueStart')" [min]="0" class="w-full" placeholder="Start Value" [showButtons]="true"></p-inputNumber>
                     <p-inputNumber [formControl]="ruleCtrl.get('valueEnd')" [min]="0" class="w-full" placeholder="End Value" [showButtons]="true"></p-inputNumber>
                   } @else if (numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.type === 'decimal') {
-                    <p-inputNumber [formControl]="ruleCtrl.get('valueStart')" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="1" [min]="0" [max]="numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.max" class="w-full" placeholder="Start Value" [showButtons]="true"></p-inputNumber>
-                    <p-inputNumber [formControl]="ruleCtrl.get('valueEnd')" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="1" [min]="0" [max]="numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.max" class="w-full" placeholder="End Value" [showButtons]="true"></p-inputNumber>
+                    <p-inputNumber [formControl]="ruleCtrl.get('valueStart')" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="1" [min]="0" [max]="numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.max || 10" class="w-full" placeholder="Start Value" [showButtons]="true"></p-inputNumber>
+                    <p-inputNumber [formControl]="ruleCtrl.get('valueEnd')" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="1" [min]="0" [max]="numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.max || 10" class="w-full" placeholder="End Value" [showButtons]="true"></p-inputNumber>
                   } @else {
                     <input pInputText [formControl]="ruleCtrl.get('valueStart')" class="w-full" placeholder="Start Value"/>
                     <input pInputText [formControl]="ruleCtrl.get('valueEnd')" class="w-full" placeholder="End Value"/>
@@ -83,7 +83,7 @@
                   } @else if (numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.type === 'number') {
                     <p-inputNumber formControlName="value" class="w-full" mode="decimal" placeholder="Value" [showButtons]="true"></p-inputNumber>
                   } @else if (numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.type === 'decimal') {
-                    <p-inputNumber formControlName="value" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="1" [min]="0" [max]="numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.max" class="w-full" placeholder="Value" [showButtons]="true"></p-inputNumber>
+                    <p-inputNumber formControlName="value" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="1" [min]="0" [max]="numericFieldConfigMap.get(ruleCtrl.get('field')?.value)?.max || 10" class="w-full" placeholder="Value" [showButtons]="true"></p-inputNumber>
                   } @else if (['includes_any', 'includes_all', 'excludes_all'].includes(ruleCtrl.get('operator')?.value)) {
                     @if (ruleCtrl.get('field')?.value === 'readStatus') {
                       <p-multiSelect [options]="readStatusOptions" formControlName="value" display="chip" class="w-full" appendTo="body" placeholder="Select Statuses"></p-multiSelect>
