@@ -8,7 +8,7 @@ import org.hibernate.annotations.FetchMode;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -191,6 +191,9 @@ public class BookMetadataEntity {
     @Column(name = "comicvine_id_locked")
     private Boolean comicvineIdLocked = Boolean.FALSE;
 
+    @Column(name = "reviews_locked")
+    private Boolean reviewsLocked = Boolean.FALSE;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "book_id")
@@ -213,6 +216,10 @@ public class BookMetadataEntity {
     )
     @Fetch(FetchMode.SUBSELECT)
     private Set<CategoryEntity> categories;
+
+    @OneToMany(mappedBy = "bookMetadata", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<BookReviewEntity> reviews = new HashSet<>();
 
     public void applyLockToAllFields(boolean lock) {
         this.titleLocked = lock;
@@ -242,6 +249,7 @@ public class BookMetadataEntity {
         this.goodreadsIdLocked = lock;
         this.hardcoverIdLocked = lock;
         this.googleIdLocked = lock;
+        this.reviewsLocked = lock;
     }
 
     public boolean areAllFieldsLocked() {
@@ -272,6 +280,7 @@ public class BookMetadataEntity {
                 && Boolean.TRUE.equals(this.comicvineIdLocked)
                 && Boolean.TRUE.equals(this.hardcoverIdLocked)
                 && Boolean.TRUE.equals(this.googleIdLocked)
+                && Boolean.TRUE.equals(this.reviewsLocked)
                 ;
     }
 }

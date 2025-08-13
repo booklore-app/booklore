@@ -2,9 +2,7 @@
 
   <div class="p-4 pt-6 min-w-[50rem]">
     <p class="text-lg pb-4 pt-2">Auto-Download Metadata for Files in BookDrop Folder:</p>
-
     <div class="flex flex-col gap-4 pl-6">
-
       <div class="flex items-center gap-4">
         <p-toggleswitch
           [(ngModel)]="metadataDownloadOnBookdrop"
@@ -24,50 +22,8 @@
     <p-divider></p-divider>
   </div>
 
-  <div class="p-4 pt-6 min-w-[50rem]">
-    <p class="text-lg pb-4 pt-2">Metadata Persistence:</p>
-
-    <div class="flex flex-col gap-4 pl-6">
-
-      <div class="flex items-center gap-4">
-        <label>Write to File</label>
-        <p-toggleswitch
-          [ngModel]="metadataPersistence.saveToOriginalFile"
-          (onChange)="onPersistenceToggle('saveToOriginalFile')">
-        </p-toggleswitch>
-        <div class="text-sm text-gray-400 flex items-start gap-2">
-          <i class="pi pi-exclamation-triangle text-yellow-500 mt-0.5"></i>
-          <span>
-          Writes metadata directly into the original file. A backup of the metadata and/or cover is created <b>only if enabled below</b>. Proceed with caution, restoration may fail if the file is moved or renamed.
-        </span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <label>Backup Metadata</label>
-        <p-toggleswitch
-          [ngModel]="metadataPersistence.backupMetadata"
-          (onChange)="onPersistenceToggle('backupMetadata')"
-          [disabled]="!metadataPersistence.saveToOriginalFile">
-        </p-toggleswitch>
-        <span class="text-sm text-gray-400">
-          Save a JSON copy of the current metadata before writing new data to the file.
-        </span>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <label>Backup Cover</label>
-        <p-toggleswitch
-          [ngModel]="metadataPersistence.backupCover"
-          (onChange)="onPersistenceToggle('backupCover')"
-          [disabled]="!metadataPersistence.saveToOriginalFile">
-        </p-toggleswitch>
-        <span class="text-sm text-gray-400">
-          Save a copy of the existing embedded cover image before it is replaced.
-        </span>
-      </div>
-
-    </div>
+  <div>
+    <app-metadata-persistence-settings-component></app-metadata-persistence-settings-component>
   </div>
 
   <div class="pb-4">
@@ -82,11 +38,19 @@
     <p-divider></p-divider>
   </div>
 
+  <div>
+    <app-public-reviews-settings-component></app-public-reviews-settings-component>
+  </div>
+
+  <div class="pb-4">
+    <p-divider></p-divider>
+  </div>
+
   <div class="p-4">
     <p class="text-lg ">
       Quick Book Match Preferences
       <i class="pi pi-info-circle text-sky-600"
-         pTooltip="Choose how metadata fields (title, description, authors, categories, cover) are retrieved by setting priority providers. You can apply the same provider settings to all fields or customize them individually. Enable ‘Refresh Covers’ to update book covers, and ‘Merge Categories’ to consolidate categories/genres from all sources while preserving the existing categories/genres in the book."
+         pTooltip="Choose how metadata fields (title, description, authors, categories, cover) are retrieved by setting priority providers. You can apply the same provider settings to all fields or customize them individually. Enable 'Refresh Covers' to update book covers, and 'Merge Categories' to consolidate categories/genres from all sources while preserving the existing categories/genres in the book."
          tooltipPosition="right"
          style="cursor: pointer;">
       </i>

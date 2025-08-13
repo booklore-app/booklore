@@ -46,14 +46,14 @@
 }
 
 .dashboard-scroller-card {
-  width: 101px;
+  width: 115px;
   flex-shrink: 0;
   flex-grow: 0;
-  flex-basis: 101px;
+  flex-basis: 115px;
 }
 
 .description-container {
-  max-height: 58px;
+  max-height: 60px;
   overflow: hidden;
   transition: max-height 0.3s ease-in-out;
 }
@@ -102,6 +102,13 @@
 
 .cover-progress-bar-ko-only {
   bottom: 0;
+}
+
+.custom-p-tabs > .p-tabpanels {
+  padding-top: 10px !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 ::ng-deep .p-inputchips {

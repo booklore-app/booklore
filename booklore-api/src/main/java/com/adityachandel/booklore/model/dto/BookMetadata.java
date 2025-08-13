@@ -47,6 +47,7 @@ public class BookMetadata {
     private Set<String> categories;
     private MetadataProvider provider;
     private String thumbnailUrl;
+    private List<BookReview> bookReviews;
 
     private Boolean titleLocked;
     private Boolean subtitleLocked;
@@ -75,4 +76,5 @@ public class BookMetadata {
     private Boolean coverLocked;
     private Boolean authorsLocked;
     private Boolean categoriesLocked;
+    private Boolean reviewsLocked;
 }

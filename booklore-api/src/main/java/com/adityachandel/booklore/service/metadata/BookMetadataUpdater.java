@@ -4,10 +4,7 @@ import com.adityachandel.booklore.model.MetadataClearFlags;
 import com.adityachandel.booklore.model.MetadataUpdateWrapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.MetadataPersistenceSettings;
-import com.adityachandel.booklore.model.entity.AuthorEntity;
-import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.BookMetadataEntity;
-import com.adityachandel.booklore.model.entity.CategoryEntity;
+import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.CategoryRepository;
@@ -17,11 +14,11 @@ import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupR
 import com.adityachandel.booklore.service.metadata.backuprestore.MetadataBackupRestoreFactory;
 import com.adityachandel.booklore.service.metadata.writer.MetadataWriterFactory;
 import com.adityachandel.booklore.util.FileService;
-import com.adityachandel.booklore.util.FileUtils;
 import com.adityachandel.booklore.util.MetadataChangeDetector;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +29,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,6 +45,7 @@ public class BookMetadataUpdater {
     private final AppSettingService appSettingService;
     private final MetadataWriterFactory metadataWriterFactory;
     private final MetadataBackupRestoreFactory metadataBackupRestoreFactory;
+    private final BookReviewUpdateService bookReviewUpdateService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void setBookMetadata(BookEntity bookEntity, MetadataUpdateWrapper wrapper, boolean setThumbnail, boolean mergeCategories) {
@@ -94,6 +89,7 @@ public class BookMetadataUpdater {
         updateBasicFields(newMetadata, metadata, clearFlags);
         updateAuthorsIfNeeded(newMetadata, metadata, clearFlags);
         updateCategoriesIfNeeded(newMetadata, metadata, clearFlags, mergeCategories);
+        bookReviewUpdateService.updateBookReviews(newMetadata, metadata, clearFlags, mergeCategories);
         updateThumbnailIfNeeded(bookId, newMetadata, metadata, setThumbnail);
 
         try {
@@ -175,29 +171,35 @@ public class BookMetadataUpdater {
 
     private void updateCategoriesIfNeeded(BookMetadata m, BookMetadataEntity e, MetadataClearFlags clear, boolean merge) {
         if (Boolean.TRUE.equals(e.getCategoriesLocked())) {
-            // Locked — do nothing
-        } else if (clear.isCategories()) {
-            e.setCategories(Set.of());
+            return;
+        }
+        if (e.getCategories() == null) {
+            e.setCategories(new HashSet<>());
+        }
+        if (clear.isCategories()) {
+            e.getCategories().clear();
         } else if (shouldUpdateField(false, m.getCategories()) && m.getCategories() != null) {
             if (merge) {
-                Set<CategoryEntity> existing = new HashSet<>(e.getCategories());
+                Set<CategoryEntity> existing = e.getCategories();
                 for (String name : m.getCategories()) {
                     if (name == null || name.isBlank()) continue;
                     CategoryEntity entity = categoryRepository.findByName(name)
                             .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(name).build()));
                     existing.add(entity);
                 }
-                e.setCategories(existing);
             } else {
+                Set<CategoryEntity> existing = e.getCategories();
+                existing.clear();
                 Set<CategoryEntity> result = m.getCategories().stream()
                         .filter(n -> n != null && !n.isBlank())
                         .map(name -> categoryRepository.findByName(name)
                                 .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(name).build())))
                         .collect(Collectors.toSet());
-                e.setCategories(result);
+                existing.addAll(result);
             }
         }
     }
+
 
     private void updateThumbnailIfNeeded(long bookId, BookMetadata m, BookMetadataEntity e, boolean set) {
         if (Boolean.TRUE.equals(e.getCoverLocked())) {
@@ -243,17 +245,12 @@ public class BookMetadataUpdater {
                 Pair.of(m.getHardcoverReviewCountLocked(), e::setHardcoverReviewCountLocked),
                 Pair.of(m.getCoverLocked(), e::setCoverLocked),
                 Pair.of(m.getAuthorsLocked(), e::setAuthorsLocked),
-                Pair.of(m.getCategoriesLocked(), e::setCategoriesLocked)
+                Pair.of(m.getCategoriesLocked(), e::setCategoriesLocked),
+                Pair.of(m.getReviewsLocked(), e::setReviewsLocked)
         );
         lockMappings.forEach(pair -> {
             if (pair.getLeft() != null) pair.getRight().accept(pair.getLeft());
         });
-    }
-
-    private <T> void updateFieldIfUnlocked(Supplier<Boolean> lock, T value, Consumer<T> setter) {
-        if ((lock.get() == null || !lock.get()) && value != null) {
-            setter.accept(value);
-        }
     }
 
     private boolean shouldUpdateField(Boolean locked, Object value) {

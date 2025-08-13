@@ -1,8 +1,10 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.APIException;
+import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
+import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookdropFileEntity;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.repository.BookdropFileRepository;
@@ -17,6 +19,7 @@ import com.adityachandel.booklore.util.ImageUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -104,7 +107,7 @@ class BookdropMetadataServiceTest {
         when(appSettingService.getAppSettings()).thenReturn(settings);
         when(metadataRefreshService.prepareProviders(any())).thenReturn(List.of());
         when(objectMapper.readValue(sampleFile.getOriginalMetadata(), BookMetadata.class)).thenReturn(fetched);
-        when(metadataRefreshService.fetchMetadataForBook(any(), any())).thenReturn(Map.of());
+        when(metadataRefreshService.fetchMetadataForBook(any(), any(Book.class))).thenReturn(Map.of());
         when(metadataRefreshService.buildFetchMetadata(any(), any(), any())).thenReturn(fetched);
         when(objectMapper.writeValueAsString(fetched)).thenReturn("{\"title\":\"New Title\"}");
 
@@ -155,7 +158,7 @@ class BookdropMetadataServiceTest {
         when(appSettingService.getAppSettings()).thenReturn(settings);
         when(metadataRefreshService.prepareProviders(any())).thenReturn(List.of(MetadataProvider.GoodReads));
         when(objectMapper.readValue(anyString(), eq(BookMetadata.class))).thenReturn(fetched);
-        when(metadataRefreshService.fetchMetadataForBook(any(), any())).thenReturn(Map.of());
+        when(metadataRefreshService.fetchMetadataForBook(any(), any(Book.class))).thenReturn(Map.of());
         when(metadataRefreshService.buildFetchMetadata(any(), any(), any())).thenReturn(fetched);
         when(objectMapper.writeValueAsString(fetched)).thenReturn("{\"title\":\"Fetched Book\"}");
         when(bookdropFileRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));

@@ -32,4 +32,5 @@ public class MetadataClearFlags {
     private boolean authors;
     private boolean categories;
     private boolean cover;
+    private boolean reviews;
 }

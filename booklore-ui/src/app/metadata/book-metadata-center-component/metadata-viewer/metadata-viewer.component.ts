@@ -7,7 +7,6 @@ import {Rating, RatingRateEvent} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
 import {Book, BookMetadata, BookRecommendation, ReadStatus} from '../../../book/model/book.model';
-import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {UserService} from '../../../settings/user-management/user.service';
 import {SplitButton} from 'primeng/splitbutton';
@@ -30,13 +29,15 @@ import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {BookCardLiteComponent} from '../../../book/components/book-card-lite/book-card-lite-component';
 import {ResetProgressType, ResetProgressTypes} from '../../../shared/constants/reset-progress-type';
 import {DatePicker} from 'primeng/datepicker';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {BookReviewsComponent} from '../../../components/book-reviews/book-reviews.component';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent, DatePicker]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent, DatePicker, Tab, TabList, TabPanel, TabPanels, Tabs, BookReviewsComponent]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
   @Input() book$!: Observable<Book | null>;
@@ -219,6 +220,10 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     this.recommendedBooks = this.originalRecommendedBooks.filter(
       rec => !bookInSeriesIds.has(rec.book.id)
     );
+  }
+
+  get defaultTabValue(): number {
+    return this.bookInSeries && this.bookInSeries.length > 0 ? 1 : 2;
   }
 
   toggleExpand(): void {
@@ -607,9 +612,9 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
 
   saveDateFinished(book: Book): void {
     if (!book) return;
-    
+
     const dateToSave = this.editDateFinished ? this.editDateFinished.toISOString() : null;
-    
+
     this.bookService.updateDateFinished(book.id, dateToSave).subscribe({
       next: () => {
         this.messageService.add({

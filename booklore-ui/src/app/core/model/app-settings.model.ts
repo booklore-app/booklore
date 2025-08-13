@@ -67,14 +67,27 @@ export interface Hardcover {
   enabled: boolean;
   apiKey: string;
 }
+
 export interface Comicvine {
   enabled: boolean;
   apiKey: string;
 }
+
 export interface MetadataPersistenceSettings {
   saveToOriginalFile: boolean;
   backupMetadata: boolean;
   backupCover: boolean;
+}
+
+export interface ReviewProviderConfig {
+  provider: string;
+  enabled: boolean;
+  maxReviews: number;
+}
+
+export interface PublicReviewSettings {
+  downloadEnabled: boolean;
+  providers: ReviewProviderConfig[];
 }
 
 export interface AppSettings {
@@ -93,6 +106,7 @@ export interface AppSettings {
   metadataProviderSettings: MetadataProviderSettings;
   metadataMatchWeights: MetadataMatchWeights;
   metadataPersistenceSettings: MetadataPersistenceSettings;
+  metadataPublicReviewsSettings: PublicReviewSettings;
   metadataDownloadOnBookdrop: boolean;
 }
 
@@ -111,5 +125,6 @@ export enum AppSettingKey {
   METADATA_PROVIDER_SETTINGS = 'METADATA_PROVIDER_SETTINGS',
   METADATA_MATCH_WEIGHTS = 'METADATA_MATCH_WEIGHTS',
   METADATA_PERSISTENCE_SETTINGS = 'METADATA_PERSISTENCE_SETTINGS',
-  METADATA_DOWNLOAD_ON_BOOKDROP = 'METADATA_DOWNLOAD_ON_BOOKDROP'
+  METADATA_DOWNLOAD_ON_BOOKDROP = 'METADATA_DOWNLOAD_ON_BOOKDROP',
+  METADATA_PUBLIC_REVIEWS_SETTINGS = 'METADATA_PUBLIC_REVIEWS_SETTINGS'
 }

@@ -29,4 +29,5 @@ public class AppSettings {
     private MetadataProviderSettings metadataProviderSettings;
     private MetadataMatchWeights metadataMatchWeights;
     private MetadataPersistenceSettings metadataPersistenceSettings;
+    private MetadataPublicReviewsSettings metadataPublicReviewsSettings;
 }

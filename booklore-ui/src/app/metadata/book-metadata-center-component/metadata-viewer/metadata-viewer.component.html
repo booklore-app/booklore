@@ -465,10 +465,10 @@
       </div>
     </div>
 
-    <div class="px-4 pb-2 pt-4 border border-[var(--border-color)] rounded-xl">
+    <div class="px-4 pb-2 pt-4 mb-6 mx-2 border border-[var(--border-color)] rounded-xl">
       <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }" class="transition-all duration-300 overflow-hidden description-container">
         <div class="readonly-editor px-2">
-          <p-editor #quillEditor [readonly]="true" [style]="{height: '225px'}" [(ngModel)]="book.metadata!.description">
+          <p-editor #quillEditor [readonly]="true" [style]="{height: '200px'}" [(ngModel)]="book.metadata!.description">
             <ng-template #header>
             </ng-template>
           </p-editor>
@@ -486,44 +486,63 @@
       }
     </div>
 
-    <div class="pt-4 space-y-4 pb-6">
-      @if (bookInSeries.length > 0) {
-        <div>
-          <h3 class="text-xl font-semibold pt-2">More in the Series</h3>
-          <div class="dashboard-scroller-infinite"
-               infiniteScroll
-               [infiniteScrollDistance]="2"
-               [infiniteScrollThrottle]="50"
-               [horizontal]="true">
-            @for (book of bookInSeries; track book) {
-              <div class="dashboard-scroller-card">
-                <app-book-card-lite-component
-                  [book]="book"
-                ></app-book-card-lite-component>
+    <p-tabs lazy="true" class="custom-p-tabs" [value]="defaultTabValue" scrollable>
+      <p-tablist>
+        @if (bookInSeries.length > 0) {
+          <p-tab [value]="1">
+            <i class="pi pi-ethereum"></i> More in Series
+          </p-tab>
+        }
+        <p-tab [value]="2">
+          <i class="pi pi-bookmark"></i> Similar Books
+        </p-tab>
+        <p-tab [value]="3">
+          <i class="pi pi-comments"></i> Reviews
+        </p-tab>
+      </p-tablist>
+      <p-tabpanels>
+        <p-tabpanel [value]="1">
+          <div class="pt-2">
+            @if (bookInSeries.length > 0) {
+              <div>
+                <div class="dashboard-scroller-infinite"
+                     infiniteScroll
+                     [infiniteScrollDistance]="2"
+                     [infiniteScrollThrottle]="50"
+                     [horizontal]="true">
+                  @for (book of bookInSeries; track book) {
+                    <div class="dashboard-scroller-card">
+                      <app-book-card-lite-component [book]="book"></app-book-card-lite-component>
+                    </div>
+                  }
+                </div>
               </div>
             }
           </div>
-        </div>
-        <p-divider></p-divider>
-      }
-      @if (recommendedBooks.length > 0) {
-        <div>
-          <h3 class="text-xl font-semibold">Similar Books</h3>
-          <div class="dashboard-scroller-infinite"
-               infiniteScroll
-               [infiniteScrollDistance]="2"
-               [infiniteScrollThrottle]="50"
-               [horizontal]="true">
-            @for (book of recommendedBooks; track book) {
-              <div class="dashboard-scroller-card">
-                <app-book-card-lite-component
-                  [book]="book.book"
-                ></app-book-card-lite-component>
+        </p-tabpanel>
+        <p-tabpanel [value]="2">
+          <div class="pt-2">
+            @if (recommendedBooks.length > 0) {
+              <div>
+                <div class="dashboard-scroller-infinite"
+                     infiniteScroll
+                     [infiniteScrollDistance]="2"
+                     [infiniteScrollThrottle]="50"
+                     [horizontal]="true">
+                  @for (book of recommendedBooks; track book) {
+                    <div class="dashboard-scroller-card">
+                      <app-book-card-lite-component [book]="book.book"></app-book-card-lite-component>
+                    </div>
+                  }
+                </div>
               </div>
             }
           </div>
-        </div>
-      }
-    </div>
+        </p-tabpanel>
+        <p-tabpanel [value]="3">
+          <app-book-reviews [bookId]="book.id"></app-book-reviews>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
   }
 </div>

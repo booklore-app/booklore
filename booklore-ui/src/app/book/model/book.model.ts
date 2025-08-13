@@ -1,5 +1,6 @@
 import {Shelf} from './shelf.model';
 import {NewPdfReaderSetting} from '../../settings/user-management/user.service';
+import {BookReview} from '../../book-review-service';
 
 export type BookType = "PDF" | "EPUB" | "CBX";
 
@@ -79,6 +80,7 @@ export interface BookMetadata {
   provider?: string;
   providerBookId?: string;
   thumbnailUrl?: string | null;
+  reviews?: BookReview[];
 
   titleLocked?: boolean;
   subtitleLocked?: boolean;
@@ -108,6 +110,7 @@ export interface BookMetadata {
   authorsLocked?: boolean;
   categoriesLocked?: boolean;
   coverLocked?: boolean;
+  reviewsLocked?: boolean;
 
   [key: string]: any;
 }

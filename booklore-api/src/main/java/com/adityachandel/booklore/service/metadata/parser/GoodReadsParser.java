@@ -2,9 +2,12 @@ package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
+import com.adityachandel.booklore.model.dto.BookReview;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
+import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.util.BookUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.similarity.FuzzyScore;
 import org.jsoup.Connection;
@@ -29,11 +32,13 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class GoodReadsParser implements BookParser {
 
     private static final String BASE_SEARCH_URL = "https://www.goodreads.com/search?q=";
     private static final String BASE_BOOK_URL = "https://www.goodreads.com/book/show/";
     private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
+    private final AppSettingService appSettingService;
 
     @Override
     public BookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
@@ -72,8 +77,10 @@ public class GoodReadsParser implements BookParser {
     }
 
     private BookMetadata parseBookDetails(Document document, String goodreadsId) {
-        BookMetadata.BookMetadataBuilder builder = BookMetadata.builder().goodreadsId(goodreadsId);
-        builder.provider(MetadataProvider.GoodReads);
+        BookMetadata.BookMetadataBuilder builder = BookMetadata.builder()
+                .goodreadsId(goodreadsId)
+                .provider(MetadataProvider.GoodReads);
+
         try {
             JSONObject apolloStateJson = getJson(document)
                     .getJSONObject("props")
@@ -86,6 +93,15 @@ public class GoodReadsParser implements BookParser {
             extractSeriesDetails(apolloStateJson, keySet, builder);
             extractBookDetails(apolloStateJson, keySet, builder);
             extractWorkDetails(apolloStateJson, keySet, builder);
+
+            appSettingService.getAppSettings()
+                    .getMetadataPublicReviewsSettings()
+                    .getProviders()
+                    .stream()
+                    .filter(cfg -> cfg.getProvider() == MetadataProvider.GoodReads && cfg.isEnabled())
+                    .findFirst()
+                    .ifPresent(cfg -> extractReviews(apolloStateJson, keySet, builder, cfg.getMaxReviews()));
+
         } catch (Exception e) {
             log.error("Error parsing book details for providerBookId: {}", goodreadsId, e);
             return null;
@@ -102,6 +118,77 @@ public class GoodReadsParser implements BookParser {
                 builder.authors(Set.of(contributorName));
             }
         }
+    }
+
+    private void extractReviews(JSONObject apolloStateJson, LinkedHashSet<String> keySet, BookMetadata.BookMetadataBuilder builder, int maxReviews) {
+        List<String> allReviewKeys = findKeysByPrefixAll(keySet, "Review:kca");
+        List<BookReview> reviews = new ArrayList<>();
+
+        int count = 0;
+        int index = 0;
+
+        while (count < maxReviews && index < allReviewKeys.size()) {
+            String reviewKey = allReviewKeys.get(index);
+            index++;
+            try {
+                JSONObject reviewJson = apolloStateJson.getJSONObject(reviewKey);
+                String creatorRef = reviewJson.getJSONObject("creator").getString("__ref");
+                JSONObject userJson = apolloStateJson.optJSONObject(creatorRef);
+
+                String reviewerName = null;
+                Integer followersCount = null;
+                Integer textReviewsCount = null;
+                if (userJson != null) {
+                    reviewerName = userJson.optString("name", null);
+                    followersCount = userJson.has("followersCount") ? userJson.optInt("followersCount") : null;
+                    textReviewsCount = userJson.has("textReviewsCount") ? userJson.optInt("textReviewsCount") : null;
+                }
+
+                String rawBody = reviewJson.optString("text", null);
+                String plainBody = rawBody != null ? Jsoup.parse(rawBody).text() : null;
+
+                if (plainBody == null || plainBody.trim().isEmpty()) {
+                    continue;
+                }
+
+                BookReview review = BookReview.builder()
+                        .metadataProvider(MetadataProvider.GoodReads)
+                        .date(parseEpochMillis(String.valueOf(reviewJson.getLong("updatedAt"))))
+                        .body(plainBody.trim())
+                        .rating(Float.valueOf(reviewJson.optString("rating", null)))
+                        .spoiler(reviewJson.optBoolean("spoilerStatus", false))
+                        .reviewerName(reviewerName != null ? reviewerName.trim() : null)
+                        .followersCount(followersCount)
+                        .textReviewsCount(textReviewsCount)
+                        .build();
+                reviews.add(review);
+                count++;
+            } catch (Exception e) {
+                log.error("Error fetching review: {}, Error: {}", reviewKey, e.getMessage());
+            }
+        }
+
+        builder.bookReviews(reviews);
+    }
+
+    private Instant parseEpochMillis(String millisString) {
+        try {
+            long millis = Long.parseLong(millisString);
+            return Instant.ofEpochMilli(millis);
+        } catch (NumberFormatException e) {
+            log.warn("Invalid epoch millis: {}", millisString, e);
+            return null;
+        }
+    }
+
+    private List<String> findKeysByPrefixAll(LinkedHashSet<String> keySet, String prefix) {
+        List<String> matchingKeys = new ArrayList<>();
+        for (String key : keySet) {
+            if (key.startsWith(prefix)) {
+                matchingKeys.add(key);
+            }
+        }
+        return matchingKeys;
     }
 
     private void extractSeriesDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, BookMetadata.BookMetadataBuilder builder) {

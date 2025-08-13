@@ -8,7 +8,7 @@ import {filter, Subject} from 'rxjs';
 import {NgClass} from '@angular/common';
 import {BookMetadataHostService} from '../../../utilities/service/book-metadata-host-service';
 import {takeUntil} from 'rxjs/operators';
-import { TooltipModule } from 'primeng/tooltip';
+import {TooltipModule} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-book-card-lite-component',

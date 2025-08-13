@@ -1,9 +1,4 @@
 <div class="book-card"
-     tooltipPosition="bottom"
-     autoHide="false"
-     tooltipStyleClass="text-xs text-center"
-     [pTooltip]="book.metadata?.title"
-
      [class.selected]="isSelected"
      (mouseover)="isHovered = true"
      (mouseout)="isHovered = false">
@@ -36,17 +31,9 @@
       </div>
     }
 
-    <p-button
-        tooltipPosition="top"
-        tooltipStyleClass="text-xs text-center"
-        pTooltip="Open Book Info"
-        [rounded]="true" icon="pi pi-info" class="info-btn" (click)="openBookInfo(book)"></p-button>
+    <p-button [rounded]="true" icon="pi pi-info" class="info-btn" (click)="openBookInfo(book)"></p-button>
 
-    <p-button
-        tooltipPosition="top"
-        tooltipStyleClass="text-xs text-center"
-        pTooltip="{{ koProgressPercentage || progressPercentage ? 'Continue Reading' : 'Start Reading' }}"
-        [hidden]="readButtonHidden" [rounded]="true" icon="pi pi-book" class="read-btn" (click)="readBook(book)"></p-button>
+    <p-button [hidden]="readButtonHidden" [rounded]="true" icon="pi pi-book" class="read-btn" (click)="readBook(book)"></p-button>
 
     @if (isCheckboxEnabled) {
       <p-checkbox
@@ -80,7 +67,12 @@
 
   <div [hidden]="bottomBarHidden">
     <div class="book-title-container flex items-center">
-      <h4 class="book-title m-0 pl-2">{{ book.metadata?.title }}</h4>
+      <h4 class="book-title m-0 pl-2"
+          tooltipPosition="bottom"
+          tooltipStyleClass="text-xs text-center"
+          [pTooltip]="book.metadata?.title">
+        {{ book.metadata?.title }}
+      </h4>
       <p-tieredmenu #menu [model]="items" [popup]="true" appendTo="body"></p-tieredmenu>
       <p-button
         class="custom-button-padding"

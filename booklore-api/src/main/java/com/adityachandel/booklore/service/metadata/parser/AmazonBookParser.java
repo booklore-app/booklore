@@ -2,6 +2,7 @@ package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
+import com.adityachandel.booklore.model.dto.BookReview;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
@@ -16,9 +17,14 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -147,7 +153,22 @@ public class AmazonBookParser implements BookParser {
 
     private BookMetadata getBookMetadata(String amazonBookId) {
         log.info("Amazon: Fetching metadata for: {}", amazonBookId);
+
         Document doc = fetchDocument(BASE_BOOK_URL + amazonBookId);
+
+        List<BookReview> reviews = appSettingService.getAppSettings()
+                .getMetadataPublicReviewsSettings()
+                .getProviders()
+                .stream()
+                .filter(cfg -> cfg.getProvider() == MetadataProvider.Amazon && cfg.isEnabled())
+                .findFirst()
+                .map(cfg -> getReviews(doc, cfg.getMaxReviews()))
+                .orElse(Collections.emptyList());
+
+        return buildBookMetadata(doc, amazonBookId, reviews);
+    }
+
+    private BookMetadata buildBookMetadata(Document doc, String amazonBookId, List<BookReview> reviews) {
         return BookMetadata.builder()
                 .provider(MetadataProvider.Amazon)
                 .title(getTitle(doc))
@@ -168,6 +189,7 @@ public class AmazonBookParser implements BookParser {
                 .thumbnailUrl(getThumbnail(doc))
                 .amazonRating(getRating(doc))
                 .amazonReviewCount(getReviewCount(doc))
+                .bookReviews(reviews)
                 .build();
     }
 
@@ -427,6 +449,107 @@ public class AmazonBookParser implements BookParser {
             log.warn("Failed to parse amazonRating: {}", e.getMessage());
         }
         return null;
+    }
+
+    private List<BookReview> getReviews(Document doc, int maxReviews) {
+        List<BookReview> reviews = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+
+        try {
+            Elements reviewElements = doc.select("li[data-hook=review]");
+            int count = 0;
+            int index = 0;
+
+            while (count < maxReviews && index < reviewElements.size()) {
+                Element reviewElement = reviewElements.get(index);
+                index++;
+
+                Elements reviewerNameElements = reviewElement.select(".a-profile-name");
+                String reviewerName = !reviewerNameElements.isEmpty() ? reviewerNameElements.first().text() : null;
+
+                String title = null;
+                Elements titleElements = reviewElement.select("[data-hook=review-title] span");
+                if (!titleElements.isEmpty()) {
+                    title = titleElements.last().text();
+                    if (title.isEmpty()) title = null;
+                }
+
+                Float ratingValue = null;
+                Elements ratingElements = reviewElement.select("[data-hook=review-star-rating] .a-icon-alt");
+                String ratingText = !ratingElements.isEmpty() ? ratingElements.first().text() : "";
+                if (!ratingText.isEmpty()) {
+                    try {
+                        Pattern ratingPattern = Pattern.compile("^([0-9]+(\\.[0-9]+)?)");
+                        Matcher ratingMatcher = ratingPattern.matcher(ratingText);
+                        if (ratingMatcher.find()) {
+                            ratingValue = Float.parseFloat(ratingMatcher.group(1));
+                        }
+                    } catch (NumberFormatException e) {
+                        log.warn("Failed to parse rating '{}': {}", ratingText, e.getMessage());
+                    }
+                }
+
+                Elements fullDateElements = reviewElement.select("[data-hook=review-date]");
+                String fullDateText = !fullDateElements.isEmpty() ? fullDateElements.first().text() : "";
+                String country = null;
+                Instant dateInstant = null;
+
+                if (!fullDateText.isEmpty()) {
+                    try {
+                        Pattern pattern = Pattern.compile("Reviewed in (.+?) on (.+)");
+                        Matcher matcher = pattern.matcher(fullDateText);
+                        String datePart = fullDateText;
+
+                        if (matcher.find() && matcher.groupCount() == 2) {
+                            country = matcher.group(1).trim();
+                            if (country.toLowerCase().startsWith("the ")) {
+                                country = country.substring(4).trim();
+                            }
+                            datePart = matcher.group(2).trim();
+                        }
+
+                        LocalDate localDate = LocalDate.parse(datePart, formatter);
+                        dateInstant = localDate.atStartOfDay(ZoneOffset.UTC).toInstant();
+
+                    } catch (DateTimeParseException e) {
+                        log.warn("Failed to parse date '{}' in review: {}", fullDateText, e.getMessage());
+                    } catch (Exception e) {
+                        log.warn("Error parsing date string '{}': {}", fullDateText, e.getMessage());
+                    }
+                }
+
+                Elements bodyElements = reviewElement.select("[data-hook=review-body]");
+                String body = !bodyElements.isEmpty() ? Objects.requireNonNull(bodyElements.first()).text() : null;
+                if (body != null && body.isEmpty()) {
+                    body = null;
+                } else if (body != null) {
+                    String toRemove = " Read more";
+                    int lastIndex = body.lastIndexOf(toRemove);
+                    if (lastIndex != -1) {
+                        body = body.substring(0, lastIndex) + body.substring(lastIndex + toRemove.length());
+                    }
+                }
+
+                if (body == null) {
+                    continue;
+                }
+
+                reviews.add(BookReview.builder()
+                        .metadataProvider(MetadataProvider.Amazon)
+                        .reviewerName(reviewerName != null ? reviewerName.trim() : null)
+                        .title(title != null ? title.trim() : null)
+                        .rating(ratingValue)
+                        .country(country != null ? country.trim() : null)
+                        .date(dateInstant)
+                        .body(body.trim())
+                        .build());
+
+                count++;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to parse reviews: {}", e.getMessage());
+        }
+        return reviews;
     }
 
     private Integer getReviewCount(Document doc) {

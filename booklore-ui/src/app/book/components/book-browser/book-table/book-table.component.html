@@ -69,10 +69,6 @@
             </td>
           } @else {
             <td [title]="getCellValue(metadata, book, col.field)"
-                tooltipPosition="right"
-                autoHide="false"
-                tooltipStyleClass="text-xs text-center"
-                [pTooltip]="getCellValue(metadata, book, col.field)?.toString()"
                 class="overflow-hidden truncate text-right min-w-[6rem] max-w-[12rem]">
               {{ getCellValue(metadata, book, col.field) }}
             </td>

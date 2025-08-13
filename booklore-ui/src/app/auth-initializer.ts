@@ -37,7 +37,6 @@ export function initializeAuthFactory() {
                 if (oauthService.hasValidAccessToken()) {
                   authService.tokenSubject.next(oauthService.getAccessToken())
                   console.log('[OIDC] Valid access token found after tryLogin');
-                  router.navigate(['/dashboard']);
                   oauthService.setupAutomaticSilentRefresh();
                   websocketInitializer(authService);
                   authInitService.markAsInitialized();
