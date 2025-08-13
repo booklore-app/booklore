@@ -47,7 +47,18 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "quill-delta",
+              "event-emitter",
+              "showdown",
+              "@xmldom/xmldom",
+              "path-webpack",
+              "jszip/dist/jszip",
+              "localforage",
+              "marks-pane"
+            ]
           },
           "configurations": {
             "production": {
