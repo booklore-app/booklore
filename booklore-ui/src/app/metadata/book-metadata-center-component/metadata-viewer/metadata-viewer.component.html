@@ -495,10 +495,11 @@
                [infiniteScrollDistance]="2"
                [infiniteScrollThrottle]="50"
                [horizontal]="true">
-            @for (book of bookInSeries; track book) {
+            @for (bookInSeriesItem of bookInSeries; track bookInSeriesItem) {
               <div class="dashboard-scroller-card">
                 <app-book-card-lite-component
-                  [book]="book"
+                  [book]="bookInSeriesItem"
+                  [isActive]="bookInSeriesItem.id === book.id"
                 ></app-book-card-lite-component>
               </div>
             }

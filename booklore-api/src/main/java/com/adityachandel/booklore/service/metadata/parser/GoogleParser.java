@@ -122,14 +122,19 @@ public class GoogleParser implements BookParser {
     private String getSearchTerm(Book book, FetchMetadataRequest request) {
         String searchTerm = Optional.ofNullable(request.getTitle())
                 .filter(title -> !title.isEmpty())
-                .orElseGet(() -> Optional.ofNullable(book.getFileName())
-                        .filter(fileName -> !fileName.isEmpty())
-                        .map(BookUtils::cleanFileName)
-                        .orElse(null));
+                .orElseGet(() -> {
+                    String comicTerm = BookUtils.buildComicSearchTerm(book);
+                    if (comicTerm != null) {
+                        return comicTerm;
+                    }
+                    return Optional.ofNullable(book.getFileName())
+                            .filter(fileName -> !fileName.isEmpty())
+                            .map(BookUtils::cleanFileName)
+                            .orElse(null);
+                });
 
         if (searchTerm != null) {
-            searchTerm = searchTerm.replaceAll("[.,\\-\\[\\]{}()!@#$%^&*_=+|~`<>?/\";:]", "").trim();
-            searchTerm = truncateToMaxLength(searchTerm, 60);
+            searchTerm = BookUtils.cleanAndTruncateSearchTerm(searchTerm);
         }
 
         if (searchTerm != null && request.getAuthor() != null && !request.getAuthor().isEmpty()) {
@@ -137,19 +142,6 @@ public class GoogleParser implements BookParser {
         }
 
         return searchTerm;
-    }
-
-    private String truncateToMaxLength(String input, int maxLength) {
-        String[] words = input.split("\\s+");
-        StringBuilder truncated = new StringBuilder();
-
-        for (String word : words) {
-            if (truncated.length() + word.length() + 1 > maxLength) break;
-            if (!truncated.isEmpty()) truncated.append(" ");
-            truncated.append(word);
-        }
-
-        return truncated.toString();
     }
 
     public LocalDate parseDate(String input) {

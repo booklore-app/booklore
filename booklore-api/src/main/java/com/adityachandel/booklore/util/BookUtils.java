@@ -1,4 +1,5 @@
 package com.adityachandel.booklore.util;
+import com.adityachandel.booklore.model.dto.Book;
 
 public class BookUtils {
 
@@ -16,7 +17,7 @@ public class BookUtils {
     }
 
     public static String cleanAndTruncateSearchTerm(String term) {
-        term = term.replaceAll("[.,\\-\\[\\]{}()!@#$%^&*_=+|~`<>?/\";:]", "").trim();
+        term = term.replaceAll("[^\\p{Alnum}# ]", "").trim();
         if (term.length() > 60) {
             String[] words = term.split("\\s+");
             StringBuilder truncated = new StringBuilder();
@@ -28,5 +29,21 @@ public class BookUtils {
             term = truncated.toString();
         }
         return term;
+    }
+
+    public static String buildComicSearchTerm(Book book) {
+        if (book == null || book.getMetadata() == null) {
+            return null;
+        }
+        String seriesName = book.getMetadata().getSeriesName();
+        Float seriesNumber = book.getMetadata().getSeriesNumber();
+        if (seriesName == null || seriesName.isBlank() || seriesNumber == null) {
+            return null;
+        }
+        int intValue = seriesNumber.intValue();
+        String issue = seriesNumber.equals((float) intValue)
+                ? String.valueOf(intValue)
+                : seriesNumber.toString();
+        return seriesName + " #" + issue;
     }
 }

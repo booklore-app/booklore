@@ -22,6 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 })
 export class BookCardLiteComponent implements OnInit, OnDestroy {
   @Input() book!: Book;
+  @Input() isActive!: boolean;
 
   private router = inject(Router);
   protected urlHelper = inject(UrlHelperService);
@@ -32,6 +33,7 @@ export class BookCardLiteComponent implements OnInit, OnDestroy {
 
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
   isHovered: boolean = false;
+  // isActive: boolean = false;
 
   ngOnInit(): void {
     this.userService.userState$

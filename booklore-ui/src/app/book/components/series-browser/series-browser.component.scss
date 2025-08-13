@@ -1,0 +1,12 @@
+.series-browser {
+}
+
+.series-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  gap: 1rem;
+}
+
+.series-item {
+  margin-bottom: 0;
+}

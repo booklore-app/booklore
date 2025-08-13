@@ -80,6 +80,13 @@ export class AppMenuComponent implements OnInit {
               routerLink: ['/all-books'],
               bookCount$: of(bookState.books ? bookState.books.length : 0),
             },
+            {
+              label: 'All Series',
+              type: 'All Series',
+              icon: 'pi pi-fw pi-ellipsis-h',
+              routerLink: ['/all-series'],
+              // bookCount$: of(bookState.books ? bookState.books.length : 0),
+            }
           ],
         },
       ])
