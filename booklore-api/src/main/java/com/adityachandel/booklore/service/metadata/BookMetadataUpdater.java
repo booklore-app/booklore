@@ -159,13 +159,22 @@ public class BookMetadataUpdater {
         if (Boolean.TRUE.equals(e.getAuthorsLocked())) {
             // Locked — do nothing
         } else if (clear.isAuthors()) {
-            e.setAuthors(Set.of());
+            if (e.getAuthors() == null) {
+                e.setAuthors(new HashSet<>());
+            } else {
+                e.getAuthors().clear();
+            }
         } else if (shouldUpdateField(false, m.getAuthors()) && m.getAuthors() != null) {
-            e.setAuthors(m.getAuthors().stream()
+            if (e.getAuthors() == null) {
+                e.setAuthors(new HashSet<>());
+            }
+            Set<AuthorEntity> newAuthors = m.getAuthors().stream()
                     .filter(a -> a != null && !a.isBlank())
                     .map(name -> authorRepository.findByName(name)
                             .orElseGet(() -> authorRepository.save(AuthorEntity.builder().name(name).build())))
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toSet());
+            e.getAuthors().clear();
+            e.getAuthors().addAll(newAuthors);
         }
     }
 
