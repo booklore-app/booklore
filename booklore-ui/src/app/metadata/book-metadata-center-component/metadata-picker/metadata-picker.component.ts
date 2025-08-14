@@ -144,7 +144,7 @@ export class MetadataPickerComponent implements OnInit {
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
-      thumbnailUrlLocked: new FormControl(false),
+      coverLocked: new FormControl(false),
     });
   }
 
@@ -221,7 +221,7 @@ export class MetadataPickerComponent implements OnInit {
           seriesNameLocked: metadata.seriesNameLocked || false,
           seriesNumberLocked: metadata.seriesNumberLocked || false,
           seriesTotalLocked: metadata.seriesTotalLocked || false,
-          thumbnailUrlLocked: metadata.coverLocked || false,
+          coverLocked: metadata.coverLocked || false,
         });
 
         if (metadata.titleLocked) this.metadataForm.get('title')?.disable();
@@ -330,7 +330,7 @@ export class MetadataPickerComponent implements OnInit {
       seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,
-      coverLocked: this.metadataForm.get('thumbnailUrlLocked')?.value,
+      coverLocked: this.metadataForm.get('coverLocked')?.value,
 
       ...(shouldLockAllFields !== undefined && {allFieldsLocked: shouldLockAllFields}),
     };
@@ -407,6 +407,9 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   toggleLock(field: string): void {
+    if (field === 'thumbnailUrl') {
+      field = 'cover'
+    }
     const isLocked = this.metadataForm.get(field + 'Locked')?.value;
     const updatedLockedState = !isLocked;
     this.metadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
@@ -437,6 +440,9 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   copyFetchedToCurrent(field: string): void {
+    if (field === 'thumbnailUrl') {
+      field = 'cover';
+    }
     const isLocked = this.metadataForm.get(`${field}Locked`)?.value;
     if (isLocked) {
       this.messageService.add({
@@ -445,6 +451,9 @@ export class MetadataPickerComponent implements OnInit {
         detail: `${field} is locked and cannot be updated.`
       });
       return;
+    }
+    if (field === 'cover') {
+      field = 'thumbnailUrl';
     }
     const value = this.fetchedMetadata[field];
     if (value) {

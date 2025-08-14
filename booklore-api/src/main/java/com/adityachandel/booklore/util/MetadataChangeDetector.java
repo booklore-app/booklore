@@ -3,6 +3,7 @@ package com.adityachandel.booklore.util;
 import com.adityachandel.booklore.model.MetadataClearFlags;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,9 +11,8 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class MetadataChangeDetector {
-
-    private static final Logger log = LoggerFactory.getLogger(MetadataChangeDetector.class);
 
     public static boolean isDifferent(BookMetadata newMeta, BookMetadataEntity existingMeta, MetadataClearFlags clear) {
         if (clear == null) return true;
@@ -45,6 +45,12 @@ public class MetadataChangeDetector {
         compare(changes, "hardcoverReviewCount", clear.isHardcoverReviewCount(), newMeta.getHardcoverReviewCount(), existingMeta.getHardcoverReviewCount(), () -> !isTrue(existingMeta.getHardcoverReviewCountLocked()), newMeta.getHardcoverReviewCountLocked(), existingMeta.getHardcoverReviewCountLocked());
         compare(changes, "authors", clear.isAuthors(), newMeta.getAuthors(), toNameSet(existingMeta.getAuthors()), () -> !isTrue(existingMeta.getAuthorsLocked()), newMeta.getAuthorsLocked(), existingMeta.getAuthorsLocked());
         compare(changes, "categories", clear.isCategories(), newMeta.getCategories(), toNameSet(existingMeta.getCategories()), () -> !isTrue(existingMeta.getCategoriesLocked()), newMeta.getCategoriesLocked(), existingMeta.getCategoriesLocked());
+
+        Boolean coverLockedNew = newMeta.getCoverLocked();
+        Boolean coverLockedExisting = existingMeta.getCoverLocked();
+        if (differsLock(coverLockedNew, coverLockedExisting)) {
+            changes.add("cover lock: [" + isTrue(coverLockedExisting) + "] → [" + isTrue(coverLockedNew) + "]");
+        }
 
         if (!changes.isEmpty()) {
             /*changes.forEach(change -> log.info("Metadata change: {}", change));*/

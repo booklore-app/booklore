@@ -134,7 +134,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
-      thumbnailUrlLocked: new FormControl(false),
+      coverLocked: new FormControl(false),
     });
   }
 
@@ -227,7 +227,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: metadata.seriesNameLocked ?? false,
       seriesNumberLocked: metadata.seriesNumberLocked ?? false,
       seriesTotalLocked: metadata.seriesTotalLocked ?? false,
-      thumbnailUrlLocked: metadata.coverLocked ?? false,
+      coverLocked: metadata.coverLocked ?? false,
     });
 
     const lockableFields: { key: keyof BookMetadata; control: string }[] = [
@@ -256,7 +256,8 @@ export class MetadataEditorComponent implements OnInit {
       {key: 'descriptionLocked', control: 'description'},
       {key: 'seriesNameLocked', control: 'seriesName'},
       {key: 'seriesNumberLocked', control: 'seriesNumber'},
-      {key: 'seriesTotalLocked', control: 'seriesTotal'}
+      {key: 'seriesTotalLocked', control: 'seriesTotal'},
+      {key: 'coverLocked', control: 'thumbnailUrl'},
     ];
 
     for (const {key, control} of lockableFields) {
@@ -287,6 +288,9 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   toggleLock(field: string): void {
+    if (field === 'thumbnailUrl') {
+      field = 'cover'
+    }
     const isLocked = this.metadataForm.get(field + 'Locked')?.value;
     const updatedLockedState = !isLocked;
     this.metadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
@@ -396,7 +400,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: form.get('seriesNameLocked')?.value,
       seriesNumberLocked: form.get('seriesNumberLocked')?.value,
       seriesTotalLocked: form.get('seriesTotalLocked')?.value,
-      coverLocked: form.get('thumbnailUrlLocked')?.value,
+      coverLocked: form.get('coverLocked')?.value,
 
       ...(shouldLockAllFields !== undefined && {allFieldsLocked: shouldLockAllFields})
     };
