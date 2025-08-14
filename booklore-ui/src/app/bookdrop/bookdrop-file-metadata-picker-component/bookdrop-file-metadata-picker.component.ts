@@ -7,6 +7,7 @@ import {InputText} from 'primeng/inputtext';
 import {BookMetadata} from '../../book/model/book.model';
 import {UrlHelperService} from '../../utilities/service/url-helper.service';
 import {Textarea} from 'primeng/textarea';
+import {AutoComplete} from 'primeng/autocomplete';
 
 @Component({
   selector: 'app-bookdrop-file-metadata-picker-component',
@@ -17,7 +18,8 @@ import {Textarea} from 'primeng/textarea';
     InputText,
     NgClass,
     FormsModule,
-    Textarea
+    Textarea,
+    AutoComplete
   ],
   templateUrl: './bookdrop-file-metadata-picker.component.html',
   styleUrl: './bookdrop-file-metadata-picker.component.scss'
@@ -128,6 +130,24 @@ export class BookdropFileMetadataPickerComponent {
     this.metadataForm.get(field)?.setValue(this.originalMetadata?.[field]);
     this.copiedFields[field] = false;
     this.hoveredFields[field] = false;
+  }
+
+  // Handle blur event for AutoComplete to add custom values
+  onAutoCompleteBlur(fieldName: string, event: any) {
+    const inputValue = event.target.value?.trim();
+    if (inputValue) {
+      const currentValue = this.metadataForm.get(fieldName)?.value || [];
+      const values = Array.isArray(currentValue) ? currentValue :
+                     typeof currentValue === 'string' && currentValue ? currentValue.split(',').map((v: string) => v.trim()) : [];
+
+      // Add the new value if it's not already in the array
+      if (!values.includes(inputValue)) {
+        values.push(inputValue);
+        this.metadataForm.get(fieldName)?.setValue(values);
+      }
+      // Clear the input
+      event.target.value = '';
+    }
   }
 
   resetAll() {

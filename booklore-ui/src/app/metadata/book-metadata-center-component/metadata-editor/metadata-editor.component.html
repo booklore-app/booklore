@@ -87,7 +87,7 @@
               <label for="authors">Authors</label>
               <div class="flex justify-between items-center gap-2">
                 <div class="w-full">
-                  <p-chips formControlName="authors" addOnBlur="true"></p-chips>
+                  <p-autoComplete formControlName="authors" [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" [showClear]="true" (onBlur)="onAutoCompleteBlur('authors', $event)" styleClass="w-full"></p-autoComplete>
                 </div>
                 @if (!book.metadata!['authorsLocked']) {
                   <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('authors')" severity="success"></p-button>
@@ -128,7 +128,7 @@
               <label for="categories">Categories</label>
               <div class="flex justify-between items-center gap-2">
                 <div class="w-full">
-                  <p-chips formControlName="categories" addOnBlur="true"></p-chips>
+                  <p-autoComplete formControlName="categories" [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" [showClear]="true" (onBlur)="onAutoCompleteBlur('categories', $event)" styleClass="w-full"></p-autoComplete>
                 </div>
                 @if (!book.metadata!['categoriesLocked']) {
                   <p-button icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('categories')" severity="success"></p-button>

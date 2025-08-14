@@ -93,7 +93,7 @@
                       <p-multiSelect [options]="libraryOptions" formControlName="value" display="chip" class="w-full" appendTo="body" placeholder="Select Libraries"></p-multiSelect>
                     } @else {
                       <div class="w-full">
-                        <p-chips [formControl]="ruleCtrl.get('value')" separator="," placeholder="Enter values (press Enter or comma)" class="w-full"></p-chips>
+                        <p-autoComplete [formControl]="ruleCtrl.get('value')" [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" styleClass="w-full" placeholder="Enter values (press Enter or comma)" (onBlur)="onAutoCompleteBlur(ruleCtrl.get('value'), $event)"></p-autoComplete>
                       </div>
                     }
                   } @else if (ruleCtrl.get('field')?.value === 'readStatus') {

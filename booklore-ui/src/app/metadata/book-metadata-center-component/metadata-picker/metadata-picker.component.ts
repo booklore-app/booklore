@@ -13,6 +13,7 @@ import {BookService} from '../../../book/service/book.service';
 import {Textarea} from 'primeng/textarea';
 import {filter, map} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AutoComplete} from 'primeng/autocomplete';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -29,7 +30,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     NgStyle,
     Tooltip,
     AsyncPipe,
-    Textarea
+    Textarea,
+    AutoComplete
   ]
 })
 export class MetadataPickerComponent implements OnInit {
@@ -74,6 +76,24 @@ export class MetadataPickerComponent implements OnInit {
   @Input() fetchedMetadata!: BookMetadata;
   @Input() book$!: Observable<Book | null>;
   @Output() goBack = new EventEmitter<boolean>();
+
+  // Handle blur event for AutoComplete to add custom values
+  onAutoCompleteBlur(fieldName: string, event: any) {
+    const inputValue = event.target.value?.trim();
+    if (inputValue) {
+      const currentValue = this.metadataForm.get(fieldName)?.value || [];
+      const values = Array.isArray(currentValue) ? currentValue :
+                     typeof currentValue === 'string' && currentValue ? currentValue.split(',').map((v: string) => v.trim()) : [];
+
+      // Add the new value if it's not already in the array
+      if (!values.includes(inputValue)) {
+        values.push(inputValue);
+        this.metadataForm.get(fieldName)?.setValue(values);
+      }
+      // Clear the input
+      event.target.value = '';
+    }
+  }
 
   metadataForm: FormGroup;
   currentBookId!: number;
