@@ -419,13 +419,25 @@
               (onClick)="assignShelf(book.id)">
             </p-button>
             @if (userState.user!.permissions.canDownload || userState.user!.permissions.admin) {
-              <p-button
-                label="Download"
-                icon="pi pi-download"
-                severity="success"
-                outlined
-                (onClick)="download(book!.id)">
-              </p-button>
+              @if ((book!.alternativeFormats && book!.alternativeFormats.length > 0) || (book!.supplementaryFiles && book!.supplementaryFiles.length > 0)) {
+                @if (downloadMenuItems$ | async; as downloadItems) {
+                  <p-splitbutton
+                    label="Download"
+                    icon="pi pi-download"
+                    [model]="downloadItems"
+                    (onClick)="download(book!.id)"
+                    severity="success"
+                    outlined/>
+                }
+              } @else {
+                <p-button
+                  label="Download"
+                  icon="pi pi-download"
+                  severity="success"
+                  outlined
+                  (onClick)="download(book!.id)">
+                </p-button>
+              }
             }
             @if (userState.user!.permissions.canEmailBook || userState.user!.permissions.admin) {
               @if (emailMenuItems$ | async; as emailItems) {
@@ -457,7 +469,7 @@
             @if (userState.user!.permissions.canDeleteBook || userState.user!.permissions.admin) {
               @if (otherItems$ | async; as otherItems) {
                 <p-button icon="pi pi-ellipsis-v" outlined severity="danger" (click)="entitymenu.toggle($event)"></p-button>
-                <p-menu #entitymenu [model]="otherItems" [popup]="true" appendTo="body"></p-menu>
+                <p-tieredMenu #entitymenu [model]="otherItems" [popup]="true" appendTo="body"></p-tieredMenu>
               }
             }
           </div>
