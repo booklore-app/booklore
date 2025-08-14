@@ -6,12 +6,14 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Tooltip} from 'primeng/tooltip';
 import {MetadataRefreshOptions} from '../../metadata/model/request/metadata-refresh-options.model';
 import {AppSettingsService} from '../../core/service/app-settings.service';
-import {MessageService} from 'primeng/api';
+import {SettingsHelperService} from '../../core/service/settings-helper.service';
 import {Observable} from 'rxjs';
-import {AppSettingKey, AppSettings, MetadataPersistenceSettings} from '../../core/model/app-settings.model';
+import {AppSettingKey, AppSettings} from '../../core/model/app-settings.model';
 import {filter, take} from 'rxjs/operators';
 import {MetadataMatchWeightsComponent} from '../global-preferences/metadata-match-weights-component/metadata-match-weights-component';
 import {ToggleSwitch} from 'primeng/toggleswitch';
+import {MetadataPersistenceSettingsComponent} from './metadata-persistence-settings-component/metadata-persistence-settings-component';
+import {PublicReviewsSettingsComponent} from './public-reviews-settings-component/public-reviews-settings-component';
 
 @Component({
   selector: 'app-metadata-settings-component',
@@ -24,7 +26,9 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
     Tooltip,
     FormsModule,
     MetadataMatchWeightsComponent,
-    ToggleSwitch
+    ToggleSwitch,
+    MetadataPersistenceSettingsComponent,
+    PublicReviewsSettingsComponent
   ],
   templateUrl: './metadata-settings-component.html',
   styleUrl: './metadata-settings-component.scss'
@@ -32,68 +36,45 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
 export class MetadataSettingsComponent implements OnInit {
 
   currentMetadataOptions!: MetadataRefreshOptions;
-  metadataPersistence: MetadataPersistenceSettings = {
-    saveToOriginalFile: false,
-    backupMetadata: true,
-    backupCover: true
-  };
-  metadataDownloadOnBookdrop: boolean = true;
+  metadataDownloadOnBookdrop = true;
 
-  private appSettingsService = inject(AppSettingsService);
-  private messageService = inject(MessageService);
+  private readonly appSettingsService = inject(AppSettingsService);
+  private readonly settingsHelper = inject(SettingsHelperService);
 
-  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
+  readonly appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
   ngOnInit(): void {
-    this.appSettings$.pipe(
-      filter(settings => !!settings),
-      take(1)
-    ).subscribe(settings => {
-      if (settings?.metadataRefreshOptions) {
-        this.currentMetadataOptions = settings.metadataRefreshOptions;
-      }
-      if (settings?.metadataPersistenceSettings) {
-        this.metadataPersistence = {...settings.metadataPersistenceSettings};
-      }
-      this.metadataDownloadOnBookdrop = settings?.metadataDownloadOnBookdrop;
-    });
+    this.loadSettings();
   }
 
-  onMetadataDownloadOnBookdropToggle(checked: boolean) {
-    this.saveSetting(AppSettingKey.METADATA_DOWNLOAD_ON_BOOKDROP, checked);
-  }
-
-  onPersistenceToggle(key: keyof MetadataPersistenceSettings): void {
-    if (key === 'saveToOriginalFile') {
-      this.metadataPersistence.saveToOriginalFile = !this.metadataPersistence.saveToOriginalFile;
-
-      if (!this.metadataPersistence.saveToOriginalFile) {
-        this.metadataPersistence.backupMetadata = false;
-        this.metadataPersistence.backupCover = false;
-      }
-    } else {
-      this.metadataPersistence[key] = !this.metadataPersistence[key];
-    }
-
-    this.saveSetting(AppSettingKey.METADATA_PERSISTENCE_SETTINGS, this.metadataPersistence);
+  onMetadataDownloadOnBookdropToggle(checked: boolean): void {
+    this.metadataDownloadOnBookdrop = checked;
+    this.settingsHelper.saveSetting(AppSettingKey.METADATA_DOWNLOAD_ON_BOOKDROP, checked);
   }
 
   onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions): void {
-    this.saveSetting(AppSettingKey.QUICK_BOOK_MATCH, metadataRefreshOptions);
+    this.currentMetadataOptions = metadataRefreshOptions;
+    this.settingsHelper.saveSetting(AppSettingKey.QUICK_BOOK_MATCH, metadataRefreshOptions);
   }
 
-  private saveSetting(key: string, value: unknown): void {
-    this.appSettingsService.saveSettings([{key, newValue: value}]).subscribe({
-      next: () =>
-        this.showMessage('success', 'Settings Saved', 'The settings were successfully saved!'),
-      error: () =>
-        this.showMessage('error', 'Error', 'There was an error saving the settings.')
+  private loadSettings(): void {
+    this.appSettings$.pipe(
+      filter((settings): settings is AppSettings => !!settings),
+      take(1)
+    ).subscribe({
+      next: (settings) => this.initializeSettings(settings),
+      error: (error) => {
+        console.error('Failed to load settings:', error);
+        this.settingsHelper.showMessage('error', 'Error', 'Failed to load settings.');
+      }
     });
   }
 
-  private showMessage(severity: 'success' | 'error', summary: string, detail: string): void {
-    this.messageService.add({severity, summary, detail});
-  }
+  private initializeSettings(settings: AppSettings): void {
+    if (settings.metadataRefreshOptions) {
+      this.currentMetadataOptions = settings.metadataRefreshOptions;
+    }
 
-  protected readonly AppSettingKey = AppSettingKey;
+    this.metadataDownloadOnBookdrop = settings.metadataDownloadOnBookdrop ?? true;
+  }
 }

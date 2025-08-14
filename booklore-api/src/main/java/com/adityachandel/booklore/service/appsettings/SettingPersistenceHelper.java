@@ -1,10 +1,7 @@
 package com.adityachandel.booklore.service.appsettings;
 
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
-import com.adityachandel.booklore.model.dto.settings.AppSettingKey;
-import com.adityachandel.booklore.model.dto.settings.MetadataMatchWeights;
-import com.adityachandel.booklore.model.dto.settings.MetadataPersistenceSettings;
-import com.adityachandel.booklore.model.dto.settings.MetadataProviderSettings;
+import com.adityachandel.booklore.model.dto.settings.*;
 import com.adityachandel.booklore.model.entity.AppSettingEntity;
 import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.repository.AppSettingsRepository;
@@ -13,7 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -181,6 +180,24 @@ public class SettingPersistenceHelper {
                 .saveToOriginalFile(false)
                 .backupMetadata(false)
                 .backupCover(false)
+                .build();
+    }
+
+    public MetadataPublicReviewsSettings getDefaultMetadataPublicReviewsSettings() {
+        return MetadataPublicReviewsSettings.builder()
+                .downloadEnabled(true)
+                .providers(Set.of(
+                        MetadataPublicReviewsSettings.ReviewProviderConfig.builder()
+                                .provider(MetadataProvider.Amazon)
+                                .enabled(true)
+                                .maxReviews(5)
+                                .build(),
+                        MetadataPublicReviewsSettings.ReviewProviderConfig.builder()
+                                .provider(MetadataProvider.GoodReads)
+                                .enabled(false)
+                                .maxReviews(5)
+                                .build()
+                ))
                 .build();
     }
 }

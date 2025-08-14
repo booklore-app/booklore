@@ -1,28 +1,27 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnDestroy} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
-import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
-import {filter, take} from 'rxjs/operators';
+import {filter, take, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
 
 import {BookService} from '../../../book/service/book.service';
 import {Book} from '../../../book/model/book.model';
 import {FileMoveRequest, FileOperationsService} from '../../service/file-operations-service';
 import {LibraryService} from "../../../book/service/library.service";
 import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {AppSettingKey} from '../../../core/model/app-settings.model';
 
 @Component({
   selector: 'app-file-mover-component',
   standalone: true,
-  imports: [Button, FormsModule, TableModule, InputText, Divider],
+  imports: [Button, FormsModule, TableModule, Divider],
   templateUrl: './file-mover-component.html',
   styleUrl: './file-mover-component.scss'
 })
-export class FileMoverComponent {
+export class FileMoverComponent implements OnDestroy {
   private config = inject(DynamicDialogConfig);
   private ref = inject(DynamicDialogRef);
   private bookService = inject(BookService);
@@ -30,10 +29,18 @@ export class FileMoverComponent {
   private fileOperationsService = inject(FileOperationsService);
   private messageService = inject(MessageService);
   private appSettingsService = inject(AppSettingsService);
+  private destroy$ = new Subject<void>();
 
-  movePattern = '';
-  placeholdersVisible = false;
+  libraryPatterns: {
+    libraryId: number | null;
+    libraryName: string;
+    pattern: string;
+    source: string;
+    bookCount: number;
+  }[] = [];
+  defaultMovePattern = '';
   loading = false;
+  patternsCollapsed = false;
 
   bookIds: Set<number> = new Set();
   books: Book[] = [];
@@ -42,12 +49,69 @@ export class FileMoverComponent {
   constructor() {
     this.bookIds = new Set(this.config.data?.bookIds ?? []);
     this.books = this.bookService.getBooksByIdsFromState([...this.bookIds]);
+    this.loadDefaultPattern();
+  }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadDefaultPattern(): void {
     this.appSettingsService.appSettings$.pipe(
       filter(settings => settings != null),
-      take(1)
+      take(1),
+      takeUntil(this.destroy$)
     ).subscribe(settings => {
-      this.movePattern = settings?.movePattern;
+      this.defaultMovePattern = settings?.uploadPattern || '';
+      this.loadLibraryPatterns();
+    });
+  }
+
+  private loadLibraryPatterns(): void {
+    this.libraryService.libraryState$.pipe(
+      filter(state => state.loaded && state.libraries != null),
+      take(1),
+      takeUntil(this.destroy$)
+    ).subscribe(state => {
+      const booksByLibrary = new Map<number | null, Book[]>();
+      this.books.forEach(book => {
+        const libraryId =
+          book.libraryId ??
+          book.libraryPath?.id ??
+          (book as any).library?.id ??
+          null;
+        if (!booksByLibrary.has(libraryId)) {
+          booksByLibrary.set(libraryId, []);
+        }
+        booksByLibrary.get(libraryId)!.push(book);
+      });
+
+      this.libraryPatterns = Array.from(booksByLibrary.entries()).map(([libraryId, books]) => {
+        let libraryName = 'Unknown Library';
+        let pattern = this.defaultMovePattern;
+        let source = 'App Default';
+
+        if (libraryId) {
+          const library = state.libraries?.find(lib => lib.id === libraryId);
+          if (library) {
+            libraryName = library.name;
+            if (library.fileNamingPattern) {
+              pattern = library.fileNamingPattern;
+              source = 'Library Setting';
+            }
+          }
+        }
+
+        return {
+          libraryId,
+          libraryName,
+          pattern,
+          source,
+          bookCount: books.length
+        };
+      });
+
       this.applyPattern();
     });
   }
@@ -66,6 +130,14 @@ export class FileMoverComponent {
           : '';
       const originalPath = `${libraryPathPrefix}/${relativeOriginalPath}`.replace(/\/\/+/g, '/');
 
+      const bookLibraryId =
+        book.libraryId ??
+        book.libraryPath?.id ??
+        (book as any).library?.id ??
+        null;
+      const libraryPattern = this.libraryPatterns.find(p => p.libraryId === bookLibraryId);
+      const pattern = libraryPattern?.pattern || this.defaultMovePattern;
+
       const values: Record<string, string> = {
         authors: this.sanitize(meta.authors?.join(', ') || 'Unknown Author'),
         title: this.sanitize(meta.title || 'Untitled'),
@@ -80,11 +152,10 @@ export class FileMoverComponent {
 
       let newPath: string;
 
-      if (!this.movePattern?.trim()) {
-        // If pattern empty, just use current filename as the new path
-        newPath = `${fileSubPath}${fileName}`;  // preserve subpath + filename
+      if (!pattern?.trim()) {
+        newPath = `${fileSubPath}${fileName}`;
       } else {
-        newPath = this.movePattern.replace(/<([^<>]+)>/g, (_, block) => {
+        newPath = pattern.replace(/<([^<>]+)>/g, (_, block) => {
           const placeholders = [...block.matchAll(/{(.*?)}/g)].map(m => m[1]);
           const allHaveValues = placeholders.every(key => values[key]?.trim());
           return allHaveValues
@@ -94,7 +165,6 @@ export class FileMoverComponent {
 
         newPath = newPath.replace(/{(.*?)}/g, (_, key) => values[key] ?? '');
 
-        // Append extension if not already present (most patterns won't include extension)
         if (!newPath.endsWith(extension)) {
           newPath += extension;
         }
@@ -111,6 +181,7 @@ export class FileMoverComponent {
         newPath: fullNewPath,
         relativeNewPath
       };
+
     });
   }
 
@@ -136,35 +207,23 @@ export class FileMoverComponent {
     return this.sanitize(seriesNumber.toString());
   }
 
-  getDefaultPattern(): string {
-    return 'e.g. {authors}/<{series}/><{seriesIndex}. >{title} - {authors}< ({year})>';
-  }
-
   saveChanges(): void {
-    if (!this.movePattern?.trim()) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Missing Pattern',
-        detail: 'Move pattern cannot be empty. Please enter a valid pattern.',
-        life: 3000
-      });
-      return;
-    }
-
     this.loading = true;
+
     const request: FileMoveRequest = {
-      bookIds: [...this.bookIds],
-      pattern: this.movePattern
+      bookIds: [...this.bookIds]
     };
 
-    this.fileOperationsService.moveFiles(request).subscribe({
+    this.fileOperationsService.moveFiles(request).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: () => {
         this.loading = false;
         this.filePreviews.forEach(p => (p.isMoved = true));
         this.messageService.add({
           severity: 'success',
-          summary: 'Files Moved',
-          detail: `${this.filePreviews.length} file(s) successfully relocated.`,
+          summary: 'Files Organized!',
+          detail: `Successfully organized ${this.filePreviews.length} file${this.filePreviews.length === 1 ? '' : 's'}.`,
           life: 3000
         });
       },
@@ -172,48 +231,19 @@ export class FileMoverComponent {
         this.loading = false;
         this.messageService.add({
           severity: 'error',
-          summary: 'Move Failed',
-          detail: 'An error occurred while moving the files.',
+          summary: 'Oops! Something went wrong',
+          detail: 'We had trouble organizing your files. Please try again.',
           life: 3000
         });
       }
     });
   }
 
-  setDefaultPattern(): void {
-    const trimmedPattern = this.movePattern?.trim();
-
-    if (!trimmedPattern) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Cannot Save',
-        detail: 'Move pattern cannot be empty.'
-      });
-      return;
-    }
-
-    const payload = [
-      {
-        key: AppSettingKey.MOVE_FILE_PATTERN,
-        newValue: trimmedPattern
-      }
-    ];
-
-    this.appSettingsService.saveSettings(payload).subscribe({
-      next: () => this.messageService.add({
-        severity: 'success',
-        summary: 'Saved',
-        detail: 'Move pattern saved as default.'
-      }),
-      error: () => this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to save default move pattern.'
-      })
-    });
-  }
-
   cancel(): void {
     this.ref.close();
+  }
+
+  togglePatternsCollapsed(): void {
+    this.patternsCollapsed = !this.patternsCollapsed;
   }
 }

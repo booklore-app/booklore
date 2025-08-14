@@ -3,14 +3,12 @@ package com.adityachandel.booklore.service.metadata;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.MetadataUpdateWrapper;
-import com.adityachandel.booklore.model.dto.Book;
-import com.adityachandel.booklore.model.dto.BookMetadata;
-import com.adityachandel.booklore.model.dto.TaskMessage;
-import com.adityachandel.booklore.model.dto.MetadataBatchProgressNotification;
+import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
+import com.adityachandel.booklore.model.dto.settings.MetadataPublicReviewsSettings;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.entity.MetadataFetchJobEntity;
@@ -171,7 +169,7 @@ public class MetadataRefreshService {
                 ));
     }
 
-    protected Map<MetadataProvider, BookMetadata> fetchMetadataForBook(List<MetadataProvider> providers, BookEntity bookEntity) {
+    public Map<MetadataProvider, BookMetadata> fetchMetadataForBook(List<MetadataProvider> providers, BookEntity bookEntity) {
         Book book = bookMapper.toBook(bookEntity);
         return providers.stream()
                 .map(provider -> createInterruptibleMetadataFuture(() -> fetchTopMetadataFromAProvider(provider, book)))
@@ -363,6 +361,14 @@ public class MetadataRefreshService {
         metadata.setDescription(resolveFieldAsString(metadataMap, fieldOptions.getDescription(), BookMetadata::getDescription));
         metadata.setAuthors(resolveFieldAsList(metadataMap, fieldOptions.getAuthors(), BookMetadata::getAuthors));
 
+        List<BookReview> allReviews = metadataMap.values().stream()
+                .filter(Objects::nonNull)
+                .flatMap(md -> Optional.ofNullable(md.getBookReviews()).stream().flatMap(Collection::stream))
+                .collect(Collectors.toList());
+        if (!allReviews.isEmpty()) {
+            metadata.setBookReviews(allReviews);
+        }
+
         if (metadataMap.containsKey(GoodReads)) {
             metadata.setGoodreadsId(metadataMap.get(GoodReads).getGoodreadsId());
         }
@@ -375,7 +381,6 @@ public class MetadataRefreshService {
         if (metadataMap.containsKey(Comicvine)) {
             metadata.setComicvineId(metadataMap.get(Comicvine).getComicvineId());
         }
-
 
         if (request.getRefreshOptions().isMergeCategories()) {
             metadata.setCategories(getAllCategories(metadataMap, fieldOptions.getCategories(), BookMetadata::getCategories));
@@ -399,7 +404,6 @@ public class MetadataRefreshService {
 
         return metadata;
     }
-
 
     protected void setOtherUnspecifiedMetadata(Map<MetadataProvider, BookMetadata> metadataMap, BookMetadata metadataCombined, MetadataProvider provider) {
         if (metadataMap.containsKey(provider)) {

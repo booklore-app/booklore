@@ -44,7 +44,7 @@ interface UploadingFile {
 export class BookUploaderComponent implements OnInit {
   files: UploadingFile[] = [];
   isUploading: boolean = false;
-  selectedLibrary: Library | null = null;
+  _selectedLibrary: Library | null = null;
   selectedPath: LibraryPath | null = null;
 
   private readonly libraryService = inject(LibraryService);
@@ -70,6 +70,26 @@ export class BookUploaderComponent implements OnInit {
       .subscribe(settings => {
         this.maxFileSizeBytes = (settings?.maxFileUploadSizeInMb ?? 100) * 1024 * 1024;
       });
+
+    this.libraryState$.subscribe(state => {
+      if (state?.libraries?.length !== 1 || this.selectedLibrary) {
+        return;
+      }
+
+      this.selectedLibrary = state.libraries[0];
+    });
+  }
+
+  get selectedLibrary(): Library | null {
+    return this._selectedLibrary;
+  }
+
+  set selectedLibrary(library: Library | null) {
+    this._selectedLibrary = library;
+
+    if(library?.paths?.length === 1) {
+      this.selectedPath = library.paths[0];
+    }
   }
 
   hasPendingFiles(): boolean {

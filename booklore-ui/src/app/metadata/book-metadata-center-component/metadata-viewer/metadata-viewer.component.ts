@@ -7,7 +7,6 @@ import {Rating, RatingRateEvent} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
 import {Book, BookMetadata, BookRecommendation, ReadStatus} from '../../../book/model/book.model';
-import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {UserService} from '../../../settings/user-management/user.service';
 import {SplitButton} from 'primeng/splitbutton';
@@ -29,13 +28,17 @@ import {Menu} from 'primeng/menu';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {BookCardLiteComponent} from '../../../book/components/book-card-lite/book-card-lite-component';
 import {ResetProgressType, ResetProgressTypes} from '../../../shared/constants/reset-progress-type';
+import {DatePicker} from 'primeng/datepicker';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {BookReviewsComponent} from '../../../book/components/book-reviews/book-reviews.component';
+import {BookNotesComponent} from '../../../book/components/book-notes-component/book-notes-component';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, Divider, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent, DatePicker, Tab, TabList, TabPanel, TabPanels, Tabs, BookReviewsComponent, BookNotesComponent]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
   @Input() book$!: Observable<Book | null>;
@@ -65,6 +68,8 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   isAutoFetching = false;
   private metadataCenterViewMode: 'route' | 'dialog' = 'route';
   selectedReadStatus: ReadStatus = ReadStatus.UNREAD;
+  isEditingDateFinished = false;
+  editDateFinished: Date | null = null;
 
   readStatusOptions: { value: ReadStatus, label: string }[] = [
     {value: ReadStatus.UNREAD, label: 'Unread'},
@@ -164,11 +169,11 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
 
     this.userService.userState$
       .pipe(
-        filter(user => !!user),
+        filter(userState => !!userState?.user && userState.loaded),
         take(1)
       )
-      .subscribe(user => {
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+      .subscribe(userState => {
+        this.metadataCenterViewMode = userState.user?.userSettings.metadataCenterViewMode ?? 'route';
       });
 
     this.book$
@@ -216,6 +221,10 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     this.recommendedBooks = this.originalRecommendedBooks.filter(
       rec => !bookInSeriesIds.has(rec.book.id)
     );
+  }
+
+  get defaultTabValue(): number {
+    return this.bookInSeries && this.bookInSeries.length > 0 ? 1 : 2;
   }
 
   toggleExpand(): void {
@@ -592,5 +601,48 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
     });
   }
 
+  toggleDateFinishedEdit(book: Book): void {
+    if (this.isEditingDateFinished) {
+      this.isEditingDateFinished = false;
+      this.editDateFinished = null;
+    } else {
+      this.isEditingDateFinished = true;
+      this.editDateFinished = book.dateFinished ? new Date(book.dateFinished) : new Date();
+    }
+  }
+
+  saveDateFinished(book: Book): void {
+    if (!book) return;
+
+    const dateToSave = this.editDateFinished ? this.editDateFinished.toISOString() : null;
+
+    this.bookService.updateDateFinished(book.id, dateToSave).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Date Updated',
+          detail: 'Book finish date has been updated.',
+          life: 1500
+        });
+        this.isEditingDateFinished = false;
+        this.editDateFinished = null;
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: 'Could not update book finish date.',
+          life: 3000
+        });
+      }
+    });
+  }
+
+  cancelDateFinishedEdit(): void {
+    this.isEditingDateFinished = false;
+    this.editDateFinished = null;
+  }
+
   protected readonly ResetProgressTypes = ResetProgressTypes;
+  protected readonly ReadStatus = ReadStatus;
 }

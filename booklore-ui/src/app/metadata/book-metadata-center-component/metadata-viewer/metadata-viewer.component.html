@@ -303,11 +303,6 @@
                   {{ getStatusLabel(selectedReadStatus) }}
               </span>
                 <p-menu #menu [popup]="true" [model]="readStatusMenuItems"></p-menu>
-                @if (selectedReadStatus === 'READ' && book?.dateFinished) {
-                  <span class="text-xs text-gray-400 ml-2">
-                    Finished on {{ formatDate(book.dateFinished) }}
-                  </span>
-                }
               </p>
               @if (book?.koreaderProgress && book.koreaderProgress?.percentage != null) {
                 <p class="whitespace-nowrap flex items-center">
@@ -333,6 +328,53 @@
                 </span>
                 </p>
               }
+              @if (selectedReadStatus === ReadStatus.READ) {
+                <div>
+                  @if (book?.dateFinished) {
+                    <div class="flex items-center gap-2">
+                      <p><strong>Finished On: </strong></p>
+                      @if (!isEditingDateFinished) {
+                        <div class="flex items-center gap-2">
+                          <p>{{ formatDate(book.dateFinished) }}</p>
+                          <i class="pi pi-pencil text-[cornflowerblue] hover:text-[darkturquoise] cursor-pointer"
+                             (click)="toggleDateFinishedEdit(book)">
+                          </i>
+                        </div>
+                      } @else {
+                        <div class="flex items-center">
+                          <p-datepicker
+                            [(ngModel)]="editDateFinished"
+                            dateFormat="dd-M-yy"
+                            size="small"
+                            [showIcon]="true"
+                            iconDisplay="input"
+                            [style]="{ 'width': '125px', 'font-size': '12px' }"
+                            class="text-xs">
+                          </p-datepicker>
+                          <p-button
+                            rounded
+                            icon="pi pi-check"
+                            size="small"
+                            severity="success"
+                            text
+                            (onClick)="saveDateFinished(book)"
+                            pTooltip="Save date">
+                          </p-button>
+                          <p-button
+                            rounded
+                            icon="pi pi-times"
+                            size="small"
+                            severity="danger"
+                            text
+                            (onClick)="cancelDateFinishedEdit()"
+                            pTooltip="Cancel">
+                          </p-button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
               <p><strong>Page Count:</strong> {{ book?.metadata!.pageCount || '-' }}</p>
             </div>
 
@@ -350,7 +392,7 @@
           </div>
         </div>
 
-        @if (userService.userState$ | async; as userData) {
+        @if (userService.userState$ | async; as userState) {
           <div class="flex flex-wrap gap-3 pt-6">
             @if (book!.bookType === 'PDF') {
               @if (readMenuItems$ | async; as readItems) {
@@ -376,28 +418,28 @@
               outlined
               (onClick)="assignShelf(book.id)">
             </p-button>
-            @if (userData.permissions.canDownload || userData.permissions.admin) {
+            @if (userState.user!.permissions.canDownload || userState.user!.permissions.admin) {
               <p-button
                 label="Download"
                 icon="pi pi-download"
                 severity="success"
                 outlined
-                (onClick)="download(book.id)">
+                (onClick)="download(book!.id)">
               </p-button>
             }
-            @if (userData.permissions.canEmailBook || userData.permissions.admin) {
+            @if (userState.user!.permissions.canEmailBook || userState.user!.permissions.admin) {
               @if (emailMenuItems$ | async; as emailItems) {
                 <p-splitbutton
                   label="Quick Send"
                   icon="pi pi-send"
                   [model]="emailItems"
-                  (onClick)="quickSend(book.id)"
+                  (onClick)="quickSend(book!.id)"
                   outlined
                   severity="info">
                 </p-splitbutton>
               }
             }
-            @if (userData.permissions.canEditMetadata || userData.permissions.admin) {
+            @if (userState.user!.permissions.canEditMetadata || userState.user!.permissions.admin) {
               @if (refreshMenuItems$ | async; as refreshItems) {
                 <p-splitbutton
                   [label]="isAutoFetching ? 'Fetching...' : 'Auto Fetch'"
@@ -405,14 +447,14 @@
                   [outlined]="true"
                   [model]="refreshItems"
                   severity="warn"
-                  (onClick)="quickRefresh(book.id)"
+                  (onClick)="quickRefresh(book!.id)"
                   [disabled]="isAutoFetching"
                   pTooltip="Automatically fetch metadata using default sources"
                   tooltipPosition="top">
                 </p-splitbutton>
               }
             }
-            @if (userData.permissions.canDeleteBook || userData.permissions.admin) {
+            @if (userState.user!.permissions.canDeleteBook || userState.user!.permissions.admin) {
               @if (otherItems$ | async; as otherItems) {
                 <p-button icon="pi pi-ellipsis-v" outlined severity="danger" (click)="entitymenu.toggle($event)"></p-button>
                 <p-menu #entitymenu [model]="otherItems" [popup]="true" appendTo="body"></p-menu>
@@ -423,10 +465,10 @@
       </div>
     </div>
 
-    <div class="px-4 pb-2 pt-4 border border-[var(--border-color)] rounded-xl">
+    <div class="px-4 pb-2 pt-4 mb-6 mx-2 border border-[var(--border-color)] rounded-xl">
       <div [ngClass]="{ 'line-clamp-5': !isExpanded, 'line-clamp-none': isExpanded }" class="transition-all duration-300 overflow-hidden description-container">
         <div class="readonly-editor px-2">
-          <p-editor #quillEditor [readonly]="true" [style]="{height: '225px'}" [(ngModel)]="book.metadata!.description">
+          <p-editor #quillEditor [readonly]="true" [style]="{height: '200px'}" [(ngModel)]="book.metadata!.description">
             <ng-template #header>
             </ng-template>
           </p-editor>
@@ -444,44 +486,69 @@
       }
     </div>
 
-    <div class="pt-4 space-y-4 pb-6">
-      @if (bookInSeries.length > 0) {
-        <div>
-          <h3 class="text-xl font-semibold pt-2">More in the Series</h3>
-          <div class="dashboard-scroller-infinite"
-               infiniteScroll
-               [infiniteScrollDistance]="2"
-               [infiniteScrollThrottle]="50"
-               [horizontal]="true">
-            @for (book of bookInSeries; track book) {
-              <div class="dashboard-scroller-card">
-                <app-book-card-lite-component
-                  [book]="book"
-                ></app-book-card-lite-component>
+    <p-tabs lazy="true" class="custom-p-tabs" [value]="defaultTabValue" scrollable>
+      <p-tablist>
+        @if (bookInSeries.length > 0) {
+          <p-tab [value]="1">
+            <i class="pi pi-ethereum"></i> More in Series
+          </p-tab>
+        }
+        <p-tab [value]="2">
+          <i class="pi pi-bookmark"></i> Similar Books
+        </p-tab>
+        <p-tab [value]="3">
+          <i class="pi pi-pen-to-square"></i> Notes
+        </p-tab>
+        <p-tab [value]="4">
+          <i class="pi pi-comments"></i> Reviews
+        </p-tab>
+      </p-tablist>
+      <p-tabpanels>
+        <p-tabpanel [value]="1">
+          <div class="pt-2">
+            @if (bookInSeries.length > 0) {
+              <div>
+                <div class="dashboard-scroller-infinite"
+                     infiniteScroll
+                     [infiniteScrollDistance]="2"
+                     [infiniteScrollThrottle]="50"
+                     [horizontal]="true">
+                  @for (book of bookInSeries; track book) {
+                    <div class="dashboard-scroller-card">
+                      <app-book-card-lite-component [book]="book"></app-book-card-lite-component>
+                    </div>
+                  }
+                </div>
               </div>
             }
           </div>
-        </div>
-        <p-divider></p-divider>
-      }
-      @if (recommendedBooks.length > 0) {
-        <div>
-          <h3 class="text-xl font-semibold">Similar Books</h3>
-          <div class="dashboard-scroller-infinite"
-               infiniteScroll
-               [infiniteScrollDistance]="2"
-               [infiniteScrollThrottle]="50"
-               [horizontal]="true">
-            @for (book of recommendedBooks; track book) {
-              <div class="dashboard-scroller-card">
-                <app-book-card-lite-component
-                  [book]="book.book"
-                ></app-book-card-lite-component>
+        </p-tabpanel>
+        <p-tabpanel [value]="2">
+          <div class="pt-2">
+            @if (recommendedBooks.length > 0) {
+              <div>
+                <div class="dashboard-scroller-infinite"
+                     infiniteScroll
+                     [infiniteScrollDistance]="2"
+                     [infiniteScrollThrottle]="50"
+                     [horizontal]="true">
+                  @for (book of recommendedBooks; track book) {
+                    <div class="dashboard-scroller-card">
+                      <app-book-card-lite-component [book]="book.book"></app-book-card-lite-component>
+                    </div>
+                  }
+                </div>
               </div>
             }
           </div>
-        </div>
-      }
-    </div>
+        </p-tabpanel>
+        <p-tabpanel [value]="3">
+          <app-book-notes-component [bookId]="book.id"></app-book-notes-component>
+        </p-tabpanel>
+        <p-tabpanel [value]="4">
+          <app-book-reviews [bookId]="book.id"></app-book-reviews>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
   }
 </div>

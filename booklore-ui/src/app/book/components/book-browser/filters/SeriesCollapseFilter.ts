@@ -1,27 +1,32 @@
 import {BookFilter} from './BookFilter';
-import {Observable, BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {BookState} from '../../../model/state/book-state.model';
-import {map, debounceTime, filter, take} from 'rxjs/operators';
+import {debounceTime, filter, map, take, takeUntil} from 'rxjs/operators';
 import {Book} from '../../../model/book.model';
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, OnDestroy} from '@angular/core';
 import {MessageService} from 'primeng/api';
 import {UserService} from '../../../../settings/user-management/user.service';
 
 @Injectable({providedIn: 'root'})
-export class SeriesCollapseFilter implements BookFilter {
+export class SeriesCollapseFilter implements BookFilter, OnDestroy {
   private readonly userService = inject(UserService);
   private readonly messageService = inject(MessageService);
 
   private readonly seriesCollapseSubject = new BehaviorSubject<boolean>(false);
   readonly seriesCollapse$ = this.seriesCollapseSubject.asObservable();
+  private destroy$ = new Subject<void>();
 
   private hasUserToggled = false;
 
   constructor() {
     this.userService.userState$
-      .pipe(filter(user => !!user), take(1))
+      .pipe(
+        filter(userState => !!userState?.user && userState.loaded),
+        take(1),
+        takeUntil(this.destroy$)
+      )
       .subscribe(user => {
-        const prefs = user.userSettings?.entityViewPreferences;
+        const prefs = user.user?.userSettings?.entityViewPreferences;
         const initialCollapsed = prefs?.global?.seriesCollapsed ?? false;
         this.seriesCollapseSubject.next(initialCollapsed);
       });
@@ -101,5 +106,10 @@ export class SeriesCollapseFilter implements BookFilter {
       detail: `Series collapse set to ${isCollapsed ? 'enabled' : 'disabled'}.`,
       life: 1500
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -2,81 +2,57 @@
 
   <div class="px-4 mx-2 mb-4 py-3 rounded-lg border border-[var(--border-color)] transition-all">
     <p class="text-[var(--primary-color)] font-semibold mb-1">
-      Customize Your File Organization
+      File Organization Preview
     </p>
-    <p class="text-sm text-gray-300 leading-relaxed">
-      Define a naming pattern to reorganize selected book files on your system. Use dynamic placeholders like
-      <code class="bg-gray-800 px-1 py-0.5 rounded text-[var(--primary-color)] font-mono text-xs">{{ '{title}' }}</code>
-      or
-      <code class="bg-gray-800 px-1 py-0.5 rounded text-[var(--primary-color)] font-mono text-xs">{{ '{authors}' }}</code>
-      to automatically insert metadata. <br>
-      A preview below shows how files will be renamed and moved.
-      Once you're satisfied, click <span class="font-semibold text-green-400">Move Files</span> to proceed.
-      <span class="text-yellow-500 font-medium flex items-center gap-2">
+    <div class="text-sm text-gray-300 space-y-3">
+      <p>
+        Your files will be automatically renamed and organized based on your library's naming rules.
+        Check the preview below to see how your files will look, then click <span class="font-semibold text-green-400">Move Files</span> to organize them.
+      </p>
+      <p>
+        <i class="pi pi-lightbulb text-blue-400 mr-1"></i>
+        <span class="text-blue-300">Want to change how files are named? Go to <strong>Settings → File Naming Pattern</strong></span>
+      </p>
+      <p class="text-yellow-500 font-medium flex items-center gap-2">
         <i class="pi pi-exclamation-triangle text-yellow-400"></i>
-        Files will be physically moved on your system when you apply changes.
-      </span>
-    </p>
-  </div>
-
-  <div class="mb-2 px-1 text-sm text-muted">
-    <p-button
-      size="small"
-      text
-      severity="info"
-      (click)="placeholdersVisible = !placeholdersVisible">
-      {{ placeholdersVisible ? 'Hide' : 'Show' }} available placeholders
-    </p-button>
-
-    @if (placeholdersVisible) {
-      <div class="mx-4 my-2 flex flex-wrap gap-4">
-        <ul class="list-disc pl-4 min-w-[250px]">
-          <li><code>{{ '{title}' }}</code> - Book title</li>
-          <li><code>{{ '{authors}' }}</code> - Author(s)</li>
-          <li><code>{{ '{year}' }}</code> - Full year (e.g. 2025)</li>
-          <li><code>{{ '{series}' }}</code> - Series name</li>
-          <li><code>{{ '{seriesIndex}' }}</code> - Series index (e.g. 01)</li>
-          <li><code>{{ '{language}' }}</code> - Language (e.g. en)</li>
-          <li><code>{{ '{publisher}' }}</code> - Publisher</li>
-          <li><code>{{ '{isbn}' }}</code> - ISBN</li>
-          <li><code>{{ '{currentFilename}' }}</code> - Original file name (with extension)</li>
-        </ul>
-
-        <p-divider layout="vertical"></p-divider>
-
-        <div class="text-sm p-3 min-w-[250px]">
-          <p class="mb-1 font-medium">Tip: Optional placeholders</p>
-          <p>Wrap parts of your pattern in angle brackets <code>{{ '<...>' }}</code> to make them optional.</p>
-          <p>If any placeholder inside has no value, the whole block is removed.</p>
-          <p class="mt-1 font-semibold">Example:</p>
-          <p><code>{{ '<{seriesIndex} - >{title}' }}</code></p>
-          <p class="pl-4 mt-1">• <code>{{ '01 - Dune' }}</code> (if <code>{{ '{seriesIndex}' }}</code> is present)</p>
-          <p class="pl-4">• <code>{{ 'Dune' }}</code> (if <code>{{ '{seriesIndex}' }}</code> is missing)</p>
-        </div>
-      </div>
-    }
+        This will actually move and rename files on your computer, make sure you're happy with the preview first!
+      </p>
+    </div>
   </div>
 
   <div class="flex gap-4 mb-4 px-2 items-center w-full">
-    <input
-      type="text"
-      pInputText
-      [(ngModel)]="movePattern"
-      (ngModelChange)="applyPattern()"
-      [placeholder]="movePattern.trim() ? '' : getDefaultPattern()"
-      class="flex-1"
-    />
+    <div class="flex-1">
+      <div class="flex items-center justify-between cursor-pointer" (click)="togglePatternsCollapsed()">
+        <p-button
+          outlined
+          [icon]="patternsCollapsed ? 'pi pi-chevron-right' : 'pi pi-chevron-down'"
+          iconPos="right"
+          size="small"
+          severity="info"
+          [label]="patternsCollapsed ? 'Show Naming Rules' : 'Hide Naming Rules'">
+        </p-button>
+      </div>
 
-    <p-button
-      icon="pi pi-save"
-      label="Make Default"
-      severity="info"
-      outlined
-      (click)="setDefaultPattern()"
-    ></p-button>
+      @if (!patternsCollapsed) {
+        <div class="space-y-2 mt-2">
+          @for (pattern of libraryPatterns; track pattern.libraryId) {
+            <div class="p-3 border border-zinc-700 rounded-lg bg-zinc-800">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <p class="text-xs text-gray-400 mb-1">Library: {{ pattern.libraryName }}</p>
+                  <code class="text-[var(--primary-color)] font-mono text-sm">{{ pattern.pattern || 'No pattern available' }}</code>
+                  <p class="text-xs text-gray-400 mt-1">Source: {{ pattern.source }}</p>
+                </div>
+                <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded ml-2">{{ pattern.bookCount }} book{{ pattern.bookCount > 1 ? 's' : '' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
 
-  <div class="flex-grow overflow-y-auto mt-4">
+  <div class="flex-grow overflow-y-auto">
     <p-table
       [value]="filePreviews"
       [responsiveLayout]="'scroll'"
@@ -84,7 +60,7 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 0.5rem; text-align: center;">ID</th>
+          <th>ID</th>
           <th>Current Path</th>
           <th></th>
           <th>New Path</th>
@@ -95,13 +71,13 @@
           <td class="text-center">{{ preview.bookId }}</td>
           <td class="w-auto">
             <p>
-              <span class="text-gray-400 select-none">{{ preview.libraryPathPrefix }}/</span><span>{{ preview.relativeOriginalPath }}</span>
+              <span class="text-gray-400 select-none">{{ preview.libraryPathPrefix }}/</span><span class="text-gray-200">{{ preview.relativeOriginalPath }}</span>
             </p>
           </td>
           <td class="w-auto text-[var(--primary-color)] text-center">→</td>
           <td class="w-auto">
             <p>
-              <span class="text-gray-400 select-none">{{ preview.libraryPathPrefix }}/</span><span>{{ preview.relativeNewPath }}</span>
+              <span class="text-gray-400 select-none">{{ preview.libraryPathPrefix }}/</span><span class="text-gray-200">{{ preview.relativeNewPath }}</span>
             </p>
           </td>
           <td class="w-auto text-center">

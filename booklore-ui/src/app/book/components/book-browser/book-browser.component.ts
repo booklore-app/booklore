@@ -45,7 +45,7 @@ import {MultiSelect} from 'primeng/multiselect';
 import {TableColumnPreferenceService} from './table-column-preference-service';
 import {TieredMenu} from 'primeng/tieredmenu';
 import {BookMenuService} from '../../service/book-menu.service';
-import {MagicShelf, MagicShelfService} from '../../../magic-shelf-service';
+import {MagicShelf, MagicShelfService} from '../../../magic-shelf.service';
 import {BookRuleEvaluatorService} from '../../../book-rule-evaluator.service';
 import {GroupRule} from '../../../magic-shelf-component/magic-shelf-component';
 
@@ -136,7 +136,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   rawFilterParamFromUrl: string | null = null;
   hasSearchTerm = false;
   visibleColumns: { field: string; header: string }[] = [];
-  entityViewPreferences!: EntityViewPreferences;
+  entityViewPreferences: EntityViewPreferences | undefined;
   currentViewMode: string | undefined;
   lastAppliedSort: SortOption | null = null;
   private settingFiltersFromUrl = false;
@@ -161,7 +161,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.coverScalePreferenceService.scaleChange$.pipe(debounceTime(1000)).subscribe();
-    this.bookService.loadBooks();
 
     const currentPath = this.activatedRoute.snapshot.routeConfig?.path;
     if (currentPath === 'all-books' || currentPath === 'unshelved-books') {
@@ -206,7 +205,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     combineLatest({
       paramMap: this.activatedRoute.queryParamMap,
       user: this.userService.userState$.pipe(
-        filter((user): user is NonNullable<typeof user> => !!user),
+        filter(userState => !!userState?.user && userState.loaded),
         take(1)
       )
     }).subscribe(({paramMap, user}) => {
@@ -216,6 +215,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const directionParam = paramMap.get(QUERY_PARAMS.DIRECTION);
       const filterParams = paramMap.get(QUERY_PARAMS.FILTER);
       const sidebarParam = paramMap.get(QUERY_PARAMS.SIDEBAR);
+      this.showFilter = sidebarParam === null ? true : sidebarParam === 'true';
 
       const parsedFilters: Record<string, string[]> = {};
 
@@ -250,12 +250,12 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         this.currentFilterLabel = 'All Books';
       }
 
-      this.entityViewPreferences = user.userSettings?.entityViewPreferences;
+      this.entityViewPreferences = user.user?.userSettings?.entityViewPreferences;
       const globalPrefs = this.entityViewPreferences?.global;
       const currentEntityTypeStr = this.entityType ? this.entityType.toString().toUpperCase() : undefined;
       this.coverScalePreferenceService.initScaleValue(this.coverScalePreferenceService.scaleFactor);
-      this.filterSortPreferenceService.initValue(user?.userSettings?.filterSortingMode);
-      this.columnPreferenceService.initPreferences(user.userSettings?.tableColumnPreference);
+      this.filterSortPreferenceService.initValue(user.user?.userSettings?.filterSortingMode);
+      this.columnPreferenceService.initPreferences(user.user?.userSettings?.tableColumnPreference);
       this.visibleColumns = this.columnPreferenceService.visibleColumns;
 
 
@@ -298,8 +298,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           : VIEW_MODES.GRID)
         : (effectivePrefs.view?.toLowerCase() ?? VIEW_MODES.GRID);
 
-      //this.showFilter = sidebarParam === 'true' || (sidebarParam === null && filterParams !== filterParams);
-
       this.bookSorter.updateSortOptions();
 
       if (this.lastAppliedSort?.field !== this.bookSorter.selectedSort.field || this.lastAppliedSort?.direction !== this.bookSorter.selectedSort.direction) {
@@ -311,9 +309,12 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         [QUERY_PARAMS.VIEW]: this.currentViewMode,
         [QUERY_PARAMS.SORT]: this.bookSorter.selectedSort.field,
         [QUERY_PARAMS.DIRECTION]: this.bookSorter.selectedSort.direction === SortDirection.ASCENDING ? SORT_DIRECTION.ASCENDING : SORT_DIRECTION.DESCENDING,
-        [QUERY_PARAMS.SIDEBAR]: this.showFilter.toString(),
-        [QUERY_PARAMS.FILTER]: Object.entries(parsedFilters).map(([k, v]) => `${k}:${v.join('|')}`).join(',')
+        [QUERY_PARAMS.SIDEBAR]: this.showFilter.toString()
       };
+
+      if (Object.keys(parsedFilters).length > 0) {
+        queryParams[QUERY_PARAMS.FILTER] = Object.entries(parsedFilters).map(([k, v]) => `${k}:${v.join('|')}`).join(',');
+      }
 
       const currentParams = this.activatedRoute.snapshot.queryParams;
       const changed = Object.keys(queryParams).some(k => currentParams[k] !== queryParams[k]);
@@ -479,11 +480,12 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   toggleFilterSidebar() {
     this.showFilter = !this.showFilter;
+    const currentParams = this.activatedRoute.snapshot.queryParams;
     this.router.navigate([], {
       queryParams: {
+        ...currentParams,
         [QUERY_PARAMS.SIDEBAR]: this.showFilter.toString()
       },
-      queryParamsHandling: 'merge',
       replaceUrl: true
     });
   }

@@ -94,7 +94,7 @@ export class BookDialogHelperService {
   openFileMoverDialog(selectedBooks: Set<number>) {
     const count = selectedBooks.size;
     return this.dialogService.open(FileMoverComponent, {
-      header: `Relocate Book Files (${count} book${count !== 1 ? 's' : ''})`,
+      header: `Organize Book Files (${count} book${count !== 1 ? 's' : ''})`,
       showHeader: true,
       modal: true,
       closable: true,

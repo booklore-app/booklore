@@ -17,7 +17,6 @@ public class AppSettings {
     private boolean similarBookRecommendation;
     private boolean opdsServerEnabled;
     private String uploadPattern;
-    private String movePattern;
     private Integer cbxCacheSizeInMb;
     private Integer pdfCacheSizeInMb;
     private Integer maxFileUploadSizeInMb;
@@ -30,4 +29,5 @@ public class AppSettings {
     private MetadataProviderSettings metadataProviderSettings;
     private MetadataMatchWeights metadataMatchWeights;
     private MetadataPersistenceSettings metadataPersistenceSettings;
+    private MetadataPublicReviewsSettings metadataPublicReviewsSettings;
 }

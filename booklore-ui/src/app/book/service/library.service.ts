@@ -1,119 +1,145 @@
 import {inject, Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {catchError, map} from 'rxjs/operators';
-import {Library} from '../model/library.model';
-import {BookService} from './book.service';
-import {LibraryState} from '../model/state/library-state.model';
-import {API_CONFIG} from '../../config/api-config';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import {catchError, distinctUntilChanged, finalize, map, shareReplay, tap} from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root',
-})
+import {Library} from '../model/library.model';
+import {LibraryState} from '../model/state/library-state.model';
+import {BookService} from './book.service';
+import {API_CONFIG} from '../../config/api-config';
+import {AuthService} from '../../core/service/auth.service';
+
+@Injectable({providedIn: 'root'})
 export class LibraryService {
   private readonly url = `${API_CONFIG.BASE_URL}/api/v1/libraries`;
+  private http = inject(HttpClient);
+  private bookService = inject(BookService);
+  private authService = inject(AuthService);
 
   private libraryStateSubject = new BehaviorSubject<LibraryState>({
     libraries: null,
     loaded: false,
     error: null,
   });
-  libraryState$ = this.libraryStateSubject.asObservable();
 
-  private http = inject(HttpClient);
-  private bookService = inject(BookService);
+  private loading$: Observable<Library[]> | null = null;
 
   constructor() {
-    this.loadLibraries();
-  }
-
-  private loadLibraries(): void {
-    this.http.get<Library[]>(this.url).pipe(
-      catchError(error => {
+    this.authService.token$.pipe(
+      distinctUntilChanged()
+    ).subscribe(token => {
+      if (token === null) {
         this.libraryStateSubject.next({
           libraries: null,
           loaded: true,
-          error: error.message,
+          error: null,
         });
-        return of([]);
-      })
-    ).subscribe(libraries => {
-      this.libraryStateSubject.next({
-        libraries,
-        loaded: true,
-        error: null,
-      });
+        this.loading$ = null;
+      } else {
+        const current = this.libraryStateSubject.value;
+        if (current.loaded && !current.libraries) {
+          this.libraryStateSubject.next({
+            libraries: null,
+            loaded: false,
+            error: null,
+          });
+          this.loading$ = null;
+        }
+      }
     });
   }
 
-  doesLibraryExistByName(name: string): boolean {
-    const libraries = this.libraryStateSubject.value.libraries || [];
-    return libraries.some(library => library.name === name);
-  }
+  libraryState$ = this.libraryStateSubject.asObservable().pipe(
+    tap(state => {
+      if (!state.loaded && !state.error && !this.loading$) {
+        this.loading$ = this.fetchLibraries().pipe(
+          shareReplay(1),
+          finalize(() => (this.loading$ = null))
+        );
+        this.loading$.subscribe();
+      }
+    })
+  );
 
-  findLibraryById(id: number): Library | undefined {
-    return this.libraryStateSubject.value.libraries?.find(library => library.id === id);
-  }
-
-  createLibrary(newLibrary: Library): Observable<Library> {
-    return this.http.post<Library>(this.url, newLibrary).pipe(
-      map(createdLibrary => {
-        const currentState = this.libraryStateSubject.value;
-        const updatedLibraries = currentState.libraries ? [...currentState.libraries, createdLibrary] : [createdLibrary];
-        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
-        return createdLibrary;
-      }),
-      catchError(error => {
-        throw error;
+  private fetchLibraries(): Observable<Library[]> {
+    return this.http.get<Library[]>(this.url).pipe(
+      tap(libs => this.libraryStateSubject.next({libraries: libs, loaded: true, error: null})),
+      catchError(err => {
+        const current = this.libraryStateSubject.value;
+        this.libraryStateSubject.next({libraries: current.libraries, loaded: true, error: err.message});
+        throw err;
       })
     );
   }
 
-  updateLibrary(library: Library, libraryId: number | undefined): Observable<Library> {
-    return this.http.put<Library>(`${this.url}/${libraryId}`, library).pipe(
-      map(updatedLibrary => {
-        const currentState = this.libraryStateSubject.value;
-        const updatedLibraries = currentState.libraries ? currentState.libraries.map(existingLibrary =>
-          existingLibrary.id === updatedLibrary.id ? updatedLibrary : existingLibrary) : [updatedLibrary];
-        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries,});
-        return updatedLibrary;
-      }),
-      catchError(error => {
-        throw error;
+  createLibrary(lib: Library): Observable<Library> {
+    return this.http.post<Library>(this.url, lib).pipe(
+      map(created => {
+        const curr = this.libraryStateSubject.value;
+        const updated = curr.libraries ? [...curr.libraries, created] : [created];
+        this.libraryStateSubject.next({...curr, libraries: updated});
+        return created;
       })
     );
   }
 
-  deleteLibrary(libraryId: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${libraryId}`).pipe(
+  updateLibrary(lib: Library, id?: number): Observable<Library> {
+    return this.http.put<Library>(`${this.url}/${id}`, lib).pipe(
+      map(updated => {
+        const curr = this.libraryStateSubject.value;
+        const list = curr.libraries?.map(l => (l.id === updated.id ? updated : l)) || [updated];
+        this.libraryStateSubject.next({...curr, libraries: list});
+        return updated;
+      })
+    );
+  }
+
+  deleteLibrary(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`).pipe(
       tap(() => {
-        this.bookService.removeBooksByLibraryId(libraryId);
-        const currentState = this.libraryStateSubject.value;
-        const updatedLibraries = currentState.libraries?.filter(library => library.id !== libraryId) || [];
-        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
+        this.bookService.removeBooksByLibraryId(id);
+        const curr = this.libraryStateSubject.value;
+        const filtered = curr.libraries?.filter(l => l.id !== id) || [];
+        this.libraryStateSubject.next({...curr, libraries: filtered});
       }),
-      catchError(error => {
-        const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({...currentState, error: error.message});
+      catchError(err => {
+        const curr = this.libraryStateSubject.value;
+        this.libraryStateSubject.next({...curr, error: err.message});
         return of();
       })
     );
   }
 
-  refreshLibrary(libraryId: number): Observable<void> {
-    return this.http.put<void>(`${this.url}/${libraryId}/refresh`, {}).pipe(
-      catchError(error => {
-        const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({...currentState, error: error.message});
-        throw error;
+  refreshLibrary(id: number): Observable<void> {
+    return this.http.put<void>(`${this.url}/${id}/refresh`, {}).pipe(
+      catchError(err => {
+        const curr = this.libraryStateSubject.value;
+        this.libraryStateSubject.next({...curr, error: err.message});
+        throw err;
       })
     );
   }
 
-  getBookCount(libraryId: number): Observable<number> {
-    return this.bookService.bookState$.pipe(
-      map(state => (state.books || []).filter(book => book.libraryId === libraryId).length)
-    );
+  updateLibraryFileNamingPattern(id: number, pattern: string): Observable<Library> {
+    return this.http
+      .patch<Library>(`${this.url}/${id}/file-naming-pattern`, {fileNamingPattern: pattern})
+      .pipe(
+        map(updated => {
+          const curr = this.libraryStateSubject.value;
+          const list = curr.libraries?.map(l => (l.id === updated.id ? updated : l)) || [updated];
+          this.libraryStateSubject.next({...curr, libraries: list});
+          return updated;
+        })
+      );
+  }
+
+
+  doesLibraryExistByName(name: string): boolean {
+    return (this.libraryStateSubject.value.libraries || []).some(l => l.name === name);
+  }
+
+  findLibraryById(id: number): Library | undefined {
+    return this.libraryStateSubject.value.libraries?.find(l => l.id === id);
   }
 
   getLibrariesFromState(): Library[] {
@@ -121,28 +147,14 @@ export class LibraryService {
   }
 
   getLibraryPathById(pathId: number): string | undefined {
-    const libraries = this.libraryStateSubject.value.libraries || [];
-    for (const library of libraries) {
-      const match = library.paths.find(p => p.id === pathId);
-      if (match) {
-        return match.path;
-      }
-    }
-    return undefined;
+    return this.libraryStateSubject.value.libraries
+      ?.find(lib => lib.paths.some(p => p.id === pathId))
+      ?.paths.find(p => p.id === pathId)?.path;
   }
 
-  updateLibraryFileNamingPattern(libraryId: number, fileNamingPattern: string): Observable<Library> {
-    return this.http.patch<Library>(`${this.url}/${libraryId}/file-naming-pattern`, { fileNamingPattern }).pipe(
-      map(updatedLibrary => {
-        const currentState = this.libraryStateSubject.value;
-        const updatedLibraries = currentState.libraries ? currentState.libraries.map(existingLibrary =>
-          existingLibrary.id === updatedLibrary.id ? updatedLibrary : existingLibrary) : [updatedLibrary];
-        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
-        return updatedLibrary;
-      }),
-      catchError(error => {
-        throw error;
-      })
+  getBookCount(libraryId: number): Observable<number> {
+    return this.bookService.bookState$.pipe(
+      map(state => (state.books || []).filter(b => b.libraryId === libraryId).length)
     );
   }
 }

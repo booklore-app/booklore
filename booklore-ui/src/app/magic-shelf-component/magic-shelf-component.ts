@@ -10,7 +10,7 @@ import {InputNumber} from 'primeng/inputnumber';
 import {ReadStatus} from '../book/model/book.model';
 import {LibraryService} from '../book/service/library.service';
 import {Library} from '../book/model/library.model';
-import {MagicShelfService} from '../magic-shelf-service';
+import {MagicShelfService} from '../magic-shelf.service';
 import {MessageService} from 'primeng/api';
 import {DynamicDialogConfig} from 'primeng/dynamicdialog';
 import {Chips} from 'primeng/chips';

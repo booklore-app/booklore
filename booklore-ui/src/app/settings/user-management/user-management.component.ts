@@ -1,10 +1,10 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {CreateUserDialogComponent} from './create-user-dialog/create-user-dialog.component';
 import {TableModule} from 'primeng/table';
-import { LowerCasePipe, NgStyle, TitleCasePipe } from '@angular/common';
+import {LowerCasePipe, NgStyle, TitleCasePipe} from '@angular/common';
 import {User, UserService} from './user.service';
 import {MessageService} from 'primeng/api';
 import {Checkbox} from 'primeng/checkbox';
@@ -13,7 +13,8 @@ import {Library} from '../../book/model/library.model';
 import {LibraryService} from '../../book/service/library.service';
 import {Dialog} from 'primeng/dialog';
 import {Password} from 'primeng/password';
-import {filter, take} from 'rxjs/operators';
+import {filter, take, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-user-management',
@@ -28,19 +29,20 @@ import {filter, take} from 'rxjs/operators';
     Password,
     LowerCasePipe,
     TitleCasePipe
-],
+  ],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
-export class UserManagementComponent implements OnInit {
+export class UserManagementComponent implements OnInit, OnDestroy {
   ref: DynamicDialogRef | undefined;
   private dialogService = inject(DialogService);
   private userService = inject(UserService);
   private libraryService = inject(LibraryService);
   private messageService = inject(MessageService);
+  private readonly destroy$ = new Subject<void>();
 
   users: User[] = [];
-  currentUser: User | undefined;
+  currentUser: User | null = null;
   editingLibraryIds: number[] = [];
   allLibraries: Library[] = [];
 
@@ -49,17 +51,34 @@ export class UserManagementComponent implements OnInit {
   newPassword = '';
   confirmNewPassword = '';
   passwordError = '';
+  isAdmin = false;
 
   ngOnInit() {
     this.loadUsers();
 
     this.userService.userState$
-      .pipe(filter(user => !!user), take(1))
-      .subscribe(user => this.currentUser = user);
+      .pipe(
+        filter(userState => !!userState?.user && userState.loaded),
+        take(1),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(userState => {
+        this.currentUser = userState.user;
+        this.isAdmin = userState.user?.permissions?.admin || false;
+      });
 
     this.libraryService.libraryState$
-      .pipe(filter(state => !!state?.loaded), take(1))
+      .pipe(
+        filter(state => !!state?.loaded),
+        take(1),
+        takeUntil(this.destroy$)
+      )
       .subscribe(libraries => this.allLibraries = libraries.libraries ?? []);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 

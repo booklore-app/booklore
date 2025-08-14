@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "user_settings",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "setting_key"})})
+@Table(name = "user_settings", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "setting_key"})})
 public class UserSettingEntity {
 
     @Id

@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, first, Observable, of, throwError} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {catchError, filter, map, tap} from 'rxjs/operators';
+import {catchError, filter, map, tap, shareReplay, finalize, distinctUntilChanged} from 'rxjs/operators';
 import {Book, BookDeletionResponse, BookMetadata, BookRecommendation, BookSetting, BulkMetadataUpdateRequest, MetadataUpdateWrapper, ReadStatus} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
@@ -9,6 +9,7 @@ import {FetchMetadataRequest} from '../../metadata/model/request/fetch-metadata-
 import {MetadataRefreshRequest} from '../../metadata/model/request/metadata-refresh-request.model';
 import {MessageService} from 'primeng/api';
 import {ResetProgressType, ResetProgressTypes} from '../../shared/constants/reset-progress-type';
+import {AuthService} from '../../core/service/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,22 +18,57 @@ export class BookService {
 
   private readonly url = `${API_CONFIG.BASE_URL}/api/v1/books`;
 
+  private http = inject(HttpClient);
+  private messageService = inject(MessageService);
+  private authService = inject(AuthService);
+
   private bookStateSubject = new BehaviorSubject<BookState>({
     books: null,
     loaded: false,
     error: null,
   });
-  bookState$ = this.bookStateSubject.asObservable();
 
-  private http = inject(HttpClient);
-  private messageService = inject(MessageService);
+  private loading$: Observable<Book[]> | null = null;
 
-  loadBooks(): void {
-    const currentState = this.bookStateSubject.value;
-    if (currentState.loaded && this.bookStateSubject.value.books != null) {
-      return;
-    }
-    this.http.get<Book[]>(this.url).pipe(
+  constructor() {
+    this.authService.token$.pipe(
+      distinctUntilChanged()
+    ).subscribe(token => {
+      if (token === null) {
+        this.bookStateSubject.next({
+          books: null,
+          loaded: true,
+          error: null,
+        });
+        this.loading$ = null;
+      } else {
+        const current = this.bookStateSubject.value;
+        if (current.loaded && !current.books) {
+          this.bookStateSubject.next({
+            books: null,
+            loaded: false,
+            error: null,
+          });
+          this.loading$ = null;
+        }
+      }
+    });
+  }
+
+  bookState$ = this.bookStateSubject.asObservable().pipe(
+    tap(state => {
+      if (!state.loaded && !state.error && !this.loading$) {
+        this.loading$ = this.fetchBooks().pipe(
+          shareReplay(1),
+          finalize(() => (this.loading$ = null))
+        );
+        this.loading$.subscribe();
+      }
+    })
+  );
+
+  private fetchBooks(): Observable<Book[]> {
+    return this.http.get<Book[]>(this.url).pipe(
       tap(books => {
         this.bookStateSubject.next({
           books: books || [],
@@ -41,14 +77,15 @@ export class BookService {
         });
       }),
       catchError(error => {
+        const curr = this.bookStateSubject.value;
         this.bookStateSubject.next({
-          books: null,
+          books: curr.books,
           loaded: true,
           error: error.message,
         });
-        return of(null);
+        throw error;
       })
-    ).subscribe();
+    );
   }
 
   getBookByIdFromState(bookId: number): Book | undefined {
@@ -280,6 +317,31 @@ export class BookService {
       }
     };
     return this.http.post<void>(`${this.url}/progress`, body);
+  }
+
+  updateDateFinished(bookId: number, dateFinished: string | null): Observable<void> {
+    const body = {
+      bookId: bookId,
+      dateFinished: dateFinished
+    };
+    return this.http.post<void>(`${this.url}/progress`, body).pipe(
+      tap(() => {
+        // Update the book in the state
+        const currentState = this.bookStateSubject.value;
+        if (currentState.books) {
+          const updatedBooks = currentState.books.map(book => {
+            if (book.id === bookId) {
+              return { ...book, dateFinished: dateFinished || undefined };
+            }
+            return book;
+          });
+          this.bookStateSubject.next({
+            ...currentState,
+            books: updatedBooks
+          });
+        }
+      })
+    );
   }
 
   regenerateCovers(): Observable<void> {

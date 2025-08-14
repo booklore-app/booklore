@@ -7,5 +7,4 @@ import java.util.Set;
 @Data
 public class FileMoveRequest {
     private Set<Long> bookIds;
-    private String pattern;
 }

@@ -1,4 +1,5 @@
 import {Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {TooltipModule} from "primeng/tooltip";
 import {Book, ReadStatus} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
@@ -21,7 +22,7 @@ import {BookSenderComponent} from '../../book-sender/book-sender.component';
 import {Router} from '@angular/router';
 import {ProgressBar} from 'primeng/progressbar';
 import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center-component/book-metadata-center.component';
-import {takeUntil} from 'rxjs/operators';
+import {take, takeUntil} from 'rxjs/operators';
 import {readStatusLabels} from '../book-filter/book-filter.component';
 import {ResetProgressTypes} from '../../../../shared/constants/reset-progress-type';
 
@@ -29,7 +30,7 @@ import {ResetProgressTypes} from '../../../../shared/constants/reset-progress-ty
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgClass, TieredMenu, ProgressBar],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgClass, TieredMenu, ProgressBar, TooltipModule],
   standalone: true
 })
 export class BookCardComponent implements OnInit, OnDestroy {
@@ -67,12 +68,13 @@ export class BookCardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userService.userState$
       .pipe(
-        filter(user => !!user),
+        filter(userState => !!userState?.user && userState.loaded),
+        take(1),
         takeUntil(this.destroy$)
       )
-      .subscribe(user => {
-        this.userPermissions = user.permissions;
-        this.metadataCenterViewMode = user?.userSettings.metadataCenterViewMode ?? 'route';
+      .subscribe(userState => {
+        this.userPermissions = userState.user?.permissions;
+        this.metadataCenterViewMode = userState?.user?.userSettings.metadataCenterViewMode ?? 'route';
         this.initMenu();
       });
   }

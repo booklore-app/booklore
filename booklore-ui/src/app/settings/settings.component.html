@@ -1,5 +1,5 @@
-@if (userService.userState$ | async; as userData) {
-  <div>
+@if (userService.userState$ | async; as userState) {
+  @if (userState.user) {
     <div class="rounded-xl overflow-hidden">
       <p-tabs [(value)]="activeTab" scrollable>
         <p-tablist>
@@ -9,7 +9,7 @@
           <p-tab [value]="SettingsTab.ViewPreferences">
             <i class="pi pi-desktop"></i> View
           </p-tab>
-          @if (userData.permissions.admin) {
+          @if (userState.user.permissions.admin) {
             <p-tab [value]="SettingsTab.MetadataSettings">
               <i class="pi pi-sliders-h"></i> Metadata
             </p-tab>
@@ -32,7 +32,7 @@
               <i class="pi pi-globe"></i> OPDS
             </p-tab>
           }
-          @if (userData.permissions.admin || userData.permissions.canSyncKoReader) {
+          @if (userState.user.permissions.admin || userState.user.permissions.canSyncKoReader) {
             <p-tab [value]="SettingsTab.DeviceSettings">
               <i class="pi pi-mobile"></i> Devices
             </p-tab>
@@ -45,7 +45,7 @@
           <p-tabpanel [value]="SettingsTab.ViewPreferences">
             <app-view-preferences-parent></app-view-preferences-parent>
           </p-tabpanel>
-          @if (userData.permissions.admin) {
+          @if (userState.user.permissions.admin) {
             <p-tabpanel [value]="SettingsTab.MetadataSettings">
               <app-metadata-settings-component></app-metadata-settings-component>
             </p-tabpanel>
@@ -68,7 +68,7 @@
               <app-opds-settings></app-opds-settings>
             </p-tabpanel>
           }
-          @if (userData.permissions.admin || userData.permissions.canSyncKoReader) {
+          @if (userState.user.permissions.admin || userState.user.permissions.canSyncKoReader) {
             <p-tabpanel [value]="SettingsTab.DeviceSettings">
               <app-device-settings-component></app-device-settings-component>
             </p-tabpanel>
@@ -76,5 +76,5 @@
         </p-tabpanels>
       </p-tabs>
     </div>
-  </div>
+  }
 }

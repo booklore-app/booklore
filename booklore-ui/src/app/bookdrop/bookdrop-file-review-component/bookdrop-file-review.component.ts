@@ -75,7 +75,8 @@ export class BookdropFileReviewComponent implements OnInit {
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
   uploadPattern = '';
-  defaultLibraryId: string | null = null;
+  _defaultLibraryId: string | null = null;
+
   defaultPathId: string | null = null;
   libraries: Library[] = [];
   bookdropFileUis: BookdropFileUI[] = [];
@@ -106,6 +107,20 @@ export class BookdropFileReviewComponent implements OnInit {
       .subscribe(settings => {
         this.uploadPattern = settings?.uploadPattern ?? '';
       });
+  }
+
+  get defaultLibraryId() {
+    return this._defaultLibraryId;
+  }
+
+  set defaultLibraryId(value: string | null) {
+    this._defaultLibraryId = value;
+
+    const selected = this.libraries.find((lib) => lib?.id && String(lib.id) === value)
+
+    if (selected && selected.paths.length ===1) {
+      this.defaultPathId = String(selected.paths[0].id)
+    }
   }
 
   get libraryOptions() {
@@ -188,7 +203,7 @@ export class BookdropFileReviewComponent implements OnInit {
   onLibraryChange(file: BookdropFileUI): void {
     const lib = this.libraries.find(l => String(l.id) === file.selectedLibraryId);
     file.availablePaths = lib?.paths.map(p => ({id: String(p.id ?? ''), name: p.path})) ?? [];
-    file.selectedPathId = null;
+    file.selectedPathId = file.availablePaths.length === 1 ? file.availablePaths[0].id : null;
   }
 
   onMetadataCopied(fileId: number, copied: boolean): void {

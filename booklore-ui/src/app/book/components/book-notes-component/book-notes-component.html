@@ -1,0 +1,206 @@
+<div class="book-notes-container">
+  <div class="notes-content">
+    @if (loading) {
+      <div class="flex flex-col items-center justify-center p-8 gap-4">
+        <p-progressSpinner/>
+        <span class="text-gray-400">Loading notes...</span>
+      </div>
+    } @else if (notes.length === 0) {
+      <div class="text-center p-8 text-gray-400 empty-state">
+        <div class="empty-state-icon">
+          <p-button
+            outlined
+            rounded
+            icon="pi pi-plus"
+            severity="primary"
+            (click)="openCreateDialog()"
+            pTooltip="Add New Note"
+            tooltipPosition="top"
+            class="action-btn floating-btn">
+          </p-button>
+        </div>
+        <p class="text-gray-200 empty-state-title">No notes yet for this book</p>
+        <p class="text-sm text-gray-400 mt-2 empty-state-subtitle">
+          Click "Add Note" to create your first note and start capturing your thoughts
+        </p>
+        <div class="empty-state-decoration"></div>
+      </div>
+    } @else {
+      <div class="notes-scroll-container">
+        <div class="notes-horizontal-list">
+          @for (note of notes; track note.id + '-' + note.createdAt + '-' + $index) {
+            <div class="note-card border border-zinc-700">
+              <div class="note-header">
+                <div class="flex justify-between items-start p-3">
+                  <div class="flex flex-col gap-1">
+                    <h4 class="note-title font-medium text-lg text-gray-200 m-0">{{ note.title }}</h4>
+                    <div class="note-meta">
+                      <i class="pi pi-clock text-xs mr-1"></i>
+                      <span class="text-sm text-gray-400">
+                        @if (note.createdAt !== note.updatedAt) {
+                          Updated {{ formatDate(note.updatedAt) }}
+                        } @else {
+                          Created {{ formatDate(note.createdAt) }}
+                        }
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="note-actions">
+                    <p-button
+                      icon="pi pi-pencil"
+                      size="small"
+                      severity="secondary"
+                      text
+                      (onClick)="openEditDialog(note)"
+                      pTooltip="Edit note"
+                      tooltipPosition="top"
+                      class="action-btn-hover">
+                    </p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      size="small"
+                      severity="danger"
+                      text
+                      (onClick)="deleteNote(note)"
+                      pTooltip="Delete note"
+                      tooltipPosition="top"
+                      class="action-btn-hover">
+                    </p-button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="note-content-area px-3 pb-3">
+                <div class="text-zinc-300 note-body">{{ note.content }}</div>
+                <div class="note-fade-overlay"></div>
+              </div>
+              <div class="note-bottom-glow"></div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (notes.length > 0) {
+    <div class="action-bar">
+      <p-button
+        outlined
+        icon="pi pi-plus"
+        severity="success"
+        (click)="openCreateDialog()"
+        pTooltip="Add New Note"
+        tooltipPosition="left">
+      </p-button>
+    </div>
+  }
+
+  <p-dialog
+    header="Add New Note"
+    [(visible)]="showCreateDialog"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    [dismissableMask]="true">
+
+    <div class="flex flex-col gap-4">
+      <div class="field">
+        <label for="create-title" class="block text-sm font-medium mb-2">Title</label>
+        <input
+          id="create-title"
+          pInputText
+          [(ngModel)]="newNote.title"
+          placeholder="Enter note title"
+          class="w-full"
+          maxlength="255"/>
+      </div>
+
+      <div class="field">
+        <label for="create-content" class="block text-sm font-medium mb-2">Content</label>
+        <textarea
+          id="create-content"
+          pTextarea
+          [(ngModel)]="newNote.content"
+          placeholder="Enter your note content..."
+          [rows]="8"
+          class="w-full"
+          [autoResize]="true">
+        </textarea>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex gap-2 justify-end">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          outlined
+          (onClick)="cancelCreate()">
+        </p-button>
+        <p-button
+          outlined
+          severity="success"
+          label="Save Note"
+          icon="pi pi-save"
+          (onClick)="createNote()">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog
+    header="Edit Note"
+    [(visible)]="showEditDialog"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    [dismissableMask]="true">
+
+    <div class="flex flex-col gap-4">
+      <div class="field">
+        <label for="edit-title" class="block text-sm font-medium mb-2">Title</label>
+        <input
+          id="edit-title"
+          pInputText
+          [(ngModel)]="editNote.title"
+          placeholder="Enter note title"
+          class="w-full"
+          maxlength="255"/>
+      </div>
+
+      <div class="field">
+        <label for="edit-content" class="block text-sm font-medium mb-2">Content</label>
+        <textarea
+          id="edit-content"
+          pTextarea
+          [(ngModel)]="editNote.content"
+          placeholder="Enter your note content..."
+          [rows]="8"
+          class="w-full"
+          [autoResize]="true">
+        </textarea>
+      </div>
+    </div>
+
+    <ng-template #footer>
+      <div class="flex gap-2 justify-end">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          outlined
+          (onClick)="cancelEdit()">
+        </p-button>
+        <p-button
+          outlined
+          severity="success"
+          label="Update Note"
+          icon="pi pi-save"
+          (onClick)="updateNote()">
+        </p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog key="deleteNote"></p-confirmDialog>
+</div>
