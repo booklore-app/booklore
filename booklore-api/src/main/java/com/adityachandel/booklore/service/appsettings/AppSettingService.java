@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -47,6 +49,16 @@ public class AppSettingService {
         setting.setVal(settingPersistenceHelper.serializeSettingValue(key, val));
         settingPersistenceHelper.appSettingsRepository.save(setting);
         refreshCache();
+    }
+
+    public List<PublicAppSetting> getPublicSettings() {
+        return Arrays.stream(AppSettingKey.values())
+                .filter(AppSettingKey::isPublic)
+                .map(key -> new PublicAppSetting(
+                        key.toString(),
+                        settingPersistenceHelper.getOrCreateSetting(key, null)
+                ))
+                .toList();
     }
 
     private void refreshCache() {

@@ -11,6 +11,7 @@ import {AppSettingsService} from '../../service/app-settings.service';
 import {AppSettings} from '../../model/app-settings.model';
 import {Observable} from 'rxjs';
 import {filter, take} from 'rxjs/operators';
+import {PublicAppSettings, PublicAppSettingService} from '../../../public-app-settings.service';
 
 @Component({
   selector: 'app-login',
@@ -33,20 +34,20 @@ export class LoginComponent implements OnInit {
 
   private authService = inject(AuthService);
   private oAuthService = inject(OAuthService);
-  private appSettingsService = inject(AppSettingsService);
+  private appSettingsService = inject(PublicAppSettingService);
   private router = inject(Router);
 
-  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
+  publicAppSettings$: Observable<PublicAppSettings | null> = this.appSettingsService.publicAppSettings$;
 
   ngOnInit(): void {
-    this.appSettings$
+    this.publicAppSettings$
       .pipe(
         filter(settings => settings != null),
         take(1)
       )
-      .subscribe(settings => {
-        this.oidcEnabled = settings!.oidcEnabled;
-        this.oidcName = settings!.oidcProviderDetails?.providerName || 'OIDC';
+      .subscribe(publicSettings => {
+        this.oidcEnabled = publicSettings!.oidcEnabled;
+        this.oidcName = publicSettings!.oidcProviderDetails?.providerName || 'OIDC';
       });
   }
 

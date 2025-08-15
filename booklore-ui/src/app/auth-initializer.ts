@@ -1,24 +1,21 @@
 import {inject} from '@angular/core';
-import {Router} from '@angular/router';
-import {OAuthEvent, OAuthService} from 'angular-oauth2-oidc';
-import {AppSettingsService} from './core/service/app-settings.service';
+import {OAuthService} from 'angular-oauth2-oidc';
 import {AuthService, websocketInitializer} from './core/service/auth.service';
-import {filter} from 'rxjs/operators';
 import {AuthInitializationService} from './auth-initialization-service';
+import {PublicAppSettingService} from './public-app-settings.service';
 
 export function initializeAuthFactory() {
   return () => {
     const oauthService = inject(OAuthService);
-    const appSettingsService = inject(AppSettingsService);
+    const publicAppSettingService = inject(PublicAppSettingService);
     const authService = inject(AuthService);
-    const router = inject(Router);
     const authInitService = inject(AuthInitializationService);
 
     return new Promise<void>((resolve) => {
-      const sub = appSettingsService.appSettings$.subscribe(settings => {
-        if (settings) {
-          if (settings.oidcEnabled && settings.oidcProviderDetails) {
-            const details = settings.oidcProviderDetails;
+      const sub = publicAppSettingService.publicAppSettings$.subscribe(publicSettings => {
+        if (publicSettings) {
+          if (publicSettings.oidcEnabled && publicSettings.oidcProviderDetails) {
+            const details = publicSettings.oidcProviderDetails;
 
             oauthService.configure({
               issuer: details.issuerUri,
