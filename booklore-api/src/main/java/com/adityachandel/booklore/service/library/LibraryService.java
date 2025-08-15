@@ -26,6 +26,9 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -173,13 +176,19 @@ public class LibraryService {
 
     public void rescanLibrary(long libraryId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
         Thread.startVirtualThread(() -> {
             try {
+                SecurityContext context = SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(currentAuth);
+                SecurityContextHolder.setContext(context);
                 libraryProcessingService.rescanLibrary(libraryId);
             } catch (InvalidDataAccessApiUsageException e) {
                 log.debug("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
             } catch (IOException e) {
                 log.error("Error while parsing library books", e);
+            } finally {
+                SecurityContextHolder.clearContext();
             }
             log.info("Parsing task completed!");
         });

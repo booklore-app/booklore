@@ -1,17 +1,19 @@
 package com.adityachandel.booklore.model.websocket;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public enum Topic {
-    BOOK_ADD("/topic/book-add"),
-    BOOKS_REMOVE("/topic/books-remove"),
-    BOOK_METADATA_UPDATE("/topic/book-metadata-update"),
-    BOOK_METADATA_BATCH_UPDATE("/topic/book-metadata-batch-update"),
-    BOOK_METADATA_BATCH_PROGRESS("/topic/book-metadata-batch-progress"),
-    BOOKDROP_FILE("/topic/bookdrop-file"),
-    TASK("/topic/task"),
-    LOG("/topic/log");
+    BOOK_ADD("/queue/book-add"),
+    BOOKS_REMOVE("/queue/books-remove"),
+    BOOK_METADATA_UPDATE("/queue/book-metadata-update"),
+    BOOK_METADATA_BATCH_UPDATE("/queue/book-metadata-batch-update"),
+    BOOK_METADATA_BATCH_PROGRESS("/queue/book-metadata-batch-progress"),
+    BOOKDROP_FILE("/queue/bookdrop-file"),
+    TASK("/queue/task"),
+    LOG("/queue/log");
 
     private final String path;
 
