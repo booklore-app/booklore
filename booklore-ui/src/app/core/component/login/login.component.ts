@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, OnDestroy} from '@angular/core';
 import {AuthService} from '../../service/auth.service';
 import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
@@ -7,11 +7,10 @@ import {Button} from 'primeng/button';
 import {Message} from 'primeng/message';
 import {InputText} from 'primeng/inputtext';
 import {OAuthService} from 'angular-oauth2-oidc';
-import {AppSettingsService} from '../../service/app-settings.service';
-import {AppSettings} from '../../model/app-settings.model';
-import {Observable} from 'rxjs';
-import {filter, take} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {filter, take, takeUntil} from 'rxjs/operators';
 import {PublicAppSettings, PublicAppSettingService} from '../../../public-app-settings.service';
+import {getOidcErrorCount, isOidcBypassed, resetOidcBypass} from '../../../auth-initializer';
 
 @Component({
   selector: 'app-login',
@@ -25,12 +24,16 @@ import {PublicAppSettings, PublicAppSettingService} from '../../../public-app-se
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   username = '';
   password = '';
   errorMessage = '';
   oidcEnabled = false;
   oidcName = 'OIDC';
+  isOidcBypassed = false;
+  showOidcBypassInfo = false;
+  oidcBypassMessage = '';
+  isOidcLoginInProgress = false;
 
   private authService = inject(AuthService);
   private oAuthService = inject(OAuthService);
@@ -38,6 +41,8 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
 
   publicAppSettings$: Observable<PublicAppSettings | null> = this.appSettingsService.publicAppSettings$;
+
+  private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     this.publicAppSettings$
@@ -48,7 +53,25 @@ export class LoginComponent implements OnInit {
       .subscribe(publicSettings => {
         this.oidcEnabled = publicSettings!.oidcEnabled;
         this.oidcName = publicSettings!.oidcProviderDetails?.providerName || 'OIDC';
+        this.checkOidcBypassStatus();
       });
+  }
+
+  private checkOidcBypassStatus(): void {
+    this.isOidcBypassed = isOidcBypassed();
+    const errorCount = getOidcErrorCount();
+
+    if (this.oidcEnabled && (this.isOidcBypassed || errorCount > 0)) {
+      this.showOidcBypassInfo = true;
+
+      if (this.isOidcBypassed && errorCount >= 3) {
+        this.oidcBypassMessage = `${this.oidcName} authentication has been automatically disabled after ${errorCount} consecutive failures (including timeouts). You can retry or continue with local login.`;
+      } else if (this.isOidcBypassed) {
+        this.oidcBypassMessage = `${this.oidcName} authentication has been manually disabled. You can re-enable it or continue with local login.`;
+      } else if (errorCount > 0) {
+        this.oidcBypassMessage = `${this.oidcName} authentication encountered ${errorCount} error(s), possibly due to timeouts or server issues.`;
+      }
+    }
   }
 
   login(): void {
@@ -71,6 +94,53 @@ export class LoginComponent implements OnInit {
   }
 
   loginWithOidc(): void {
-    this.oAuthService.initCodeFlow();
+    if (this.isOidcLoginInProgress) {
+      return;
+    }
+
+    this.isOidcLoginInProgress = true;
+    this.errorMessage = '';
+
+    try {
+      setTimeout(() => {
+        this.isOidcLoginInProgress = false;
+      }, 5000);
+      this.oAuthService.initCodeFlow();
+    } catch (error) {
+      console.error('OIDC login initiation failed:', error);
+      this.errorMessage = 'Failed to initiate OIDC login. Please try again or use local login.';
+      this.isOidcLoginInProgress = false;
+    }
+  }
+
+  bypassOidc(): void {
+    localStorage.setItem('booklore-oidc-bypass', 'true');
+    this.isOidcBypassed = true;
+    this.showOidcBypassInfo = false;
+  }
+
+  enableOidc(): void {
+    resetOidcBypass();
+    this.isOidcBypassed = false;
+    this.showOidcBypassInfo = false;
+    this.isOidcLoginInProgress = false;
+    window.location.reload();
+  }
+
+  retryOidc(): void {
+    resetOidcBypass();
+    this.isOidcBypassed = false;
+    this.showOidcBypassInfo = false;
+    this.isOidcLoginInProgress = false;
+    window.location.reload();
+  }
+
+  dismissOidcWarning(): void {
+    this.showOidcBypassInfo = false;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

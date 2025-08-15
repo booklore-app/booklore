@@ -9,8 +9,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -51,14 +49,8 @@ public class AppSettingService {
         refreshCache();
     }
 
-    public List<PublicAppSetting> getPublicSettings() {
-        return Arrays.stream(AppSettingKey.values())
-                .filter(AppSettingKey::isPublic)
-                .map(key -> new PublicAppSetting(
-                        key.toString(),
-                        settingPersistenceHelper.getOrCreateSetting(key, null)
-                ))
-                .toList();
+    public PublicAppSetting getPublicSettings() {
+        return buildPublicSetting();
     }
 
     private void refreshCache() {
@@ -70,8 +62,22 @@ public class AppSettingService {
         }
     }
 
+    private Map<String, String> getSettingsMap() {
+        return settingPersistenceHelper.appSettingsRepository.findAll().stream().collect(Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal));
+    }
+
+    private PublicAppSetting buildPublicSetting() {
+        Map<String, String> settingsMap = getSettingsMap();
+        PublicAppSetting.PublicAppSettingBuilder builder = PublicAppSetting.builder();
+
+        builder.oidcEnabled(Boolean.parseBoolean(settingPersistenceHelper.getOrCreateSetting(AppSettingKey.OIDC_ENABLED, "false")));
+        builder.oidcProviderDetails(settingPersistenceHelper.getJsonSetting(settingsMap, AppSettingKey.OIDC_PROVIDER_DETAILS, OidcProviderDetails.class, null, false));
+
+        return builder.build();
+    }
+
     private AppSettings buildAppSettings() {
-        Map<String, String> settingsMap = settingPersistenceHelper.appSettingsRepository.findAll().stream().collect(Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal));
+        Map<String, String> settingsMap = getSettingsMap();
 
         AppSettings.AppSettingsBuilder builder = AppSettings.builder();
         builder.remoteAuthEnabled(appProperties.getRemoteAuth().isEnabled());

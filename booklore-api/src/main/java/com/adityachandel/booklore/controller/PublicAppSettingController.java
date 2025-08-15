@@ -17,7 +17,7 @@ public class PublicAppSettingController {
     private final AppSettingService appSettingService;
 
     @GetMapping
-    public List<PublicAppSetting> getPublicSettings() {
+    public PublicAppSetting getPublicSettings() {
         return appSettingService.getPublicSettings();
     }
 }

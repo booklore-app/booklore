@@ -21,9 +21,9 @@ public class AppSettings {
     private Integer pdfCacheSizeInMb;
     private Integer maxFileUploadSizeInMb;
     private boolean remoteAuthEnabled;
-    private boolean oidcEnabled;
     private boolean bookDeletionEnabled;
     private boolean metadataDownloadOnBookdrop;
+    private boolean oidcEnabled;
     private OidcProviderDetails oidcProviderDetails;
     private OidcAutoProvisionDetails oidcAutoProvisionDetails;
     private MetadataProviderSettings metadataProviderSettings;

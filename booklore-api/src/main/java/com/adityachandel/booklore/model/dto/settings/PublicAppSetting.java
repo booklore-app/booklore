@@ -1,11 +1,12 @@
 package com.adityachandel.booklore.model.dto.settings;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
-@Getter
+@Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class PublicAppSetting {
-    private final String key;
-    private final Object value;
+    private boolean oidcEnabled;
+    private OidcProviderDetails oidcProviderDetails;
 }
