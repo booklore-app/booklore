@@ -4,8 +4,13 @@ import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.EmailProviderMapper;
 import com.adityachandel.booklore.model.dto.EmailProvider;
 import com.adityachandel.booklore.model.dto.request.CreateEmailProviderRequest;
+import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.EmailProviderEntity;
+import com.adityachandel.booklore.model.entity.UserEmailProviderEntity;
+import com.adityachandel.booklore.model.entity.UserEmailProviderId;
 import com.adityachandel.booklore.repository.EmailProviderRepository;
+import com.adityachandel.booklore.repository.UserEmailProviderRepository;
+import com.adityachandel.booklore.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,7 +26,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EmailProviderService {
 
     private final EmailProviderRepository emailProviderRepository;
+    private final UserEmailProviderRepository userEmailProviderRepository;
     private final EmailProviderMapper emailProviderMapper;
+    private final UserRepository userRepository;
 
     public EmailProvider getEmailProvider(Long id) {
         EmailProviderEntity emailProvider = emailProviderRepository.findById(id).orElseThrow(() -> ApiError.EMAIL_PROVIDER_NOT_FOUND.createException(id));
@@ -68,5 +76,27 @@ public class EmailProviderService {
 
     public List<EmailProvider> getEmailProviders() {
         return emailProviderRepository.findAll().stream().map(emailProviderMapper::toDTO).toList();
+    }
+
+    @Transactional
+    public void assignProvidersToUser(Long userId, List<Long> providerIds) {
+        BookLoreUserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(userId));
+
+        userEmailProviderRepository.deleteByUserId(userId);
+
+        List<UserEmailProviderEntity> newMappings = providerIds.stream()
+                .map(providerId -> {
+                    EmailProviderEntity provider = emailProviderRepository.findById(providerId)
+                            .orElseThrow(() -> ApiError.EMAIL_PROVIDER_NOT_FOUND.createException(providerId));
+
+                    return UserEmailProviderEntity.builder()
+                            .user(user)
+                            .provider(provider)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        userEmailProviderRepository.saveAll(newMappings);
     }
 }

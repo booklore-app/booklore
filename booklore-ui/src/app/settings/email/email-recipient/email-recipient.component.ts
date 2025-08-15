@@ -24,7 +24,7 @@ import {CreateEmailRecipientDialogComponent} from '../create-email-recipient-dia
     TableModule,
     Tooltip,
     FormsModule
-],
+  ],
   templateUrl: './email-recipient.component.html',
   styleUrl: './email-recipient.component.scss'
 })

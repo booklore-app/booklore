@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.EmailProvider;
+import com.adityachandel.booklore.model.dto.request.AssignEmailProvidersRequest;
 import com.adityachandel.booklore.model.dto.request.CreateEmailProviderRequest;
 import com.adityachandel.booklore.service.email.EmailProviderService;
 import lombok.AllArgsConstructor;
@@ -52,6 +53,13 @@ public class EmailProviderController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEmailProvider(@PathVariable Long id) {
         emailProviderService.deleteEmailProvider(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("@securityUtil.isAdmin()")
+    @PutMapping("/assign-to-user/{userId}")
+    public ResponseEntity<Void> assignProvidersToUser(@PathVariable Long userId, @RequestBody AssignEmailProvidersRequest request) {
+        emailProviderService.assignProvidersToUser(userId, request.getProviderIds());
         return ResponseEntity.noContent().build();
     }
 }
