@@ -1,8 +1,8 @@
 import {inject} from '@angular/core';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {AuthService, websocketInitializer} from './core/service/auth.service';
+import {AppSettingsService} from './core/service/app-settings.service';
 import {AuthInitializationService} from './auth-initialization-service';
-import {PublicAppSettingService} from './public-app-settings.service';
 
 const OIDC_BYPASS_KEY = 'booklore-oidc-bypass';
 const OIDC_ERROR_COUNT_KEY = 'booklore-oidc-error-count';
@@ -21,17 +21,22 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
 export function initializeAuthFactory() {
   return () => {
     const oauthService = inject(OAuthService);
-    const publicAppSettingService = inject(PublicAppSettingService);
+    const appSettingsService = inject(AppSettingsService);
     const authService = inject(AuthService);
     const authInitService = inject(AuthInitializationService);
 
     return new Promise<void>((resolve) => {
-      const sub = publicAppSettingService.publicAppSettings$.subscribe(publicSettings => {
+      const sub = appSettingsService.publicAppSettings$.subscribe(publicSettings => {
         if (publicSettings) {
+          const forceLocalOnly = new URLSearchParams(window.location.search).get('localOnly') === 'true';
           const oidcBypassed = localStorage.getItem(OIDC_BYPASS_KEY) === 'true';
           const errorCount = parseInt(localStorage.getItem(OIDC_ERROR_COUNT_KEY) || '0', 10);
 
-          if (publicSettings.oidcEnabled && publicSettings.oidcProviderDetails && !oidcBypassed && errorCount < MAX_OIDC_RETRIES) {
+          if (!forceLocalOnly &&
+            publicSettings.oidcEnabled &&
+            publicSettings.oidcProviderDetails &&
+            !oidcBypassed &&
+            errorCount < MAX_OIDC_RETRIES) {
             const details = publicSettings.oidcProviderDetails;
 
             oauthService.configure({
@@ -53,7 +58,7 @@ export function initializeAuthFactory() {
                 localStorage.removeItem(OIDC_ERROR_COUNT_KEY);
 
                 if (oauthService.hasValidAccessToken()) {
-                  authService.tokenSubject.next(oauthService.getAccessToken())
+                  authService.tokenSubject.next(oauthService.getAccessToken());
                   console.log('[OIDC] Valid access token found after tryLogin');
                   oauthService.setupAutomaticSilentRefresh();
                   websocketInitializer(authService);
@@ -90,7 +95,9 @@ export function initializeAuthFactory() {
                 resolve();
               });
           } else {
-            if (oidcBypassed) {
+            if (forceLocalOnly) {
+              console.warn('[OIDC] Forced local-only login via ?localOnly=true');
+            } else if (oidcBypassed) {
               console.log('[OIDC] OIDC is manually bypassed, using local authentication only');
             } else if (errorCount >= MAX_OIDC_RETRIES) {
               console.log(`[OIDC] OIDC automatically bypassed due to ${errorCount} consecutive errors`);

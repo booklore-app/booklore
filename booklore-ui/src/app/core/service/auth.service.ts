@@ -1,10 +1,10 @@
 import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable, Subject, tap} from 'rxjs';
+import {BehaviorSubject, Observable, tap} from 'rxjs';
 import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 import {API_CONFIG} from '../../config/api-config';
 import {createRxStompConfig} from '../../shared/websocket/rx-stomp.config';
-import {OAuthService} from 'angular-oauth2-oidc';
+import {OAuthService, OAuthStorage} from 'angular-oauth2-oidc';
 import {Router} from '@angular/router';
 
 @Injectable({
@@ -18,6 +18,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
   private oAuthService = inject(OAuthService);
+  private oAuthStorage = inject(OAuthStorage);
   private router = inject(Router);
 
   public tokenSubject = new BehaviorSubject<string | null>(this.getOidcAccessToken() || this.getInternalAccessToken());
@@ -64,9 +65,22 @@ export class AuthService {
     return localStorage.getItem('refreshToken_Internal');
   }
 
+  clearOIDCTokens(): void {
+    const hasInternalTokens = this.getInternalAccessToken() || this.getInternalRefreshToken();
+    if (!hasInternalTokens) {
+      this.oAuthStorage.removeItem("access_token");
+      this.oAuthStorage.removeItem("refresh_token");
+      this.oAuthStorage.removeItem("id_token");
+      this.router.navigate(['/login']);
+    }
+  }
+
   logout(): void {
     localStorage.removeItem('accessToken_Internal');
     localStorage.removeItem('refreshToken_Internal');
+    this.oAuthStorage.removeItem("access_token");
+    this.oAuthStorage.removeItem("refresh_token");
+    this.oAuthStorage.removeItem("id_token");
     this.tokenSubject.next(null);
     this.getRxStompService().deactivate();
     this.router.navigate(['/login']);

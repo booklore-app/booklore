@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, OnDestroy} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../../service/auth.service';
 import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
@@ -8,9 +8,9 @@ import {Message} from 'primeng/message';
 import {InputText} from 'primeng/inputtext';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {Observable, Subject} from 'rxjs';
-import {filter, take, takeUntil} from 'rxjs/operators';
-import {PublicAppSettings, PublicAppSettingService} from '../../../public-app-settings.service';
+import {filter, take} from 'rxjs/operators';
 import {getOidcErrorCount, isOidcBypassed, resetOidcBypass} from '../../../auth-initializer';
+import {AppSettingsService, PublicAppSettings} from '../../service/app-settings.service';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private authService = inject(AuthService);
   private oAuthService = inject(OAuthService);
-  private appSettingsService = inject(PublicAppSettingService);
+  private appSettingsService = inject(AppSettingsService);
   private router = inject(Router);
 
   publicAppSettings$: Observable<PublicAppSettings | null> = this.appSettingsService.publicAppSettings$;

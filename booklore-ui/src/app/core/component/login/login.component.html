@@ -2,7 +2,7 @@
      style="background: linear-gradient(60deg, var(--primary-color) 0%, #1e3a8a 100%);">
   <div class="flex flex-col items-center justify-center -mt-48 w-[90%] sm:w-auto sm:min-w-[400px] md:min-w-[500px]">
     <div class="w-full" style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-      <div class="w-full bg-surface-900 pt-8 pb-12 px-8 sm:px-8" style="border-radius: 53px">
+      <div class="w-full bg-surface-900 pt-8 pb-14 px-8 sm:px-12" style="border-radius: 53px">
         <div class="text-center mb-8">
           <svg class="mb-8 w-14 h-14 mx-auto" viewBox="0 0 126 126" fill="var(--primary-color)" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -57,6 +57,7 @@
               [(ngModel)]="username"
               placeholder="Enter your username"
               class="w-full"
+              autocomplete="username"
             />
           </div>
 
@@ -72,6 +73,7 @@
               [toggleMask]="true"
               class="mb-4"
               [fluid]="true"
+              autocomplete="current-password"
             ></p-password>
           </div>
 

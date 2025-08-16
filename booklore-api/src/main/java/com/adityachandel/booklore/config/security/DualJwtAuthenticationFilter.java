@@ -52,7 +52,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (path.startsWith("/api/v1/opds/") || path.equals("/api/v1/auth/refresh")) {
+        if (path.startsWith("/api/v1/opds/") || path.equals("/api/v1/auth/refresh") || path.equals("/api/v1/setup/status")) {
             chain.doFilter(request, response);
             return;
         }

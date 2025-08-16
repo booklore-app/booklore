@@ -113,13 +113,7 @@ export class AuthenticationSettingsComponent implements OnInit {
 
   toggleOidcEnabled(): void {
     if (!this.isOidcFormComplete()) return;
-    const payload = [
-      {
-        key: AppSettingKey.OIDC_ENABLED,
-        newValue: this.oidcEnabled
-      }
-    ];
-    this.appSettingsService.saveSettings(payload).subscribe({
+    this.appSettingsService.toggleOidcEnabled(this.oidcEnabled).subscribe({
       next: () => this.messageService.add({
         severity: 'success',
         summary: 'Saved',
