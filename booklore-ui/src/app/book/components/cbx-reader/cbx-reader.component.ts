@@ -3,6 +3,7 @@ import {Component, HostListener, inject, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {CbxReaderService} from '../../service/cbx-reader.service';
 import {BookService} from '../../service/book.service';
+import {PageTitleService} from "../../../utilities/service/page-title.service";
 import {UserService} from '../../../settings/user-management/user.service';
 import {MessageService} from 'primeng/api';
 import {forkJoin} from 'rxjs';
@@ -40,6 +41,7 @@ export class CbxReaderComponent implements OnInit {
   private bookService = inject(BookService);
   private userService = inject(UserService);
   private messageService = inject(MessageService);
+  private pageTitle = inject(PageTitleService);
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
@@ -88,6 +90,9 @@ export class CbxReaderComponent implements OnInit {
 
                 this.currentPage = (book.pdfProgress?.page || 1) - 1;
               }
+
+              this.pageTitle.setBookReadingPageTitle(book);
+
               this.alignCurrentPageToParity();
               this.isLoading = false;
             },

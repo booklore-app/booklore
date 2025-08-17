@@ -2,6 +2,7 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {NgxExtendedPdfViewerModule} from 'ngx-extended-pdf-viewer';
 import {BookService} from '../../service/book.service';
+import {PageTitleService} from '../../../utilities/service/page-title.service';
 import {forkJoin, Subscription} from 'rxjs';
 import {BookSetting} from '../../model/book.model';
 import {UserService} from '../../../settings/user-management/user.service';
@@ -34,6 +35,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private messageService = inject(MessageService);
   private route = inject(ActivatedRoute);
+  private pageTitle = inject(PageTitleService);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -52,7 +54,9 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
           const pdfData = results[2];
           const myself = results[3];
 
-          let globalOrIndividual = myself.userSettings.perBookSetting.pdf;
+          this.pageTitle.setBookReadingPageTitle(pdfMeta);
+
+          const globalOrIndividual = myself.userSettings.perBookSetting.pdf;
           if (globalOrIndividual === 'Global') {
             this.zoom = myself.userSettings.pdfReaderSetting.pageZoom || 'page-fit';
             this.spread = myself.userSettings.pdfReaderSetting.pageSpread || 'odd';
@@ -62,6 +66,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
           }
           this.page = pdfMeta.pdfProgress?.page || 1;
           this.bookData = pdfData;
+
           this.isLoading = false;
         },
         error: () => {
