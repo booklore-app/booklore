@@ -54,7 +54,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
           const pdfData = results[2];
           const myself = results[3];
 
-          this.pageTitle.setBookReadingPageTitle(pdfMeta);
+          this.pageTitle.setBookPageTitle(pdfMeta);
 
           const globalOrIndividual = myself.userSettings.perBookSetting.pdf;
           if (globalOrIndividual === 'Global') {

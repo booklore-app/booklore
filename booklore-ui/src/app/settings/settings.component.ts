@@ -1,5 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {PageTitleService} from "../utilities/service/page-title.service";
 import {UserService} from './user-management/user.service';
 import { AsyncPipe } from '@angular/common';
 import {EmailComponent} from './email/email.component';
@@ -56,6 +57,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
   protected userService = inject(UserService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private pageTitle = inject(PageTitleService);
+
 
   private routeSub!: Subscription;
 
@@ -70,6 +73,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   set activeTab(value: SettingsTab) {
     this._activeTab = value;
+
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab: value },
@@ -78,6 +82,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.pageTitle.setPageTitle('Settings');
+
     this.routeSub = this.route.queryParams.subscribe(params => {
       const tabParam = params['tab'];
       if (this.validTabs.includes(tabParam)) {

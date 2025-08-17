@@ -8,7 +8,7 @@ export class PageTitleService {
 
     private appName = 'BookLore'
 
-    setBookReadingPageTitle(book: Book) {
+    setBookPageTitle(book: Book) {
         const title = [
             book.metadata?.title,
             book.metadata?.seriesName ? `(${book.metadata.seriesName} series)` : false,
@@ -22,20 +22,7 @@ export class PageTitleService {
         this.setPageTitle(title.join(' '));
     }
 
-    setSingleBookPageTitle() {
-        this.setPageTitle('');
-    }
-
-
-    setLibraryPageTitle() {
-        this.setPageTitle('');
-    }
-
-    setShelvePageTitle() {
-        this.setPageTitle('');
-    }
-
     setPageTitle(pageTitle: string) {
-        this.titleService.setTitle([pageTitle, this.appName].join(' - '));
+        this.titleService.setTitle([pageTitle, this.appName].filter(part => part).join(' - '));
     }
 }

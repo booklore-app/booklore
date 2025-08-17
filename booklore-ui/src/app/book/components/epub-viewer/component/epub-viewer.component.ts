@@ -158,7 +158,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
             });
           };
 
-          this.pageTitle.setBookReadingPageTitle(epub);
+          this.pageTitle.setBookPageTitle(epub);
 
           fileReader.readAsArrayBuffer(epubData);
         },

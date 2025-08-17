@@ -91,7 +91,7 @@ export class CbxReaderComponent implements OnInit {
                 this.currentPage = (book.pdfProgress?.page || 1) - 1;
               }
 
-              this.pageTitle.setBookReadingPageTitle(book);
+              this.pageTitle.setBookPageTitle(book);
 
               this.alignCurrentPageToParity();
               this.isLoading = false;

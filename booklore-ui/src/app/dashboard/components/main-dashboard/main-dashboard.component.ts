@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Button} from 'primeng/button';
 import {AsyncPipe} from '@angular/common';
+import {PageTitleService} from "../../../utilities/service/page-title.service";
 import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroller.component';
 import {BookService} from '../../../book/service/book.service';
 import {BookState} from '../../../book/model/state/book-state.model';
@@ -32,6 +33,7 @@ export class MainDashboardComponent implements OnInit {
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
   protected userService = inject(UserService);
+  private pageTitle = inject(PageTitleService);
 
   bookState$ = this.bookService.bookState$;
 
@@ -44,6 +46,7 @@ export class MainDashboardComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    this.pageTitle.setPageTitle('Dashboard');
 
     this.lastReadBooks$ = this.bookService.bookState$.pipe(
       map((state: BookState) => (
