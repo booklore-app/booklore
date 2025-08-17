@@ -32,13 +32,14 @@ import {DatePicker} from 'primeng/datepicker';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {BookReviewsComponent} from '../../../book/components/book-reviews/book-reviews.component';
 import {BookNotesComponent} from '../../../book/components/book-notes-component/book-notes-component';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent, DatePicker, Tab, TabList, TabPanel, TabPanels, Tabs, BookReviewsComponent, BookNotesComponent]
+  imports: [Button, AsyncPipe, Rating, FormsModule, Tag, SplitButton, NgClass, Tooltip, DecimalPipe, Editor, ProgressBar, Menu, InfiniteScrollDirective, BookCardLiteComponent, DatePicker, Tab, TabList, TabPanel, TabPanels, Tabs, BookReviewsComponent, BookNotesComponent, ProgressSpinner]
 })
 export class MetadataViewerComponent implements OnInit, OnChanges {
   @Input() book$!: Observable<Book | null>;

@@ -7,7 +7,6 @@ import {LibraryService} from '../../book/service/library.service';
 import {Library} from '../../book/model/library.model';
 
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {DropdownModule} from 'primeng/dropdown';
 import {FormControl, FormGroup, FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {Select} from 'primeng/select';
@@ -47,7 +46,6 @@ export interface BookdropFileUI {
   styleUrl: './bookdrop-file-review.component.scss',
   imports: [
     ProgressSpinner,
-    DropdownModule,
     FormsModule,
     Button,
     Select,
@@ -118,7 +116,7 @@ export class BookdropFileReviewComponent implements OnInit {
 
     const selected = this.libraries.find((lib) => lib?.id && String(lib.id) === value)
 
-    if (selected && selected.paths.length ===1) {
+    if (selected && selected.paths.length === 1) {
       this.defaultPathId = String(selected.paths[0].id)
     }
   }
@@ -460,7 +458,7 @@ export class BookdropFileReviewComponent implements OnInit {
           modal: true,
           closable: true,
           closeOnEscape: true,
-          data: {results: result.results},
+          data: {result: result},
         });
 
         const finalizedIds = new Set(files.map(f => f.fileId));

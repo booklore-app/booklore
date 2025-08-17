@@ -4,13 +4,13 @@ import {CommonModule} from '@angular/common';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {Tooltip} from 'primeng/tooltip';
-import {Chips} from 'primeng/chips';
 import {DatePicker} from 'primeng/datepicker';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
 import {BookService} from '../../book/service/book.service';
 import {Book, BulkMetadataUpdateRequest} from '../../book/model/book.model';
 import {Checkbox} from 'primeng/checkbox';
+import {AutoComplete} from 'primeng/autocomplete';
 import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
@@ -23,10 +23,10 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     InputText,
     Button,
     Tooltip,
-    Chips,
     DatePicker,
     Checkbox,
-    ProgressSpinner
+    ProgressSpinner,
+    AutoComplete
   ],
   providers: [MessageService],
   templateUrl: './bulk-metadata-update-component.html',
@@ -80,6 +80,24 @@ export class BulkMetadataUpdateComponent implements OnInit {
       control.setValue(null);
     } else {
       control.enable();
+    }
+  }
+
+  // Handle blur event for AutoComplete to add custom values
+  onAutoCompleteBlur(fieldName: string, event: any) {
+    const inputValue = event.target.value?.trim();
+    if (inputValue) {
+      const currentValue = this.metadataForm.get(fieldName)?.value || [];
+      const values = Array.isArray(currentValue) ? currentValue :
+                     typeof currentValue === 'string' && currentValue ? currentValue.split(',').map((v: string) => v.trim()) : [];
+
+      // Add the new value if it's not already in the array
+      if (!values.includes(inputValue)) {
+        values.push(inputValue);
+        this.metadataForm.get(fieldName)?.setValue(values);
+      }
+      // Clear the input
+      event.target.value = '';
     }
   }
 

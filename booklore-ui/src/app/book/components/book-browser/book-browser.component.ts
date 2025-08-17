@@ -27,14 +27,12 @@ import {FormsModule} from '@angular/forms';
 import {BookFilterComponent} from './book-filter/book-filter.component';
 import {Tooltip} from 'primeng/tooltip';
 import {EntityViewPreferences, UserService} from '../../../settings/user-management/user.service';
-import {OverlayPanelModule} from 'primeng/overlaypanel';
 import {SeriesCollapseFilter} from './filters/SeriesCollapseFilter';
 import {SideBarFilter} from './filters/SidebarFilter';
 import {HeaderFilter} from './filters/HeaderFilter';
 import {CoverScalePreferenceService} from './cover-scale-preference.service';
 import {BookSorter} from './sorting/BookSorter';
 import {BookDialogHelperService} from './BookDialogHelperService';
-import {DropdownModule} from 'primeng/dropdown';
 import {Checkbox} from 'primeng/checkbox';
 import {Popover} from 'primeng/popover';
 import {Slider} from 'primeng/slider';
@@ -83,8 +81,8 @@ const SORT_DIRECTION = {
   styleUrls: ['./book-browser.component.scss'],
   imports: [
     Button, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, InputText, FormsModule,
-    BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, OverlayPanelModule,
-    DropdownModule, Checkbox, Popover, Slider, Select, Divider, MultiSelect, TieredMenu
+    BookTableComponent, BookFilterComponent, Tooltip, NgClass, PrimeTemplate, NgStyle, Popover,
+    Checkbox, Slider, Select, Divider, MultiSelect, TieredMenu
   ],
   providers: [SeriesCollapseFilter],
   animations: [

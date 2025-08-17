@@ -1,6 +1,8 @@
 package com.adityachandel.booklore.quartz;
 
+import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class JobSchedulerService {
 
     private final Scheduler scheduler;
+    private final AuthenticationService authenticationService;
 
     private final BlockingQueue<RefreshJobWrapper> jobQueue = new LinkedBlockingQueue<>();
     private final Map<String, String> runningJobs = new ConcurrentHashMap<>();
@@ -88,10 +91,13 @@ public class JobSchedulerService {
 
     private void scheduleJob(MetadataRefreshRequest request, Long userId, String jobId) {
         try {
+            BookLoreUser authenticatedUser = authenticationService.getAuthenticatedUser();
+
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("request", request);
             jobDataMap.put("userId", userId);
             jobDataMap.put("jobId", jobId);
+            jobDataMap.put("user", authenticatedUser);
 
             JobDetail jobDetail = JobBuilder.newJob(RefreshMetadataJob.class)
                     .withIdentity(jobId, "metadataRefreshJobGroup")

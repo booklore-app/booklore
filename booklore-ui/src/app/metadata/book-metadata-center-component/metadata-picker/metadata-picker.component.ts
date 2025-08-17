@@ -13,7 +13,7 @@ import {BookService} from '../../../book/service/book.service';
 import {Textarea} from 'primeng/textarea';
 import {filter, map} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {Chips} from 'primeng/chips';
+import {AutoComplete} from 'primeng/autocomplete';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -31,7 +31,7 @@ import {Chips} from 'primeng/chips';
     Tooltip,
     AsyncPipe,
     Textarea,
-    Chips
+    AutoComplete
   ]
 })
 export class MetadataPickerComponent implements OnInit {
@@ -76,6 +76,24 @@ export class MetadataPickerComponent implements OnInit {
   @Input() fetchedMetadata!: BookMetadata;
   @Input() book$!: Observable<Book | null>;
   @Output() goBack = new EventEmitter<boolean>();
+
+  // Handle blur event for AutoComplete to add custom values
+  onAutoCompleteBlur(fieldName: string, event: any) {
+    const inputValue = event.target.value?.trim();
+    if (inputValue) {
+      const currentValue = this.metadataForm.get(fieldName)?.value || [];
+      const values = Array.isArray(currentValue) ? currentValue :
+                     typeof currentValue === 'string' && currentValue ? currentValue.split(',').map((v: string) => v.trim()) : [];
+
+      // Add the new value if it's not already in the array
+      if (!values.includes(inputValue)) {
+        values.push(inputValue);
+        this.metadataForm.get(fieldName)?.setValue(values);
+      }
+      // Clear the input
+      event.target.value = '';
+    }
+  }
 
   metadataForm: FormGroup;
   currentBookId!: number;
@@ -144,7 +162,7 @@ export class MetadataPickerComponent implements OnInit {
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
-      thumbnailUrlLocked: new FormControl(false),
+      coverLocked: new FormControl(false),
     });
   }
 
@@ -221,7 +239,7 @@ export class MetadataPickerComponent implements OnInit {
           seriesNameLocked: metadata.seriesNameLocked || false,
           seriesNumberLocked: metadata.seriesNumberLocked || false,
           seriesTotalLocked: metadata.seriesTotalLocked || false,
-          thumbnailUrlLocked: metadata.coverLocked || false,
+          coverLocked: metadata.coverLocked || false,
         });
 
         if (metadata.titleLocked) this.metadataForm.get('title')?.disable();
@@ -330,7 +348,7 @@ export class MetadataPickerComponent implements OnInit {
       seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,
-      coverLocked: this.metadataForm.get('thumbnailUrlLocked')?.value,
+      coverLocked: this.metadataForm.get('coverLocked')?.value,
 
       ...(shouldLockAllFields !== undefined && {allFieldsLocked: shouldLockAllFields}),
     };
@@ -407,6 +425,9 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   toggleLock(field: string): void {
+    if (field === 'thumbnailUrl') {
+      field = 'cover'
+    }
     const isLocked = this.metadataForm.get(field + 'Locked')?.value;
     const updatedLockedState = !isLocked;
     this.metadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
@@ -437,6 +458,9 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   copyFetchedToCurrent(field: string): void {
+    if (field === 'thumbnailUrl') {
+      field = 'cover';
+    }
     const isLocked = this.metadataForm.get(`${field}Locked`)?.value;
     if (isLocked) {
       this.messageService.add({
@@ -445,6 +469,9 @@ export class MetadataPickerComponent implements OnInit {
         detail: `${field} is locked and cannot be updated.`
       });
       return;
+    }
+    if (field === 'cover') {
+      field = 'thumbnailUrl';
     }
     const value = this.fetchedMetadata[field];
     if (value) {

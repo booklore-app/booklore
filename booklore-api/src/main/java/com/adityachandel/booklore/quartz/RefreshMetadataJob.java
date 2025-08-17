@@ -1,10 +1,13 @@
 package com.adityachandel.booklore.quartz;
 
+import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.service.metadata.MetadataRefreshService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -22,7 +25,12 @@ public class RefreshMetadataJob implements InterruptableJob {
         try {
             MetadataRefreshRequest request = (MetadataRefreshRequest) context.getMergedJobDataMap().get("request");
             Long userId = (Long) context.getMergedJobDataMap().get("userId");
+            BookLoreUser user = (BookLoreUser) context.getMergedJobDataMap().get("user");
             String jobId = (String) context.getMergedJobDataMap().get("jobId");
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, null);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             log.info("Starting metadata refresh job with ID: {}", jobId);
             metadataRefreshService.refreshMetadata(request, userId, jobId);
             log.info("Completed metadata refresh job with ID: {}", jobId);
@@ -41,6 +49,7 @@ public class RefreshMetadataJob implements InterruptableJob {
             }
             throw new JobExecutionException("Error occurred while executing metadata refresh job", e);
         } finally {
+            SecurityContextHolder.clearContext();
             executionThread = null;
         }
     }

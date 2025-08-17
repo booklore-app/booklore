@@ -1,6 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {DropdownModule} from 'primeng/dropdown';
 import {Button} from 'primeng/button';
 import {NgTemplateOutlet} from '@angular/common';
 import {InputText} from 'primeng/inputtext';
@@ -13,8 +12,8 @@ import {Library} from '../book/model/library.model';
 import {MagicShelfService} from '../magic-shelf.service';
 import {MessageService} from 'primeng/api';
 import {DynamicDialogConfig} from 'primeng/dynamicdialog';
-import {Chips} from 'primeng/chips';
 import {MultiSelect} from 'primeng/multiselect';
+import {AutoComplete} from 'primeng/autocomplete';
 import {EMPTY_CHECK_OPERATORS, MULTI_VALUE_OPERATORS, parseValue, removeNulls, serializeDateRules} from '../magic-shelf-utils';
 import { IconPickerService } from '../utilities/services/icon-picker.service';
 
@@ -88,7 +87,7 @@ export interface GroupRule {
   name: string;
   type: 'group';
   join: 'and' | 'or';
-  rules: Array<Rule | GroupRule>;
+  rules: (Rule | GroupRule)[];
 }
 
 export type RuleFormGroup = FormGroup<{
@@ -138,15 +137,14 @@ const FIELD_CONFIGS: Record<RuleField, FullFieldConfig> = {
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    DropdownModule,
     NgTemplateOutlet,
     InputText,
     Select,
     Button,
     DatePicker,
     InputNumber,
-    Chips,
-    MultiSelect
+    MultiSelect,
+    AutoComplete
   ]
 })
 export class MagicShelfComponent implements OnInit {
@@ -327,7 +325,7 @@ export class MagicShelfComponent implements OnInit {
     return new FormGroup({
       type: new FormControl<'group'>('group' as 'group'),
       join: new FormControl<'and' | 'or'>('and' as 'and' | 'or'),
-      rules: new FormArray([] as Array<GroupFormGroup | RuleFormGroup>),
+      rules: new FormArray([] as (GroupFormGroup | RuleFormGroup)[]),
     }) as GroupFormGroup;
   }
 
@@ -411,6 +409,24 @@ export class MagicShelfComponent implements OnInit {
         return !!field && !!operator;
       }
     });
+  }
+
+  // Handle blur event for AutoComplete to add custom values
+  onAutoCompleteBlur(formControl: any, event: any) {
+    const inputValue = event.target.value?.trim();
+    if (inputValue) {
+      const currentValue = formControl.value || [];
+      const values = Array.isArray(currentValue) ? currentValue :
+                     typeof currentValue === 'string' && currentValue ? currentValue.split(',').map((v: string) => v.trim()) : [];
+
+      // Add the new value if it's not already in the array
+      if (!values.includes(inputValue)) {
+        values.push(inputValue);
+        formControl.setValue(values);
+      }
+      // Clear the input
+      event.target.value = '';
+    }
   }
 
   submit() {

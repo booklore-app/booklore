@@ -99,7 +99,7 @@
                    [ngClass]="{
                     'outlined-input-green': isValueCopied(field.controlName) && !hoveredFields[field.controlName],
                   }">
-                <p-chips formControlName="{{field.controlName}}" addOnBlur="true"></p-chips>
+                <p-autoComplete formControlName="{{field.controlName}}" [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" styleClass="w-full" (onBlur)="onAutoCompleteBlur(field.controlName, $event)"></p-autoComplete>
               </div>
               <p-button
                 [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : (hoveredFields[field.controlName] && isValueCopied(field.controlName) ? 'pi pi-times' : 'pi pi-arrow-left')"
@@ -115,11 +115,12 @@
                 (mouseleave)="onMouseLeave(field.controlName)"/>
 
               <div class="w-full">
-                <p-chips
+                <p-autoComplete
                   [ngModel]="fetchedMetadata[field.fetchedKey] ?? []"
                   [ngModelOptions]="{ standalone: true }"
-                  [disabled]="true">
-                </p-chips>
+                  [disabled]="true"
+                  [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" styleClass="w-full">
+                </p-autoComplete>
               </div>
             </div>
           </div>
@@ -201,7 +202,7 @@
         <div class="flex items-center py-1">
           <label for="{{field.controlName}}" class="w-[15%]">{{ field.label }}</label>
           <div class="flex w-full">
-            <p-chips class="w-full" formControlName="{{field.controlName}}" addOnBlur="true"></p-chips>
+            <p-autoComplete formControlName="{{field.controlName}}" [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" styleClass="w-full" (onBlur)="onAutoCompleteBlur(field.controlName, $event)"></p-autoComplete>
           </div>
         </div>
       }

@@ -1,5 +1,5 @@
-<div class="p-0 md:p-2 flex flex-col h-full w-full rounded-xl">
-  @if (book$ | async; as book) {
+@if (book$ | async; as book) {
+  <div class="p-0 md:p-2 flex flex-col h-full w-full rounded-xl">
     <div class="flex flex-col md:flex-row gap-4 md:gap-6 pb-8">
 
       <div class="flex justify-center md:justify-start">
@@ -79,7 +79,7 @@
                 </div>
 
                 <p class="text-lg">
-                  @for (author of book?.metadata!.authors; track author; let isLast = $last) {
+                  @for (author of book?.metadata!.authors; track $index; let isLast = $last) {
                     <a class="hover:underline dark:text-blue-400 cursor-pointer" (click)="goToAuthorBooks(author)">
                       {{ author }}
                     </a>
@@ -513,7 +513,7 @@
                      [infiniteScrollDistance]="2"
                      [infiniteScrollThrottle]="50"
                      [horizontal]="true">
-                  @for (book of bookInSeries; track book) {
+                  @for (book of bookInSeries; track book.id) {
                     <div class="dashboard-scroller-card">
                       <app-book-card-lite-component [book]="book"></app-book-card-lite-component>
                     </div>
@@ -532,7 +532,7 @@
                      [infiniteScrollDistance]="2"
                      [infiniteScrollThrottle]="50"
                      [horizontal]="true">
-                  @for (book of recommendedBooks; track book) {
+                  @for (book of recommendedBooks; track book.book.id) {
                     <div class="dashboard-scroller-card">
                       <app-book-card-lite-component [book]="book.book"></app-book-card-lite-component>
                     </div>
@@ -550,5 +550,16 @@
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
-  }
-</div>
+  </div>
+} @else {
+  <div class="flex flex-col justify-center items-center h-full gap-4">
+    <p-progressSpinner
+      strokeWidth="4"
+      fill="transparent"
+      animationDuration=".8s">
+    </p-progressSpinner>
+    <p style="color: var(--primary-color);">
+      Loading book details...
+    </p>
+  </div>
+}

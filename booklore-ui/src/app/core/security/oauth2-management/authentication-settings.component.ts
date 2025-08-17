@@ -2,7 +2,6 @@ import {Component, inject, OnInit} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
-import {DropdownModule} from 'primeng/dropdown';
 
 import {Checkbox} from 'primeng/checkbox';
 import {ToggleSwitch} from 'primeng/toggleswitch';
@@ -23,7 +22,6 @@ import {LibraryService} from '../../../book/service/library.service';
   imports: [
     FormsModule,
     InputText,
-    DropdownModule,
     Checkbox,
     ToggleSwitch,
     Divider,
@@ -115,13 +113,7 @@ export class AuthenticationSettingsComponent implements OnInit {
 
   toggleOidcEnabled(): void {
     if (!this.isOidcFormComplete()) return;
-    const payload = [
-      {
-        key: AppSettingKey.OIDC_ENABLED,
-        newValue: this.oidcEnabled
-      }
-    ];
-    this.appSettingsService.saveSettings(payload).subscribe({
+    this.appSettingsService.toggleOidcEnabled(this.oidcEnabled).subscribe({
       next: () => this.messageService.add({
         severity: 'success',
         summary: 'Saved',

@@ -50,7 +50,7 @@
           <label for="clearAuthors" class="text-sm text-gray-300 cursor-pointer">Clear</label>
         </div>
       </label>
-      <p-chips formControlName="authors" [disabled]="clearFields.authors" addOnBlur="true"></p-chips>
+      <p-autoComplete formControlName="authors" [disabled]="clearFields.authors" [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" (onBlur)="onAutoCompleteBlur('authors', $event)" styleClass="w-full"></p-autoComplete>
     </div>
 
     <!-- Publisher -->
@@ -139,7 +139,7 @@
           <label for="clearGenres" class="text-sm text-gray-300 cursor-pointer">Clear</label>
         </div>
       </label>
-      <p-chips formControlName="genres" addOnBlur="true" [disabled]="clearFields.genres"></p-chips>
+      <p-autoComplete formControlName="genres" [disabled]="clearFields.genres" [multiple]="true" [typeahead]="false" [dropdown]="false" [forceSelection]="false" (onBlur)="onAutoCompleteBlur('genres', $event)" styleClass="w-full"></p-autoComplete>
 
       <div class="flex items-center gap-2 mt-2">
         <p-checkbox

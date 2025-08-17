@@ -21,7 +21,7 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
-import {Chips} from 'primeng/chips';
+import {AutoComplete} from 'primeng/autocomplete';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -45,7 +45,7 @@ import {Chips} from 'primeng/chips';
     Tab,
     TabPanels,
     TabPanel,
-    Chips
+    AutoComplete
   ]
 })
 export class MetadataEditorComponent implements OnInit {
@@ -78,6 +78,24 @@ export class MetadataEditorComponent implements OnInit {
   isAutoFetching = false;
 
   originalMetadata!: BookMetadata;
+
+  // Handle blur event for AutoComplete to add custom values
+  onAutoCompleteBlur(fieldName: string, event: any) {
+    const inputValue = event.target.value?.trim();
+    if (inputValue) {
+      const currentValue = this.metadataForm.get(fieldName)?.value || [];
+      const values = Array.isArray(currentValue) ? currentValue :
+                     typeof currentValue === 'string' && currentValue ? currentValue.split(',').map((v: string) => v.trim()) : [];
+
+      // Add the new value if it's not already in the array
+      if (!values.includes(inputValue)) {
+        values.push(inputValue);
+        this.metadataForm.get(fieldName)?.setValue(values);
+      }
+      // Clear the input
+      event.target.value = '';
+    }
+  }
 
   constructor() {
     this.metadataForm = new FormGroup({
@@ -134,7 +152,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
-      thumbnailUrlLocked: new FormControl(false),
+      coverLocked: new FormControl(false),
     });
   }
 
@@ -227,7 +245,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: metadata.seriesNameLocked ?? false,
       seriesNumberLocked: metadata.seriesNumberLocked ?? false,
       seriesTotalLocked: metadata.seriesTotalLocked ?? false,
-      thumbnailUrlLocked: metadata.coverLocked ?? false,
+      coverLocked: metadata.coverLocked ?? false,
     });
 
     const lockableFields: { key: keyof BookMetadata; control: string }[] = [
@@ -256,7 +274,8 @@ export class MetadataEditorComponent implements OnInit {
       {key: 'descriptionLocked', control: 'description'},
       {key: 'seriesNameLocked', control: 'seriesName'},
       {key: 'seriesNumberLocked', control: 'seriesNumber'},
-      {key: 'seriesTotalLocked', control: 'seriesTotal'}
+      {key: 'seriesTotalLocked', control: 'seriesTotal'},
+      {key: 'coverLocked', control: 'thumbnailUrl'},
     ];
 
     for (const {key, control} of lockableFields) {
@@ -287,6 +306,9 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   toggleLock(field: string): void {
+    if (field === 'thumbnailUrl') {
+      field = 'cover'
+    }
     const isLocked = this.metadataForm.get(field + 'Locked')?.value;
     const updatedLockedState = !isLocked;
     this.metadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
@@ -396,7 +418,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: form.get('seriesNameLocked')?.value,
       seriesNumberLocked: form.get('seriesNumberLocked')?.value,
       seriesTotalLocked: form.get('seriesTotalLocked')?.value,
-      coverLocked: form.get('thumbnailUrlLocked')?.value,
+      coverLocked: form.get('coverLocked')?.value,
 
       ...(shouldLockAllFields !== undefined && {allFieldsLocked: shouldLockAllFields})
     };

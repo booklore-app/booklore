@@ -47,7 +47,7 @@ public class SecurityConfig {
     private static final String[] COMMON_PUBLIC_ENDPOINTS = {
             "/ws/**",
             "/api/v1/auth/**",
-            "/api/v1/settings",
+            "/api/v1/public-settings",
             "/api/v1/setup/**",
             "/api/v1/books/*/cover",
             "/api/v1/books/*/backup-cover",
