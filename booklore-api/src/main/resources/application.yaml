@@ -13,6 +13,9 @@ app:
     header-groups: ${REMOTE_AUTH_HEADER_GROUPS:Remote-Groups}
     admin-group: ${REMOTE_AUTH_ADMIN_GROUP}
 
+server:
+  forward-headers-strategy: native
+
 spring:
   servlet:
     multipart:
