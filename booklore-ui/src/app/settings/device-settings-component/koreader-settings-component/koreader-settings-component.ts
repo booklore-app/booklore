@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
@@ -6,7 +6,11 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
 import {Button} from 'primeng/button';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
-import {KoreaderService} from '../../koreader-service';
+import {KoreaderService} from '../koreader.service';
+import {UserService} from '../../user-management/user.service';
+import {filter, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   standalone: true,
@@ -17,13 +21,14 @@ import {KoreaderService} from '../../koreader-service';
     InputText,
     ToggleSwitch,
     Button,
-    ToastModule
+    ToastModule,
+    Tooltip
   ],
   providers: [MessageService],
   templateUrl: './koreader-settings-component.html',
   styleUrls: ['./koreader-settings-component.scss']
 })
-export class KoreaderSettingsComponent implements OnInit {
+export class KoreaderSettingsComponent implements OnInit, OnDestroy {
   editMode = true;
   showPassword = false;
   koReaderSyncEnabled = false;
@@ -34,8 +39,24 @@ export class KoreaderSettingsComponent implements OnInit {
 
   private readonly messageService = inject(MessageService);
   private readonly koreaderService = inject(KoreaderService);
+  private readonly userService = inject(UserService);
+
+  private readonly destroy$ = new Subject<void>();
+  hasPermission = false;
 
   ngOnInit() {
+    this.userService.userState$.pipe(
+      filter(userState => !!userState?.user && userState.loaded),
+      takeUntil(this.destroy$)
+    ).subscribe(userState => {
+      this.hasPermission = (userState.user?.permissions.canSyncKoReader || userState.user?.permissions.admin) ?? false;
+      if (this.hasPermission) {
+        this.loadKoreaderSettings();
+      }
+    });
+  }
+
+  private loadKoreaderSettings() {
     this.koreaderService.getUser().subscribe({
       next: koreaderUser => {
         this.koReaderUsername = koreaderUser.username;
@@ -44,10 +65,12 @@ export class KoreaderSettingsComponent implements OnInit {
         this.credentialsSaved = true;
       },
       error: err => {
-        if (err.status === 404) {
-          this.messageService.add({severity: 'warn', summary: 'User Not Found', detail: 'No KOReader account found. Please create one to enable sync.', life: 5000});
-        } else {
-          this.messageService.add({severity: 'error', summary: 'Load Error', detail: 'Unable to retrieve KOReader account. Please try again.'});
+        if (err.status !== 404) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Load Error',
+            detail: 'Unable to retrieve KOReader account. Please try again.'
+          });
         }
       }
     });
@@ -101,5 +124,14 @@ export class KoreaderSettingsComponent implements OnInit {
     navigator.clipboard.writeText(text).catch(err => {
       console.error('Copy failed', err);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  openKoReaderDocumentation() {
+    window.open('https://booklore-app.github.io/booklore-docs/docs/devices/koreader', '_blank');
   }
 }
