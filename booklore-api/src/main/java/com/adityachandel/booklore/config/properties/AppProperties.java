@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.config;
+package com.adityachandel.booklore.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;

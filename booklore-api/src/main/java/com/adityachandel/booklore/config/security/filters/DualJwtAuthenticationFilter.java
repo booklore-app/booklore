@@ -1,12 +1,14 @@
-package com.adityachandel.booklore.config.security;
+package com.adityachandel.booklore.config.security.filters;
 
+import com.adityachandel.booklore.config.security.service.DynamicOidcJwtProcessor;
+import com.adityachandel.booklore.config.security.userdetails.UserAuthenticationDetails;
+import com.adityachandel.booklore.config.security.utils.JwtUtils;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.custom.BookLoreUserTransformer;
 import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.settings.OidcAutoProvisionDetails;
 import com.adityachandel.booklore.model.dto.settings.OidcProviderDetails;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
-import com.adityachandel.booklore.model.entity.UserPermissionsEntity;
 import com.adityachandel.booklore.repository.UserRepository;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import com.adityachandel.booklore.service.user.UserProvisioningService;
@@ -18,15 +20,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,34 +41,38 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final AppSettingService appSettingService;
     private final UserProvisioningService userProvisioningService;
-    private static final ConcurrentMap<String, Object> userLocks = new ConcurrentHashMap<>();
     private final DynamicOidcJwtProcessor dynamicOidcJwtProcessor;
 
+    private static final ConcurrentMap<String, Object> userLocks = new ConcurrentHashMap<>();
+
+    // =====================
+    // Whitelisted paths
+    // Requests matching these paths should always proceed through the filter chain,
+    // even if they contain a missing, invalid, or expired token. This ensures that
+    // public or setup endpoints remain accessible without authentication.
+    // =====================
     private static final List<String> WHITELISTED_PATHS = List.of(
-            "/api/v1/opds/",
-            "/api/v1/auth/refresh",
-            "/api/v1/setup/",
-            "/api/kobo/"
+            "/api/v1/auth",
+            "/api/v1/public-settings",
+            "/api/v1/setup"
     );
 
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String requestPath = request.getRequestURI();
+        return WHITELISTED_PATHS.stream().anyMatch(requestPath::startsWith);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String token = extractToken(request);
 
-        String path = request.getRequestURI();
-
-        boolean isWhitelisted = WHITELISTED_PATHS.stream().anyMatch(path::startsWith);
-
-        if (isWhitelisted) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         if (token == null) {
             chain.doFilter(request, response);
             return;
         }
+
         try {
             if (jwtUtils.validateToken(token)) {
                 authenticateLocalUser(token, request);
@@ -85,6 +88,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
+
         chain.doFilter(request, response);
     }
 
@@ -92,8 +96,7 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
         Long userId = jwtUtils.extractUserId(token);
         BookLoreUserEntity entity = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
         BookLoreUser user = bookLoreUserTransformer.toDTO(entity);
-        List<GrantedAuthority> authorities = getAuthorities(entity.getPermissions());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, null);
         authentication.setDetails(new UserAuthenticationDetails(request, user.getId()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
@@ -138,9 +141,8 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
                     });
 
             BookLoreUser user = bookLoreUserTransformer.toDTO(entity);
-            List<GrantedAuthority> authorities = getAuthorities(entity.getPermissions());
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, null);
             authentication.setDetails(new UserAuthenticationDetails(request, user.getId()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -153,23 +155,5 @@ public class DualJwtAuthenticationFilter extends OncePerRequestFilter {
     private String extractToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
-    }
-
-    private List<GrantedAuthority> getAuthorities(UserPermissionsEntity permissions) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        if (permissions != null) {
-            addAuthorityIfPermissionGranted(authorities, "ROLE_UPLOAD", permissions.isPermissionUpload());
-            addAuthorityIfPermissionGranted(authorities, "ROLE_DOWNLOAD", permissions.isPermissionDownload());
-            addAuthorityIfPermissionGranted(authorities, "ROLE_EDIT_METADATA", permissions.isPermissionEditMetadata());
-            addAuthorityIfPermissionGranted(authorities, "ROLE_MANIPULATE_LIBRARY", permissions.isPermissionManipulateLibrary());
-            addAuthorityIfPermissionGranted(authorities, "ROLE_ADMIN", permissions.isPermissionAdmin());
-        }
-        return authorities;
-    }
-
-    private void addAuthorityIfPermissionGranted(List<GrantedAuthority> authorities, String role, boolean permissionGranted) {
-        if (permissionGranted) {
-            authorities.add(new SimpleGrantedAuthority(role));
-        }
     }
 }

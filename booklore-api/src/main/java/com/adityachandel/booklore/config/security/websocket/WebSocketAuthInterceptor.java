@@ -1,5 +1,7 @@
-package com.adityachandel.booklore.config.security;
+package com.adityachandel.booklore.config.security.websocket;
 
+import com.adityachandel.booklore.config.security.service.DynamicOidcJwtProcessor;
+import com.adityachandel.booklore.config.security.utils.JwtUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

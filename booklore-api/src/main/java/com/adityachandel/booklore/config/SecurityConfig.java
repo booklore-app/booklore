@@ -1,9 +1,12 @@
-package com.adityachandel.booklore.config.security;
+package com.adityachandel.booklore.config;
 
-import com.adityachandel.booklore.config.AppProperties;
+import com.adityachandel.booklore.config.properties.AppProperties;
+import com.adityachandel.booklore.config.security.CustomOpdsUserDetailsService;
+import com.adityachandel.booklore.config.security.filters.DualJwtAuthenticationFilter;
+import com.adityachandel.booklore.config.security.filters.KoboAuthFilter;
+import com.adityachandel.booklore.config.security.filters.KoreaderAuthFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -27,47 +30,65 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 @AllArgsConstructor
 @EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
 
-    private final CustomOpdsUserDetailsService customOpdsUserDetailsService;
-    private final DualJwtAuthenticationFilter dualJwtAuthenticationFilter;
-    private final KoboAuthFilter koboAuthFilter;
     private final AppProperties appProperties;
+    private final CustomOpdsUserDetailsService customOpdsUserDetailsService;
 
+    // =====================
+    // Swagger / API Docs
+    // =====================
     private static final String[] SWAGGER_ENDPOINTS = {
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/v3/api-docs/**"
+            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
     };
 
+    // =====================
+    // Common public endpoints
+    // Requests matching these paths should always be accessible without authentication.
+    // =====================
     private static final String[] COMMON_PUBLIC_ENDPOINTS = {
             "/ws/**",
-            "/kobo/**",
             "/api/v1/auth/**",
             "/api/v1/public-settings",
-            "/api/v1/setup/**",
+            "/api/v1/setup/**"
+    };
+
+    // =====================
+    // Cover / file endpoints
+    // Publicly accessible endpoints for book assets (cover images, CBX/PDF pages)
+    // These do not require authentication.
+    // =====================
+    private static final String[] COVER_PUBLIC_ENDPOINTS = {
             "/api/v1/books/*/cover",
             "/api/v1/books/*/backup-cover",
             "/api/v1/opds/*/cover.jpg",
             "/api/v1/cbx/*/pages/*",
             "/api/v1/pdf/*/pages/*",
-            "/api/bookdrop/*/cover"
+            "/api/v1/bookdrop/*/cover"
     };
 
+    // =====================
+    // OPDS unauthenticated endpoints
+    // =====================
     private static final String[] COMMON_UNAUTHENTICATED_ENDPOINTS = {
             "/api/v1/opds/search.opds"
     };
 
+    // =====================
+    // Password Encoder
+    // =====================
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+
+    // =====================
+    // OPDS Basic Auth Chain
+    // =====================
     @Bean
     @Order(1)
     public SecurityFilterChain opdsBasicAuthSecurityChain(HttpSecurity http) throws Exception {
@@ -92,49 +113,56 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // =====================
+    // Koreader Security Chain
+    // =====================
     @Bean
     @Order(2)
     public SecurityFilterChain koreaderSecurityChain(HttpSecurity http, KoreaderAuthFilter koreaderAuthFilter) throws Exception {
-        http
-                .securityMatcher("/api/koreader/**")
+        http.securityMatcher("/api/koreader/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .addFilterBefore(koreaderAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
+    // =====================
+    // Kobo Security Chain
+    // =====================
     @Bean
     @Order(3)
     public SecurityFilterChain koboSecurityChain(HttpSecurity http, KoboAuthFilter koboAuthFilter) throws Exception {
-        http
-                .securityMatcher("/api/kobo/**")
+        http.securityMatcher("/api/kobo/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .addFilterBefore(koboAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
+    // =====================
+    // JWT API Security Chain (Final Boss Chain)
+    // =====================
     @Bean
     @Order(4)
-    public SecurityFilterChain jwtApiSecurityChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain jwtApiSecurityChain(HttpSecurity http, DualJwtAuthenticationFilter dualJwtAuthenticationFilter) throws Exception {
         List<String> publicEndpoints = new ArrayList<>(Arrays.asList(COMMON_PUBLIC_ENDPOINTS));
+        publicEndpoints.addAll(Arrays.asList(COVER_PUBLIC_ENDPOINTS));
         if (appProperties.getSwagger().isEnabled()) {
             publicEndpoints.addAll(Arrays.asList(SWAGGER_ENDPOINTS));
         }
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(dualJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
@@ -151,18 +179,20 @@ public class SecurityConfig {
         return provider;
     }
 
+    // =====================
+    // CORS Config
+    // =====================
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setExposedHeaders(List.of("Content-Disposition"));
-        configuration.setAllowCredentials(true);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+        config.setExposedHeaders(List.of("Content-Disposition"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }

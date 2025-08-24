@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.service.upload;
 
-import com.adityachandel.booklore.config.AppProperties;
+import com.adityachandel.booklore.config.properties.AppProperties;
 import com.adityachandel.booklore.exception.APIException;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.Book;

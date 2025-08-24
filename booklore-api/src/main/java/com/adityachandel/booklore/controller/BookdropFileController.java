@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/bookdrop")
+@RequestMapping("/api/v1/bookdrop")
 public class BookdropFileController {
 
     private final BookDropService bookDropService;

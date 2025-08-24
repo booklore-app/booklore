@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.config.security;
+package com.adityachandel.booklore.config.security.utils;
 
 import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.repository.ShelfRepository;

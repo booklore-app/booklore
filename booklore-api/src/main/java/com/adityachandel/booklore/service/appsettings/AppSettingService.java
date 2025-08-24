@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.service.appsettings;
 
-import com.adityachandel.booklore.config.AppProperties;
+import com.adityachandel.booklore.config.properties.AppProperties;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.settings.*;
 import com.adityachandel.booklore.model.entity.AppSettingEntity;

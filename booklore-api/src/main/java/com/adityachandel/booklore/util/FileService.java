@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.util;
 
-import com.adityachandel.booklore.config.AppProperties;
+import com.adityachandel.booklore.config.properties.AppProperties;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.service.appsettings.AppSettingService;
 import lombok.RequiredArgsConstructor;

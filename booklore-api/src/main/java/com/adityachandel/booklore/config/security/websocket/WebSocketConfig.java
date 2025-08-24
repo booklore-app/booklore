@@ -1,6 +1,5 @@
-package com.adityachandel.booklore.config;
+package com.adityachandel.booklore.config.security.websocket;
 
-import com.adityachandel.booklore.config.security.WebSocketAuthInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
