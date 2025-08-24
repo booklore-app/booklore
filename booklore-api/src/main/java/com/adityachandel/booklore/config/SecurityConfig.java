@@ -164,6 +164,16 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // =====================
+    // Authentication Manager & Provider for OPDS
+    // =====================
+    /**
+     * AuthenticationManager bean is required because we’re explicitly using
+     * username/password (Basic Auth) for OPDS instead of JWT/OIDC.
+     *
+     * It delegates to the AuthenticationProvider, which in turn uses our
+     * CustomOpdsUserDetailsService for looking up OPDS users and verifying credentials.
+     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -171,6 +181,14 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * DaoAuthenticationProvider configured with:
+     * - customOpdsUserDetailsService → loads OPDS-specific users
+     * - passwordEncoder → ensures passwords are properly hashed/verified
+     *
+     * This is specifically scoped for OPDS Basic Authentication and
+     * should not interfere with JWT/OIDC chains.
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
