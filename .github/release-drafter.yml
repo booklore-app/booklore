@@ -8,6 +8,9 @@ categories:
   - title: '✨ Enhancements'
     labels:
       - 'enhancement'
+  - title: '🎨 UI Tweaks'
+    labels:
+      - 'ui-tweaks'
   - title: '🐛 Bug Fixes'
     labels:
       - 'bug'
