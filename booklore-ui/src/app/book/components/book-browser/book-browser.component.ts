@@ -1,6 +1,7 @@
 import {AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ConfirmationService, MenuItem, MessageService, PrimeTemplate} from 'primeng/api';
+import {PageTitleService} from "../../../utilities/service/page-title.service";
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {catchError, debounceTime, filter, map, switchMap, take} from 'rxjs/operators';
@@ -114,6 +115,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   protected confirmationService = inject(ConfirmationService);
   protected magicShelfService = inject(MagicShelfService);
   protected bookRuleEvaluatorService = inject(BookRuleEvaluatorService);
+  private pageTitle = inject(PageTitleService);
+
 
   bookState$: Observable<BookState> | undefined;
   entity$: Observable<Library | Shelf | MagicShelf | null> | undefined;
@@ -158,6 +161,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   get isFilterActive(): boolean { return this.selectedFilter.value !== null; }
 
   ngOnInit(): void {
+    this.pageTitle.setPageTitle('')
     this.coverScalePreferenceService.scaleChange$.pipe(debounceTime(1000)).subscribe();
 
     const currentPath = this.activatedRoute.snapshot.routeConfig?.path;
@@ -166,6 +170,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.entityType = entityType;
       this.entityType$ = of(entityType);
       this.entity$ = of(null);
+
+      this.pageTitle.setPageTitle(currentPath === 'all-books' ? 'All Books' : 'Unshelved Books');
     } else {
       const routeEntityInfo$ = this.getEntityInfoFromRoute();
       this.entityType$ = routeEntityInfo$.pipe(map(info => info.entityType));
@@ -173,6 +179,9 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         switchMap(({entityId, entityType}) => this.fetchEntity(entityId, entityType))
       );
       this.entity$.subscribe(entity => {
+        if (entity) {
+          this.pageTitle.setPageTitle(entity.name);
+        }
         this.entity = entity ?? null;
         this.entityOptions = entity
           ? this.isLibrary(entity)

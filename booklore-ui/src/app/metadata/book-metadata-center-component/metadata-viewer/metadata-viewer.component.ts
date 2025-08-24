@@ -7,6 +7,7 @@ import {Rating, RatingRateEvent} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
 import {Book, BookMetadata, BookRecommendation, ReadStatus} from '../../../book/model/book.model';
+import {PageTitleService} from "../../../utilities/service/page-title.service";
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {UserService} from '../../../settings/user-management/user.service';
 import {SplitButton} from 'primeng/splitbutton';
@@ -48,6 +49,8 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
   private originalRecommendedBooks: BookRecommendation[] = [];
 
   private dialogService = inject(DialogService);
+  private pageTitle = inject(PageTitleService);
+
   private emailService = inject(EmailService);
   private messageService = inject(MessageService);
   private bookService = inject(BookService);
@@ -183,6 +186,8 @@ export class MetadataViewerComponent implements OnInit, OnChanges {
         filter((book): book is Book => book != null && book.metadata != null)
       )
       .subscribe(book => {
+        this.pageTitle.setBookPageTitle(book);
+
         const metadata = book.metadata;
         this.isAutoFetching = false;
         this.loadBooksInSeriesAndFilterRecommended(metadata!.bookId);

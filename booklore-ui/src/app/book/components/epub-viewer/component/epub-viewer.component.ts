@@ -7,6 +7,7 @@ import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {Book, BookSetting} from '../../../model/book.model';
 import {BookService} from '../../../service/book.service';
+import {PageTitleService} from "../../../../utilities/service/page-title.service";
 import {forkJoin} from 'rxjs';
 import {Select} from 'primeng/select';
 import {UserService} from '../../../../settings/user-management/user.service';
@@ -71,6 +72,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private bookService = inject(BookService);
   private messageService = inject(MessageService);
+  private pageTitle = inject(PageTitleService);
 
   epub!: Book;
 
@@ -155,6 +157,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
               this.isLoading = false;
             });
           };
+
+          this.pageTitle.setBookPageTitle(epub);
 
           fileReader.readAsArrayBuffer(epubData);
         },
