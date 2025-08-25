@@ -173,12 +173,12 @@
             <i class="pi pi-search"></i>
           </button>
 
-          <p-popover #searchDropdown [dismissable]="true" appendTo="body" [style]="{ width: '18rem' }">
+          <p-popover #searchDropdown [dismissable]="true" appendTo="body" [style]="{ width: '24rem' }">
             <div class="relative w-full">
               <input
                 type="text"
                 pInputText
-                placeholder="Title, Series or Author..."
+                placeholder="Title, Author, Series, Genre, or ISBN..."
                 [(ngModel)]="bookTitle"
                 (ngModelChange)="onSearchTermChange($event)"
                 class="w-full"
@@ -200,7 +200,7 @@
           <input
             type="text"
             pInputText
-            placeholder="Title, Series or Author..."
+            placeholder="Title, Author, Series, Genre, or ISBN..."
             [(ngModel)]="bookTitle"
             (ngModelChange)="onSearchTermChange($event)"
             class="search-input"
