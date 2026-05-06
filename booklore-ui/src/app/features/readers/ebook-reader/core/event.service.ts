@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, NgZone} from '@angular/core';
 import {Subject} from 'rxjs';
 import {ReaderAnnotationService} from '../features/annotations/annotation-renderer.service';
 
@@ -33,6 +33,7 @@ export class ReaderEventService {
   private readonly SWIPE_THRESHOLD_PX = 50;
 
   private annotationService = inject(ReaderAnnotationService);
+  private ngZone = inject(NgZone);
 
   private view: any;
   private viewCallbacks: ViewCallbacks | null = null;
@@ -407,10 +408,12 @@ export class ReaderEventService {
 
         popupX = Math.max(100, Math.min(popupX, window.innerWidth - 150));
 
-        this.eventSubject.next({
-          type: 'text-selected',
-          detail: {text, cfi, range, index},
-          popupPosition: {x: popupX, y: popupY, showBelow}
+        this.ngZone.run(() => {
+          this.eventSubject.next({
+            type: 'text-selected',
+            detail: {text, cfi, range, index},
+            popupPosition: {x: popupX, y: popupY, showBelow}
+          });
         });
       }
     }, 10);
