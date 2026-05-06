@@ -395,7 +395,8 @@ export class ReaderEventService {
         }
 
         const minSpaceAbove = 120;
-        const showBelow = selectionTop < minSpaceAbove;
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const showBelow = isMobile || selectionTop < minSpaceAbove;
 
         let popupY: number;
         if (showBelow) {
