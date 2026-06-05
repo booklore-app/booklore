@@ -99,6 +99,9 @@ public class SettingPersistenceHelper {
         defaultHardcover.setEnabled(false);
         defaultHardcover.setApiKey(null);
 
+        MetadataProviderSettings.OpenLibrary defaultOpenLibrary = new MetadataProviderSettings.OpenLibrary();
+        defaultOpenLibrary.setEnabled(true);
+
         MetadataProviderSettings.Comicvine defaultComicvine = new MetadataProviderSettings.Comicvine();
         defaultComicvine.setEnabled(false);
         defaultComicvine.setApiKey(null);
@@ -113,6 +116,7 @@ public class SettingPersistenceHelper {
         defaultMetadataProviderSettings.setGoogle(defaultGoogle);
         defaultMetadataProviderSettings.setGoodReads(defaultGoodreads);
         defaultMetadataProviderSettings.setHardcover(defaultHardcover);
+        defaultMetadataProviderSettings.setOpenLibrary(defaultOpenLibrary);
         defaultMetadataProviderSettings.setComicvine(defaultComicvine);
         defaultMetadataProviderSettings.setRanobedb(defaultRanobedb);
         defaultMetadataProviderSettings.setDouban(defaultDouban);

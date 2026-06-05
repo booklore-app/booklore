@@ -9,6 +9,7 @@ public class MetadataProviderSettings {
     private Google google;
     private Goodreads goodReads;
     private Hardcover hardcover;
+    private OpenLibrary openLibrary;
     private Comicvine comicvine;
     private Ranobedb ranobedb;
     private Douban douban;
@@ -39,6 +40,11 @@ public class MetadataProviderSettings {
     public static class Hardcover {
         private boolean enabled;
         private String apiKey;
+    }
+
+    @Data
+    public static class OpenLibrary {
+        private boolean enabled;
     }
 
     @Data
