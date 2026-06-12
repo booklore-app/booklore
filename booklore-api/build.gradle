@@ -102,7 +102,7 @@ dependencies {
     implementation 'org.freemarker:freemarker:2.3.34'
 
     // --- Jackson 3 ---
-    implementation platform('tools.jackson:jackson-bom:3.1.4')
+    implementation platform('tools.jackson:jackson-bom:3.2.0')
     implementation 'tools.jackson.core:jackson-core'
     implementation 'tools.jackson.core:jackson-databind'
     implementation 'tools.jackson.module:jackson-module-blackbird'
