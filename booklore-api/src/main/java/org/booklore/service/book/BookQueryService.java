@@ -2,18 +2,29 @@ package org.booklore.service.book;
 
 import org.booklore.mapper.v2.BookMapperV2;
 import org.booklore.model.dto.Book;
+import org.booklore.model.dto.BookFile;
 import org.booklore.model.dto.BookMetadata;
 import org.booklore.model.dto.ComicMetadata;
+import org.booklore.model.dto.Shelf;
 import org.booklore.model.entity.BookEntity;
+import org.booklore.model.enums.BookFileType;
+import org.booklore.model.enums.IconType;
 import org.booklore.repository.BookRepository;
 import org.booklore.service.restriction.ContentRestrictionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BookQueryService {
@@ -23,8 +34,154 @@ public class BookQueryService {
     private final ContentRestrictionService contentRestrictionService;
 
     public List<Book> getAllBooks(boolean includeDescription) {
-        List<BookEntity> books = bookRepository.findAllWithMetadata();
-        return mapBooksToDto(books, includeDescription, null, !includeDescription);
+        long t0 = System.nanoTime();
+        List<Object[]> rows = bookRepository.findAllBookListRows();
+        long t1 = System.nanoTime();
+
+        Map<Long, List<String>> authors = groupStrings(bookRepository.findAllAuthorRows());
+        Map<Long, Set<String>> categories = groupStringSet(bookRepository.findAllCategoryRows());
+        Map<Long, Set<String>> moods = groupStringSet(bookRepository.findAllMoodRows());
+        Map<Long, Set<String>> tags = groupStringSet(bookRepository.findAllTagRows());
+        Map<Long, Integer> shelfCounts = new HashMap<>();
+        for (Object[] c : bookRepository.findShelfBookCounts()) {
+            shelfCounts.put((Long) c[0], ((Number) c[1]).intValue());
+        }
+        Map<Long, Set<Shelf>> shelves = groupShelves(bookRepository.findAllShelfRows(), shelfCounts);
+        Map<Long, List<BookFile>> files = groupFiles(bookRepository.findAllBookFileRows());
+        long t2 = System.nanoTime();
+
+        List<Book> result = new ArrayList<>(rows.size());
+        for (Object[] r : rows) {
+            result.add(assembleBook(r, authors, categories, moods, tags, shelves, files));
+        }
+        log.info("getAllBooks(projection): {} books | projection {} ms | batches {} ms | assemble {} ms",
+                rows.size(), (t1 - t0) / 1_000_000, (t2 - t1) / 1_000_000, (System.nanoTime() - t2) / 1_000_000);
+        return result;
+    }
+
+    private static <T> Set<T> nullIfEmpty(Set<T> s) { return (s == null || s.isEmpty()) ? null : s; }
+    private static <T> List<T> nullIfEmpty(List<T> l) { return (l == null || l.isEmpty()) ? null : l; }
+
+    private Book assembleBook(Object[] r,
+                              Map<Long, List<String>> authors,
+                              Map<Long, Set<String>> categories,
+                              Map<Long, Set<String>> moods,
+                              Map<Long, Set<String>> tags,
+                              Map<Long, Set<Shelf>> shelves,
+                              Map<Long, List<BookFile>> files) {
+        Long id = (Long) r[0];
+        BookMetadata meta = BookMetadata.builder()
+                .bookId(id)
+                .title((String) r[6])
+                .publisher((String) r[7])
+                .publishedDate((java.time.LocalDate) r[8])
+                .seriesName((String) r[9])
+                .seriesNumber((Float) r[10])
+                .isbn13((String) r[11])
+                .isbn10((String) r[12])
+                .pageCount((Integer) r[13])
+                .language((String) r[14])
+                .narrator((String) r[15])
+                .rating((Double) r[16])
+                .amazonRating((Double) r[17])
+                .amazonReviewCount((Integer) r[18])
+                .goodreadsRating((Double) r[19])
+                .goodreadsReviewCount((Integer) r[20])
+                .hardcoverRating((Double) r[21])
+                .hardcoverReviewCount((Integer) r[22])
+                .ranobedbRating((Double) r[23])
+                .ageRating((Integer) r[24])
+                .contentRating((String) r[25])
+                .coverUpdatedOn((Instant) r[26])
+                .audiobookCoverUpdatedOn((Instant) r[27])
+                .allMetadataLocked(false)
+                .authors(nullIfEmpty(authors.get(id)))
+                .categories(nullIfEmpty(categories.get(id)))
+                .moods(nullIfEmpty(moods.get(id)))
+                .tags(nullIfEmpty(tags.get(id)))
+                .build();
+
+        List<BookFile> bf = files.getOrDefault(id, List.of());
+        BookFile primary = bf.isEmpty() ? null : bf.getFirst();
+        List<BookFile> alts = bf.size() > 1 ? bf.subList(1, bf.size()) : null;
+        return Book.builder()
+                .id(id)
+                .metadataMatchScore((Float) r[1])
+                .isPhysical((Boolean) r[2])
+                .addedOn((Instant) r[3])
+                .libraryId((Long) r[4])
+                .libraryName((String) r[5])
+                .metadata(meta)
+                .primaryFile(primary)
+                .alternativeFormats(alts)
+                .shelves(shelves.getOrDefault(id, Set.of()))
+                .build();
+    }
+
+    private Map<Long, List<String>> groupStrings(List<Object[]> rows) {
+        Map<Long, List<String>> map = new HashMap<>();
+        for (Object[] r : rows) {
+            map.computeIfAbsent((Long) r[0], k -> new ArrayList<>()).add((String) r[1]);
+        }
+        return map;
+    }
+
+    private Map<Long, Set<String>> groupStringSet(List<Object[]> rows) {
+        Map<Long, Set<String>> map = new HashMap<>();
+        for (Object[] r : rows) {
+            map.computeIfAbsent((Long) r[0], k -> new LinkedHashSet<>()).add((String) r[1]);
+        }
+        return map;
+    }
+
+    private Map<Long, Set<Shelf>> groupShelves(List<Object[]> rows, Map<Long, Integer> counts) {
+        Map<Long, Set<Shelf>> map = new HashMap<>();
+        for (Object[] r : rows) {
+            Long shelfId = (Long) r[1];
+            Shelf s = Shelf.builder()
+                    .id(shelfId)
+                    .name((String) r[2])
+                    .icon((String) r[3])
+                    .iconType((IconType) r[4])
+                    .userId((Long) r[5])
+                    .publicShelf(r[6] != null && (Boolean) r[6])
+                    .bookCount(counts.getOrDefault(shelfId, 0))
+                    .build();
+            map.computeIfAbsent((Long) r[0], k -> new LinkedHashSet<>()).add(s);
+        }
+        return map;
+    }
+
+    private Map<Long, List<BookFile>> groupFiles(List<Object[]> rows) {
+        Map<Long, List<BookFile>> map = new HashMap<>();
+        for (Object[] r : rows) {
+            String fileName = (String) r[2];
+            String subPath = (String) r[3];
+            String libPath = (String) r[7];
+            String filePath = (libPath != null && subPath != null && fileName != null)
+                    ? java.nio.file.Paths.get(libPath, subPath, fileName).toString() : null;
+            BookFile f = BookFile.builder()
+                    .bookId((Long) r[0])
+                    .id((Long) r[1])
+                    .fileName(fileName)
+                    .filePath(filePath)
+                    .fileSubPath(subPath)
+                    .bookType((BookFileType) r[4])
+                    .fileSizeKb((Long) r[5])
+                    .addedOn((Instant) r[6])
+                    .folderBased(r[8] != null && (Boolean) r[8])
+                    .isBook(r[9] != null && (Boolean) r[9])
+                    .extension(extractExtension(fileName))
+                    .build();
+            map.computeIfAbsent((Long) r[0], k -> new ArrayList<>()).add(f);
+        }
+        return map;
+    }
+
+    private static String extractExtension(String fileName) {
+        if (fileName == null) return null;
+        int dot = fileName.lastIndexOf('.');
+        return dot > 0 ? fileName.substring(dot + 1).toLowerCase() : null;
     }
 
     public List<Book> getAllBooksByLibraryIds(Set<Long> libraryIds, boolean includeDescription, Long userId) {
@@ -50,9 +207,12 @@ public class BookQueryService {
     }
 
     private List<Book> mapBooksToDto(List<BookEntity> books, boolean includeDescription, Long userId, boolean stripForListView) {
-        return books.stream()
+        long t0 = System.nanoTime();
+        List<Book> result = books.stream()
                 .map(book -> mapBookToDto(book, includeDescription, userId, stripForListView))
                 .collect(Collectors.toList());
+        log.info("mapBooksToDto: {} books | seqMap {} ms", books.size(), (System.nanoTime() - t0) / 1_000_000);
+        return result;
     }
 
     private Book mapBookToDto(BookEntity bookEntity, boolean includeDescription, Long userId, boolean stripForListView) {
