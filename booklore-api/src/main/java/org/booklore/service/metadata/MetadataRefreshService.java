@@ -391,6 +391,7 @@ public class MetadataRefreshService {
             case Google -> settings.getGoogle() != null && settings.getGoogle().isEnabled();
             case GoodReads -> settings.getGoodReads() != null && settings.getGoodReads().isEnabled();
             case Hardcover -> settings.getHardcover() != null && settings.getHardcover().isEnabled();
+            case OpenLibrary -> settings.getOpenLibrary() != null && settings.getOpenLibrary().isEnabled();
             case Comicvine -> settings.getComicvine() != null && settings.getComicvine().isEnabled();
             case Ranobedb -> settings.getRanobedb() != null && settings.getRanobedb().isEnabled();
             case Douban -> settings.getDouban() != null && settings.getDouban().isEnabled();

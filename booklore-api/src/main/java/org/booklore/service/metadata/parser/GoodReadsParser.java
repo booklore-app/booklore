@@ -38,16 +38,30 @@ import java.util.regex.Pattern;
 public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
 
     private static final String BASE_SEARCH_URL = "https://www.goodreads.com/search?q=";
+    private static final String BASE_AUTOCOMPLETE_URL = "https://www.goodreads.com/book/auto_complete?format=json&q=";
     private static final String BASE_BOOK_URL = "https://www.goodreads.com/book/show/";
     private static final String BASE_ISBN_URL = "https://www.goodreads.com/book/isbn/";
     private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
     private static final int COUNT_DETAILED_METADATA_TO_GET_RETRY = 2;
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
     private static final Pattern BOOK_SHOW_ID_PATTERN = Pattern.compile("/book/show/(\\d+)");
+    private static final Pattern SERIES_SUFFIX_PATTERN = Pattern.compile("\\s*\\([^,(]+,\\s*#[\\d.]+\\)\\s*$");
+    private static final Pattern SERIES_FROM_TITLE_PATTERN = Pattern.compile("\\(([^,(]+),\\s*#([\\d.]+)\\)\\s*$");
+    private static final Pattern COVER_SIZE_TOKEN_PATTERN = Pattern.compile("\\._S[XY]\\d+_\\.");
 
     private final AppSettingService appSettingService;
 
     private record TitleInfo(String title, String subtitle) {}
+
+    // Carries a book ID plus the autocomplete preview — used so the search loop
+    // can fall back to the autocomplete data when the detail page is WAF-gated.
+    private record SearchTarget(String id, BookMetadata autocompletePreview) {
+        SearchTarget(String id) { this(id, null); }
+    }
+
+    private static final class WafChallengeException extends RuntimeException {
+        WafChallengeException() { super("WAF challenge detected"); }
+    }
 
     @Override
     public BookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
@@ -61,16 +75,15 @@ public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
                     return metadata;
                 }
                 log.warn("GoodReads: Failed to parse details for existing ID: {}, falling back to search", existingGoodreadsId);
+            } catch (WafChallengeException e) {
+                log.warn("GoodReads: WAF challenge for existing ID: {}, falling back to search", existingGoodreadsId);
             } catch (Exception e) {
                 log.warn("GoodReads: Error fetching existing ID {}: {}, falling back to search", existingGoodreadsId, e.getMessage());
             }
         }
 
-        Optional<BookMetadata> preview = fetchMetadataPreviews(book, fetchMetadataRequest).stream().findFirst();
-        if (preview.isEmpty()) {
-            return null;
-        }
-        List<BookMetadata> fetchedMetadata = fetchMetadataUsingPreviews(List.of(preview.get()));
+        List<SearchTarget> targets = searchTargets(book, fetchMetadataRequest);
+        List<BookMetadata> fetchedMetadata = fetchMetadataFromTargets(targets.stream().limit(1).toList());
         return fetchedMetadata.isEmpty() ? null : fetchedMetadata.getFirst();
     }
 
@@ -97,26 +110,32 @@ public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
         String isbn = ParserUtils.cleanIsbn(fetchMetadataRequest.getIsbn());
         if (isbn != null && !isbn.isBlank()) {
             log.info("Goodreads Query URL (ISBN): {}{}", BASE_ISBN_URL, isbn);
-            Document doc = fetchDoc(BASE_ISBN_URL + isbn);
-            String ogUrl = Optional.ofNullable(doc.selectFirst("meta[property=og:url]"))
-                    .map(e -> e.attr("content"))
-                    .orElse(null);
+            try {
+                Document doc = fetchDoc(BASE_ISBN_URL + isbn);
+                String ogUrl = Optional.ofNullable(doc.selectFirst("meta[property=og:url]"))
+                        .map(e -> e.attr("content"))
+                        .orElse(null);
 
-            if (ogUrl != null && !ogUrl.isBlank()) {
-                String goodreadsId = ogUrl.substring(ogUrl.lastIndexOf('/') + 1);
-                if (!goodreadsId.isBlank()) {
-                    BookMetadata metadata = parseBookDetails(doc, goodreadsId);
-                    if (metadata != null) {
-                        return List.of(metadata);
+                if (ogUrl != null && !ogUrl.isBlank()) {
+                    String goodreadsId = ogUrl.substring(ogUrl.lastIndexOf('/') + 1);
+                    if (!goodreadsId.isBlank()) {
+                        BookMetadata metadata = parseBookDetails(doc, goodreadsId);
+                        if (metadata != null) {
+                            return List.of(metadata);
+                        }
                     }
                 }
+            } catch (WafChallengeException e) {
+                log.warn("GoodReads: WAF challenge on ISBN lookup, falling back to search");
+            } catch (Exception e) {
+                log.warn("GoodReads: ISBN lookup failed: {}", e.getMessage());
             }
         }
 
-        List<BookMetadata> previews = fetchMetadataPreviews(book, fetchMetadataRequest).stream()
+        List<SearchTarget> targets = searchTargets(book, fetchMetadataRequest).stream()
                 .limit(COUNT_DETAILED_METADATA_TO_GET)
                 .toList();
-        List<BookMetadata> results = fetchMetadataUsingPreviews(previews);
+        List<BookMetadata> results = fetchMetadataFromTargets(targets);
 
         if (results.isEmpty()
                 && fetchMetadataRequest.getTitle() != null && !fetchMetadataRequest.getTitle().isBlank()
@@ -129,31 +148,47 @@ public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
                     .title(fetchMetadataRequest.getTitle())
                     .asin(fetchMetadataRequest.getAsin())
                     .build();
-            previews = fetchMetadataPreviews(book, titleOnlyRequest).stream()
+            targets = searchTargets(book, titleOnlyRequest).stream()
                     .limit(COUNT_DETAILED_METADATA_TO_GET_RETRY)
                     .toList();
-            results = fetchMetadataUsingPreviews(previews);
+            results = fetchMetadataFromTargets(targets);
         }
 
         return results;
     }
 
-    private List<BookMetadata> fetchMetadataUsingPreviews(List<BookMetadata> previews) {
-        List<BookMetadata> fetchedMetadata = new ArrayList<>();
-        for (BookMetadata preview : previews) {
-            log.info("GoodReads: Fetching metadata for: {}", preview.getTitle());
-            try {
-                Document document = fetchDoc(BASE_BOOK_URL + preview.getGoodreadsId());
-                BookMetadata detailedMetadata = parseBookDetails(document, preview.getGoodreadsId());
-                if (detailedMetadata != null) {
-                    fetchedMetadata.add(detailedMetadata);
+    private List<BookMetadata> fetchMetadataFromTargets(List<SearchTarget> targets) {
+        List<BookMetadata> results = new ArrayList<>();
+        boolean detailReachable = true;
+
+        for (SearchTarget target : targets) {
+            BookMetadata candidate = null;
+
+            if (detailReachable) {
+                log.info("GoodReads: Fetching metadata for ID: {}", target.id());
+                try {
+                    if (!results.isEmpty()) {
+                        Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1501));
+                    }
+                    Document document = fetchDoc(BASE_BOOK_URL + target.id());
+                    candidate = parseBookDetails(document, target.id());
+                } catch (WafChallengeException e) {
+                    log.warn("GoodReads: WAF challenge on detail page for ID: {}", target.id());
+                    if (target.autocompletePreview() != null) detailReachable = false;
+                } catch (Exception e) {
+                    log.error("Error fetching metadata for book: {}", target.id(), e);
                 }
-                Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1501));
-            } catch (Exception e) {
-                log.error("Error fetching metadata for book: {}", preview.getGoodreadsId(), e);
             }
+
+            if (candidate == null && target.autocompletePreview() != null) {
+                log.info("GoodReads: Using autocomplete fallback for ID: {}", target.id());
+                candidate = target.autocompletePreview();
+            }
+
+            if (candidate != null) results.add(candidate);
         }
-        return fetchedMetadata;
+
+        return results;
     }
 
     private BookMetadata parseBookDetails(Document document, String goodreadsId) {
@@ -455,15 +490,41 @@ public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
     }
 
     public List<BookMetadata> fetchMetadataPreviews(Book book, FetchMetadataRequest request) {
-        String searchTerm = getSearchTerm(book, request);
+        return searchTargets(book, request).stream()
+                .map(t -> t.autocompletePreview() != null ? t.autocompletePreview() :
+                        BookMetadata.builder()
+                                .goodreadsId(t.id())
+                                .provider(MetadataProvider.GoodReads)
+                                .build())
+                .toList();
+    }
 
+    private List<SearchTarget> searchTargets(Book book, FetchMetadataRequest request) {
+        String searchTerm = getSearchTerm(book, request);
         if (searchTerm == null || searchTerm.isEmpty()) {
             log.info("GoodReads: No metadata previews found (no ISBN, title, or filename).");
             return Collections.emptyList();
         }
 
+        // Try the autocomplete JSON endpoint first — not gated behind WAF
         try {
-            String searchUrl = generateSearchUrl(searchTerm);
+            String autocompleteUrl = BASE_AUTOCOMPLETE_URL + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8);
+            log.info("GoodReads: Autocomplete URL: {}", autocompleteUrl);
+            String jsonBody = fetchJsonBody(autocompleteUrl);
+            if (jsonBody != null) {
+                List<SearchTarget> targets = parseAutocompleteTargets(jsonBody, request);
+                if (!targets.isEmpty()) {
+                    return targets;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("GoodReads: Autocomplete fetch failed: {}", e.getMessage());
+        }
+
+        // Fall back to HTML search page
+        try {
+            String searchUrl = BASE_SEARCH_URL + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8);
+            log.info("GoodReads: Search URL: {}", searchUrl);
             Document doc = fetchDoc(searchUrl);
             Element tableList = doc.select("table.tableList").first();
 
@@ -473,10 +534,9 @@ public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
             }
 
             Elements previewBooks = tableList.select("tr[itemtype=http://schema.org/Book]");
-
-            List<BookMetadata> metadataPreviews = new ArrayList<>();
             FuzzyScore fuzzyScore = new FuzzyScore(Locale.ENGLISH);
             String queryAuthor = request.getAuthor();
+            List<SearchTarget> targets = new ArrayList<>();
 
             for (Element previewBook : previewBooks) {
                 List<String> authors = extractAuthorsPreview(previewBook);
@@ -496,28 +556,173 @@ public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
                                 return false;
                             });
 
-                    if (!matches) {
-                        continue;
-                    }
+                    if (!matches) continue;
                 }
 
-                BookMetadata previewMetadata = BookMetadata.builder()
-                        .goodreadsId(String.valueOf(extractGoodReadsIdPreview(previewBook)))
+                Integer id = extractGoodReadsIdPreview(previewBook);
+                if (id == null) continue;
+
+                BookMetadata preview = BookMetadata.builder()
+                        .goodreadsId(String.valueOf(id))
                         .title(extractTitlePreview(previewBook))
                         .authors(authors)
                         .provider(MetadataProvider.GoodReads)
                         .thumbnailUrl(extractThumbnailPreview(previewBook))
                         .build();
-                metadataPreviews.add(previewMetadata);
+                targets.add(new SearchTarget(String.valueOf(id), preview));
             }
 
             Thread.sleep(Duration.ofSeconds(1));
-            return metadataPreviews;
+            return targets;
 
+        } catch (WafChallengeException e) {
+            log.warn("GoodReads: WAF challenge on search page for term: {}", searchTerm);
+            return Collections.emptyList();
         } catch (Exception e) {
-            log.error("Error fetching metadata previews: {}", e.getMessage());
+            log.error("Error fetching search page: {}", e.getMessage());
             return Collections.emptyList();
         }
+    }
+
+    private List<SearchTarget> parseAutocompleteTargets(String jsonBody, FetchMetadataRequest request) {
+        try {
+            JSONArray items = new JSONArray(jsonBody);
+            Set<String> seen = new LinkedHashSet<>();
+            FuzzyScore fuzzyScore = new FuzzyScore(Locale.ENGLISH);
+            String queryAuthor = request.getAuthor();
+            List<SearchTarget> targets = new ArrayList<>();
+
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                String id = getAutocompleteBookId(item);
+                if (id == null || seen.contains(id)) continue;
+                seen.add(id);
+
+                String author = getAutocompleteAuthor(item);
+                if (queryAuthor != null && !queryAuthor.isBlank() && author != null) {
+                    List<String> queryTokens = List.of(WHITESPACE_PATTERN.split(queryAuthor.toLowerCase()));
+                    List<String> authorTokens = List.of(WHITESPACE_PATTERN.split(author.toLowerCase()));
+                    boolean matches = authorTokens.stream().anyMatch(actual -> {
+                        for (String query : queryTokens) {
+                            int score = fuzzyScore.fuzzyScore(actual, query);
+                            int maxScore = Math.max(fuzzyScore.fuzzyScore(query, query),
+                                    fuzzyScore.fuzzyScore(actual, actual));
+                            if (maxScore > 0 && (double) score / maxScore >= 0.5) return true;
+                        }
+                        return false;
+                    });
+                    if (!matches) continue;
+                }
+
+                BookMetadata preview = mapAutocompleteItem(item, id);
+                if (preview != null) targets.add(new SearchTarget(id, preview));
+            }
+
+            return targets;
+        } catch (Exception e) {
+            log.warn("GoodReads: Failed to parse autocomplete response: {}", e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    private BookMetadata mapAutocompleteItem(JSONObject item, String id) {
+        try {
+            String rawTitle = normalizeNull(item.optString("bookTitleBare"));
+            if (rawTitle == null) {
+                String fullTitle = normalizeNull(item.optString("title"));
+                rawTitle = fullTitle != null ? SERIES_SUFFIX_PATTERN.matcher(fullTitle).replaceFirst("").trim() : null;
+            }
+            if (rawTitle == null) return null;
+
+            TitleInfo titleInfo = parseTitleInfo(rawTitle);
+            String author = getAutocompleteAuthor(item);
+
+            String seriesName = null;
+            Float seriesNumber = null;
+            String fullTitle = item.optString("title");
+            if (fullTitle != null) {
+                Matcher m = SERIES_FROM_TITLE_PATTERN.matcher(fullTitle);
+                if (m.find()) {
+                    seriesName = normalizeNull(m.group(1));
+                    seriesNumber = parseNumber(m.group(2), Float::parseFloat);
+                }
+            }
+
+            String coverUrl = normalizeNull(item.optString("imageUrl"));
+            if (coverUrl != null) {
+                coverUrl = COVER_SIZE_TOKEN_PATTERN.matcher(coverUrl).replaceFirst(".");
+            }
+
+            String description = extractAutocompleteDescription(item);
+
+            Double rating = parseNumber(normalizeNull(item.optString("avgRating")), Double::parseDouble);
+            Integer ratingCount = parseNumber(normalizeNull(item.optString("ratingsCount")), v -> Integer.parseInt(v.replace(",", "")));
+
+            return BookMetadata.builder()
+                    .goodreadsId(id)
+                    .provider(MetadataProvider.GoodReads)
+                    .title(titleInfo.title())
+                    .subtitle(titleInfo.subtitle())
+                    .authors(author != null ? List.of(author) : null)
+                    .description(description)
+                    .pageCount(parseNumber(normalizeNull(item.optString("numPages")), Integer::parseInt))
+                    .thumbnailUrl(coverUrl)
+                    .seriesName(seriesName)
+                    .seriesNumber(seriesNumber)
+                    .goodreadsRating(rating)
+                    .goodreadsReviewCount(ratingCount)
+                    .build();
+        } catch (Exception e) {
+            log.warn("GoodReads: Failed to map autocomplete item: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private String extractAutocompleteDescription(JSONObject item) {
+        try {
+            Object desc = item.opt("description");
+            if (desc == null) return null;
+            String html;
+            if (desc instanceof JSONObject descObj) {
+                html = normalizeNull(descObj.optString("html"));
+            } else {
+                html = normalizeNull(desc.toString());
+            }
+            if (html == null) return null;
+            return Jsoup.parse(html).text();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getAutocompleteBookId(JSONObject item) {
+        try {
+            String id = null;
+            Object bookId = item.opt("bookId");
+            if (bookId instanceof Number) {
+                id = String.valueOf(((Number) bookId).longValue());
+            } else if (bookId instanceof String s && !s.isBlank()) {
+                id = s;
+            }
+            if (id != null && id.matches("\\d+")) return id;
+
+            String bookUrl = item.optString("bookUrl");
+            Matcher m = BOOK_SHOW_ID_PATTERN.matcher(bookUrl);
+            return m.find() ? m.group(1) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getAutocompleteAuthor(JSONObject item) {
+        try {
+            Object author = item.opt("author");
+            if (author instanceof String s) return normalizeNull(s);
+            if (author instanceof JSONObject obj) return normalizeNull(obj.optString("name"));
+        } catch (Exception e) {
+            log.warn("GoodReads: Failed to extract author from autocomplete item: {}", e.getMessage());
+        }
+        return null;
     }
 
     private String getSearchTerm(Book book, FetchMetadataRequest request) {
@@ -603,35 +808,56 @@ public class GoodReadsParser implements BookParser, DetailedMetadataProvider {
     private Document fetchDoc(String url) {
         try {
             Connection.Response response = Jsoup.connect(url)
-                    .header("accept", "text/html, application/json")
+                    .header("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
                     .header("accept-language", "en-US,en;q=0.9")
-                    .header("content-type", "application/json")
-                    .header("device-memory", "8")
-                    .header("downlink", "10")
-                    .header("dpr", "2")
-                    .header("ect", "4g")
-                    .header("origin", "https://www.amazon.com")
-                    .header("priority", "u=1, i")
-                    .header("rtt", "50")
-                    .header("sec-ch-device-memory", "8")
-                    .header("sec-ch-dpr", "2")
                     .header("sec-ch-ua", "\"Google Chrome\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"")
                     .header("sec-ch-ua-mobile", "?0")
                     .header("sec-ch-ua-platform", "\"macOS\"")
-                    .header("sec-ch-viewport-width", "1170")
-                    .header("sec-fetch-dest", "empty")
-                    .header("sec-fetch-mode", "cors")
-                    .header("sec-fetch-site", "same-origin")
+                    .header("sec-fetch-dest", "document")
+                    .header("sec-fetch-mode", "navigate")
+                    .header("sec-fetch-site", "none")
                     .header("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
-                    .header("viewport-width", "1170")
-                    .header("x-amz-amabot-click-attributes", "disable")
-                    .header("x-requested-with", "XMLHttpRequest")
+                    .ignoreHttpErrors(true)
                     .method(Connection.Method.GET)
                     .execute();
+
+            if (isWafChallenge(response.statusCode(), response.body())) {
+                throw new WafChallengeException();
+            }
             return response.parse();
+        } catch (WafChallengeException e) {
+            throw e;
         } catch (IOException e) {
-            log.error("Error parsing url: {}", url, e);
+            log.error("Error fetching url: {}", url, e);
             throw new RuntimeException(e);
         }
     }
-}
+
+    private String fetchJsonBody(String url) {
+        try {
+            Connection.Response response = Jsoup.connect(url)
+                    .header("accept", "application/json,text/plain,*/*")
+                    .header("accept-language", "en-US,en;q=0.9")
+                    .header("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+                    .ignoreContentType(true)
+                    .ignoreHttpErrors(true)
+                    .method(Connection.Method.GET)
+                    .execute();
+
+            if (!response.body().startsWith("[") && !response.body().startsWith("{")) {
+                return null;
+            }
+            return response.body();
+        } catch (IOException e) {
+            log.warn("Error fetching JSON url: {}", url, e);
+            return null;
+        }
+    }
+
+    private static boolean isWafChallenge(int statusCode, String html) {
+        if (statusCode == 202) return true;
+        return html != null && (html.contains("awsWafCookieDomainList")
+                || html.contains("AwsWafIntegration")
+                || html.contains("id=\"challenge-container\"")
+                || html.contains("challenge.js"));
+    }}

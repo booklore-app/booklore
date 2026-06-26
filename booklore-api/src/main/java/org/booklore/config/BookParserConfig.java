@@ -12,12 +12,13 @@ public class BookParserConfig {
 
     @Bean
     public Map<MetadataProvider, BookParser> parserMap(GoogleParser googleParser, AmazonBookParser amazonBookParser,
-                                                       GoodReadsParser goodReadsParser, HardcoverParser hardcoverParser, ComicvineBookParser comicvineBookParser, DoubanBookParser doubanBookParser, RanobeDbParser ranobedbParser, LubimyCzytacParser lubimyczytacParser, AudibleParser audibleParser) {
+                                                       GoodReadsParser goodReadsParser, HardcoverParser hardcoverParser, OpenLibraryParser openLibraryParser, ComicvineBookParser comicvineBookParser, DoubanBookParser doubanBookParser, RanobeDbParser ranobedbParser, LubimyCzytacParser lubimyczytacParser, AudibleParser audibleParser) {
         return Map.of(
                 MetadataProvider.Amazon, amazonBookParser,
                 MetadataProvider.GoodReads, goodReadsParser,
                 MetadataProvider.Google, googleParser,
                 MetadataProvider.Hardcover, hardcoverParser,
+                MetadataProvider.OpenLibrary, openLibraryParser,
                 MetadataProvider.Comicvine, comicvineBookParser,
                 MetadataProvider.Douban, doubanBookParser,
                 MetadataProvider.Lubimyczytac, lubimyczytacParser,
