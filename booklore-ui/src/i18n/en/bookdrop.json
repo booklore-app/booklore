@@ -114,12 +114,19 @@
       "refetchSuccessSummary": "Metadata refetched",
       "refetchSuccessDetail": "Metadata was refetched successfully.",
       "refetchFailedSummary": "Refetch failed",
-      "refetchFailedDetail": "Failed to refetch metadata for this file."
+      "refetchFailedDetail": "Failed to refetch metadata for this file.",
+      "autoApplySummary": "Auto-apply complete",
+      "autoApplyDetail": "Applied metadata for {{ count }} file(s) at or above {{ threshold }}% confidence."
     },
     "refetchProviderPlaceholder": "Default (Quick Book Match)",
     "refetchDefaultOption": "Default (Quick Book Match)",
     "refetchButton": "Refetch",
-    "refetchButtonTooltip": "Refetch metadata for this file, optionally from a specific provider"
+    "refetchButtonTooltip": "Refetch metadata for this file, optionally from a specific provider",
+    "autoApplyThresholdLabel": "Auto-apply ≥",
+    "autoApplyThresholdTooltip": "Minimum match confidence (title/author similarity to the original file) required to auto-apply fetched metadata",
+    "autoApplyButton": "Auto-Apply Matches",
+    "autoApplyButtonTooltip": "Apply fetched metadata for every file at or above the confidence threshold, without opening each one individually",
+    "matchConfidenceTooltip": "How closely the fetched metadata's title/author matches the original file — higher is more likely to be correct"
   },
   "filesWidget": {
     "title": "Pending Bookdrop Files",

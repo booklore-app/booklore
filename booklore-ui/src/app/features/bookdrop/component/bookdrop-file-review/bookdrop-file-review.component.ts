@@ -30,6 +30,7 @@ import {BookdropBulkEditDialogComponent, BulkEditResult} from '../bookdrop-bulk-
 import {BookdropPatternExtractDialogComponent} from '../bookdrop-pattern-extract-dialog/bookdrop-pattern-extract-dialog.component';
 import {DialogLauncherService} from '../../../../shared/services/dialog-launcher.service';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {MetadataUtilsService} from '../../../../shared/metadata';
 
 export interface BookdropFileUI {
   file: BookdropFile;
@@ -43,6 +44,7 @@ export interface BookdropFileUI {
   availablePaths: { id: string; name: string }[];
   refetchProvider: string | null;
   refetching: boolean;
+  matchConfidence: number | null;
 }
 
 @Component({
@@ -78,6 +80,7 @@ export class BookdropFileReviewComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly pageTitle = inject(PageTitleService);
   private readonly t = inject(TranslocoService);
+  private readonly metadataUtils = inject(MetadataUtilsService);
 
   @ViewChildren('metadataPicker') metadataPickers!: QueryList<BookdropFileMetadataPickerComponent>;
 
@@ -95,6 +98,8 @@ export class BookdropFileReviewComponent implements OnInit {
   loading = true;
   saving = false;
   includeCoversOnCopy = true;
+  autoApplyThreshold = 90;
+  autoApplying = false;
 
   pageSize = 50;
   totalRecords = 0;
@@ -651,7 +656,20 @@ export class BookdropFileReviewComponent implements OnInit {
       savedFields: {},
       refetchProvider: null,
       refetching: false,
+      matchConfidence: this.computeMatchConfidence(file),
     };
+  }
+
+  private computeMatchConfidence(file: BookdropFile): number | null {
+    const fallbackTitle = file.fileName.replace(/\.[^.]+$/, '');
+    return this.metadataUtils.calculateMatchConfidence(file.originalMetadata, file.fetchedMetadata, fallbackTitle);
+  }
+
+  matchConfidenceSeverity(confidence: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
+    if (confidence === null) return 'secondary';
+    if (confidence >= 90) return 'success';
+    if (confidence >= 70) return 'warn';
+    return 'danger';
   }
 
   refetchMetadata(fileUi: BookdropFileUI): void {
@@ -660,6 +678,7 @@ export class BookdropFileReviewComponent implements OnInit {
       next: (updated: BookdropFile) => {
         fileUi.refetching = false;
         fileUi.file = updated;
+        fileUi.matchConfidence = this.computeMatchConfidence(updated);
         this.messageService.add({
           severity: 'success',
           summary: this.t.translate('bookdrop.fileReview.toast.refetchSuccessSummary'),
@@ -675,6 +694,46 @@ export class BookdropFileReviewComponent implements OnInit {
           detail: err?.error?.message ?? this.t.translate('bookdrop.fileReview.toast.refetchFailedDetail'),
         });
       },
+    });
+  }
+
+  async autoApplyHighConfidenceMatches(): Promise<void> {
+    this.autoApplying = true;
+    if (this.selectAllAcrossPages) {
+      try {
+        await this.loadAllPagesIntoCache();
+      } catch (err) {
+        console.error('Error loading pages into cache:', err);
+        this.autoApplying = false;
+        return;
+      }
+    }
+
+    const excludeFields = this.includeCoversOnCopy ? ['bookId'] : ['thumbnailUrl', 'bookId'];
+    let appliedCount = 0;
+
+    Object.values(this.fileUiCache).forEach(fileUi => {
+      const confidence = fileUi.matchConfidence;
+      const fetched = fileUi.file.fetchedMetadata;
+      if (confidence === null || confidence < this.autoApplyThreshold || !fetched) {
+        return;
+      }
+
+      this.metadataUtils.copyAllFields(
+        fetched,
+        fileUi.metadataForm,
+        (field) => this.metadataUtils.copyFieldToForm(field, fetched, fileUi.metadataForm, fileUi.copiedFields),
+        excludeFields
+      );
+      this.onMetadataCopied(fileUi.file.id, true);
+      appliedCount++;
+    });
+
+    this.autoApplying = false;
+    this.messageService.add({
+      severity: appliedCount > 0 ? 'success' : 'warn',
+      summary: this.t.translate('bookdrop.fileReview.toast.autoApplySummary'),
+      detail: this.t.translate('bookdrop.fileReview.toast.autoApplyDetail', {count: appliedCount, threshold: this.autoApplyThreshold}),
     });
   }
 

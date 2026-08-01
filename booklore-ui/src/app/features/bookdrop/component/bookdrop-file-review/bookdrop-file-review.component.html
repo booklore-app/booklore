@@ -102,6 +102,30 @@
               [pTooltip]="t('extractPatternTooltip')"
               tooltipPosition="top">
             </p-button>
+
+            <p-inputgroup class="autoapply">
+              <p-inputgroup-addon [pTooltip]="t('autoApplyThresholdTooltip')" tooltipPosition="top">
+                {{ t('autoApplyThresholdLabel') }}
+              </p-inputgroup-addon>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                [(ngModel)]="autoApplyThreshold"
+                class="autoapply-threshold-input"/>
+              <p-inputgroup-addon>%</p-inputgroup-addon>
+              <p-button
+                size="small"
+                outlined
+                severity="success"
+                [label]="t('autoApplyButton')"
+                icon="pi pi-bolt"
+                [loading]="autoApplying"
+                (click)="autoApplyHighConfidenceMatches()"
+                [pTooltip]="t('autoApplyButtonTooltip')"
+                tooltipPosition="top">
+              </p-button>
+            </p-inputgroup>
           </div>
 
           <div class="default-controls">
@@ -200,6 +224,16 @@
                       : t('metadataNotAppliedTooltip')"
                   tooltipPosition="top">
                 </i>
+
+                @if (file.matchConfidence !== null) {
+                  <span
+                    class="match-confidence-badge"
+                    [ngClass]="'severity-' + matchConfidenceSeverity(file.matchConfidence)"
+                    [pTooltip]="t('matchConfidenceTooltip')"
+                    tooltipPosition="top">
+                    {{ file.matchConfidence }}%
+                  </span>
+                }
 
                 <p-select
                   size="small"
