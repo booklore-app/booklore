@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📄 PDF Reader | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>📄 PDF Reader</h1></header>
+<p>BookLore includes a full PDF reader powered by PDF.js with support for annotations, multiple view modes, search, and reading progress tracking.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-reading-interface">📚 Reading Interface<a href="#-reading-interface" class="hash-link" aria-label="Direct link to 📚 Reading Interface" title="Direct link to 📚 Reading Interface">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="PDF Reader Overview" src="https://web.archive.org/web/20260310154850im_/https://booklore.org/assets/images/pdf-reader-overview-8e164ead8804bb9b3c26f3e1bf8f53a4.jpg" width="1200" height="696" class="img_ev3q"></p>
+<p>The reader opens with a toolbar across the top and an optional sidebar showing the document outline (table of contents). The sidebar can be toggled with the sidebar button in the toolbar.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-toolbar-actions">🔧 Toolbar Actions<a href="#-toolbar-actions" class="hash-link" aria-label="Direct link to 🔧 Toolbar Actions" title="Direct link to 🔧 Toolbar Actions">​</a></h3>
+<p><strong>Left side:</strong></p>
+<table><thead><tr><th>Button</th><th>Action</th></tr></thead><tbody><tr><td><strong>Sidebar toggle</strong></td><td>Show/hide the document outline</td></tr><tr><td><strong>Find</strong></td><td>Open the search bar</td></tr><tr><td><strong>Page input</strong></td><td>Jump to a specific page number</td></tr></tbody></table>
+<p><strong>Right side:</strong></p>
+<table><thead><tr><th>Button</th><th>Action</th></tr></thead><tbody><tr><td><strong>Zoom controls</strong></td><td>Zoom in/out and preset zoom levels</td></tr><tr><td><strong>Hand tool</strong></td><td>Pan/scroll mode</td></tr><tr><td><strong>Select tool</strong></td><td>Text selection mode</td></tr><tr><td><strong>Rotate</strong></td><td>Rotate page clockwise or counter-clockwise</td></tr><tr><td><strong>Print</strong></td><td>Print the document (requires download permission)</td></tr><tr><td><strong>View mode</strong></td><td>Page spread and scroll mode selector</td></tr><tr><td><strong>Highlight</strong></td><td>Highlight annotation tool</td></tr><tr><td><strong>Text</strong></td><td>Text annotation tool</td></tr><tr><td><strong>Draw</strong></td><td>Freehand drawing tool</td></tr><tr><td><strong>Theme toggle</strong></td><td>Switch between dark and light mode</td></tr><tr><td><strong>Close</strong></td><td>Exit the reader</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-view-modes">📐 View Modes<a href="#-view-modes" class="hash-link" aria-label="Direct link to 📐 View Modes" title="Direct link to 📐 View Modes">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="PDF View Modes" src="https://web.archive.org/web/20260310154850im_/https://booklore.org/assets/images/pdf-reader-view-modes-758f56dc75abdca8c9207885ed038438.jpg" width="300" height="234" class="img_ev3q"></p>
+<p>The view mode dropdown offers several ways to display pages:</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-page-spreads">📖 Page Spreads<a href="#-page-spreads" class="hash-link" aria-label="Direct link to 📖 Page Spreads" title="Direct link to 📖 Page Spreads">​</a></h3>
+<table><thead><tr><th>Mode</th><th>Description</th></tr></thead><tbody><tr><td><strong>No Spreads</strong></td><td>Single page at a time</td></tr><tr><td><strong>Odd Spreads</strong></td><td>Odd pages on the left, even on the right</td></tr><tr><td><strong>Even Spreads</strong></td><td>Even pages on the left, odd on the right</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-scroll-modes">📜 Scroll Modes<a href="#-scroll-modes" class="hash-link" aria-label="Direct link to 📜 Scroll Modes" title="Direct link to 📜 Scroll Modes">​</a></h3>
+<table><thead><tr><th>Mode</th><th>Description</th></tr></thead><tbody><tr><td><strong>Page Scrolling</strong></td><td>One page at a time, snapping between pages</td></tr><tr><td><strong>Vertical Scrolling</strong></td><td>Continuous vertical scroll through all pages</td></tr><tr><td><strong>Horizontal Scrolling</strong></td><td>Scroll left/right through pages</td></tr><tr><td><strong>Wrapped Scrolling</strong></td><td>Pages wrap like a grid, multiple pages visible at once</td></tr><tr><td><strong>Infinite Scroll</strong></td><td>Seamless continuous scrolling</td></tr><tr><td><strong>Book Mode</strong></td><td>Two-page spread that mimics a physical book</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-zoom-options">🔍 Zoom Options<a href="#-zoom-options" class="hash-link" aria-label="Direct link to 🔍 Zoom Options" title="Direct link to 🔍 Zoom Options">​</a></h2>
+<p>Four preset zoom levels are available in the reader preferences:</p>
+<table><thead><tr><th>Option</th><th>Description</th></tr></thead><tbody><tr><td><strong>Auto</strong></td><td>Automatically selects the best zoom</td></tr><tr><td><strong>Page Fit</strong></td><td>Fits the entire page in view (default)</td></tr><tr><td><strong>Page Width</strong></td><td>Fits the page width to the window</td></tr><tr><td><strong>Actual Size</strong></td><td>Displays at 100% scale</td></tr></tbody></table>
+<p>The toolbar also provides manual zoom in/out controls.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-annotations">✏️ Annotations<a href="#️-annotations" class="hash-link" aria-label="Direct link to ✏️ Annotations" title="Direct link to ✏️ Annotations">​</a></h2>
+<p>The PDF reader supports three annotation types:</p>
+<ul>
+<li><strong>Highlights</strong> for marking text passages</li>
+<li><strong>Text annotations</strong> for adding comments</li>
+<li><strong>Freehand drawing</strong> for markup</li>
+</ul>
+<p>Annotations are saved automatically (with a 1.5 second debounce) and persist across sessions.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-search">🔍 Search<a href="#-search" class="hash-link" aria-label="Direct link to 🔍 Search" title="Direct link to 🔍 Search">​</a></h2>
+<p>Click the Find button or use <code>Ctrl+F</code> to open the search bar. Matches are highlighted in the document as you type.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-reading-progress">📊 Reading Progress<a href="#-reading-progress" class="hash-link" aria-label="Direct link to 📊 Reading Progress" title="Direct link to 📊 Reading Progress">​</a></h2>
+<p>Progress is saved automatically on every page change. The reader tracks both the current page number and the reading percentage. When you reopen a PDF, it returns to your last position.</p>
+<p>Reading sessions are recorded in the background with start/end times and page positions.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-settings-persistence">💾 Settings Persistence<a href="#-settings-persistence" class="hash-link" aria-label="Direct link to 💾 Settings Persistence" title="Direct link to 💾 Settings Persistence">​</a></h2>
+<p>PDF reader settings can be saved globally (applied to all PDFs) or per book. The scope is controlled in <a href="../reader-preferences.html">Reader Preferences</a>. Per-book settings override global defaults when enabled.</p>
+</body>
+</html>

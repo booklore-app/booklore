@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📝 File Naming Patterns | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>📝 File Naming Patterns</h1></header>
+<p>Configure automatic file organization using metadata placeholders. Patterns are applied when uploading books, finalizing Bookdrop imports, moving files between libraries, and (optionally) after metadata updates.</p>
+<p><img decoding="async" loading="lazy" alt="File Naming Patterns UI" src="https://web.archive.org/web/20260305045252im_/https://booklore.org/assets/images/file-naming-patterns-a07e84b19ac27294e5e00d8fd35b316c.jpg" width="1200" height="692" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-patterns-work">How Patterns Work<a href="#how-patterns-work" class="hash-link" aria-label="Direct link to How Patterns Work" title="Direct link to How Patterns Work">​</a></h2>
+<p>Patterns are text templates with placeholders in curly braces. When a file is processed, Booklore replaces each placeholder with the book's actual metadata and renames/moves the file accordingly.</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">{authors}/{series}/{seriesIndex} - {title}</span><br></span></code></pre></div></div>
+<p>Produces:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">J.K. Rowling/Harry Potter/01 - Harry Potter and the Sorcerer's Stone.epub</span><br></span></code></pre></div></div>
+<p>The file extension is always added automatically.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="available-placeholders">Available Placeholders<a href="#available-placeholders" class="hash-link" aria-label="Direct link to Available Placeholders" title="Direct link to Available Placeholders">​</a></h2>
+<table><thead><tr><th>Placeholder</th><th>Description</th><th>Example</th></tr></thead><tbody><tr><td><code>{title}</code></td><td>Book title</td><td>The Hobbit</td></tr><tr><td><code>{subtitle}</code></td><td>Book subtitle</td><td>There and Back Again</td></tr><tr><td><code>{authors}</code></td><td>Author name(s)</td><td>J.R.R. Tolkien</td></tr><tr><td><code>{year}</code></td><td>Publication year</td><td>1937</td></tr><tr><td><code>{series}</code></td><td>Series name</td><td>Middle-earth</td></tr><tr><td><code>{seriesIndex}</code></td><td>Series position, zero-padded</td><td>01</td></tr><tr><td><code>{language}</code></td><td>Language code</td><td>en</td></tr><tr><td><code>{publisher}</code></td><td>Publisher name</td><td>Allen & Unwin</td></tr><tr><td><code>{isbn}</code></td><td>ISBN (prefers ISBN-13)</td><td>9780547928227</td></tr><tr><td><code>{currentFilename}</code></td><td>Original filename with extension</td><td>hobbit_original.epub</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="folder-structures">Folder Structures<a href="#folder-structures" class="hash-link" aria-label="Direct link to Folder Structures" title="Direct link to Folder Structures">​</a></h2>
+<p>Use forward slashes to create nested folder structures:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">{authors}/{series}/{seriesIndex} - {title}</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">→ J.K. Rowling/Harry Potter/01 - Harry Potter and the Sorcerer's Stone.epub</span><br></span></code></pre></div></div>
+<p><strong>Trailing slash</strong> keeps the original filename:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">{title}/</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">→ Harry Potter and the Sorcerer's Stone/harry1_original.epub</span><br></span></code></pre></div></div>
+<p><strong>Leading slash</strong> creates an absolute path from the library root:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">/{authors}/{title}</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">→ /J.K. Rowling/Harry Potter and the Sorcerer's Stone.epub</span><br></span></code></pre></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="optional-blocks">Optional Blocks<a href="#optional-blocks" class="hash-link" aria-label="Direct link to Optional Blocks" title="Direct link to Optional Blocks">​</a></h2>
+<p>Wrap parts of a pattern in angle brackets (<code><...></code>) to make them conditional. If any placeholder inside the block has no value, the entire block is removed.</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain"><{seriesIndex} - >{title}</span><br></span></code></pre></div></div>
+<ul>
+<li>With series index: <code>01 - Dune.epub</code></li>
+<li>Without series index: <code>Dune.epub</code></li>
+</ul>
+<p>This is essential for metadata that may be missing, like series, subtitle, or ISBN.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="examples">Examples<a href="#examples" class="hash-link" aria-label="Direct link to Examples" title="Direct link to Examples">​</a></h3>
+<p><strong>Subtitle block:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">{title}<: {subtitle}></span><br></span></code></pre></div></div>
+<ul>
+<li>With subtitle: <code>Project Hail Mary: A Novel.epub</code></li>
+<li>Without: <code>Project Hail Mary.epub</code></li>
+</ul>
+<p><strong>Full series path with fallbacks:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">{authors}/<{series}/><{seriesIndex}. >{title}</span><br></span></code></pre></div></div>
+<ul>
+<li>Full metadata: <code>Andy Weir/The Martian Series/02. Project Hail Mary.epub</code></li>
+<li>No series: <code>Andy Weir/Project Hail Mary.epub</code></li>
+</ul>
+<p><strong>Decorative brackets:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain"><[{series}] >{title} - {authors}</span><br></span></code></pre></div></div>
+<ul>
+<li>With series: <code>[Harry Potter] Chamber of Secrets - J.K. Rowling.epub</code></li>
+<li>Without: <code>Chamber of Secrets - J.K. Rowling.epub</code></li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="worked-examples">Worked Examples<a href="#worked-examples" class="hash-link" aria-label="Direct link to Worked Examples" title="Direct link to Worked Examples">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="with-complete-metadata">With Complete Metadata<a href="#with-complete-metadata" class="hash-link" aria-label="Direct link to With Complete Metadata" title="Direct link to With Complete Metadata">​</a></h3>
+<p><strong>Sample book:</strong> Harry Potter and the Sorcerer's Stone by J.K. Rowling, Series: Harry Potter #1, Year: 1997, Original file: <code>harry1_original.epub</code></p>
+<table><thead><tr><th>Pattern</th><th>Output</th></tr></thead><tbody><tr><td><code>{authors} - {title}</code></td><td><code>J.K. Rowling - Harry Potter and the Sorcerer's Stone.epub</code></td></tr><tr><td><code>{authors}/{series}/{seriesIndex} - {title}</code></td><td><code>J.K. Rowling/Harry Potter/01 - Harry Potter and the Sorcerer's Stone.epub</code></td></tr><tr><td><code>{title}/</code></td><td><code>Harry Potter and the Sorcerer's Stone/harry1_original.epub</code></td></tr><tr><td><code>{authors}/{series}/{currentFilename}</code></td><td><code>J.K. Rowling/Harry Potter/harry1_original.epub</code></td></tr><tr><td><code>/{authors}/{title}</code></td><td><code>/J.K. Rowling/Harry Potter and the Sorcerer's Stone.epub</code></td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="with-missing-metadata">With Missing Metadata<a href="#with-missing-metadata" class="hash-link" aria-label="Direct link to With Missing Metadata" title="Direct link to With Missing Metadata">​</a></h3>
+<p><strong>Sample book:</strong> Project Hail Mary by Andy Weir, Year: 2021, no series, no subtitle. Original file: <code>project_hail_mary_final.epub</code></p>
+<table><thead><tr><th>Pattern</th><th>Output</th><th>What happened</th></tr></thead><tbody><tr><td><code>{authors}/<{series}/><{seriesIndex}. >{title}< ({year})></code></td><td><code>Andy Weir/Project Hail Mary (2021).epub</code></td><td>Series and index blocks removed, year block kept</td></tr><tr><td><code><{seriesIndex}. >{title}< - {authors}></code></td><td><code>Project Hail Mary - Andy Weir.epub</code></td><td>Index block removed</td></tr><tr><td><code><[{series}] >{title} - {authors}</code></td><td><code>Project Hail Mary - Andy Weir.epub</code></td><td>Brackets and series removed entirely</td></tr><tr><td><code>{title}<: {subtitle}></code></td><td><code>Project Hail Mary.epub</code></td><td>Subtitle block removed</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="configuration">Configuration<a href="#configuration" class="hash-link" aria-label="Direct link to Configuration" title="Direct link to Configuration">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="default-pattern">Default Pattern<a href="#default-pattern" class="hash-link" aria-label="Direct link to Default Pattern" title="Direct link to Default Pattern">​</a></h3>
+<p>The default pattern applies to all libraries unless overridden. Set it in the <strong>Default File Naming Pattern</strong> section, then click <strong>Save</strong>. A live preview shows what the output would look like.</p>
+<p>If no pattern is configured at all, files keep their original filename.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="library-specific-overrides">Library-Specific Overrides<a href="#library-specific-overrides" class="hash-link" aria-label="Direct link to Library-Specific Overrides" title="Direct link to Library-Specific Overrides">​</a></h3>
+<p>Each library can have its own pattern. Leave a library's pattern empty to inherit the default. Click <strong>Clear</strong> to remove an override.</p>
+<p>Some useful per-library patterns:</p>
+<table><thead><tr><th>Library Type</th><th>Pattern</th></tr></thead><tbody><tr><td>Comics/Manga</td><td><code>{series}/{seriesIndex} - {title}</code></td></tr><tr><td>Academic</td><td><code>{year}/{authors} - {title}</code></td></tr><tr><td>Audiobooks</td><td><code>{authors}/{title}/</code></td></tr><tr><td>Fiction</td><td><code>{authors}/<{series}/><{seriesIndex}. >{title}</code></td></tr><tr><td>Multi-language</td><td><code>{language}/{authors}/{title}</code></td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="when-patterns-are-applied">When Patterns Are Applied<a href="#when-patterns-are-applied" class="hash-link" aria-label="Direct link to When Patterns Are Applied" title="Direct link to When Patterns Are Applied">​</a></h2>
+<ul>
+<li><strong>Uploads</strong> to a library</li>
+<li><strong>Bookdrop imports</strong> when finalizing files into a library</li>
+<li><strong>File moves</strong> between libraries or subfolders</li>
+<li><strong>Metadata updates</strong>, if the "Auto-Move Files on Metadata Update" setting is enabled for that library</li>
+</ul>
+</body>
+</html>

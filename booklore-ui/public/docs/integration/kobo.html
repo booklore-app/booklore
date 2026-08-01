@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📲 Kobo Integration | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>📲 Kobo Integration</h1></header>
+<p>Sync books from your Booklore library to your Kobo eReader. Books are managed through a dedicated Kobo shelf. Adding or removing books from this shelf controls what syncs to your device.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-what-youll-achieve">🌟 What You'll Achieve<a href="#-what-youll-achieve" class="hash-link" aria-label="Direct link to 🌟 What You'll Achieve" title="Direct link to 🌟 What You'll Achieve">​</a></h2>
+<p>With Kobo integration, you can:</p>
+<ul>
+<li><strong>Access your entire Booklore library</strong> on your Kobo eReader</li>
+<li><strong>Sync books automatically</strong> between Booklore and your device</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-key-features--capabilities">✨ Key Features & Capabilities<a href="#-key-features--capabilities" class="hash-link" aria-label="Direct link to ✨ Key Features & Capabilities" title="Direct link to ✨ Key Features & Capabilities">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-smart-shelf-management">📖 Smart Shelf Management<a href="#-smart-shelf-management" class="hash-link" aria-label="Direct link to 📖 Smart Shelf Management" title="Direct link to 📖 Smart Shelf Management">​</a></h3>
+<ul>
+<li><strong>Dedicated Kobo Shelf</strong>: Each user gets a special Kobo shelf that automatically syncs with their device</li>
+<li><strong>Two-Way Synchronization</strong>: Add/remove books in Booklore or on your Kobo - changes sync both ways</li>
+<li><strong>Instant Updates</strong>: Book changes reflect immediately after syncing</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-shelf-sync-to-kobo-collections">🏷️ Shelf Sync to Kobo Collections<a href="#️-shelf-sync-to-kobo-collections" class="hash-link" aria-label="Direct link to 🏷️ Shelf Sync to Kobo Collections" title="Direct link to 🏷️ Shelf Sync to Kobo Collections">​</a></h3>
+<p>Your shelves and magic shelves are automatically synced to your Kobo as collections, helping you organize your reading on the device.</p>
+<ul>
+<li><strong>Automatic Sync</strong>: Each shelf in Booklore appears as a collection on your Kobo</li>
+<li><strong>Magic Shelves Included</strong>: Dynamic magic shelves are synced the same way</li>
+</ul>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>How Collection Filtering Works</div><div class="admonitionContent_BuS1"><p>Only books that are in your Kobo shelf will appear in collections on your device. For example, if your "Favorites" shelf contains 10 books but only 4 are in your Kobo shelf, the "Favorites" collection on your Kobo will only show those 4 books. Shelves containing no Kobo-synced books won't appear as collections at all.</p><p>This gives you full control - simply manage your Kobo shelf to control which books and collections appear on your reader.</p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-device-integration">📱 Device Integration<a href="#-device-integration" class="hash-link" aria-label="Direct link to 📱 Device Integration" title="Direct link to 📱 Device Integration">​</a></h3>
+<ul>
+<li><strong>Seamless Setup</strong>: One-time configuration connects your Kobo to Booklore</li>
+<li><strong>Proxy Support</strong>: Access both your Booklore library and Kobo Store purchases</li>
+<li><strong>Multiple Users</strong>: Each user has their own independent Kobo integration</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-file-support">📄 File Support<a href="#-file-support" class="hash-link" aria-label="Direct link to 📄 File Support" title="Direct link to 📄 File Support">​</a></h3>
+<ul>
+<li><strong>EPUB Files</strong>: Full support for EPUB format books</li>
+<li><strong>Quality Preservation</strong>: Books maintain their original formatting and metadata</li>
+<li><strong>No PDF Support</strong>: PDF files are currently not supported for Kobo sync</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="nginx-reverse-proxy-configuration">Nginx Reverse Proxy Configuration<a href="#nginx-reverse-proxy-configuration" class="hash-link" aria-label="Direct link to Nginx Reverse Proxy Configuration" title="Direct link to Nginx Reverse Proxy Configuration">​</a></h2>
+<p>If you use nginx as a reverse proxy, add these settings for Kobo sync to work properly:</p>
+<div class="language-nginx codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-nginx codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_set_header Host $host;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_set_header X-Real-IP $remote_addr;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_set_header X-Forwarded-Host $host;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_set_header X-Forwarded-Proto $scheme;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_set_header X-Forwarded-Port $server_port;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_buffer_size 128k;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_buffers 4 256k;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">proxy_busy_buffers_size 256k;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">large_client_header_buffers 8 32k;</span><br></span></code></pre></div></div>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Nginx Proxy Manager</div><div class="admonitionContent_BuS1"><p>The proxy headers are already set automatically, but you still need to add the buffer settings manually.</p></div></div>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Other Reverse Proxies</div><div class="admonitionContent_BuS1"><p>If you use Caddy, Traefik, or another reverse proxy, configure equivalent headers and buffer settings. Consult your proxy's documentation.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="step-1-get-your-api-token">Step 1: Get Your API Token<a href="#step-1-get-your-api-token" class="hash-link" aria-label="Direct link to Step 1: Get Your API Token" title="Direct link to Step 1: Get Your API Token">​</a></h2>
+<ol>
+<li>Go to <strong>Settings > Devices</strong> in Booklore</li>
+<li>Find the <strong>Kobo Sync Settings</strong> section</li>
+<li>Copy your unique API token</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Device Settings" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/device-settings-1b85f8b7f550b3da2fc940c2e860ec6e.jpg" width="1200" height="690" class="img_ev3q"></p>
+<p>You can regenerate the token at any time, but you'll need to update your Kobo's configuration afterward.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Permissions</div><div class="admonitionContent_BuS1"><p>Admin users have Kobo Sync enabled by default. Other users need the permission granted by an admin (see below).</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="step-2-configure-your-kobo">Step 2: Configure Your Kobo<a href="#step-2-configure-your-kobo" class="hash-link" aria-label="Direct link to Step 2: Configure Your Kobo" title="Direct link to Step 2: Configure Your Kobo">​</a></h2>
+<ol>
+<li>Connect your Kobo to your computer via USB</li>
+<li>Enable hidden files in your file manager</li>
+<li>Open <code>.kobo/Kobo/Kobo eReader.conf</code> in a text editor</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Config File Location" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/config-file-location-d5d5432476ef946b0a93adda38c2fc49.jpg" width="1494" height="576" class="img_ev3q"></p>
+<ol start="4">
+<li>Find the <code>[OneStoreServices]</code> section and update the <code>api_endpoint</code> line:</li>
+</ol>
+<p><strong>Local network:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">api_endpoint=http://192.168.1.100:6060/api/kobo/your-token-here</span><br></span></code></pre></div></div>
+<p><strong>Remote server (with reverse proxy):</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">api_endpoint=https://booklore.example.com/api/kobo/your-token-here</span><br></span></code></pre></div></div>
+<p><img decoding="async" loading="lazy" alt="Before Change" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/config-before-3088123f97228e4e437fb459387abf5b.jpg" width="1341" height="288" class="img_ev3q">
+<img decoding="async" loading="lazy" alt="After Change" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/config-after-57e84910bfd350e3881b0f35189ad41a.jpg" width="1218" height="282" class="img_ev3q"></p>
+<ol start="5">
+<li>Save the file and safely eject your Kobo</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="step-3-sync-books">Step 3: Sync Books<a href="#step-3-sync-books" class="hash-link" aria-label="Direct link to Step 3: Sync Books" title="Direct link to Step 3: Sync Books">​</a></h2>
+<ol>
+<li>In Booklore, click the three-dot menu on any book card and select <strong>Assign Shelf</strong></li>
+<li>Choose your <strong>Kobo</strong> shelf</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Assign Shelf" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/assign-shelf-ffac05ae21c2a4930f7c0cd27b90f066.jpg" width="1200" height="691" class="img_ev3q"></p>
+<ol start="3">
+<li>Repeat for all books you want on your device</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Shelf With Books" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/shelf-with-books-5fdc0a3fe3774d0efc167136bb9df3e5.jpg" width="1200" height="691" class="img_ev3q"></p>
+<ol start="4">
+<li>On your Kobo, go to <strong>My Books</strong> and tap the sync icon, then <strong>Sync Now</strong></li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Sync Button" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/sync-button-9ac546d585ada0f4f4a4841d6985dbf7.jpg" width="500" height="665" class="img_ev3q"></p>
+<ol start="5">
+<li>Your Booklore books appear on the device</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Synced Books" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/synced-books-e109531b6c44b4d8d037f8935de4ba9d.jpg" width="500" height="665" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="removing-books">Removing Books<a href="#removing-books" class="hash-link" aria-label="Direct link to Removing Books" title="Direct link to Removing Books">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="from-the-kobo-device">From the Kobo device<a href="#from-the-kobo-device" class="hash-link" aria-label="Direct link to From the Kobo device" title="Direct link to From the Kobo device">​</a></h3>
+<ol>
+<li>Tap the three dots on the book cover and select <strong>Remove</strong></li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Remove Menu" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/remove-menu-fc4b9c10a3784218b7b438c5a1830bfa.jpg" width="500" height="665" class="img_ev3q"></p>
+<ol start="2">
+<li>Select <strong>Remove from My Books</strong></li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Remove Confirm" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/remove-confirm-4ceadc82885f4e3d844322c604804ba8.jpg" width="500" height="665" class="img_ev3q"></p>
+<ol start="3">
+<li>Tap <strong>Sync Now</strong> to push the change back to Booklore</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Sync After Removal" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/sync-after-removal-5d0207dccd4185396a9ff9a82a1ecbf5.jpg" width="500" height="665" class="img_ev3q"></p>
+<p>The book is removed from your Kobo shelf in Booklore but remains in your main library.</p>
+<p><img decoding="async" loading="lazy" alt="Shelf After Removal" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/shelf-after-removal-fb18ac83a221a9e7fc30e53f7436b8cc.jpg" width="1200" height="691" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="from-booklore">From Booklore<a href="#from-booklore" class="hash-link" aria-label="Direct link to From Booklore" title="Direct link to From Booklore">​</a></h3>
+<ol>
+<li>Go to your Kobo shelf</li>
+<li>Click the three-dot menu on the book and select <strong>Assign Shelf</strong></li>
+<li>Uncheck the Kobo shelf and save</li>
+<li>Sync your Kobo device to apply the change</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="viewing-synced-progress">Viewing Synced Progress<a href="#viewing-synced-progress" class="hash-link" aria-label="Direct link to Viewing Synced Progress" title="Direct link to Viewing Synced Progress">​</a></h2>
+<p>Reading progress from your Kobo appears on the book's detail page in Booklore as a percentage with a red progress bar under the cover.</p>
+<p><img decoding="async" loading="lazy" alt="Synced Progress" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/synced-progress-ba1b496d2ae042e98741d7019bb705cf.jpg" width="1200" height="611" class="img_ev3q"></p>
+<p>Click <strong>Reset Progress</strong> to clear the Kobo progress in Booklore. This does not affect the device's read status.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="granting-access-to-other-users">Granting Access to Other Users<a href="#granting-access-to-other-users" class="hash-link" aria-label="Direct link to Granting Access to Other Users" title="Direct link to Granting Access to Other Users">​</a></h2>
+<p>By default, only admins have Kobo Sync enabled. To grant it to other users:</p>
+<ol>
+<li>Go to <strong>Settings > Users</strong></li>
+<li>Click on the user</li>
+<li>Enable the <strong>Kobo Sync</strong> permission</li>
+<li>Save</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="User Permissions" src="https://web.archive.org/web/20260301053224im_/https://booklore.org/assets/images/user-permissions-877c042726947806cfac10a996482091.jpg" width="1200" height="691" class="img_ev3q"></p>
+<p>The user can then find their own API token in <strong>Settings > Devices</strong> and follow the setup steps above. Each user gets their own token and Kobo shelf.</p>
+</body>
+</html>

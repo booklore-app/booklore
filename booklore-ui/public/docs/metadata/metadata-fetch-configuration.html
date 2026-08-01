@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🔃 Library Metadata Configuration | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🔃 Library Metadata Configuration</h1></header>
+<p>Configure how Booklore fetches and applies book metadata from online providers. Set global defaults with per-field provider priorities, enable or disable specific fields, and create library-specific overrides for different collections.</p>
+<p>Navigate to <strong>Settings > Metadata 2</strong> to access this page. Requires the <strong>Manage Metadata Configuration</strong> permission.</p>
+<p><img decoding="async" loading="lazy" alt="Metadata Configuration" src="https://web.archive.org/web/20260305021600im_/https://booklore.org/assets/images/metadata-configuration-17d30464615f368ad55f62b933e2db45.jpg" width="500" height="645" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-how-it-works">🧩 How It Works<a href="#-how-it-works" class="hash-link" aria-label="Direct link to 🧩 How It Works" title="Direct link to 🧩 How It Works">​</a></h2>
+<p>When Booklore fetches metadata for a book, it checks your configuration to determine which providers to query and in what order. For each metadata field (title, author, description, etc.), you assign up to four providers in priority order:</p>
+<ol>
+<li><strong>1st Priority (P1)</strong>: The provider Booklore tries first</li>
+<li><strong>2nd Priority (P2)</strong>: Used if P1 doesn't have data for that field</li>
+<li><strong>3rd Priority (P3)</strong>: Used if P2 also lacks data</li>
+<li><strong>4th Priority (P4)</strong>: Final fallback</li>
+</ol>
+<p>This means different fields can pull from different providers. For example, you might prefer GoodReads for descriptions but Amazon for cover images.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Smart Fallback</div><div class="admonitionContent_BuS1"><p>If your first-choice provider doesn't have data for a field, Booklore automatically tries the next priority until it finds data or exhausts all four. Leave a priority as "Unset" to skip it.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-metadata-providers">📊 Metadata Providers<a href="#-metadata-providers" class="hash-link" aria-label="Direct link to 📊 Metadata Providers" title="Direct link to 📊 Metadata Providers">​</a></h2>
+<p>Booklore integrates with the following providers:</p>
+<table><thead><tr><th>Provider</th><th>Strengths</th></tr></thead><tbody><tr><td><strong>Amazon</strong></td><td>High-quality covers, comprehensive catalog, ratings and reviews</td></tr><tr><td><strong>Google Books</strong></td><td>Detailed publisher descriptions, accurate ISBNs, broad coverage</td></tr><tr><td><strong>GoodReads</strong></td><td>Community ratings, excellent series data, comprehensive genres</td></tr><tr><td><strong>Hardcover</strong></td><td>Modern releases, moods and tags, community-driven data</td></tr><tr><td><strong>Comicvine</strong></td><td>Specialized comic book and graphic novel metadata</td></tr><tr><td><strong>Douban</strong></td><td>Asian literature (Chinese, Japanese, Korean titles)</td></tr><tr><td><strong>Lubimyczytac</strong></td><td>Polish literature and book ratings</td></tr><tr><td><strong>Ranobedb</strong></td><td>Light novels and web novel metadata</td></tr><tr><td><strong>Audible</strong></td><td>Audiobook-specific metadata, narrator info, ratings</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Provider Availability</div><div class="admonitionContent_BuS1"><p>Some providers (Hardcover, Comicvine, Ranobedb, Douban) are disabled by default. Enable them in <strong>Settings > Metadata 1</strong> before they appear in the priority dropdowns.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-default-metadata-settings">⚙️ Default Metadata Settings<a href="#️-default-metadata-settings" class="hash-link" aria-label="Direct link to ⚙️ Default Metadata Settings" title="Direct link to ⚙️ Default Metadata Settings">​</a></h2>
+<p>The top section of the page configures the <strong>global defaults</strong> that apply to all libraries unless overridden.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="priority-grid">Priority Grid<a href="#priority-grid" class="hash-link" aria-label="Direct link to Priority Grid" title="Direct link to Priority Grid">​</a></h3>
+<p>The grid shows all standard metadata fields as rows, with four priority columns. Each cell is a dropdown where you select a provider.</p>
+<p><strong>Standard fields (14):</strong></p>
+<table><thead><tr><th>Field</th><th>What It Controls</th></tr></thead><tbody><tr><td><strong>Title</strong></td><td>Book title</td></tr><tr><td><strong>Subtitle</strong></td><td>Book subtitle</td></tr><tr><td><strong>Description</strong></td><td>Synopsis or summary</td></tr><tr><td><strong>Authors</strong></td><td>Author names</td></tr><tr><td><strong>Publisher</strong></td><td>Publishing house</td></tr><tr><td><strong>Published Date</strong></td><td>Publication date</td></tr><tr><td><strong>Series Name</strong></td><td>Series the book belongs to</td></tr><tr><td><strong>Series Number</strong></td><td>Position within the series (supports decimals like 1.5)</td></tr><tr><td><strong>Series Total</strong></td><td>Total books in the series</td></tr><tr><td><strong>ISBN-13</strong></td><td>13-digit ISBN identifier</td></tr><tr><td><strong>ISBN-10</strong></td><td>10-digit ISBN identifier</td></tr><tr><td><strong>Language</strong></td><td>Book language</td></tr><tr><td><strong>Genres</strong></td><td>Categories and genres</td></tr><tr><td><strong>Page Count</strong></td><td>Number of pages</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="bulk-priority-setters">Bulk Priority Setters<a href="#bulk-priority-setters" class="hash-link" aria-label="Direct link to Bulk Priority Setters" title="Direct link to Bulk Priority Setters">​</a></h3>
+<p>The <strong>"Set All"</strong> row at the top of each priority column lets you assign the same provider to all enabled fields at once. Select a provider from the dropdown to apply it across the board, or select <strong>"Clear All"</strong> to unset that priority for every field.</p>
+<p>Use this to quickly establish a baseline, then fine-tune individual fields as needed.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="enableddisabled-fields">Enabled/Disabled Fields<a href="#enableddisabled-fields" class="hash-link" aria-label="Direct link to Enabled/Disabled Fields" title="Direct link to Enabled/Disabled Fields">​</a></h3>
+<p>The <strong>Enabled</strong> checkbox on each row controls whether that field is fetched at all. Disabling a field skips it entirely during metadata fetching, regardless of provider assignments. Disabled rows appear grayed out.</p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Validation</div><div class="admonitionContent_BuS1"><p>Every enabled standard field must have at least one provider assigned (P1, P2, P3, or P4). The form won't save if an enabled field has no providers set.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-provider-specific-fields">🏷️ Provider-Specific Fields<a href="#️-provider-specific-fields" class="hash-link" aria-label="Direct link to 🏷️ Provider-Specific Fields" title="Direct link to 🏷️ Provider-Specific Fields">​</a></h2>
+<p>Below the priority grid, a separate section lists fields that are unique to specific providers. These fields don't use the priority system because they can only come from one source.</p>
+<p>Simply check or uncheck each field to enable or disable it:</p>
+<p><strong>Amazon:</strong></p>
+<ul>
+<li>Amazon ASIN, Amazon Rating, Amazon Review Count</li>
+</ul>
+<p><strong>Google:</strong></p>
+<ul>
+<li>Google Books ID</li>
+</ul>
+<p><strong>GoodReads:</strong></p>
+<ul>
+<li>Goodreads ID, Goodreads Rating, Goodreads Review Count</li>
+</ul>
+<p><strong>Hardcover:</strong></p>
+<ul>
+<li>Hardcover ID, Hardcover Rating, Hardcover Review Count, Moods, Tags</li>
+</ul>
+<p><strong>Comicvine:</strong></p>
+<ul>
+<li>Comicvine ID</li>
+</ul>
+<p><strong>Lubimyczytac:</strong></p>
+<ul>
+<li>Lubimyczytac ID, Lubimyczytac Rating</li>
+</ul>
+<p><strong>Ranobedb:</strong></p>
+<ul>
+<li>Ranobedb ID, Ranobedb Rating</li>
+</ul>
+<p><strong>Audible:</strong></p>
+<ul>
+<li>Audible ID, Audible Rating, Audible Review Count</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-fetch-options">🔧 Fetch Options<a href="#-fetch-options" class="hash-link" aria-label="Direct link to 🔧 Fetch Options" title="Direct link to 🔧 Fetch Options">​</a></h2>
+<p>The bottom bar provides four additional settings that control how fetched metadata is applied:</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="replace-mode">Replace Mode<a href="#replace-mode" class="hash-link" aria-label="Direct link to Replace Mode" title="Direct link to Replace Mode">​</a></h3>
+<table><thead><tr><th>Mode</th><th>Description</th></tr></thead><tbody><tr><td><strong>Replace Missing Only</strong> (default)</td><td>Only fills in fields that are currently empty. Existing metadata is preserved. Safe for routine use.</td></tr><tr><td><strong>Replace All</strong></td><td>Overwrites all metadata fields with fetched values, even if data already exists. Use with caution.</td></tr><tr><td><strong>Replace When Provided</strong></td><td>Replaces a field only when the provider returns a value for it. Empty provider responses don't clear existing data.</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="update-covers">Update Covers<a href="#update-covers" class="hash-link" aria-label="Direct link to Update Covers" title="Direct link to Update Covers">​</a></h3>
+<p>When checked, cover images are fetched and applied. When unchecked, existing covers are preserved and the Cover field is hidden from the priority grid.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="merge-genres">Merge Genres<a href="#merge-genres" class="hash-link" aria-label="Direct link to Merge Genres" title="Direct link to Merge Genres">​</a></h3>
+<p>When checked, fetched genres are <strong>merged</strong> with existing ones (union). When unchecked, existing genres are <strong>replaced</strong> entirely by fetched genres.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Recommended</div><div class="admonitionContent_BuS1"><p>Keep "Merge genres" enabled to build up comprehensive genre data over time. Disable it only if you want to clean up incorrect genre assignments.</p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="manual-review">Manual Review<a href="#manual-review" class="hash-link" aria-label="Direct link to Manual Review" title="Direct link to Manual Review">​</a></h3>
+<p>When checked, fetched metadata is not applied automatically. Instead, it's queued for manual review where you can compare old vs. new values and approve or reject individual changes. Useful for important collections where you want full control.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-saving">💾 Saving<a href="#-saving" class="hash-link" aria-label="Direct link to 💾 Saving" title="Direct link to 💾 Saving">​</a></h2>
+<ul>
+<li><strong>Save Default Settings</strong>: Validates and saves your configuration as the global default for all libraries</li>
+<li><strong>Reset Form</strong>: Clears all provider selections back to "Unset", re-enables all fields, and resets options to defaults. Does not save.</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-library-specific-overrides">📚 Library-Specific Overrides<a href="#-library-specific-overrides" class="hash-link" aria-label="Direct link to 📚 Library-Specific Overrides" title="Direct link to 📚 Library-Specific Overrides">​</a></h2>
+<p>The bottom section of the page lets you override the default settings for individual libraries. This is powerful when different libraries need different provider priorities.</p>
+<p><strong>Use cases:</strong></p>
+<ul>
+<li>Prefer Amazon for fiction but Google Books for technical books</li>
+<li>Use Comicvine as primary for a comics library</li>
+<li>Disable description fetching for a library where you've manually curated descriptions</li>
+<li>Use Audible as primary for an audiobook library</li>
+</ul>
+<p>Each library is listed with a badge:</p>
+<ul>
+<li><strong>Default Settings</strong> (green globe icon): Using the global defaults</li>
+<li><strong>Custom Settings</strong> (green checkmark icon): Has a library-specific override</li>
+</ul>
+<p>Click on a library to expand it and configure custom provider priorities, enabled fields, and fetch options. The configuration UI is identical to the default settings section. Any field left unconfigured falls back to the global default.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-sidecar-export--import">📤 Sidecar Export & Import<a href="#-sidecar-export--import" class="hash-link" aria-label="Direct link to 📤 Sidecar Export & Import" title="Direct link to 📤 Sidecar Export & Import">​</a></h2>
+<p>Each library panel includes <strong>Export Sidecar</strong> and <strong>Import Sidecar</strong> buttons for bulk metadata file operations.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="export-sidecar">Export Sidecar<a href="#export-sidecar" class="hash-link" aria-label="Direct link to Export Sidecar" title="Direct link to Export Sidecar">​</a></h3>
+<p>Writes the current metadata for every book in the library to <code>.sidecar.json</code> files alongside the book files on disk. This is useful for:</p>
+<ul>
+<li>Backing up metadata before a major change</li>
+<li>Sharing metadata between Booklore instances</li>
+<li>Preserving metadata independently from the database</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="import-sidecar">Import Sidecar<a href="#import-sidecar" class="hash-link" aria-label="Direct link to Import Sidecar" title="Direct link to Import Sidecar">​</a></h3>
+<p>Reads <code>.sidecar.json</code> files from disk and applies them to the corresponding books in the library. Metadata is applied using the <strong>Replace When Provided</strong> mode, so only fields present in the sidecar file are updated.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Fault Tolerant</div><div class="admonitionContent_BuS1"><p>Both export and import operations process books individually. If one book fails, the rest continue. The result shows how many books were successfully processed.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-configuration-examples">📋 Configuration Examples<a href="#-configuration-examples" class="hash-link" aria-label="Direct link to 📋 Configuration Examples" title="Direct link to 📋 Configuration Examples">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="general-purpose-library">General-Purpose Library<a href="#general-purpose-library" class="hash-link" aria-label="Direct link to General-Purpose Library" title="Direct link to General-Purpose Library">​</a></h3>
+<p>A balanced setup that works well for most fiction and non-fiction:</p>
+<table><thead><tr><th>Priority</th><th>Provider</th></tr></thead><tbody><tr><td><strong>P1</strong></td><td>GoodReads</td></tr><tr><td><strong>P2</strong></td><td>Google</td></tr><tr><td><strong>P3</strong></td><td>Amazon</td></tr><tr><td><strong>P4</strong></td><td>Unset</td></tr></tbody></table>
+<p>Enable all standard fields plus Goodreads ID/Rating and Amazon ASIN. Use "Replace Missing Only" with "Merge genres" checked.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="comics-library-override">Comics Library (Override)<a href="#comics-library-override" class="hash-link" aria-label="Direct link to Comics Library (Override)" title="Direct link to Comics Library (Override)">​</a></h3>
+<p>Override for a comics-specific library:</p>
+<table><thead><tr><th>Priority</th><th>Provider</th></tr></thead><tbody><tr><td><strong>P1</strong></td><td>Comicvine</td></tr><tr><td><strong>P2</strong></td><td>Google</td></tr><tr><td><strong>P3</strong></td><td>Amazon</td></tr><tr><td><strong>P4</strong></td><td>Unset</td></tr></tbody></table>
+<p>Enable Comicvine ID. Disable series fields if your comics don't use them.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="audiobook-library-override">Audiobook Library (Override)<a href="#audiobook-library-override" class="hash-link" aria-label="Direct link to Audiobook Library (Override)" title="Direct link to Audiobook Library (Override)">​</a></h3>
+<p>Override for an audiobook library:</p>
+<table><thead><tr><th>Priority</th><th>Provider</th></tr></thead><tbody><tr><td><strong>P1</strong></td><td>Audible</td></tr><tr><td><strong>P2</strong></td><td>GoodReads</td></tr><tr><td><strong>P3</strong></td><td>Amazon</td></tr><tr><td><strong>P4</strong></td><td>Unset</td></tr></tbody></table>
+<p>Enable Audible ID, Audible Rating, and Audible Review Count.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="polish-literature-override">Polish Literature (Override)<a href="#polish-literature-override" class="hash-link" aria-label="Direct link to Polish Literature (Override)" title="Direct link to Polish Literature (Override)">​</a></h3>
+<p>Override for a Polish book collection:</p>
+<table><thead><tr><th>Priority</th><th>Provider</th></tr></thead><tbody><tr><td><strong>P1</strong></td><td>Lubimyczytac</td></tr><tr><td><strong>P2</strong></td><td>GoodReads</td></tr><tr><td><strong>P3</strong></td><td>Google</td></tr><tr><td><strong>P4</strong></td><td>Unset</td></tr></tbody></table>
+<p>Enable Lubimyczytac ID and Lubimyczytac Rating.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📋 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📋 Notes" title="Direct link to 📋 Notes">​</a></h2>
+<ul>
+<li>All configuration changes are recorded in the <a href="../tools/audit-logs.html">Audit Log</a>.</li>
+<li>Library overrides take full precedence. When a library has custom settings, the global defaults are not used as a fallback for individual fields within that configuration.</li>
+<li>The configuration is used by all metadata fetch operations: Auto Fetch, Custom Fetch, and the Refresh Metadata system task.</li>
+<li>Provider-specific fields (ratings, IDs, moods, tags) are only fetched when their parent provider is queried for at least one standard field.</li>
+<li>Disabling a provider in <strong>Settings > Metadata 1</strong> removes it from all priority dropdowns. Re-enabling it does not restore previous priority assignments.</li>
+</ul>
+</body>
+</html>

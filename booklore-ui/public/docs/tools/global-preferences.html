@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>⚙️ Global Preferences | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>⚙️ Global Preferences</h1></header>
+<p>Configure global settings for your Booklore instance, including cover image handling, search preferences, and file upload limits. These settings apply to all users on the server.</p>
+<p>Navigate to <strong>Settings > Application</strong> to access this page. Requires the <strong>Manage Application Preferences</strong> permission.</p>
+<p><img decoding="async" loading="lazy" alt="Global Preferences" src="https://web.archive.org/web/20260312083844im_/https://booklore.org/assets/images/global-preferences-8f58f8611c9ff5063809ee1125771ca8.jpg" width="500" height="349" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-book-cover-image">🖼️ Book Cover Image<a href="#️-book-cover-image" class="hash-link" aria-label="Direct link to 🖼️ Book Cover Image" title="Direct link to 🖼️ Book Cover Image">​</a></h2>
+<p>Controls how Booklore generates and processes book cover thumbnails.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="regenerate-covers">Regenerate Covers<a href="#regenerate-covers" class="hash-link" aria-label="Direct link to Regenerate Covers" title="Direct link to Regenerate Covers">​</a></h3>
+<p>Click <strong>Regenerate</strong> to re-extract cover images for all books from the embedded covers in their files. This runs as a background task with progress tracking. Books with locked covers are skipped.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>When to Regenerate</div><div class="admonitionContent_BuS1"><p>Use this after changing cover cropping settings, or if covers appear broken or outdated after a migration.</p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="cover-cropping">Cover Cropping<a href="#cover-cropping" class="hash-link" aria-label="Direct link to Cover Cropping" title="Direct link to Cover Cropping">​</a></h3>
+<p>Some book files contain covers that are extremely tall (like web comics or manga scans) or extremely wide (like panoramic images). These don't display well as thumbnails. Cover cropping automatically trims these images to a standard portrait ratio (approximately 2:3).</p>
+<table><thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><strong>Vertical Cover Cropping</strong></td><td>Off</td><td>Crops extremely tall images from the top to create usable thumbnails. Useful for web comics and vertically-scrolling manga.</td></tr><tr><td><strong>Horizontal Cover Cropping</strong></td><td>Off</td><td>Crops extremely wide images from the left to create usable thumbnails.</td></tr><tr><td><strong>Aspect Ratio Threshold</strong></td><td>2.5</td><td>Controls when cropping kicks in. Only images with an aspect ratio exceeding this value are cropped. A value of 2.5 means images more than 2.5x taller (or wider) than normal will be cropped. Range: 1.5 to 3.0.</td></tr><tr><td><strong>Smart Cropping</strong></td><td>Off</td><td>When enabled, the cropping algorithm skips uniform color regions (borders, margins) and focuses on the most relevant content. Without smart cropping, images are simply trimmed from the top or left edge.</td></tr></tbody></table>
+<p><strong>How cropping works:</strong></p>
+<ol>
+<li>When a cover is generated, Booklore checks if its aspect ratio exceeds the threshold</li>
+<li>If vertical cropping is enabled and the image is too tall, it's cropped to a standard portrait ratio</li>
+<li>If horizontal cropping is enabled and the image is too wide, it's cropped similarly</li>
+<li>With smart cropping on, the algorithm scans from the edges to find where actual content begins (skipping blank or solid-color borders) and crops from there</li>
+</ol>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Recommended for Comics</div><div class="admonitionContent_BuS1"><p>If your library contains web comics or manga with very tall cover images, enable <strong>Vertical Cover Cropping</strong> with <strong>Smart Cropping</strong> for the best results. Adjust the threshold if too many or too few covers are being cropped.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-search--recommendations">🔍 Search & Recommendations<a href="#-search--recommendations" class="hash-link" aria-label="Direct link to 🔍 Search & Recommendations" title="Direct link to 🔍 Search & Recommendations">​</a></h2>
+<table><thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><strong>Auto Book Search</strong></td><td>On</td><td>Automatically attempts to find metadata matches when you open the book information panel. Disable this if you prefer to trigger metadata searches manually.</td></tr><tr><td><strong>Similar Book Recommendation</strong></td><td>On</td><td>Enables the "Similar Books" feature that recommends books from your library based on content similarity. Recommendations are generated by the <a href="../tools/task-manager.html">Update Book Recommendations</a> task.</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-file-management">📁 File Management<a href="#-file-management" class="hash-link" aria-label="Direct link to 📁 File Management" title="Direct link to 📁 File Management">​</a></h2>
+<table><thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><strong>Max File Upload Size</strong></td><td>1000 MB</td><td>The maximum allowed file size (in MB) for each uploaded file. Applies to EPUB, PDF, CBZ, CBR, and CB7 formats uploaded through Bookdrop.</td></tr></tbody></table>
+<p>Enter a new value and click <strong>Save</strong> to update.</p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Server Restart Required</div><div class="admonitionContent_BuS1"><p>Changes to the max file upload size take effect only after restarting the Booklore server.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📋 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📋 Notes" title="Direct link to 📋 Notes">​</a></h2>
+<ul>
+<li>All settings changes are recorded in the <a href="../tools/audit-logs.html">Audit Log</a>.</li>
+<li>Cover cropping settings apply globally. After changing them, use <strong>Regenerate Covers</strong> to apply the new settings to existing books. New books will use the updated settings automatically.</li>
+<li>The aspect ratio threshold slider moves in increments of 0.1. Lower values crop more aggressively; higher values are more lenient.</li>
+<li>Disabling Similar Book Recommendation hides the recommendation section in the book detail view but does not delete the computed recommendations.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🚀 Getting Started | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="./index.html">Back to docs index</a>
+</div>
+<header><h1>🚀 Getting Started</h1></header>
+<p>Booklore is a self-hosted library management system for ebooks, comics, and audiobooks. Your books and data stay on your server, with no subscription fees or cloud dependency.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-prerequisites">📋 Prerequisites<a href="#-prerequisites" class="hash-link" aria-label="Direct link to 📋 Prerequisites" title="Direct link to 📋 Prerequisites">​</a></h2>
+<ul>
+<li><strong>Docker & Docker Compose</strong> (v20.10+ / v2.0+)</li>
+<li><strong>2GB RAM</strong>, 10GB+ storage</li>
+<li><strong>Port 6060</strong> available</li>
+<li><strong>Internet connection</strong> for metadata fetching</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-1-install">📥 Step 1: Install<a href="#-step-1-install" class="hash-link" aria-label="Direct link to 📥 Step 1: Install" title="Direct link to 📥 Step 1: Install">​</a></h2>
+<p>Create the directory structure and start the containers:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">mkdir -p ~/booklore/{config/mariadb,data,books,bookdrop}</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">cd ~/booklore</span><br></span></code></pre></div></div>
+<p>Create a <code>docker-compose.yml</code> with the Booklore and MariaDB services. The key volumes to mount are:</p>
+<table><thead><tr><th>Volume</th><th>Purpose</th></tr></thead><tbody><tr><td><code>./data:/app/data</code></td><td>Application data, settings, and metadata cache</td></tr><tr><td><code>./books:/books</code></td><td>Your book library folder</td></tr><tr><td><code>./bookdrop:/bookdrop</code></td><td>Drop folder for automatic importing</td></tr></tbody></table>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose up -d</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose ps   # verify both containers are running</span><br></span></code></pre></div></div>
+<p>See the <a href="./installation.html">Installation Guide</a> for the complete <code>docker-compose.yml</code> with all environment variables and configuration options.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-2-create-admin-account">👤 Step 2: Create Admin Account<a href="#-step-2-create-admin-account" class="hash-link" aria-label="Direct link to 👤 Step 2: Create Admin Account" title="Direct link to 👤 Step 2: Create Admin Account">​</a></h2>
+<p>Open <code>http://localhost:6060</code> in your browser. On first launch, Booklore shows a setup wizard to create the admin account:</p>
+<table><thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead><tbody><tr><td>Username</td><td>Yes</td><td></td></tr><tr><td>Full Name</td><td>Yes</td><td></td></tr><tr><td>Email</td><td>Yes</td><td>Must be a valid email address</td></tr><tr><td>Password</td><td>Yes</td><td>Minimum 6 characters</td></tr><tr><td>Confirm Password</td><td>Yes</td><td>Must match</td></tr></tbody></table>
+<p>After submitting, you'll be redirected to the login page. See <a href="./initial-setup.html">Initial Setup</a> for details.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-3-create-a-library">📚 Step 3: Create a Library<a href="#-step-3-create-a-library" class="hash-link" aria-label="Direct link to 📚 Step 3: Create a Library" title="Direct link to 📚 Step 3: Create a Library">​</a></h2>
+<p>Click <strong>"Add a Library"</strong> from the dashboard to open the library creation dialog.</p>
+<p><strong>Library Details:</strong> Give it a name and optionally pick an icon.</p>
+<p><strong>Book Folders:</strong> Add one or more folders containing your book files. Navigate the directory picker to select them.</p>
+<p><strong>Options:</strong></p>
+<table><thead><tr><th>Option</th><th>Description</th></tr></thead><tbody><tr><td>Watch Folders</td><td>Automatically detects new, changed, or deleted books in your folders</td></tr><tr><td>Metadata Source</td><td>Where to read metadata during scans: embedded file metadata, sidecar files, or both</td></tr><tr><td>Format Priority</td><td>Drag to reorder which format is treated as primary when a book exists in multiple formats</td></tr><tr><td>Allowed Formats</td><td>Restrict which file formats this library will scan</td></tr></tbody></table>
+<p>Booklore supports EPUB, PDF, MOBI, AZW3, FB2, CBZ/CBR/CB7, M4B, M4A, and MP3.</p>
+<p>After saving, the library scans your folders automatically. See <a href="./library/setup-first-library.html">Setup First Library</a> for a full walkthrough, and <a href="./library/folder-structure.html">Folder Structure</a> for how to organize your files.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-4-add-books">📖 Step 4: Add Books<a href="#-step-4-add-books" class="hash-link" aria-label="Direct link to 📖 Step 4: Add Books" title="Direct link to 📖 Step 4: Add Books">​</a></h2>
+<p><strong>Direct copy:</strong> Place files in your library folder, then rescan from the UI (or let Watch Folders pick them up automatically).</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cp /path/to/your/books/* ~/booklore/books/</span><br></span></code></pre></div></div>
+<p><strong>Bookdrop:</strong> Drop files into the bookdrop folder. Booklore auto-detects them, fetches metadata, and stages them for review. You can edit metadata, assign a destination library, and finalize the import from the UI. See <a href="./bookdrop.html">Bookdrop</a>.</p>
+<p><strong>Web upload:</strong> Use the upload button in the toolbar. You can upload directly to a library or to BookDrop for staging. The default file size limit is 100 MB per file (configurable by admins).</p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Cloudflare Tunnels</div><div class="admonitionContent_BuS1"><p>If you serve Booklore through a Cloudflare Tunnel, the free tier has a <a href="https://web.archive.org/web/20260305164130/https://developers.cloudflare.com/workers/platform/limits/#request-limits" target="_blank" rel="noopener noreferrer">100 MB upload limit</a>.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-5-start-reading">📱 Step 5: Start Reading<a href="#-step-5-start-reading" class="hash-link" aria-label="Direct link to 📱 Step 5: Start Reading" title="Direct link to 📱 Step 5: Start Reading">​</a></h2>
+<p>Click any book cover, then click <strong>"Read"</strong> to open the built-in reader. Booklore has dedicated readers for each format:</p>
+<table><thead><tr><th>Reader</th><th>Formats</th><th>Highlights</th></tr></thead><tbody><tr><td>Ebook Reader</td><td>EPUB, MOBI, AZW3, FB2</td><td>Bookmarks, annotations, highlights, search, custom fonts, progress sync</td></tr><tr><td>PDF Reader</td><td>PDF</td><td>Page-level progress sync, zoom, page spread modes, annotations</td></tr><tr><td>Comic Reader</td><td>CBZ, CBR, CB7</td><td>Fit/scroll modes, reading direction (LTR/RTL), slideshow, bookmarks</td></tr><tr><td>Audiobook Player</td><td>M4B, MP3</td><td>Chapters, track listing, playback speed, progress sync</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-e-readers-and-mobile-apps">📲 E-Readers and Mobile Apps<a href="#-e-readers-and-mobile-apps" class="hash-link" aria-label="Direct link to 📲 E-Readers and Mobile Apps" title="Direct link to 📲 E-Readers and Mobile Apps">​</a></h3>
+<p>Connect external reading apps via OPDS:</p>
+<ol>
+<li>Go to <strong>Settings > OPDS Configuration</strong></li>
+<li>Toggle the OPDS server on</li>
+<li>Copy the catalog URL shown in the API Endpoints section</li>
+<li>Add it to your reading app (KOReader, Moon+ Reader, etc.)</li>
+</ol>
+<p>Booklore also provides a Komga-compatible API for apps like Tachiyomi and Komelia. OPDS uses its own user accounts, created by admins in the OPDS settings page.</p>
+<p>See <a href="./integration/kobo.html">Kobo Integration</a> and <a href="./integration/opds.html">OPDS</a> for detailed setup guides.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-what-to-explore-next">⚙️ What to Explore Next<a href="#️-what-to-explore-next" class="hash-link" aria-label="Direct link to ⚙️ What to Explore Next" title="Direct link to ⚙️ What to Explore Next">​</a></h2>
+<table><thead><tr><th>Feature</th><th>Description</th></tr></thead><tbody><tr><td><a href="./metadata/metadata-fetch-configuration.html">Metadata Configuration</a></td><td>Set up automatic metadata enrichment from online sources</td></tr><tr><td><a href="./bookdrop-advanced.html">Bookdrop Advanced Features</a></td><td>Bulk editing, filename pattern extraction, and more</td></tr><tr><td><a href="./magic-shelf.html">Magic Shelf</a></td><td>Dynamic, auto-updating shelves based on filters</td></tr><tr><td><a href="./authentication/overview.html">Authentication</a></td><td>OIDC providers, multi-user setup, and permissions</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-common-questions">❓ Common Questions<a href="#-common-questions" class="hash-link" aria-label="Direct link to ❓ Common Questions" title="Direct link to ❓ Common Questions">​</a></h2>
+<p><strong>Can I access Booklore remotely?</strong>
+Yes, set up a reverse proxy with HTTPS. See the <a href="./installation.html">Installation Guide</a>.</p>
+<p><strong>How do I backup my library?</strong>
+Backup your <code>data</code> directory (application state) and your books directory regularly.</p>
+<p><strong>What e-readers work with Booklore?</strong>
+Any device or app that supports OPDS. Kobo devices have a dedicated integration with deeper sync support.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-get-help">🔗 Get Help<a href="#-get-help" class="hash-link" aria-label="Direct link to 🔗 Get Help" title="Direct link to 🔗 Get Help">​</a></h2>
+<ul>
+<li><a href="https://web.archive.org/web/20260305164130/https://github.com/booklore-app/booklore" target="_blank" rel="noopener noreferrer">GitHub Issues</a> for bug reports</li>
+<li><a href="https://web.archive.org/web/20260305164130/https://discord.gg/Ee5hd458Uz" target="_blank" rel="noopener noreferrer">Community Discord</a> for questions and support</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🔐 Authelia Authentication | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🔐 Authelia Authentication</h1></header>
+<p>Seamlessly integrate Authelia as your single sign-on (SSO) provider for Booklore. Simplify user authentication, enhance security, and provide a streamlined login experience across your applications.</p>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Username Matching Required</div><div class="admonitionContent_BuS1"><p>The username in Authelia must exactly match the username in Booklore for authentication to work properly. Case sensitivity matters. If a user doesn't exist in Booklore with the matching username, authentication will fail.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-what-youll-achieve">🌟 What You'll Achieve<a href="#-what-youll-achieve" class="hash-link" aria-label="Direct link to 🌟 What You'll Achieve" title="Direct link to 🌟 What You'll Achieve">​</a></h2>
+<p>With Authelia integration, you can:</p>
+<ul>
+<li><strong>Enable single sign-on (SSO)</strong> for seamless access to Booklore without separate login credentials</li>
+<li><strong>Centralize user management</strong> across multiple applications from one unified interface</li>
+<li><strong>Enhance security</strong> with OAuth2/OpenID Connect protocols and modern authentication standards</li>
+<li><strong>Simplify login experience</strong> for your users with automatic session management</li>
+<li><strong>Control access</strong> through OIDC client configuration and user permissions</li>
+<li><strong>Streamline deployment</strong> with Authelia's lightweight and easy-to-configure architecture</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-how-authelia-integration-works">✨ How Authelia Integration Works<a href="#-how-authelia-integration-works" class="hash-link" aria-label="Direct link to ✨ How Authelia Integration Works" title="Direct link to ✨ How Authelia Integration Works">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-the-authentication-flow">🔄 The Authentication Flow<a href="#-the-authentication-flow" class="hash-link" aria-label="Direct link to 🔄 The Authentication Flow" title="Direct link to 🔄 The Authentication Flow">​</a></h3>
+<p>Understanding the authentication flow helps troubleshoot issues and explains what happens behind the scenes:</p>
+<ol>
+<li>
+<p><strong>🎫 User Initiates Login</strong><br>
+User attempts to access Booklore and is redirected to Authelia's secure login portal. The original destination URL is preserved for automatic redirect after authentication.</p>
+</li>
+<li>
+<p><strong>🔑 Authelia Authenticates</strong><br>
+User enters credentials in Authelia's login page. Authelia validates the credentials against its user directory and verifies the user's identity.</p>
+</li>
+<li>
+<p><strong>✅ Token Exchange</strong><br>
+Authelia validates credentials and issues OAuth2 tokens (access token, ID token). These tokens contain user information and are cryptographically signed for security.</p>
+</li>
+<li>
+<p><strong>🚪 Access Granted</strong><br>
+Booklore receives and validates the tokens, extracts user information, matches it with an existing Booklore user account, and grants access to the authenticated user.</p>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-setting-up-authelia">🚀 Setting Up Authelia<a href="#-setting-up-authelia" class="hash-link" aria-label="Direct link to 🚀 Setting Up Authelia" title="Direct link to 🚀 Setting Up Authelia">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-1-create-oidc-client-in-authelia">Step 1: Create OIDC Client in Authelia<a href="#step-1-create-oidc-client-in-authelia" class="hash-link" aria-label="Direct link to Step 1: Create OIDC Client in Authelia" title="Direct link to Step 1: Create OIDC Client in Authelia">​</a></h3>
+<p>The essential parts of the Authelia config are highlighted below, and should be adapted to your specific setup.</p>
+<p><code>booklore.dev</code> will need changing to your actual domain name.</p>
+<p>It's also best practice to change the <code>client_id</code> parameter to a randomly generated string, the following restrictions apply:</p>
+<p>Valid Client ID’s have the following characteristics:</p>
+<ul>
+<li>Less than or equal to 100 characters.</li>
+<li>Only contains <a href="https://web.archive.org/web/20260112202618/https://datatracker.ietf.org/doc/html/rfc3986#section-2.3" target="_blank" rel="noopener noreferrer">RFC3986 Unreserved Characters.</a></li>
+<li>Completely unique from other configured clients.</li>
+</ul>
+<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token key atrule">identity_providers</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token key atrule">oidc</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token key atrule">lifespans</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token key atrule">access_token</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> 1h</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token key atrule">authorize_code</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> 1m</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token key atrule">id_token</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> 1h</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token key atrule">refresh_token</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> 90m</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token key atrule">enable_client_debug_messages</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> </span><span class="token boolean important">true</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token key atrule">enforce_pkce</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> public_clients_only</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token key atrule">cors</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token key atrule">endpoints</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> authorization</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> pushed</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">authorization</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">request</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> token</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> revocation</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> introspection</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> userinfo</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token key atrule">allowed_origins_from_client_redirect_uris</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> </span><span class="token boolean important">true</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token key atrule">claims_policies</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token key atrule">legacy</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">id_token</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token string" style="color:rgb(255, 121, 198)">'email'</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">'email_verified'</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">'preferred_username'</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">'name'</span><span class="token punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token key atrule">clients</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> </span><span class="token key atrule">client_id</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> booklore</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">client_name</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> Booklore</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">public</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> </span><span class="token boolean important">true</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">authorization_policy</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> two_factor</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">claims_policy</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> legacy</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">consent_mode</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> implicit</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">require_pkce</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> </span><span class="token boolean important">true</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">pkce_challenge_method</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> S256</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">scopes</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> offline_access</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> openid</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> profile</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> email</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">redirect_uris</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> https</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain">//booklore.booklore.dev/oauth2</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">callback</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> https</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain">//booklore.booklore.dev/*</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">response_types</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> code</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        </span><span class="token key atrule">grant_types</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> authorization_code</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">          </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> refresh_token</span><br></span></code></pre></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-configuring-booklore">⚙️ Configuring Booklore<a href="#️-configuring-booklore" class="hash-link" aria-label="Direct link to ⚙️ Configuring Booklore" title="Direct link to ⚙️ Configuring Booklore">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-2-connect-booklore-to-authelia">Step 2: Connect Booklore to Authelia<a href="#step-2-connect-booklore-to-authelia" class="hash-link" aria-label="Direct link to Step 2: Connect Booklore to Authelia" title="Direct link to Step 2: Connect Booklore to Authelia">​</a></h3>
+<p>Now configure Booklore to use Authelia as the authentication provider. This is the final configuration step:</p>
+<p><img decoding="async" loading="lazy" alt="Booklore OIDC Settings" src="https://web.archive.org/web/20260112202618im_/https://booklore.org/assets/images/authelia-01-aaeaaee42935d55f7a0a732b29987858.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol>
+<li>
+<p><strong>Open Booklore Settings</strong><br>
+Navigate to <strong>Settings → Authentication</strong> in your Booklore admin interface. You'll need administrator privileges to access this section.</p>
+</li>
+<li>
+<p><strong>Configure OIDC Provider</strong>
+Enter the credentials you copied from Authelia:</p>
+<ul>
+<li><strong>Provider Name:</strong> <code>Authelia</code> (or your preferred display name)
+<ul>
+<li>This name appears on the login button, so make it recognizable to users</li>
+</ul>
+</li>
+<li><strong>Client ID:</strong> Paste the Client ID from Authelia (<code>booklore</code>)
+<ul>
+<li>Make sure there are no extra spaces before or after</li>
+</ul>
+</li>
+<li><strong>Issuer URI:</strong> Paste the OpenID Configuration Issuer URL from Authelia  <strong>without a trailing slash</strong>
+<ul>
+<li>Example: <code>https://auth.booklore.dev</code></li>
+</ul>
+</li>
+<li><strong>Username Claim:</strong> <code>preferred_username</code></li>
+<li><strong>Email Claim:</strong> <code>email</code></li>
+<li><strong>Display Name Claim:</strong> <code>name</code></li>
+<li>Click <strong>Save</strong> to store the configuration</li>
+</ul>
+</li>
+<li>
+<p><strong>Enable OIDC Authentication</strong><br>
+Toggle <strong>"OIDC Enabled"</strong> to ON to activate Authelia authentication</p>
+<ul>
+<li>When enabled, users will see a "Login with Authelia" button on the Booklore login page</li>
+<li>The standard username/password login will still be available unless specifically disabled</li>
+</ul>
+</li>
+</ol>
+<div class="theme-admonition theme-admonition-success admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Configuration Complete!</div><div class="admonitionContent_BuS1"><p>Booklore is now configured to use Authelia for authentication. The next step is testing the integration to ensure everything works correctly.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-testing-the-integration">🧪 Testing the Integration<a href="#-testing-the-integration" class="hash-link" aria-label="Direct link to 🧪 Testing the Integration" title="Direct link to 🧪 Testing the Integration">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-4-test-login-with-authelia">Step 4: Test Login with Authelia<a href="#step-4-test-login-with-authelia" class="hash-link" aria-label="Direct link to Step 4: Test Login with Authelia" title="Direct link to Step 4: Test Login with Authelia">​</a></h3>
+<p>Verify that the integration works correctly before rolling it out to users. Testing ensures a smooth experience:</p>
+<p><strong>Open an incognito/private browser window</strong></p>
+<ul>
+<li>Navigate to your Booklore instance</li>
+<li>Click "Login with Authelia" (or your configured provider name)</li>
+<li>You'll be redirected to Authelia for authentication</li>
+<li>After logging in, you should be redirected back to Booklore</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="Booklore Opens" src="https://web.archive.org/web/20260112202618im_/https://booklore.org/assets/images/authelia-02-c5ff9c2af3ccc83b31cc5998fbbf3cbe.jpg" width="1500" height="895" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-success admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Integration Successful!</div><div class="admonitionContent_BuS1"><p>Your Authelia integration is working correctly. You can now roll it out to your users.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-managing-authentication">🔄 Managing Authentication<a href="#-managing-authentication" class="hash-link" aria-label="Direct link to 🔄 Managing Authentication" title="Direct link to 🔄 Managing Authentication">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="disabling-authelia-authentication">Disabling Authelia Authentication<a href="#disabling-authelia-authentication" class="hash-link" aria-label="Direct link to Disabling Authelia Authentication" title="Direct link to Disabling Authelia Authentication">​</a></h3>
+<p>If you need to temporarily disable or switch authentication methods (for maintenance or troubleshooting):</p>
+<p><img decoding="async" loading="lazy" alt="Disable OIDC" src="https://web.archive.org/web/20260112202618im_/https://booklore.org/assets/images/authelia-03-1005387e2188198a8470d5de6391a98f.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol>
+<li>
+<p><strong>Navigate to Authentication Settings</strong><br>
+Go to <strong>Booklore → Settings → Authentication</strong></p>
+</li>
+<li>
+<p><strong>Disable OIDC</strong><br>
+Toggle <strong>"OIDC Enabled"</strong> to <strong>OFF</strong></p>
+<ul>
+<li>This immediately disables Authelia authentication</li>
+<li>Active sessions remain valid until they expire</li>
+<li>New login attempts will use standard authentication</li>
+</ul>
+</li>
+<li>
+<p><strong>Log Out</strong><br>
+Click <strong>Logout</strong> to end your current session and verify the change</p>
+</li>
+<li>
+<p><strong>Standard Login Returns</strong><br>
+You'll be redirected to the standard Booklore login page with username/password fields</p>
+</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Booklore Login" src="https://web.archive.org/web/20260112202618im_/https://booklore.org/assets/images/authelia-04-09d26a6baedc962de635da7d404eaa4b.jpg" width="1500" height="895" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Configuration Persistence</div><div class="admonitionContent_BuS1"><p>Disabling OIDC doesn't delete your Authelia configuration. All settings (Client ID, Issuer URL) are preserved. You can re-enable it anytime by toggling the switch back on. Users who were authenticated via Authelia can still log in with standard credentials if they have them configured.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-troubleshooting">🛠️ Troubleshooting<a href="#️-troubleshooting" class="hash-link" aria-label="Direct link to 🛠️ Troubleshooting" title="Direct link to 🛠️ Troubleshooting">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="common-issues-and-solutions">Common Issues and Solutions<a href="#common-issues-and-solutions" class="hash-link" aria-label="Direct link to Common Issues and Solutions" title="Direct link to Common Issues and Solutions">​</a></h3>
+<p><strong>Authentication Fails:</strong></p>
+<ul>
+<li>✓ Verify usernames match exactly between Authelia and Booklore (case-sensitive)</li>
+<li>✓ Check callback URLs <strong>DO NOT</strong> include trailing slashes</li>
+<li>✓ Ensure user exists in both Authelia and Booklore</li>
+<li>✓ Verify Client ID is correctly copied (no extra spaces)</li>
+<li>✓ Check browser console for errors (F12)</li>
+</ul>
+<p><strong>Redirect Errors:</strong></p>
+<ul>
+<li>✓ Verify callback URL: <code>/oauth2/callback</code> (<strong>without</strong> trailing slash)</li>
+<li>✓ Confirm domain matches exactly in both systems</li>
+<li>✓ Ensure HTTPS is used in production</li>
+<li>✓ Validate wildcard pattern: <code>https://your-domain/*</code></li>
+</ul>
+<p><strong>User Not Found:</strong></p>
+<ul>
+<li>✓ Create matching username in Booklore (case-sensitive)</li>
+<li>✓ Verify user account is active in Authelia</li>
+<li>✓ Check that email addresses match between systems</li>
+</ul>
+<p><strong>"Invalid Client" Error:</strong></p>
+<ul>
+<li>✓ Check Client ID is copied correctly (no extra spaces)</li>
+<li>✓ Ensure Issuer URL <strong>DOES NOT</strong> have a trailing slash</li>
+</ul>
+<p><strong>Connection Refused:</strong></p>
+<ul>
+<li>✓ Verify Authelia service is running and accessible</li>
+<li>✓ Check network connectivity between Booklore and Authelia</li>
+<li>✓ Ensure firewall rules allow communication</li>
+<li>✓ Validate DNS resolution for both domains</li>
+</ul>
+<p><strong>SSL/Certificate Errors:</strong></p>
+<ul>
+<li>✓ Ensure valid SSL certificates on both systems</li>
+<li>✓ Verify Issuer URL uses HTTPS in production</li>
+<li>✓ Check certificate chains are properly configured</li>
+<li>✓ Validate certificate expiration dates</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="viewing-logs">Viewing Logs<a href="#viewing-logs" class="hash-link" aria-label="Direct link to Viewing Logs" title="Direct link to Viewing Logs">​</a></h3>
+<p><strong>Authelia:</strong> Check application logs for OAuth-related events and errors<br>
+<strong>Booklore:</strong> Review authentication logs in the application logs directory</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-best-practices">🎯 Best Practices<a href="#-best-practices" class="hash-link" aria-label="Direct link to 🎯 Best Practices" title="Direct link to 🎯 Best Practices">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="security-recommendations">Security Recommendations<a href="#security-recommendations" class="hash-link" aria-label="Direct link to Security Recommendations" title="Direct link to Security Recommendations">​</a></h3>
+<ul>
+<li>🔒 <strong>Use HTTPS</strong> - Always use HTTPS in production with valid SSL certificates</li>
+<li>🔐 <strong>Secure Credentials</strong> - Store Client IDs securely and never expose them in public repositories</li>
+<li>🛡️ <strong>Keep Updated</strong> - Regularly update both Authelia and Booklore to patch security vulnerabilities</li>
+<li>📊 <strong>Monitor Activity</strong> - Track login attempts and set up alerts for unusual patterns</li>
+<li>🔑 <strong>Rotate Credentials</strong> - Periodically regenerate Client IDs, especially after personnel changes</li>
+<li>🚪 <strong>Restrict Access</strong> - Configure callback URLs as specifically as possible</li>
+<li>👥 <strong>Review Users</strong> - Regularly audit user accounts and remove inactive users</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="optimization-tips">Optimization Tips<a href="#optimization-tips" class="hash-link" aria-label="Direct link to Optimization Tips" title="Direct link to Optimization Tips">​</a></h3>
+<ul>
+<li>📝 <strong>Use descriptive names</strong> - Name OIDC clients clearly (e.g., "Booklore Production")</li>
+<li>🌐 <strong>Use reverse proxy</strong> - Add rate limiting and IP whitelisting for additional security</li>
+<li>🔄 <strong>Test in staging</strong> - Validate changes in a staging environment before production</li>
+<li>⚡ <strong>Optimize tokens</strong> - Configure appropriate token expiration times</li>
+<li>📋 <strong>Document setup</strong> - Keep detailed records of your configuration for troubleshooting</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="user-experience">User Experience<a href="#user-experience" class="hash-link" aria-label="Direct link to User Experience" title="Direct link to User Experience">​</a></h3>
+<ul>
+<li>🎨 <strong>Customize branding</strong> - Configure Authelia with your organization's branding</li>
+<li>📚 <strong>Document the process</strong> - Create user guides with screenshots and support contact info</li>
+<li>🆘 <strong>Provide support</strong> - Ensure users know how to get help with authentication issues</li>
+<li>🔄 <strong>Test regularly</strong> - Periodically verify the authentication flow works as expected</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-additional-resources">📚 Additional Resources<a href="#-additional-resources" class="hash-link" aria-label="Direct link to 📚 Additional Resources" title="Direct link to 📚 Additional Resources">​</a></h2>
+<ul>
+<li><strong><a href="https://web.archive.org/web/20260112202618/https://www.authelia.com/" target="_blank" rel="noopener noreferrer">Authelia Documentation</a>:</strong> Official documentation for Authelia configuration</li>
+<li><strong>OAuth 2.0 Specification:</strong> Understanding the protocol behind SSO</li>
+<li><strong>OpenID Connect Core:</strong> Detailed information about OIDC flows</li>
+<li><strong>Security Best Practices:</strong> Regular security audits and penetration testing</li>
+</ul>
+<hr>
+<p>Authelia is an open-source authentication and authorization server and portal fulfilling the identity and access management (IAM) role of information security in providing multi-factor authentication and single sign-on (SSO) for your applications via a web portal. Authelia is an OpenID Connect 1.0 Provider which is OpenID Certified™ allowing comprehensive integrations, and acts as a companion for common reverse proxies.</p>
+</body>
+</html>

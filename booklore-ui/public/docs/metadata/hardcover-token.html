@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hardcover API Token Setup | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>Hardcover API Token Setup</h1></header>
+<p><a href="https://web.archive.org/web/20260316213240/https://hardcover.app/" target="_blank" rel="noopener noreferrer">Hardcover</a> is a book tracking and discovery platform with rich metadata: covers, descriptions, community ratings, review counts, moods, and tags. To use it as a metadata provider in Booklore, you need a free API token from your Hardcover account.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="get-your-token">Get Your Token<a href="#get-your-token" class="hash-link" aria-label="Direct link to Get Your Token" title="Direct link to Get Your Token">​</a></h2>
+<ol>
+<li>Sign up or log in at <a href="https://web.archive.org/web/20260316213240/https://hardcover.app/" target="_blank" rel="noopener noreferrer">hardcover.app</a></li>
+<li>Go to <a href="https://web.archive.org/web/20260316213240/https://hardcover.app/account/api" target="_blank" rel="noopener noreferrer">Account > API</a> to open the API Access page</li>
+<li>Copy the token from the text box. It starts with <code>Bearer</code> followed by a long string beginning with <code>eyJ...</code></li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Hardcover API Access page showing the Bearer token" src="https://web.archive.org/web/20260316213240im_/https://booklore.org/assets/images/hardcover-1-208cf5d155cda0086886fcba1e62c12b.jpg" width="800" height="461" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Copy Only the Token</div><div class="admonitionContent_BuS1"><p>The text box contains <code>Bearer eyJ...</code>. When pasting into Booklore, copy only the part <strong>after</strong> <code>Bearer </code>. Do not include the word "Bearer" or the space after it.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="configure-booklore">Configure Booklore<a href="#configure-booklore" class="hash-link" aria-label="Direct link to Configure Booklore" title="Direct link to Configure Booklore">​</a></h2>
+<ol>
+<li>Open <strong>Settings > Metadata 1</strong></li>
+<li>Enable the <strong>Hardcover</strong> checkbox</li>
+<li>Paste the token (without the <code>Bearer </code> prefix) into the <strong>API Token</strong> field</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Booklore Metadata 1 settings with the Hardcover token field" src="https://web.archive.org/web/20260316213240im_/https://booklore.org/assets/images/hardcover-2-fe413a316dd334a2bd00eebb1d251b5a.jpg" width="800" height="461" class="img_ev3q"></p>
+<p>Hardcover is now active as a metadata provider. You can set its priority for individual fields in the Advanced Metadata Fetch dialog.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting">​</a></h2>
+<table><thead><tr><th>Problem</th><th>What to check</th></tr></thead><tbody><tr><td>Authentication errors</td><td>Make sure you removed the <code>Bearer </code> prefix. Check for extra spaces at the start or end of the token.</td></tr><tr><td>Token stopped working</td><td>Hardcover tokens expire after 1 year. Go back to the API page and copy the new token. Hardcover may also reset tokens during their beta period.</td></tr><tr><td>No results for a book</td><td>Hardcover's coverage is broad but not exhaustive. Verify the book exists on hardcover.app by searching manually.</td></tr></tbody></table>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📚 RanobeDB | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>📚 RanobeDB</h1></header>
+<p><a href="https://web.archive.org/web/20260305125548/https://ranobedb.org/" target="_blank" rel="noopener noreferrer">RanobeDB</a> is a community-driven light novel database with extensive metadata for Japanese light novels, including English titles, authors, descriptions, series information, ratings, and cover images. If you have a light novel collection, this is the provider to prioritize. It covers light novels only, not manga or other book types.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>No Setup Required</div><div class="admonitionContent_BuS1"><p>RanobeDB doesn't need API tokens, cookies, or any authentication. Just toggle it on in <strong>Settings > Metadata 2</strong> and you're done.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-enabling-ranobedb">⚙️ Enabling RanobeDB<a href="#️-enabling-ranobedb" class="hash-link" aria-label="Direct link to ⚙️ Enabling RanobeDB" title="Direct link to ⚙️ Enabling RanobeDB">​</a></h2>
+<p>Open <strong>Settings > Metadata 2</strong>, find <strong>Ranobedb</strong> in the provider list, flip the toggle, and save. That's all there is to it.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-using-it-in-metadata-fetch">🔍 Using It in Metadata Fetch<a href="#-using-it-in-metadata-fetch" class="hash-link" aria-label="Direct link to 🔍 Using It in Metadata Fetch" title="Direct link to 🔍 Using It in Metadata Fetch">​</a></h2>
+<p>Once enabled, RanobeDB appears as a priority option in the Advanced Metadata Fetch dialog. You can set it as Priority 1, 2, 3, or 4 for any individual field.</p>
+<p><strong>For light novels</strong>, set RanobeDB as Priority 1 for most fields. Fallbacks to Google Books or Goodreads are optional but may not match well since light novel titles often differ across platforms. If RanobeDB doesn't have data for a particular field, Booklore automatically tries the next provider in your priority list.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-what-you-get">📊 What You Get<a href="#-what-you-get" class="hash-link" aria-label="Direct link to 📊 What You Get" title="Direct link to 📊 What You Get">​</a></h2>
+<p>RanobeDB provides titles (in English when available), authors, descriptions, cover images (usually the original Japanese cover), publisher, published date, language, categories, series name, and series number.</p>
+<p>It also returns two provider-specific fields:</p>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><strong>RanobeDB ID</strong></td><td>Unique identifier linking to the book's page on ranobedb.org. Shown as a clickable link in the metadata viewer.</td></tr><tr><td><strong>RanobeDB Rating</strong></td><td>Community rating from light novel readers. Displayed with the site's favicon in the metadata viewer.</td></tr></tbody></table>
+<p>Both fields can be locked in the metadata picker to prevent overwriting during future refreshes.</p>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Rating Scale</div><div class="admonitionContent_BuS1"><p>RanobeDB uses a 10-point scale. Booklore automatically converts it to 5 points for consistency with other providers (e.g., an 8.0 becomes 4.0).</p></div></div>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Authors Only</div><div class="admonitionContent_BuS1"><p>RanobeDB provides author names but does not include illustrators as a separate field.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-troubleshooting">🔧 Troubleshooting<a href="#-troubleshooting" class="hash-link" aria-label="Direct link to 🔧 Troubleshooting" title="Direct link to 🔧 Troubleshooting">​</a></h2>
+<table><thead><tr><th>Problem</th><th>What to check</th></tr></thead><tbody><tr><td>No results returned</td><td>Make sure the provider is enabled in Settings > Metadata 2. Verify the book exists on ranobedb.org by searching manually.</td></tr><tr><td>Wrong book matched</td><td>Use <strong>title + author name</strong> for the most accurate results. English titles work best.</td></tr><tr><td>Slow responses</td><td>RanobeDB is community-driven, so Booklore rate-limits requests to avoid overloading their servers. Be patient and try again later if you hit delays.</td></tr><tr><td>Network errors</td><td>Confirm your Booklore instance can reach ranobedb.org (check firewalls, DNS, and proxy settings).</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>API Status</div><div class="admonitionContent_BuS1"><p>RanobeDB's API is still under development. Booklore uses the available endpoints, and future updates may enhance functionality as the API matures.</p></div></div>
+</body>
+</html>

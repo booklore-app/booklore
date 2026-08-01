@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🏠 Dashboard | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="./index.html">Back to docs index</a>
+</div>
+<header><h1>🏠 Dashboard</h1></header>
+<p>The Dashboard is the first page you see after logging in. It shows a personalized overview of your library through scrollable rows of book covers, each row driven by a different data source. Pick up where you left off, see what just arrived, or let BookLore surface something unexpected.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-overview">📖 Overview<a href="#-overview" class="hash-link" aria-label="Direct link to 📖 Overview" title="Direct link to 📖 Overview">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Dashboard Overview" src="https://web.archive.org/web/20260306124728im_/https://booklore.org/assets/images/dashboard-overview-34b7dceb8dcb089ec638fc0b9118a883.jpg" width="1200" height="697" class="img_ev3q"></p>
+<p>The dashboard is made up of <strong>scrollers</strong>, horizontal rows of book cards. Each scroller pulls books from a different source and displays up to 20 covers. Click any cover to open the book, or hover to see the title.</p>
+<p>By default, four scrollers are shown:</p>
+<table><thead><tr><th>Scroller</th><th>What it shows</th></tr></thead><tbody><tr><td><strong>Continue Listening</strong></td><td>Audiobooks you've started but haven't finished, ordered by last listened</td></tr><tr><td><strong>Continue Reading</strong></td><td>Ebooks and PDFs you've started but haven't finished, ordered by last read</td></tr><tr><td><strong>Recently Added</strong></td><td>The newest books added to your libraries</td></tr><tr><td><strong>Discover Something New</strong></td><td>A random selection of books from your collection</td></tr></tbody></table>
+<p>Each scroller only appears if it has books to show. If you haven't started any audiobooks, for example, the Continue Listening row is hidden automatically.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-dashboard-configuration">⚙️ Dashboard Configuration<a href="#️-dashboard-configuration" class="hash-link" aria-label="Direct link to ⚙️ Dashboard Configuration" title="Direct link to ⚙️ Dashboard Configuration">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Dashboard Configuration" src="https://web.archive.org/web/20260306124728im_/https://booklore.org/assets/images/dashboard-settings-f9084d62419dbfd5e1d1fa3605d56a05.jpg" width="500" height="255" class="img_ev3q"></p>
+<p>Click the gear icon in the top-right corner of the dashboard to open the configuration dialog.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-scroller-settings">🔧 Scroller Settings<a href="#-scroller-settings" class="hash-link" aria-label="Direct link to 🔧 Scroller Settings" title="Direct link to 🔧 Scroller Settings">​</a></h3>
+<p>Each scroller row has the following options:</p>
+<table><thead><tr><th>Option</th><th>Description</th></tr></thead><tbody><tr><td><strong>Checkbox</strong></td><td>Enable or disable the scroller without deleting it</td></tr><tr><td><strong>Type</strong></td><td>The data source (see available types below)</td></tr><tr><td><strong>Max Items</strong></td><td>Number of books to display (10 to 20)</td></tr><tr><td><strong>Reorder arrows</strong></td><td>Move the scroller up or down to change its position</td></tr><tr><td><strong>Delete</strong></td><td>Remove the scroller entirely</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-available-scroller-types">📋 Available Scroller Types<a href="#-available-scroller-types" class="hash-link" aria-label="Direct link to 📋 Available Scroller Types" title="Direct link to 📋 Available Scroller Types">​</a></h3>
+<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><strong>Continue Reading</strong></td><td>Books with active reading progress (ebooks, PDFs, comics)</td></tr><tr><td><strong>Continue Listening</strong></td><td>Audiobooks with active listening progress</td></tr><tr><td><strong>Recently Added</strong></td><td>Books sorted by date added to the library</td></tr><tr><td><strong>Discover Something New</strong></td><td>A random selection refreshed each time you visit</td></tr><tr><td><strong>Magic Shelf</strong></td><td>Books from any <a href="./magic-shelf.html">Magic Shelf</a> you've created</td></tr></tbody></table>
+<p>When you select <strong>Magic Shelf</strong> as the type, a second dropdown appears to pick which Magic Shelf to use. The scroller title automatically matches the shelf name.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-limits">📏 Limits<a href="#-limits" class="hash-link" aria-label="Direct link to 📏 Limits" title="Direct link to 📏 Limits">​</a></h3>
+<ul>
+<li>Up to <strong>5 scrollers</strong> can be added</li>
+<li>At least <strong>1 scroller</strong> must remain</li>
+<li>Each scroller shows between <strong>10 and 20</strong> items</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-add--reset">🔄 Add & Reset<a href="#-add--reset" class="hash-link" aria-label="Direct link to 🔄 Add & Reset" title="Direct link to 🔄 Add & Reset">​</a></h3>
+<ul>
+<li><strong>Add Scroller</strong> adds a new row at the bottom (defaults to Recently Added)</li>
+<li><strong>Reset to Default</strong> restores the original four-scroller layout</li>
+</ul>
+<p>Click <strong>Save</strong> to apply changes. The configuration is stored per user, so each user can have their own dashboard layout.</p>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>👥 User Management | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>👥 User Management</h1></header>
+<p>User Management lets administrators create, edit, and delete users, assign granular permissions, control library access, and set up content restrictions to limit what specific users can see.</p>
+<p>Navigate to <strong>Settings > Users</strong> to access this page. Only admin users can manage other users.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-current-users">👤 Current Users<a href="#-current-users" class="hash-link" aria-label="Direct link to 👤 Current Users" title="Direct link to 👤 Current Users">​</a></h2>
+<p>The Users page lists all registered users. Each user row shows:</p>
+<ul>
+<li><strong>Avatar</strong> with initials and a colored badge</li>
+<li><strong>Username</strong> with a <strong>LOCAL</strong> or <strong>OIDC</strong> badge indicating the authentication method</li>
+<li><strong>Full name</strong> and <strong>email</strong></li>
+<li><strong>Permission summary badges</strong> showing how many permissions are enabled per category (e.g., 3/5)</li>
+</ul>
+<p>Click the arrow on a user row to expand it and view or edit their full details.</p>
+<p><img decoding="async" loading="lazy" alt="User Management" src="https://web.archive.org/web/20260307192128im_/https://booklore.org/assets/images/user-management-dd906ade3fa12d2d2c61210ec60b9e31.jpg" width="1200" height="755" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-adding-a-user">➕ Adding a User<a href="#-adding-a-user" class="hash-link" aria-label="Direct link to ➕ Adding a User" title="Direct link to ➕ Adding a User">​</a></h2>
+<p>Click <strong>"+ Add User"</strong> in the top right corner. The creation form requires:</p>
+<table><thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Full Name</strong></td><td>Yes</td><td>Minimum 3 characters</td></tr><tr><td><strong>Username</strong></td><td>Yes</td><td>Must be unique</td></tr><tr><td><strong>Email</strong></td><td>Yes</td><td>Must be a valid email address</td></tr><tr><td><strong>Password</strong></td><td>Yes</td><td>Minimum 6 characters</td></tr><tr><td><strong>Confirm Password</strong></td><td>Yes</td><td>Must match password</td></tr><tr><td><strong>Library Access</strong></td><td>Yes</td><td>Select which libraries the user can access</td></tr></tbody></table>
+<p>After filling in the details, you can assign permissions and content restrictions before saving.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-user-information">📝 User Information<a href="#-user-information" class="hash-link" aria-label="Direct link to 📝 User Information" title="Direct link to 📝 User Information">​</a></h2>
+<p>Expand a user row and click the edit button to modify their details.</p>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><strong>Full Name</strong></td><td>The user's display name</td></tr><tr><td><strong>Email</strong></td><td>The user's email address</td></tr><tr><td><strong>Libraries</strong></td><td>Which libraries the user can access. Admin users automatically have access to all libraries.</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-permissions">🔑 Permissions<a href="#-permissions" class="hash-link" aria-label="Direct link to 🔑 Permissions" title="Direct link to 🔑 Permissions">​</a></h2>
+<p>Permissions are organized into categories. Each permission is a checkbox that can be toggled individually. Enabling <strong>Full Administrator Access</strong> grants all permissions automatically.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-administration">🛡️ Administration<a href="#️-administration" class="hash-link" aria-label="Direct link to 🛡️ Administration" title="Direct link to 🛡️ Administration">​</a></h3>
+<table><thead><tr><th>Permission</th><th>Description</th></tr></thead><tbody><tr><td><strong>Full Administrator Access</strong></td><td>Grants all permissions and full system control</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-book-management">📚 Book Management<a href="#-book-management" class="hash-link" aria-label="Direct link to 📚 Book Management" title="Direct link to 📚 Book Management">​</a></h3>
+<table><thead><tr><th>Permission</th><th>Description</th></tr></thead><tbody><tr><td><strong>Upload Books</strong></td><td>Upload book files via Bookdrop</td></tr><tr><td><strong>Download Books</strong></td><td>Download book files</td></tr><tr><td><strong>Delete Books</strong></td><td>Remove books from libraries</td></tr><tr><td><strong>Manage Library</strong></td><td>Create, edit, and delete libraries</td></tr><tr><td><strong>Email Books</strong></td><td>Send books to devices or email addresses</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-system-access">👁️ System Access<a href="#️-system-access" class="hash-link" aria-label="Direct link to 👁️ System Access" title="Direct link to 👁️ System Access">​</a></h3>
+<table><thead><tr><th>Permission</th><th>Description</th></tr></thead><tbody><tr><td><strong>Access Bookdrop</strong></td><td>Use the Bookdrop upload interface</td></tr><tr><td><strong>View Library Statistics</strong></td><td>View library-level statistics and analytics</td></tr><tr><td><strong>View User Reading Statistics</strong></td><td>View personal reading statistics</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-system-configuration">⚙️ System Configuration<a href="#️-system-configuration" class="hash-link" aria-label="Direct link to ⚙️ System Configuration" title="Direct link to ⚙️ System Configuration">​</a></h3>
+<table><thead><tr><th>Permission</th><th>Description</th></tr></thead><tbody><tr><td><strong>Manage Metadata Configuration</strong></td><td>Configure metadata fetch providers and settings</td></tr><tr><td><strong>Manage Application Preferences</strong></td><td>Change application-wide preferences</td></tr><tr><td><strong>Access Task Manager</strong></td><td>View and manage background tasks</td></tr><tr><td><strong>Manage Icons</strong></td><td>Upload and manage custom library icons</td></tr><tr><td><strong>Manage Fonts</strong></td><td>Upload and manage custom reader fonts</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-metadata-editing">✏️ Metadata Editing<a href="#️-metadata-editing" class="hash-link" aria-label="Direct link to ✏️ Metadata Editing" title="Direct link to ✏️ Metadata Editing">​</a></h3>
+<table><thead><tr><th>Permission</th><th>Description</th></tr></thead><tbody><tr><td><strong>Edit Single Metadata</strong></td><td>Edit metadata for individual books</td></tr><tr><td><strong>Bulk Auto Fetch Metadata</strong></td><td>Run automatic metadata fetch on multiple books</td></tr><tr><td><strong>Bulk Custom Fetch Metadata</strong></td><td>Run custom metadata fetch on multiple books</td></tr><tr><td><strong>Access Bulk Metadata Editor</strong></td><td>Use the bulk metadata editor</td></tr><tr><td><strong>Bulk Regenerate Cover</strong></td><td>Regenerate covers for multiple books</td></tr><tr><td><strong>Move/Organize Files</strong></td><td>Move and reorganize book files on disk</td></tr><tr><td><strong>Bulk Lock/Unlock Metadata</strong></td><td>Lock or unlock metadata fields in bulk</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-device-sync">📱 Device Sync<a href="#-device-sync" class="hash-link" aria-label="Direct link to 📱 Device Sync" title="Direct link to 📱 Device Sync">​</a></h3>
+<table><thead><tr><th>Permission</th><th>Description</th></tr></thead><tbody><tr><td><strong>KOReader Sync</strong></td><td>Sync reading progress with KOReader devices</td></tr><tr><td><strong>Kobo Sync</strong></td><td>Sync books and progress with Kobo devices</td></tr><tr><td><strong>OPDS Feed Access</strong></td><td>Access the OPDS catalog feed</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-bulk-reset">🔄 Bulk Reset<a href="#-bulk-reset" class="hash-link" aria-label="Direct link to 🔄 Bulk Reset" title="Direct link to 🔄 Bulk Reset">​</a></h3>
+<table><thead><tr><th>Permission</th><th>Description</th></tr></thead><tbody><tr><td><strong>Bulk Reset Booklore Read Progress</strong></td><td>Reset reading progress tracked by Booklore</td></tr><tr><td><strong>Bulk Reset KOReader Read Progress</strong></td><td>Reset KOReader sync progress</td></tr><tr><td><strong>Bulk Reset Book Read Status</strong></td><td>Reset read/unread status for books</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="permission-summary-badges">Permission Summary Badges<a href="#permission-summary-badges" class="hash-link" aria-label="Direct link to Permission Summary Badges" title="Direct link to Permission Summary Badges">​</a></h3>
+<p>When a user row is collapsed, colored badges provide a quick overview of their permission levels per category. Each badge shows the count of enabled permissions vs. the total (e.g., <strong>3/5</strong>). The badge color reflects the level: none, low, medium, or high.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-content-restrictions">🔒 Content Restrictions<a href="#-content-restrictions" class="hash-link" aria-label="Direct link to 🔒 Content Restrictions" title="Direct link to 🔒 Content Restrictions">​</a></h2>
+<p>Content restrictions let you control which books a user can see based on metadata attributes. This is especially useful for shared instances where you want to hide mature or age-inappropriate content from certain users.</p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>How Restrictions Work</div><div class="admonitionContent_BuS1"><p>Content restrictions are applied transparently. Restricted books are completely hidden from the user. They won't appear in the library, search results, series, shelves, or statistics. The user has no indication that restricted content exists.</p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="restriction-types">Restriction Types<a href="#restriction-types" class="hash-link" aria-label="Direct link to Restriction Types" title="Direct link to Restriction Types">​</a></h3>
+<table><thead><tr><th>Type</th><th>Description</th><th>Example Values</th></tr></thead><tbody><tr><td><strong>Category/Genre</strong></td><td>Filter by the book's categories or genres</td><td>Horror, Romance, True Crime</td></tr><tr><td><strong>Tag</strong></td><td>Filter by book tags</td><td>Violence, Profanity</td></tr><tr><td><strong>Mood</strong></td><td>Filter by book moods</td><td>Dark, Lighthearted</td></tr><tr><td><strong>Age Rating</strong></td><td>Filter by age rating thresholds</td><td>All Ages, 6+, 10+, 13+, 16+, 18+, 21+</td></tr><tr><td><strong>Content Rating</strong></td><td>Filter by content maturity level</td><td>Everyone, Teen, Mature, Adult, Explicit</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="restriction-modes">Restriction Modes<a href="#restriction-modes" class="hash-link" aria-label="Direct link to Restriction Modes" title="Direct link to Restriction Modes">​</a></h3>
+<p>Each restriction can operate in one of two modes:</p>
+<table><thead><tr><th>Mode</th><th>Behavior</th></tr></thead><tbody><tr><td><strong>Exclude (Hide matching)</strong></td><td>Books that match the restriction value are <strong>hidden</strong> from the user</td></tr><tr><td><strong>Allow Only (Show only matching)</strong></td><td><strong>Only</strong> books that match the restriction value are shown; everything else is hidden</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="adding-a-restriction">Adding a Restriction<a href="#adding-a-restriction" class="hash-link" aria-label="Direct link to Adding a Restriction" title="Direct link to Adding a Restriction">​</a></h3>
+<ol>
+<li>Expand the user row and enter edit mode</li>
+<li>Scroll down to the <strong>Content Restrictions</strong> section</li>
+<li>Select a <strong>Type</strong> (e.g., Age Rating)</li>
+<li>Select a <strong>Mode</strong> (e.g., Exclude)</li>
+<li>Select a <strong>Value</strong> (e.g., 18+)</li>
+<li>Click the <strong>+</strong> button to add the restriction</li>
+<li>Save the user to apply changes</li>
+</ol>
+<p>You can add multiple restrictions. They are evaluated together when filtering books.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="how-restrictions-are-combined">How Restrictions Are Combined<a href="#how-restrictions-are-combined" class="hash-link" aria-label="Direct link to How Restrictions Are Combined" title="Direct link to How Restrictions Are Combined">​</a></h3>
+<p>When a user has multiple restrictions, they work together as follows:</p>
+<ul>
+<li><strong>Multiple Exclude rules:</strong> A book is hidden if it matches <strong>any</strong> exclude rule. For example, excluding both "Horror" and "True Crime" categories hides books in either category.</li>
+<li><strong>Multiple Allow Only rules:</strong> A book must satisfy <strong>all</strong> allow-only rules to be visible. For example, allowing only "Fiction" category and "Lighthearted" mood means only fiction books tagged as lighthearted are shown.</li>
+<li><strong>Mixed Exclude + Allow Only:</strong> Allow-only rules are applied first to narrow down the visible set, then exclude rules remove any remaining matches. For example, allowing only "Young Adult" and excluding "Violence" tag shows young adult books that aren't tagged as violent.</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="age-rating-filtering">Age Rating Filtering<a href="#age-rating-filtering" class="hash-link" aria-label="Direct link to Age Rating Filtering" title="Direct link to Age Rating Filtering">​</a></h3>
+<p>Age rating restrictions work as thresholds. If you exclude a specific age rating (e.g., <strong>13+</strong>), all books rated at or above that age level are hidden. Books without an age rating or with a lower rating remain visible.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="examples">Examples<a href="#examples" class="hash-link" aria-label="Direct link to Examples" title="Direct link to Examples">​</a></h3>
+<p><strong>Scenario: Child-safe account</strong></p>
+<ul>
+<li>Add restriction: Type = <strong>Age Rating</strong>, Mode = <strong>Exclude</strong>, Value = <strong>13+</strong></li>
+<li>Result: The user only sees books rated below 13+</li>
+</ul>
+<p><strong>Scenario: Fiction-only reader</strong></p>
+<ul>
+<li>Add restriction: Type = <strong>Category/Genre</strong>, Mode = <strong>Allow Only</strong>, Value = <strong>Fiction</strong></li>
+<li>Result: The user only sees books categorized as Fiction</li>
+</ul>
+<p><strong>Scenario: Hide specific content</strong></p>
+<ul>
+<li>Add restriction: Type = <strong>Tag</strong>, Mode = <strong>Exclude</strong>, Value = <strong>Violence</strong></li>
+<li>Add restriction: Type = <strong>Tag</strong>, Mode = <strong>Exclude</strong>, Value = <strong>Profanity</strong></li>
+<li>Result: Books tagged with Violence or Profanity are hidden</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-deleting-a-user">🗑️ Deleting a User<a href="#️-deleting-a-user" class="hash-link" aria-label="Direct link to 🗑️ Deleting a User" title="Direct link to 🗑️ Deleting a User">​</a></h2>
+<p>Click the delete button on a user row to remove the account. This permanently deletes:</p>
+<ul>
+<li>The user account and profile</li>
+<li>All personal shelves and reading progress</li>
+<li>All content restrictions and settings</li>
+</ul>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Permanent Action</div><div class="admonitionContent_BuS1"><p>User deletion cannot be undone. The user's original book files in libraries are not affected.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📋 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📋 Notes" title="Direct link to 📋 Notes">​</a></h2>
+<ul>
+<li>Admin users always have access to all libraries and all permissions. Library and permission controls are disabled for admin accounts.</li>
+<li>Users created via OIDC (SSO) show an <strong>OIDC</strong> badge instead of <strong>LOCAL</strong>. Their password is managed by the identity provider.</li>
+<li>All user management actions (creation, updates, permission changes, deletion) are recorded in the <a href="../tools/audit-logs.html">Audit Log</a>.</li>
+<li>Content restrictions are evaluated server-side. There is no way for a restricted user to bypass them through the UI.</li>
+<li>The values available in content restriction dropdowns (categories, tags, moods) are pulled from the metadata of books already in your libraries.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🔐 Authentik Authentication | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🔐 Authentik Authentication</h1></header>
+<p>Seamlessly integrate Authentik as your single sign-on (SSO) provider for Booklore. Centralize user authentication, enhance security, and simplify access management across your applications.</p>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Username Matching Required</div><div class="admonitionContent_BuS1"><p>The username in Authentik must exactly match the username in Booklore for authentication to work properly. Case sensitivity matters. If a user doesn't exist in Booklore with the matching username, authentication will fail.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-what-youll-achieve">🌟 What You'll Achieve<a href="#-what-youll-achieve" class="hash-link" aria-label="Direct link to 🌟 What You'll Achieve" title="Direct link to 🌟 What You'll Achieve">​</a></h2>
+<p>With Authentik integration, you can:</p>
+<ul>
+<li><strong>Enable single sign-on (SSO)</strong> for seamless access to Booklore without separate login credentials</li>
+<li><strong>Centralize user management</strong> across multiple applications from one unified interface</li>
+<li><strong>Enhance security</strong> with OAuth2/OpenID Connect protocols and optional multi-factor authentication</li>
+<li><strong>Control access</strong> through provider bindings and authorization flows at user or group level</li>
+<li><strong>Simplify login experience</strong> for your users with automatic session management</li>
+<li><strong>Audit authentication</strong> with comprehensive logging of all login attempts and user activities</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-how-authentik-integration-works">✨ How Authentik Integration Works<a href="#-how-authentik-integration-works" class="hash-link" aria-label="Direct link to ✨ How Authentik Integration Works" title="Direct link to ✨ How Authentik Integration Works">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-the-authentication-flow">🔄 The Authentication Flow<a href="#-the-authentication-flow" class="hash-link" aria-label="Direct link to 🔄 The Authentication Flow" title="Direct link to 🔄 The Authentication Flow">​</a></h3>
+<p>Understanding the authentication flow helps troubleshoot issues and explains what happens behind the scenes:</p>
+<ol>
+<li>
+<p><strong>🎫 User Initiates Login</strong><br>
+User attempts to access Booklore and is redirected to Authentik's secure login portal. The original destination URL is preserved for automatic redirect after authentication.</p>
+</li>
+<li>
+<p><strong>🔑 Authentik Authenticates</strong><br>
+User enters credentials in Authentik's secure login page. Authentik validates the credentials against its user directory and can optionally prompt for additional authentication factors (MFA).</p>
+</li>
+<li>
+<p><strong>✅ Token Exchange</strong><br>
+Authentik validates credentials and issues OAuth2 tokens (access token, ID token, and optionally a refresh token). These tokens contain user information and are cryptographically signed.</p>
+</li>
+<li>
+<p><strong>🚪 Access Granted</strong><br>
+Booklore receives and validates the tokens, extracts user information, matches it with an existing Booklore user account, and grants access to the authenticated user.</p>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-setting-up-authentik">🚀 Setting Up Authentik<a href="#-setting-up-authentik" class="hash-link" aria-label="Direct link to 🚀 Setting Up Authentik" title="Direct link to 🚀 Setting Up Authentik">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-1-create-application-and-configure-oauth2-provider">Step 1: Create Application and Configure OAuth2 Provider<a href="#step-1-create-application-and-configure-oauth2-provider" class="hash-link" aria-label="Direct link to Step 1: Create Application and Configure OAuth2 Provider" title="Direct link to Step 1: Create Application and Configure OAuth2 Provider">​</a></h3>
+<p>Begin by setting up Booklore as an application in Authentik with OAuth2 authentication. This entire process should take about 5-10 minutes:</p>
+<ol>
+<li>
+<p><strong>Navigate to Applications</strong><br>
+Open your Authentik dashboard and click <strong>"Create a new application"</strong>. This will launch a setup wizard that guides you through the process.</p>
+<p><img decoding="async" loading="lazy" alt="Create Application" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-1-6b54ac579c46e39829a7457063e6de08.jpg" width="1500" height="895" class="img_ev3q"></p>
+</li>
+<li>
+<p><strong>Configure Application Details</strong></p>
+<p><img decoding="async" loading="lazy" alt="Application Configuration" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-2-31f1afc059d464889ec223295db85c76.jpg" width="1500" height="895" class="img_ev3q"></p>
+<p>Fill in the application section:</p>
+<ul>
+<li><strong>Name:</strong> <code>Booklore</code> (or your preferred name) - This name will be displayed to users on the Authentik login page</li>
+<li><strong>Slug:</strong> <code>booklore</code> (used in URLs, lowercase recommended) - This creates a unique identifier for the application</li>
+<li>Click <strong>Next</strong> to proceed to provider configuration</li>
+</ul>
+</li>
+<li>
+<p><strong>Select Provider Type</strong></p>
+<p><img decoding="async" loading="lazy" alt="Choose Provider" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-3-a906171fad7aba090014900f68c98284.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ul>
+<li>Choose <strong>OAuth2/OpenID Provider</strong> from the available options</li>
+<li>Click <strong>Next</strong> to configure provider settings</li>
+</ul>
+</li>
+<li>
+<p><strong>Configure Provider Settings</strong></p>
+<p><img decoding="async" loading="lazy" alt="Configure Provider" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-4-2b90ac1f67a25c8da7ad20e3fd5aba2e.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ul>
+<li><strong>Name:</strong> <code>Booklore OAuth2</code> (or your preferred name) - This is the internal provider name</li>
+<li><strong>Authorization Flow:</strong> Select <code>default-provider-authorization-implicit-consent</code>
+<ul>
+<li>This flow handles user consent and authorization</li>
+<li>Implicit consent means users won't be prompted to approve access each time</li>
+</ul>
+</li>
+<li><strong>Client Type:</strong> Select <strong>Public</strong> (under Protocol settings)
+<ul>
+<li>Public clients are suitable for applications that run in browsers or mobile apps</li>
+<li>Client secrets cannot be securely stored in these environments</li>
+</ul>
+</li>
+</ul>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Public Client Type</div><div class="admonitionContent_BuS1"><p>Public client type is appropriate for applications where the client secret cannot be kept confidential. Booklore's frontend needs to initiate the OAuth flow, making this the correct choice.</p></div></div>
+</li>
+<li>
+<p><strong>Set Up Redirect URIs</strong></p>
+<p>Configure where Authentik should redirect users after authentication. These URIs are critical for security:</p>
+<p><img decoding="async" loading="lazy" alt="Redirect URIs" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-5-d88f2e77be72a219a0bd07e79cf92858.jpg" width="1500" height="895" class="img_ev3q"></p>
+<p>Add the following URIs (replace <code><your-booklore-domain></code> with your actual domain):</p>
+<ul>
+<li><strong>Strict:</strong> <code>https://<your-booklore-domain>/oauth2-callback</code>
+<ul>
+<li>This is the exact callback endpoint that handles the OAuth response</li>
+<li>The trailing slash is required and must not be omitted</li>
+</ul>
+</li>
+<li><strong>Regex:</strong> <code>https://<your-booklore-domain>/*</code>
+<ul>
+<li>This pattern allows flexibility for various OAuth flows</li>
+<li>The asterisk permits any path under your domain</li>
+</ul>
+</li>
+</ul>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Important: Redirect URI Format</div><div class="admonitionContent_BuS1"><p>Ensure the trailing slash is included in the strict redirect URI. Use your actual domain without brackets or placeholders. Incorrect redirect URIs are the most common cause of authentication failures.</p></div></div>
+<p><strong>Example for a production setup:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Strict: https://books.example.com/oauth2-callback</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Regex: https://books.example.com/*</span><br></span></code></pre></div></div>
+<p><strong>Example for local testing:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Strict: http://localhost:3000/oauth2-callback</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Regex: http://localhost:3000/*</span><br></span></code></pre></div></div>
+<p>Ensure the signing key is set to "authentik Self-signed certificate".</p>
+</li>
+<li>
+<p><strong>Configure OAuth Scopes</strong></p>
+<p>Define what information Authentik will share with Booklore. Each scope grants access to specific user data:</p>
+<p><img decoding="async" loading="lazy" alt="OAuth Scopes" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-6-657886eeda188d599edb56e8c1d0c253.jpg" width="1500" height="895" class="img_ev3q"></p>
+<p>Add the following scopes (all are required):</p>
+<ul>
+<li>✉️ <strong>email</strong> - User's email address for notifications and account identification</li>
+<li>🆔 <strong>openid</strong> - Basic OpenID Connect authentication (required for OIDC)</li>
+<li>👤 <strong>profile</strong> - User profile information including name and username</li>
+<li>🔄 <strong>offline_access</strong> - Enables refresh tokens for extended sessions without re-authentication</li>
+</ul>
+<p>Click <strong>Save</strong> to apply the configuration.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Privacy-Friendly Scopes</div><div class="admonitionContent_BuS1"><p>These scopes provide Booklore with essential user information while respecting privacy. Without these scopes, Booklore won't have the necessary data to create or match user sessions.</p></div></div>
+</li>
+<li>
+<p><strong>Bind Users to Application</strong></p>
+<p>Control which users can access Booklore through Authentik. This step is crucial for access control:</p>
+<p><img decoding="async" loading="lazy" alt="Configure Bindings" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-7-38305853a0a025d83bcc4056701b49dd.jpg" width="1500" height="895" class="img_ev3q"></p>
+<p>In the "Configure Bindings" section:</p>
+<ul>
+<li><strong>Type:</strong> Select <strong>User</strong> to bind individual users, or <strong>Group</strong> to bind entire groups</li>
+<li><strong>Select Users/Groups:</strong> Choose the users or groups who should have access to Booklore</li>
+<li><strong>Timeout:</strong> (Optional) Set session timeout in seconds for enhanced security</li>
+<li>Click <strong>Save Binding</strong> to apply</li>
+</ul>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Access Control Options</div><div class="admonitionContent_BuS1"><p>You can bind individual users, groups, or both depending on your access control requirements. For easier management at scale, consider using groups. Users not bound to this application will not see Booklore in their Authentik dashboard and cannot authenticate.</p></div></div>
+</li>
+</ol>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-2-retrieve-provider-credentials">Step 2: Retrieve Provider Credentials<a href="#step-2-retrieve-provider-credentials" class="hash-link" aria-label="Direct link to Step 2: Retrieve Provider Credentials" title="Direct link to Step 2: Retrieve Provider Credentials">​</a></h3>
+<p>Get the credentials needed to connect Booklore to Authentik. You'll need these in the next step:</p>
+<p><img decoding="async" loading="lazy" alt="Provider List" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-8-91839c249e514725651e98ced6ddd188.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol>
+<li><strong>Navigate to Providers</strong><br>
+From the Authentik main page, go to <strong>Applications → Providers</strong> and select the provider you just created (it should be named <code>Booklore OAuth2</code> if you followed the naming convention)</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Provider Credentials" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-9-250d3672ad6feb522bbfc153f21f0544.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol start="2">
+<li><strong>Copy Credentials</strong><br>
+You'll need two pieces of information from this screen:
+<ul>
+<li>🔑 <strong>Client ID</strong> - Your application's unique identifier (looks like a long alphanumeric string)</li>
+<li>🌐 <strong>OpenID Configuration Issuer URL</strong> - The authentication endpoint (typically <code>https://your-authentik-domain/application/o/booklore/</code>)</li>
+</ul>
+</li>
+</ol>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Save These Credentials</div><div class="admonitionContent_BuS1"><p>Copy both the Client ID and Issuer URL to a secure location. You'll paste these into Booklore in the next step. Keep this tab open or save these values in a password manager.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-configuring-booklore">⚙️ Configuring Booklore<a href="#️-configuring-booklore" class="hash-link" aria-label="Direct link to ⚙️ Configuring Booklore" title="Direct link to ⚙️ Configuring Booklore">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-3-connect-booklore-to-authentik">Step 3: Connect Booklore to Authentik<a href="#step-3-connect-booklore-to-authentik" class="hash-link" aria-label="Direct link to Step 3: Connect Booklore to Authentik" title="Direct link to Step 3: Connect Booklore to Authentik">​</a></h3>
+<p>Now configure Booklore to use Authentik as the authentication provider. This is the final configuration step:</p>
+<p><img decoding="async" loading="lazy" alt="Booklore OIDC Settings" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-10-65704dc16d80e4223de9a8d7043cacf1.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol>
+<li>
+<p><strong>Open Booklore Settings</strong><br>
+Navigate to <strong>Settings → Authentication</strong> in your Booklore admin interface. You'll need administrator privileges to access this section.</p>
+</li>
+<li>
+<p><strong>Configure OIDC Provider</strong>
+Enter the credentials you copied from Authentik:</p>
+<ul>
+<li><strong>Provider Name:</strong> <code>Authentik</code> (or your preferred display name)
+<ul>
+<li>This name appears on the login button, so make it recognizable to users</li>
+</ul>
+</li>
+<li><strong>Client ID:</strong> Paste the Client ID from Authentik (the long alphanumeric string)
+<ul>
+<li>Make sure there are no extra spaces before or after</li>
+</ul>
+</li>
+<li><strong>Issuer URI:</strong> Paste the OpenID Configuration Issuer URL from Authentik
+<ul>
+<li>This should end with a trailing slash</li>
+<li>Example: <code>https://auth.example.com/application/o/booklore/</code></li>
+</ul>
+</li>
+<li>Click <strong>Save</strong> to store the configuration</li>
+</ul>
+</li>
+<li>
+<p><strong>Enable OIDC Authentication</strong><br>
+Toggle <strong>"OIDC Enabled"</strong> to ON to activate Authentik authentication</p>
+<ul>
+<li>When enabled, users will see a "Login with Authentik" button on the Booklore login page</li>
+<li>The standard username/password login will still be available unless specifically disabled</li>
+</ul>
+</li>
+</ol>
+<div class="theme-admonition theme-admonition-success admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Configuration Complete!</div><div class="admonitionContent_BuS1"><p>Booklore is now configured to use Authentik for authentication. The next step is testing the integration to ensure everything works correctly.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-testing-the-integration">🧪 Testing the Integration<a href="#-testing-the-integration" class="hash-link" aria-label="Direct link to 🧪 Testing the Integration" title="Direct link to 🧪 Testing the Integration">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-4-test-login-with-authentik">Step 4: Test Login with Authentik<a href="#step-4-test-login-with-authentik" class="hash-link" aria-label="Direct link to Step 4: Test Login with Authentik" title="Direct link to Step 4: Test Login with Authentik">​</a></h3>
+<p>Verify that the integration works correctly before rolling it out to users. Testing ensures a smooth experience:</p>
+<p><img decoding="async" loading="lazy" alt="User Impersonation" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-11-0b78d81cba8c8ebcd6423d4545dc3830.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol>
+<li>
+<p><strong>Impersonate a User (Recommended for Testing)</strong></p>
+<ul>
+<li>Go to <strong>Authentik → Directory → Users</strong></li>
+<li>Select a user bound to the Booklore application</li>
+<li>Click <strong>"Impersonate"</strong> to log in as that user</li>
+<li>This allows you to test without logging out of your admin account</li>
+</ul>
+<p><strong>Alternative Testing Method:</strong></p>
+<ul>
+<li>Open an incognito/private browser window</li>
+<li>Navigate to your Booklore instance</li>
+<li>Click "Login with Authentik" (or your configured provider name)</li>
+</ul>
+</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Authentik Login Page" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-12-ef08d9ad05d8ec5c0ae8524997934c83.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol start="2">
+<li><strong>Access Booklore</strong>
+<ul>
+<li>You'll see the Authentik login page with available applications</li>
+<li>The <strong>"Booklore"</strong> tile should be visible (if the user is bound to the application)</li>
+<li>Click the <strong>"Booklore"</strong> tile to initiate authentication</li>
+<li>You should be automatically redirected and logged into Booklore</li>
+</ul>
+</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Booklore Homepage" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-13-9c7bb66303053a541a09386108f9dcfd.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol start="3">
+<li><strong>Verify User Information</strong>
+<ul>
+<li>Check that your username and email are displayed correctly in Booklore</li>
+<li>Verify that you have access to your expected content and permissions</li>
+<li>Test logging out and logging back in to ensure session handling works</li>
+</ul>
+</li>
+</ol>
+<div class="theme-admonition theme-admonition-success admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Integration Successful!</div><div class="admonitionContent_BuS1"><p>Your Authentik integration is working correctly. You can now roll it out to your users.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-managing-authentication">🔄 Managing Authentication<a href="#-managing-authentication" class="hash-link" aria-label="Direct link to 🔄 Managing Authentication" title="Direct link to 🔄 Managing Authentication">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="disabling-authentik-authentication">Disabling Authentik Authentication<a href="#disabling-authentik-authentication" class="hash-link" aria-label="Direct link to Disabling Authentik Authentication" title="Direct link to Disabling Authentik Authentication">​</a></h3>
+<p>If you need to temporarily disable or switch authentication methods (for maintenance or troubleshooting):</p>
+<p><img decoding="async" loading="lazy" alt="Disable OIDC" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-14-a4a099e5151de9dabd18f0ccfbbe2171.jpg" width="1500" height="895" class="img_ev3q"></p>
+<ol>
+<li>
+<p><strong>Navigate to Authentication Settings</strong><br>
+Go to <strong>Booklore → Settings → Authentication</strong></p>
+</li>
+<li>
+<p><strong>Disable OIDC</strong><br>
+Toggle <strong>"OIDC Enabled"</strong> to OFF</p>
+<ul>
+<li>This immediately disables Authentik authentication</li>
+<li>Active sessions remain valid until they expire</li>
+<li>New login attempts will use standard authentication</li>
+</ul>
+</li>
+<li>
+<p><strong>Log Out</strong><br>
+Click <strong>Logout</strong> to end your current session and verify the change</p>
+</li>
+<li>
+<p><strong>Standard Login Returns</strong><br>
+You'll be redirected to the standard Booklore login page with username/password fields</p>
+</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Booklore Login" src="https://web.archive.org/web/20260216110411im_/https://booklore.org/assets/images/authentik-15-f984bddedfb4a1d48e0389d318704268.jpg" width="1500" height="895" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Configuration Persistence</div><div class="admonitionContent_BuS1"><p>Disabling OIDC doesn't delete your Authentik configuration. All settings (Client ID, Issuer URI) are preserved. You can re-enable it anytime by toggling the switch back on. Users who were authenticated via Authentik can still log in with standard credentials if they have them configured.</p></div></div>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Configuration Scope</div><div class="admonitionContent_BuS1"><p>This guide covered the essential configuration required to integrate Authentik with Booklore. Once the basic integration is functional, you may customize Authentik settings to align with your advanced and specific needs.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-troubleshooting">🛠️ Troubleshooting<a href="#️-troubleshooting" class="hash-link" aria-label="Direct link to 🛠️ Troubleshooting" title="Direct link to 🛠️ Troubleshooting">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="common-issues-and-solutions">Common Issues and Solutions<a href="#common-issues-and-solutions" class="hash-link" aria-label="Direct link to Common Issues and Solutions" title="Direct link to Common Issues and Solutions">​</a></h3>
+<p><strong>Authentication Fails:</strong></p>
+<ul>
+<li>✓ Verify usernames match exactly between Authentik and Booklore (case-sensitive)</li>
+<li>✓ Check redirect URIs include trailing slashes</li>
+<li>✓ Ensure user is bound to the Booklore application</li>
+<li>✓ Confirm all required OAuth scopes are enabled</li>
+<li>✓ Check browser console for errors (F12)</li>
+</ul>
+<p><strong>Redirect Errors:</strong></p>
+<ul>
+<li>✓ Verify redirect URI: <code>/oauth2-callback</code> (with trailing slash)</li>
+<li>✓ Confirm domain matches exactly in both systems</li>
+<li>✓ Ensure HTTPS is used in production</li>
+<li>✓ Validate regex pattern: <code>https://your-domain/*</code></li>
+</ul>
+<p><strong>User Not Found:</strong></p>
+<ul>
+<li>✓ Create matching username in Booklore (case-sensitive)</li>
+<li>✓ Verify user has appropriate bindings in Authentik</li>
+<li>✓ Ensure email scope is properly configured</li>
+</ul>
+<p><strong>"Invalid Client" Error:</strong></p>
+<ul>
+<li>✓ Check Client ID is copied correctly (no extra spaces)</li>
+<li>✓ Verify provider is set to "Public" client type</li>
+<li>✓ Ensure Issuer URI ends with trailing slash</li>
+</ul>
+<p><strong>Session/Token Issues:</strong></p>
+<ul>
+<li>✓ Enable offline_access scope for refresh tokens</li>
+<li>✓ Review session timeout settings in both systems</li>
+<li>✓ Check token expiration settings in Authentik</li>
+</ul>
+<p><strong>SSL/Certificate Errors:</strong></p>
+<ul>
+<li>✓ Ensure valid SSL certificates on both systems</li>
+<li>✓ Verify Issuer URI uses HTTPS in production</li>
+<li>✓ Check certificate chains are properly configured</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="viewing-logs">Viewing Logs<a href="#viewing-logs" class="hash-link" aria-label="Direct link to Viewing Logs" title="Direct link to Viewing Logs">​</a></h3>
+<p><strong>Authentik:</strong> System → System Tasks or Events → Logs<br>
+<strong>Booklore:</strong> Check application logs for OAuth-related errors</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-best-practices">🎯 Best Practices<a href="#-best-practices" class="hash-link" aria-label="Direct link to 🎯 Best Practices" title="Direct link to 🎯 Best Practices">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="security-recommendations">Security Recommendations<a href="#security-recommendations" class="hash-link" aria-label="Direct link to Security Recommendations" title="Direct link to Security Recommendations">​</a></h3>
+<ul>
+<li>🔒 <strong>Use HTTPS</strong> - Always use HTTPS in production with valid SSL certificates</li>
+<li>👥 <strong>Review Bindings</strong> - Audit user access regularly and use groups for easier management</li>
+<li>🔄 <strong>Enable offline_access</strong> - Improves user experience while maintaining security</li>
+<li>📊 <strong>Monitor Activity</strong> - Track login attempts and set up alerts for unusual patterns</li>
+<li>🛡️ <strong>Keep Updated</strong> - Regularly update both Authentik and Booklore, test in staging first</li>
+<li>🔐 <strong>Enable MFA</strong> - Implement multi-factor authentication, especially for administrators</li>
+<li>🔑 <strong>Rotate Credentials</strong> - Review access regularly and regenerate credentials annually</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="optimization-tips">Optimization Tips<a href="#optimization-tips" class="hash-link" aria-label="Direct link to Optimization Tips" title="Direct link to Optimization Tips">​</a></h3>
+<ul>
+<li>📝 <strong>Use descriptive names</strong> - Name providers clearly (e.g., "Booklore Production OAuth2")</li>
+<li>🏷️ <strong>Leverage groups</strong> - Organize users by department/role and bind groups instead of individuals</li>
+<li>⚡ <strong>Optimize tokens</strong> - Use short access tokens (15-60 min) with long-lived refresh tokens</li>
+<li>🌐 <strong>Use reverse proxy</strong> - Add rate limiting, IP whitelisting, and WAF rules</li>
+<li>🔄 <strong>Test in staging</strong> - Validate changes in a staging environment before production</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="user-experience">User Experience<a href="#user-experience" class="hash-link" aria-label="Direct link to User Experience" title="Direct link to User Experience">​</a></h3>
+<ul>
+<li>🎨 <strong>Customize branding</strong> - Add your logo and consistent color schemes to the login page</li>
+<li>📚 <strong>Document the process</strong> - Create user guides with screenshots and support contact info</li>
+<li>🆘 <strong>Enable self-service</strong> - Allow password resets and MFA device management</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-additional-resources">📚 Additional Resources<a href="#-additional-resources" class="hash-link" aria-label="Direct link to 📚 Additional Resources" title="Direct link to 📚 Additional Resources">​</a></h2>
+<ul>
+<li><strong>Authentik Documentation:</strong> <a href="https://web.archive.org/web/20260216110411/https://goauthentik.io/docs/" target="_blank" rel="noopener noreferrer">goauthentik.io/docs</a></li>
+<li><strong>OAuth 2.0 Specification:</strong> Understanding the protocol behind SSO</li>
+<li><strong>OpenID Connect Core:</strong> Detailed information about OIDC flows</li>
+<li><strong>Security Best Practices:</strong> Regular security audits and penetration testing</li>
+</ul>
+<hr>
+<p>Authentik provides enterprise-grade authentication with minimal configuration. Once set up, your users will have secure, streamlined access to Booklore with the convenience of single sign-on and the security of centralized authentication management.</p>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🛡️ Audit Logs | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🛡️ Audit Logs</h1></header>
+<p>Audit Logs provide a record of admin-significant actions performed across the system. Every login attempt, library change, user management action, and configuration update is logged with a timestamp, the user who performed it, and the originating IP address.</p>
+<p>Audit Logs are available to <strong>admin users only</strong> and can be found under <strong>Settings > Audit Logs</strong>.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-activity-log">📋 Activity Log<a href="#-activity-log" class="hash-link" aria-label="Direct link to 📋 Activity Log" title="Direct link to 📋 Activity Log">​</a></h2>
+<p>The Activity Log displays all recorded events in reverse chronological order (newest first).</p>
+<p><img decoding="async" loading="lazy" alt="Audit Logs" src="https://web.archive.org/web/20260310081817im_/https://booklore.org/assets/images/audit-logs-ce4b4ffe932dcabbbe64768f8ac5c1fa.jpg" width="1200" height="718" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="table-columns">Table Columns<a href="#table-columns" class="hash-link" aria-label="Direct link to Table Columns" title="Direct link to Table Columns">​</a></h3>
+<table><thead><tr><th>Column</th><th>Description</th></tr></thead><tbody><tr><td><strong>When</strong></td><td>Relative timestamp (e.g., "Just now", "5m ago", "2h ago", "3d ago"). Hover for the full date and time.</td></tr><tr><td><strong>User</strong></td><td>The user who performed the action. Shows <strong>system</strong> for automated or internal events like login processing.</td></tr><tr><td><strong>Action</strong></td><td>A color-coded badge indicating the type of action (see action types below).</td></tr><tr><td><strong>Description</strong></td><td>A human-readable summary of what happened. Click to expand long descriptions.</td></tr><tr><td><strong>IP Address</strong></td><td>The IP address of the request, along with a country flag resolved via geolocation.</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-action-types">🏷️ Action Types<a href="#️-action-types" class="hash-link" aria-label="Direct link to 🏷️ Action Types" title="Direct link to 🏷️ Action Types">​</a></h2>
+<p>Actions are grouped into categories and displayed with color-coded badges.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-green-created--success">🟢 Green (Created / Success)<a href="#-green-created--success" class="hash-link" aria-label="Direct link to 🟢 Green (Created / Success)" title="Direct link to 🟢 Green (Created / Success)">​</a></h3>
+<table><thead><tr><th>Action</th><th>Description</th></tr></thead><tbody><tr><td><strong>Login Success</strong></td><td>A user successfully logged in</td></tr><tr><td><strong>User Created</strong></td><td>A new user account was created</td></tr><tr><td><strong>Library Created</strong></td><td>A new library was added</td></tr><tr><td><strong>Book Uploaded</strong></td><td>A book file was uploaded via Bookdrop</td></tr><tr><td><strong>Book Sent</strong></td><td>A book was sent to a device or email</td></tr><tr><td><strong>Shelf Created</strong></td><td>A new shelf was created</td></tr><tr><td><strong>Magic Shelf Created</strong></td><td>A new magic shelf was created</td></tr><tr><td><strong>Email Provider Created</strong></td><td>A new email provider was configured</td></tr><tr><td><strong>OPDS User Created</strong></td><td>A new OPDS user was added</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-blue-updated--executed">🔵 Blue (Updated / Executed)<a href="#-blue-updated--executed" class="hash-link" aria-label="Direct link to 🔵 Blue (Updated / Executed)" title="Direct link to 🔵 Blue (Updated / Executed)">​</a></h3>
+<table><thead><tr><th>Action</th><th>Description</th></tr></thead><tbody><tr><td><strong>User Updated</strong></td><td>A user profile was modified</td></tr><tr><td><strong>Password Changed</strong></td><td>A user's password was changed</td></tr><tr><td><strong>Library Updated</strong></td><td>Library settings were modified</td></tr><tr><td><strong>Library Scanned</strong></td><td>A library scan was triggered</td></tr><tr><td><strong>Metadata Updated</strong></td><td>Book metadata was edited</td></tr><tr><td><strong>Settings Updated</strong></td><td>Application settings were changed</td></tr><tr><td><strong>Task Executed</strong></td><td>A background task was started (e.g., metadata refresh)</td></tr><tr><td><strong>Shelf Updated</strong></td><td>A shelf was modified</td></tr><tr><td><strong>Magic Shelf Updated</strong></td><td>A magic shelf was modified</td></tr><tr><td><strong>Email Provider Updated</strong></td><td>An email provider configuration was changed</td></tr><tr><td><strong>OPDS User Updated</strong></td><td>An OPDS user was modified</td></tr><tr><td><strong>Naming Pattern Changed</strong></td><td>A library's file naming pattern was updated</td></tr><tr><td><strong>Duplicate Books Merged</strong></td><td>Duplicate books were merged together</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-orange-security--permissions">🟠 Orange (Security / Permissions)<a href="#-orange-security--permissions" class="hash-link" aria-label="Direct link to 🟠 Orange (Security / Permissions)" title="Direct link to 🟠 Orange (Security / Permissions)">​</a></h3>
+<table><thead><tr><th>Action</th><th>Description</th></tr></thead><tbody><tr><td><strong>Permissions Changed</strong></td><td>A user's permissions were modified</td></tr><tr><td><strong>OIDC Config Changed</strong></td><td>OpenID Connect (SSO) configuration was updated</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-red-failed--deleted">🔴 Red (Failed / Deleted)<a href="#-red-failed--deleted" class="hash-link" aria-label="Direct link to 🔴 Red (Failed / Deleted)" title="Direct link to 🔴 Red (Failed / Deleted)">​</a></h3>
+<table><thead><tr><th>Action</th><th>Description</th></tr></thead><tbody><tr><td><strong>Login Failed</strong></td><td>A login attempt was unsuccessful</td></tr><tr><td><strong>User Deleted</strong></td><td>A user account was removed</td></tr><tr><td><strong>Library Deleted</strong></td><td>A library was deleted</td></tr><tr><td><strong>Book Deleted</strong></td><td>A book was removed from a library</td></tr><tr><td><strong>Shelf Deleted</strong></td><td>A shelf was removed</td></tr><tr><td><strong>Magic Shelf Deleted</strong></td><td>A magic shelf was removed</td></tr><tr><td><strong>Email Provider Deleted</strong></td><td>An email provider was removed</td></tr><tr><td><strong>OPDS User Deleted</strong></td><td>An OPDS user was removed</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-filtering">🔍 Filtering<a href="#-filtering" class="hash-link" aria-label="Direct link to 🔍 Filtering" title="Direct link to 🔍 Filtering">​</a></h2>
+<p>Three filters are available in the toolbar to narrow down the log.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="filter-by-action">Filter by Action<a href="#filter-by-action" class="hash-link" aria-label="Direct link to Filter by Action" title="Direct link to Filter by Action">​</a></h3>
+<p>Select a specific action type from the dropdown to show only matching entries (e.g., only "Login Failed" events).</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="filter-by-user">Filter by User<a href="#filter-by-user" class="hash-link" aria-label="Direct link to Filter by User" title="Direct link to Filter by User">​</a></h3>
+<p>Select a username from the dropdown to see only actions performed by that user. The list is populated from all usernames that appear in the logs.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="filter-by-date-range">Filter by Date Range<a href="#filter-by-date-range" class="hash-link" aria-label="Direct link to Filter by Date Range" title="Direct link to Filter by Date Range">​</a></h3>
+<p>Pick a start and end date to view logs from a specific time period.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Clear Filters</div><div class="admonitionContent_BuS1"><p>When filters are active, a clear button appears to reset all filters at once.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-auto-refresh">🔄 Auto-Refresh<a href="#-auto-refresh" class="hash-link" aria-label="Direct link to 🔄 Auto-Refresh" title="Direct link to 🔄 Auto-Refresh">​</a></h2>
+<p>Click the refresh icon in the toolbar to enable <strong>auto-refresh</strong>. When active, the log automatically reloads every 10 seconds, making it useful for monitoring live activity. The icon spins while auto-refresh is enabled. Click it again to disable.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-ip-geolocation">🌍 IP Geolocation<a href="#-ip-geolocation" class="hash-link" aria-label="Direct link to 🌍 IP Geolocation" title="Direct link to 🌍 IP Geolocation">​</a></h2>
+<p>Each log entry includes the originating IP address along with a country flag. The country is resolved automatically using IP geolocation. Private or local IP addresses (127.x.x.x, 192.168.x.x, etc.) do not display a country flag.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📋 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📋 Notes" title="Direct link to 📋 Notes">​</a></h2>
+<ul>
+<li>Audit Logs are only accessible to admin users.</li>
+<li>Logs are stored indefinitely with no automatic cleanup.</li>
+<li>Descriptions longer than 1024 characters are truncated.</li>
+<li>The log table supports pagination with page sizes of 10, 25, or 50 entries.</li>
+<li>Automated system actions (like login processing) are logged with the username <strong>system</strong>.</li>
+<li>Audit logging is designed to be non-blocking. If logging fails for any reason, it does not affect the operation that triggered it.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🔍 Duplicate Detection | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🔍 Duplicate Detection</h1></header>
+<p>Booklore can scan a library for duplicate books and merge them together. When duplicates are found, you choose which book to keep as the <strong>target</strong> and the other books' files get attached to it as alternative formats. This is useful when you have the same book in multiple formats (EPUB and PDF, for example) or accidentally imported it twice.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-opening-the-duplicate-finder">🚀 Opening the Duplicate Finder<a href="#-opening-the-duplicate-finder" class="hash-link" aria-label="Direct link to 🚀 Opening the Duplicate Finder" title="Direct link to 🚀 Opening the Duplicate Finder">​</a></h2>
+<p>Right-click (or click the three-dot icon) on any library in the sidebar or library header, then select <strong>Find Duplicates</strong>.</p>
+<p><img decoding="async" loading="lazy" alt="Library Context Menu" src="https://web.archive.org/web/20260307223115im_/https://booklore.org/assets/images/library-menu-ade35c49c074c224843f36a1b15e3028.jpg" width="800" height="479" class="img_ev3q"></p>
+<p>This opens the <strong>Find Duplicates</strong> dialog, scoped to that library.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-detection-modes">⚙️ Detection Modes<a href="#️-detection-modes" class="hash-link" aria-label="Direct link to ⚙️ Detection Modes" title="Direct link to ⚙️ Detection Modes">​</a></h2>
+<p>Before scanning, choose how aggressively Booklore should look for duplicates. Four presets are available, or you can configure individual signals manually.</p>
+<p><img decoding="async" loading="lazy" alt="Find Duplicates Dialog" src="https://web.archive.org/web/20260307223115im_/https://booklore.org/assets/images/find-duplicates-dialog-8b430ec2cf34b594f97ee2fcee94f863.jpg" width="500" height="299" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="presets">Presets<a href="#presets" class="hash-link" aria-label="Direct link to Presets" title="Direct link to Presets">​</a></h3>
+<table><thead><tr><th>Preset</th><th>Matches By</th><th>Best For</th></tr></thead><tbody><tr><td><strong>Strict</strong></td><td>ISBN, External ID</td><td>High-confidence matches only</td></tr><tr><td><strong>Balanced</strong></td><td>ISBN, External ID, Title + Author</td><td>General use (default)</td></tr><tr><td><strong>Aggressive</strong></td><td>All 5 signals</td><td>Catching every possible duplicate</td></tr><tr><td><strong>Custom</strong></td><td>Your choice</td><td>Fine-tuned control</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="detection-signals">Detection Signals<a href="#detection-signals" class="hash-link" aria-label="Direct link to Detection Signals" title="Direct link to Detection Signals">​</a></h3>
+<p>Expand the <strong>Advanced</strong> section to see and toggle individual detection signals:</p>
+<table><thead><tr><th>Signal</th><th>How It Works</th></tr></thead><tbody><tr><td><strong>ISBN</strong></td><td>Matches books sharing the same ISBN-13. Automatically converts ISBN-10 to ISBN-13 for comparison.</td></tr><tr><td><strong>External ID</strong></td><td>Matches books that share an identifier from Goodreads, Hardcover, Google Books, ASIN, Audible, or ComicVine. Uses a union-find algorithm, so if Book A and Book B share a Goodreads ID, and Book B and Book C share an Audible ID, all three are grouped together.</td></tr><tr><td><strong>Title + Author</strong></td><td>Matches books with the same normalized title whose authors overlap. Title normalization strips whitespace and casing differences. Author comparison checks for name overlap between the two books.</td></tr><tr><td><strong>Same Directory</strong></td><td>Matches books whose files live in the same directory within the library.</td></tr><tr><td><strong>Filename</strong></td><td>Matches books whose filenames are similar after normalization (lowercased, underscores/hyphens replaced with spaces, special characters removed).</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Start with Balanced</div><div class="admonitionContent_BuS1"><p>The <strong>Balanced</strong> preset is a good starting point. It catches most real duplicates without too many false positives. Switch to <strong>Aggressive</strong> if you suspect there are more, or <strong>Strict</strong> if you only want certain matches.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-scanning-for-duplicates">🔎 Scanning for Duplicates<a href="#-scanning-for-duplicates" class="hash-link" aria-label="Direct link to 🔎 Scanning for Duplicates" title="Direct link to 🔎 Scanning for Duplicates">​</a></h2>
+<p>Click <strong>Scan</strong> to run the detection. Booklore checks every book in the library against the enabled signals and groups duplicates together.</p>
+<p>Results appear as numbered groups. Each group contains two or more books that Booklore believes are duplicates, along with a colored badge showing why they matched:</p>
+<table><thead><tr><th>Badge</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>ISBN</strong></td><td>Shared ISBN</td></tr><tr><td><strong>External ID Match</strong></td><td>Shared identifier from a metadata provider</td></tr><tr><td><strong>Title + Author</strong></td><td>Same title with overlapping authors</td></tr><tr><td><strong>Directory</strong></td><td>Files in the same folder</td></tr><tr><td><strong>Filename</strong></td><td>Similar filenames</td></tr></tbody></table>
+<p>Each book in a group shows its cover, title, author(s), and format badge (EPUB, PDF, AZW3, etc.).</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-selecting-a-target">🎯 Selecting a Target<a href="#-selecting-a-target" class="hash-link" aria-label="Direct link to 🎯 Selecting a Target" title="Direct link to 🎯 Selecting a Target">​</a></h2>
+<p>Every group has one book pre-selected as the <strong>target</strong>, indicated by the <strong>TARGET</strong> label and a highlighted row. The target is the book you want to keep. All other books in the group are "source" books whose files will be attached to the target.</p>
+<p>Booklore picks the suggested target automatically based on:</p>
+<ol>
+<li>Format priority (EPUB is preferred over PDF, etc.)</li>
+<li>Number of files (more files = higher priority)</li>
+<li>Metadata completeness</li>
+</ol>
+<p>You can change the target by clicking the radio button next to any other book in the group.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-merging-duplicates">✅ Merging Duplicates<a href="#-merging-duplicates" class="hash-link" aria-label="Direct link to ✅ Merging Duplicates" title="Direct link to ✅ Merging Duplicates">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="merging-a-single-group">Merging a Single Group<a href="#merging-a-single-group" class="hash-link" aria-label="Direct link to Merging a Single Group" title="Direct link to Merging a Single Group">​</a></h3>
+<p>Click <strong>Merge</strong> on a group to merge the source books into the target. What happens:</p>
+<ol>
+<li>Source books' files are moved into the target book's directory</li>
+<li>The files become alternative formats on the target book</li>
+<li>If <strong>Delete source books</strong> is checked, the source book entries are removed from your library</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="merging-all-groups">Merging All Groups<a href="#merging-all-groups" class="hash-link" aria-label="Direct link to Merging All Groups" title="Direct link to Merging All Groups">​</a></h3>
+<p>Click <strong>Merge All</strong> at the top right to process every group at once. A progress indicator shows how many groups have been processed. After completion, a summary shows how many merges succeeded or failed.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="dismissing-a-group">Dismissing a Group<a href="#dismissing-a-group" class="hash-link" aria-label="Direct link to Dismissing a Group" title="Direct link to Dismissing a Group">​</a></h3>
+<p>Click <strong>Dismiss</strong> on any group to skip it. The group is hidden from the results but no changes are made. This is useful when Booklore flags books that aren't actually duplicates.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-delete-source-books">🗑️ Delete Source Books<a href="#️-delete-source-books" class="hash-link" aria-label="Direct link to 🗑️ Delete Source Books" title="Direct link to 🗑️ Delete Source Books">​</a></h2>
+<p>The <strong>Delete source books</strong> checkbox (enabled by default) controls what happens to source books after a merge:</p>
+<table><thead><tr><th>Setting</th><th>Behavior</th></tr></thead><tbody><tr><td><strong>Checked</strong></td><td>Source books are deleted from the library after their files are attached to the target</td></tr><tr><td><strong>Unchecked</strong></td><td>Source books remain in the library but lose their file associations</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Files Are Moved, Not Copied</div><div class="admonitionContent_BuS1"><p>During a merge, source book files are physically moved to the target book's directory. The source books' original directories are cleaned up if empty.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📋 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📋 Notes" title="Direct link to 📋 Notes">​</a></h2>
+<ul>
+<li>Duplicate detection is scoped to a single library. It does not compare books across different libraries.</li>
+<li>Folder-based audiobooks cannot be merged because their directory structure is integral to playback.</li>
+<li>File naming follows the library's configured naming pattern. If a filename conflict occurs, Booklore appends a numeric suffix (e.g., <code>_1</code>, <code>_2</code>).</li>
+<li>File monitoring is temporarily paused during the merge to prevent the scanner from reacting to file moves.</li>
+<li>Merging is not reversible. If you're unsure about a group, use <strong>Dismiss</strong> to skip it.</li>
+</ul>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Back Up First</div><div class="admonitionContent_BuS1"><p>If you have a large number of duplicates, consider backing up your library folder before running a bulk merge.</p></div></div>
+</body>
+</html>

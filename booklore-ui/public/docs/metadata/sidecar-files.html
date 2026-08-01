@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📂 Sidecar Files | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>📂 Sidecar Files</h1></header>
+<p>Sidecar files are standalone JSON metadata files stored alongside your book files on disk. They provide a portable, human-readable backup of book metadata that can be imported into BookLore or used with other tools.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-file-format">📄 File Format<a href="#-file-format" class="hash-link" aria-label="Direct link to 📄 File Format" title="Direct link to 📄 File Format">​</a></h2>
+<p>For a book named <code>MyBook.epub</code>, the sidecar files are:</p>
+<ul>
+<li><code>MyBook.metadata.json</code> containing all metadata</li>
+<li><code>MyBook.cover.jpg</code> (optional) containing the cover image</li>
+</ul>
+<p>The JSON file follows this structure:</p>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token property">"version"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"1.0"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token property">"generatedAt"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"2026-01-15T10:30:00Z"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token property">"generatedBy"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"booklore"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token property">"metadata"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"title"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"My Book"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"authors"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token string" style="color:rgb(255, 121, 198)">"Author Name"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"publisher"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"Publisher"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"publishedDate"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"2025-03-15"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"description"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"..."</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"isbn13"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"9781234567890"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"categories"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token string" style="color:rgb(255, 121, 198)">"Fiction"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"Thriller"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"language"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"en"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token property">"pageCount"</span><span class="token operator">:</span><span class="token plain"> </span><span class="token number">350</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-included-fields">📋 Included Fields<a href="#-included-fields" class="hash-link" aria-label="Direct link to 📋 Included Fields" title="Direct link to 📋 Included Fields">​</a></h3>
+<ul>
+<li>Title, subtitle, authors, publisher, published date, description</li>
+<li>ISBN-10, ISBN-13, page count, language</li>
+<li>Categories, moods, tags</li>
+<li>Series name, number, and total count</li>
+<li>External identifiers (ASIN, Goodreads ID, Google ID, Hardcover ID, ComicVine ID, and others)</li>
+<li>Ratings from each metadata provider (average and count)</li>
+<li>Age rating, content rating</li>
+<li>Audiobook-specific fields (narrator, abridged)</li>
+<li>Comic metadata (for comic books)</li>
+</ul>
+<p>Only non-null fields are included in the output.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-settings">⚙️ Settings<a href="#️-settings" class="hash-link" aria-label="Direct link to ⚙️ Settings" title="Direct link to ⚙️ Settings">​</a></h2>
+<p>Configure sidecar behavior in <strong>Settings > Metadata Settings</strong> under the Metadata Persistence section:</p>
+<table><thead><tr><th>Setting</th><th>Description</th></tr></thead><tbody><tr><td><strong>Write on Update</strong></td><td>Automatically write sidecar files when metadata is changed</td></tr><tr><td><strong>Write on Scan</strong></td><td>Automatically write sidecar files during library scans</td></tr><tr><td><strong>Include Cover File</strong></td><td>Save a <code>.cover.jpg</code> alongside the JSON file</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-per-book-operations">📖 Per-Book Operations<a href="#-per-book-operations" class="hash-link" aria-label="Direct link to 📖 Per-Book Operations" title="Direct link to 📖 Per-Book Operations">​</a></h2>
+<p>In the <strong>Metadata Center</strong>, the Sidecar tab shows:</p>
+<ul>
+<li>A <strong>sync status badge</strong> indicating whether the sidecar is in sync, outdated, conflicting, missing, or not applicable</li>
+<li>The current sidecar JSON content</li>
+<li><strong>Export</strong> button to write the sidecar file to disk</li>
+<li><strong>Import</strong> button to update BookLore metadata from an existing sidecar file</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-library-wide-operations">🏛️ Library-Wide Operations<a href="#️-library-wide-operations" class="hash-link" aria-label="Direct link to 🏛️ Library-Wide Operations" title="Direct link to 🏛️ Library-Wide Operations">​</a></h2>
+<p>In <strong>Settings > Library Metadata Settings</strong>, each library has bulk sidecar options:</p>
+<ul>
+<li><strong>Export All</strong> generates sidecar files for every book in the library</li>
+<li><strong>Import All</strong> reads sidecar files from disk and updates BookLore metadata for all books that have them</li>
+</ul>
+</body>
+</html>
