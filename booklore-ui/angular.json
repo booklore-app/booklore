@@ -98,6 +98,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": true
+          },
           "configurations": {
             "production": {
               "buildTarget": "booklore:build:production"
