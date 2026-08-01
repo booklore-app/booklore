@@ -93,7 +93,7 @@ public class BookshelfParser implements BookParser {
     }
 
     private BookMetadata fetchByIsbn(String isbn) {
-        URI uri = URI.create(BASE_URL + "/api/browse/book/isbn/" + URLEncoder.encode(isbn, StandardCharsets.UTF_8));
+        URI uri = URI.create(BASE_URL + "/api/catalog/v1/book/isbn/" + URLEncoder.encode(isbn, StandardCharsets.UTF_8));
         try {
             log.info("Bookshelf API URL: {}", uri);
             HttpResponse<String> response = httpClient.send(
@@ -127,7 +127,7 @@ public class BookshelfParser implements BookParser {
             return List.of();
         }
 
-        URI uri = UriComponentsBuilder.fromUriString(BASE_URL + "/api/browse/search")
+        URI uri = UriComponentsBuilder.fromUriString(BASE_URL + "/api/catalog/v1/search")
                 .queryParam("q", query)
                 .queryParam("limit", SEARCH_LIMIT)
                 .build()
