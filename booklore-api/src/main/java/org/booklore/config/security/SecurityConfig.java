@@ -10,8 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -66,6 +65,20 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Built explicitly per-chain rather than relying on a single shared
+     * AuthenticationManager bean resolved via HttpSecurity's shared
+     * AuthenticationManagerBuilder - with multiple SecurityFilterChain beans
+     * in play, that shared-bean pattern is fragile (bean init order isn't
+     * guaranteed to configure it with opdsUserDetailsService before some
+     * other chain's HttpSecurity resolves/caches an AuthenticationManager).
+     */
+    private DaoAuthenticationProvider opdsAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(opdsUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
     @Bean
     @Order(1)
     public SecurityFilterChain opdsBasicAuthSecurityChain(HttpSecurity http) throws Exception {
@@ -74,6 +87,7 @@ public class SecurityConfig {
                 .securityMatcher("/api/v1/opds/**", "/api/v2/opds/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(opdsAuthenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(unauthenticatedEndpoints.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
@@ -97,6 +111,7 @@ public class SecurityConfig {
                 .securityMatcher("/komga/api/v1/**", "/komga/api/v2/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(opdsAuthenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated()
                 )
@@ -237,13 +252,6 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
-        auth.userDetailsService(opdsUserDetailsService).passwordEncoder(passwordEncoder());
-        return auth.build();
     }
 
     @Bean("noRedirectRestTemplate")
