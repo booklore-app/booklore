@@ -437,7 +437,10 @@ EOF
   FQDN_ORIGIN="${FQDN_SCHEME}://${FQDN}"
   if [ "$ORIGINS_CHANGED" = true ] && ! grep -q "$FQDN_ORIGIN" "$ENV_FILE"; then
     CURRENT_ORIGINS="$(grep -oP '(?<=^ALLOWED_ORIGINS=).*' "$ENV_FILE")"
-    sed -i "s#^ALLOWED_ORIGINS=.*#ALLOWED_ORIGINS=${CURRENT_ORIGINS},${FQDN_ORIGIN}#" "$ENV_FILE"
+    # sed -i writes a temp file in the same directory before renaming it over
+    # the original, which needs write access to /etc/booklore itself (root
+    # owned), not just the credentials file - hence sudo here.
+    sudo sed -i "s#^ALLOWED_ORIGINS=.*#ALLOWED_ORIGINS=${CURRENT_ORIGINS},${FQDN_ORIGIN}#" "$ENV_FILE"
     log "Added ${FQDN_ORIGIN} to ALLOWED_ORIGINS, restarting backend..."
     sudo systemctl restart booklore-api
   fi
