@@ -21,6 +21,7 @@ import org.booklore.model.entity.LibraryEntity;
 import org.booklore.model.entity.LibraryPathEntity;
 import org.booklore.model.enums.BookFileExtension;
 import org.booklore.model.enums.BookFileType;
+import org.booklore.model.enums.MetadataProvider;
 import org.booklore.model.enums.MetadataReplaceMode;
 import org.booklore.model.websocket.Topic;
 import org.booklore.repository.BookRepository;
@@ -73,6 +74,7 @@ public class BookDropService {
     private final FileMovingHelper fileMovingHelper;
     private final MonitoringRegistrationService monitoringRegistrationService;
     private final KoboAutoShelfService koboAutoShelfService;
+    private final BookdropMetadataService bookdropMetadataService;
 
     private static final int CHUNK_SIZE = 100;
 
@@ -88,6 +90,13 @@ public class BookDropService {
         } else {
             return bookdropFileRepository.findAll(pageable).map(mapper::toDto);
         }
+    }
+
+    public BookdropFile refetchMetadata(Long id, MetadataProvider provider) {
+        BookdropFileEntity entity = provider != null
+                ? bookdropMetadataService.fetchMetadataFromProvider(id, provider)
+                : bookdropMetadataService.attachFetchedMetadata(id);
+        return mapper.toDto(entity);
     }
 
     public Resource getBookdropCover(long bookdropId) {

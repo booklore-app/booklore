@@ -41,6 +41,8 @@ export interface BookdropFileUI {
   selectedLibraryId: string | null;
   selectedPathId: string | null;
   availablePaths: { id: string; name: string }[];
+  refetchProvider: string | null;
+  refetching: boolean;
 }
 
 @Component({
@@ -101,6 +103,8 @@ export class BookdropFileReviewComponent implements OnInit {
   selectAllAcrossPages = false;
   excludedFiles = new Set<number>();
 
+  availableProviders: { label: string; value: string | null }[] = [];
+
   ngOnInit(): void {
     this.pageTitle.setPageTitle(this.t.translate('bookdrop.fileReview.title'));
 
@@ -120,6 +124,20 @@ export class BookdropFileReviewComponent implements OnInit {
       .pipe(filter(Boolean), take(1))
       .subscribe(settings => {
         this.uploadPattern = settings?.uploadPattern ?? '';
+      });
+
+    this.appSettings$
+      .pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef))
+      .subscribe(settings => {
+        const providerSettings = settings?.metadataProviderSettings ?? {};
+        const enabledProviders = Object.entries(providerSettings)
+          .filter(([_, value]) => !!value && typeof value === 'object' && 'enabled' in value && (value as any).enabled)
+          .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1));
+
+        this.availableProviders = [
+          {label: this.t.translate('bookdrop.fileReview.refetchDefaultOption'), value: null},
+          ...enabledProviders.map(name => ({label: name, value: name})),
+        ];
       });
   }
 
@@ -630,8 +648,34 @@ export class BookdropFileReviewComponent implements OnInit {
       availablePaths: [],
       metadataForm,
       copiedFields: {},
-      savedFields: {}
+      savedFields: {},
+      refetchProvider: null,
+      refetching: false,
     };
+  }
+
+  refetchMetadata(fileUi: BookdropFileUI): void {
+    fileUi.refetching = true;
+    this.bookdropService.refetchMetadata(fileUi.file.id, fileUi.refetchProvider ?? undefined).subscribe({
+      next: (updated: BookdropFile) => {
+        fileUi.refetching = false;
+        fileUi.file = updated;
+        this.messageService.add({
+          severity: 'success',
+          summary: this.t.translate('bookdrop.fileReview.toast.refetchSuccessSummary'),
+          detail: this.t.translate('bookdrop.fileReview.toast.refetchSuccessDetail'),
+        });
+      },
+      error: (err) => {
+        fileUi.refetching = false;
+        console.error('Error refetching metadata:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.t.translate('bookdrop.fileReview.toast.refetchFailedSummary'),
+          detail: err?.error?.message ?? this.t.translate('bookdrop.fileReview.toast.refetchFailedDetail'),
+        });
+      },
+    });
   }
 
   rescanBookdrop() {

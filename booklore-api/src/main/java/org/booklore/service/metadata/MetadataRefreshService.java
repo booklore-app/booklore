@@ -396,6 +396,7 @@ public class MetadataRefreshService {
             case Ranobedb -> settings.getRanobedb() != null && settings.getRanobedb().isEnabled();
             case Douban -> settings.getDouban() != null && settings.getDouban().isEnabled();
             case Lubimyczytac -> settings.getLubimyczytac() != null && settings.getLubimyczytac().isEnabled();
+            case Bookshelf -> settings.getBookshelf() != null && settings.getBookshelf().isEnabled();
             default -> true;
         };
     }

@@ -61,7 +61,8 @@
     "googleApiPlaceholder": "Enter Google Books API key",
     "apiToken": "API Token",
     "hardcoverPlaceholder": "Enter Hardcover API token",
-    "comicvinePlaceholder": "Enter Comic Vine API token"
+    "comicvinePlaceholder": "Enter Comic Vine API token",
+    "bookshelfPlaceholder": "Enter Bookshelf API token"
   },
   "publicReviews": {
     "sectionTitle": "Public Reviews",

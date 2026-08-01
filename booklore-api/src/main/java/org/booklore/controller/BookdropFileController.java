@@ -4,6 +4,7 @@ import org.booklore.model.dto.BookdropFile;
 import org.booklore.model.dto.BookdropFileNotification;
 import org.booklore.model.dto.request.BookdropBulkEditRequest;
 import org.booklore.model.dto.request.BookdropFinalizeRequest;
+import org.booklore.model.dto.request.BookdropMetadataRefetchRequest;
 import org.booklore.model.dto.request.BookdropPatternExtractRequest;
 import org.booklore.model.dto.request.BookdropSelectionRequest;
 import org.booklore.model.dto.response.BookdropBulkEditResult;
@@ -52,6 +53,17 @@ public class BookdropFileController {
             @Parameter(description = "Status to filter files by") @RequestParam(required = false) String status,
             Pageable pageable) {
         return bookDropService.getFilesByStatus(status, pageable);
+    }
+
+    @Operation(summary = "Refetch metadata for a bookdrop file", description = "Reprocess metadata for a single bookdrop file, optionally from a specific provider.")
+    @ApiResponse(responseCode = "200", description = "Metadata refetched successfully")
+    @PostMapping("/files/{id}/metadata/refetch")
+    @PreAuthorize("@securityUtil.canAccessBookdrop() or @securityUtil.isAdmin()")
+    public ResponseEntity<BookdropFile> refetchMetadata(
+            @Parameter(description = "Bookdrop file ID") @PathVariable Long id,
+            @Parameter(description = "Refetch request, optionally specifying a single provider") @RequestBody(required = false) BookdropMetadataRefetchRequest request) {
+        BookdropFile result = bookDropService.refetchMetadata(id, request != null ? request.getProvider() : null);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Discard selected bookdrop files", description = "Discard selected bookdrop files based on selection criteria.")
