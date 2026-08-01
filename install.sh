@@ -3,12 +3,19 @@
 # Native (non-Docker) local install for BookLore.
 #
 # Sets up everything needed to run the backend and frontend directly on this
-# machine in dev mode (gradlew bootRun + ng serve, hot reload), backed by a
-# local PostgreSQL database, managed as systemd services. Relocates the
-# checkout to /opt/booklore (standard FHS location for third-party app code)
-# if not already there. Optionally configures a reverse proxy (Caddy or
-# nginx+certbot, whichever is present) with a Let's Encrypt certificate if
-# you're hosting this publicly. Safe to re-run.
+# machine, backed by a local PostgreSQL database, managed as systemd
+# services. Supports two modes (asked interactively, or set INSTALL_MODE):
+#   - production: builds the Angular app and embeds it in a compiled backend
+#     jar (java -jar, single process/port). Recommended for a real server.
+#   - dev: hot reload via gradlew bootRun + ng serve, two processes. What
+#     this script originally did, kept for local development boxes.
+# Once installed, the mode is remembered (stored in the credentials file) so
+# re-running this script or deploy.sh won't silently flip it.
+#
+# Relocates the checkout to /opt/booklore (standard FHS location for
+# third-party app code) if not already there. Optionally configures a
+# reverse proxy (Caddy or nginx+certbot, whichever is present) with a Let's
+# Encrypt certificate if you're hosting this publicly. Safe to re-run.
 #
 # Prerequisites: Ubuntu/Debian-like system with apt and systemd. Needs sudo
 # for: relocating to /opt, installing PostgreSQL/nginx/caddy/certbot if
@@ -18,6 +25,7 @@
 #
 # Usage:
 #   ./install.sh
+#   INSTALL_MODE=production ./install.sh    # skip the mode prompt
 #   INSTALL_DIR=/custom/path ./install.sh   # override the /opt/booklore default
 #   CADDYFILE=/path/to/Caddyfile ./install.sh  # override Caddyfile discovery
 #
@@ -102,15 +110,40 @@ sudo systemctl enable --now postgresql
 # ─── 4. Postgres role + database (idempotent) ──────────────────────────────
 log "Ensuring Postgres role/database exist..."
 
+EXISTING_MODE=""
 if [ -f "$ENV_FILE" ]; then
-  # Reuse the existing password and ALLOWED_ORIGINS so re-running this script
-  # doesn't desync the stored DB credentials or wipe out origins added later
-  # (e.g. by the reverse-proxy step below, on a previous run).
+  # Reuse the existing password, ALLOWED_ORIGINS, and install mode so
+  # re-running this script doesn't desync the stored DB credentials, wipe out
+  # origins added later (e.g. by the reverse-proxy step below, on a previous
+  # run), or silently flip an already-installed box between dev and prod.
   DB_PASSWORD="$(grep -oP '(?<=^DATABASE_PASSWORD=).*' "$ENV_FILE" || true)"
   EXISTING_ORIGINS="$(grep -oP '(?<=^ALLOWED_ORIGINS=).*' "$ENV_FILE" || true)"
+  EXISTING_MODE="$(grep -oP '(?<=^INSTALL_MODE=).*' "$ENV_FILE" || true)"
 fi
 DB_PASSWORD="${DB_PASSWORD:-$(openssl rand -base64 24 | tr -d '=+/')}"
 ALLOWED_ORIGINS_VALUE="${EXISTING_ORIGINS:-http://localhost:${FRONTEND_PORT}}"
+
+# ─── 4.5 Install mode (dev vs production) ──────────────────────────────────
+if [ -n "$EXISTING_MODE" ]; then
+  INSTALL_MODE="$EXISTING_MODE"
+  log "Reusing existing install mode: $INSTALL_MODE"
+elif [ -n "${INSTALL_MODE:-}" ]; then
+  log "Using INSTALL_MODE=$INSTALL_MODE from environment."
+else
+  echo
+  MODE_CHOICE=""
+  read -rp "Install mode: [1] Production (compiled build, single process - recommended for a real server) or [2] Development (hot reload, gradlew bootRun + ng serve)? [1]: " MODE_CHOICE || true
+  if [ "$MODE_CHOICE" = "2" ]; then
+    INSTALL_MODE="dev"
+  else
+    INSTALL_MODE="production"
+  fi
+fi
+if [ "$INSTALL_MODE" != "dev" ] && [ "$INSTALL_MODE" != "production" ]; then
+  warn "Invalid INSTALL_MODE '$INSTALL_MODE', must be 'dev' or 'production'."
+  exit 1
+fi
+log "Install mode: $INSTALL_MODE"
 
 sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='${DB_USER}'" | grep -q 1 \
   || sudo -u postgres psql -c "CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASSWORD}';"
@@ -126,6 +159,7 @@ DATABASE_URL=jdbc:postgresql://localhost:5432/${DB_NAME}
 DATABASE_USERNAME=${DB_USER}
 DATABASE_PASSWORD=${DB_PASSWORD}
 ALLOWED_ORIGINS=${ALLOWED_ORIGINS_VALUE}
+INSTALL_MODE=${INSTALL_MODE}
 EOF
 sudo chown "$APP_USER" "$ENV_FILE"
 sudo chmod 600 "$ENV_FILE"
@@ -144,10 +178,59 @@ sudo chown -R "$APP_USER":"$APP_USER" "$DATA_DIR"
 log "Running npm install in booklore-ui..."
 (cd "$REPO_DIR/booklore-ui" && npm install)
 
+BACKEND_JAR=""
+if [ "$INSTALL_MODE" = "production" ]; then
+  log "Building Angular app for production..."
+  (cd "$REPO_DIR/booklore-ui" && npx ng build --configuration production)
+
+  log "Building backend jar (embeds the Angular build)..."
+  (cd "$REPO_DIR/booklore-api" && ./gradlew bootJar -x test)
+  BACKEND_JAR="$(ls -t "$REPO_DIR"/booklore-api/build/libs/booklore-api-*.jar 2>/dev/null | grep -v -- '-plain.jar' | head -1)"
+  if [ -z "$BACKEND_JAR" ]; then
+    warn "bootJar didn't produce an executable jar under booklore-api/build/libs/ - aborting."
+    exit 1
+  fi
+  log "Backend jar: $BACKEND_JAR"
+fi
+
 # ─── 8. systemd services ────────────────────────────────────────────────────
 log "Installing systemd services..."
 
-sudo tee /etc/systemd/system/booklore-api.service > /dev/null <<EOF
+if [ "$INSTALL_MODE" = "production" ]; then
+  sudo tee /etc/systemd/system/booklore-api.service > /dev/null <<EOF
+[Unit]
+Description=BookLore (production, single jar - embeds the frontend)
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=${APP_USER}
+WorkingDirectory=${REPO_DIR}/booklore-api
+EnvironmentFile=${ENV_FILE}
+Environment=JAVA_HOME=${JAVA_HOME_RESOLVED}
+Environment=PATH=${JAVA_HOME_RESOLVED}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=APP_PATH_CONFIG=${DATA_DIR}/config
+Environment=APP_BOOKDROP_FOLDER=${DATA_DIR}/bookdrop
+Environment=JAVA_TOOL_OPTIONS=-XX:+UseG1GC -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError
+ExecStart=/bin/bash -c 'exec "${JAVA_HOME_RESOLVED}/bin/java" -jar "\$(ls -t ${REPO_DIR}/booklore-api/build/libs/booklore-api-*.jar | grep -v -- "-plain.jar" | head -1)" --spring.profiles.active=prod'
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  # No separate frontend service in production mode - it's embedded in the jar.
+  if [ -f /etc/systemd/system/booklore-ui.service ]; then
+    log "Removing leftover booklore-ui.service from a previous dev-mode install..."
+    sudo systemctl disable --now booklore-ui 2>/dev/null || true
+    sudo rm -f /etc/systemd/system/booklore-ui.service
+  fi
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now booklore-api
+else
+  sudo tee /etc/systemd/system/booklore-api.service > /dev/null <<EOF
 [Unit]
 Description=BookLore backend (dev, gradlew bootRun)
 After=network.target postgresql.service
@@ -169,7 +252,7 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-sudo tee /etc/systemd/system/booklore-ui.service > /dev/null <<EOF
+  sudo tee /etc/systemd/system/booklore-ui.service > /dev/null <<EOF
 [Unit]
 Description=BookLore frontend (dev, ng serve)
 After=network.target
@@ -187,8 +270,9 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-sudo systemctl daemon-reload
-sudo systemctl enable --now booklore-api booklore-ui
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now booklore-api booklore-ui
+fi
 
 # ─── 9. Reverse proxy + TLS (optional, only if publicly hosted) ────────────
 echo
@@ -197,6 +281,14 @@ read -rp "Publicly hosting this? Enter the FQDN to configure a reverse proxy + L
 
 if [ -n "$FQDN" ]; then
   log "Configuring reverse proxy for $FQDN..."
+
+  # Production mode serves API + WebSocket + the embedded frontend all from
+  # one process/port; dev mode still splits frontend traffic to ng serve.
+  if [ "$INSTALL_MODE" = "production" ]; then
+    SITE_TARGET_PORT="$BACKEND_PORT"
+  else
+    SITE_TARGET_PORT="$FRONTEND_PORT"
+  fi
 
   HAS_CADDY=false
   HAS_NGINX=false
@@ -274,7 +366,7 @@ if [ -n "$FQDN" ]; then
       log "Appending site block to $CADDYFILE..."
       sudo cp "$CADDYFILE" "${CADDYFILE}.bak-$(date +%s)"
       printf '\n%s {\n%b	handle /api/* {\n		reverse_proxy localhost:%s\n	}\n\n	handle /ws* {\n		reverse_proxy localhost:%s\n	}\n\n	handle {\n		reverse_proxy localhost:%s\n	}\n}\n' \
-        "$SITE_ADDR" "$TLS_LINE" "$BACKEND_PORT" "$BACKEND_PORT" "$FRONTEND_PORT" | sudo tee -a "$CADDYFILE" > /dev/null
+        "$SITE_ADDR" "$TLS_LINE" "$BACKEND_PORT" "$BACKEND_PORT" "$SITE_TARGET_PORT" | sudo tee -a "$CADDYFILE" > /dev/null
 
       sudo "$CADDY_BIN" validate --config "$CADDYFILE" --adapter caddyfile
       sudo systemctl reload caddy
@@ -316,7 +408,7 @@ server {
     }
 
     location / {
-        proxy_pass http://localhost:${FRONTEND_PORT};
+        proxy_pass http://localhost:${SITE_TARGET_PORT};
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
     }
@@ -355,9 +447,16 @@ fi
 
 log "Done."
 echo
-echo "  Frontend: http://localhost:${FRONTEND_PORT}$([ -n "$FQDN" ] && echo "  (or https://$FQDN)")"
-echo "  Backend:  http://localhost:${BACKEND_PORT}"
-echo
-echo "Check status:  systemctl status booklore-api booklore-ui"
-echo "Tail logs:     journalctl -u booklore-api -f"
+if [ "$INSTALL_MODE" = "production" ]; then
+  echo "  App: http://localhost:${BACKEND_PORT}$([ -n "$FQDN" ] && echo "  (or https://$FQDN)")  (frontend + API + WS, one process)"
+  echo
+  echo "Check status:  systemctl status booklore-api"
+  echo "Tail logs:     journalctl -u booklore-api -f"
+else
+  echo "  Frontend: http://localhost:${FRONTEND_PORT}$([ -n "$FQDN" ] && echo "  (or https://$FQDN)")"
+  echo "  Backend:  http://localhost:${BACKEND_PORT}"
+  echo
+  echo "Check status:  systemctl status booklore-api booklore-ui"
+  echo "Tail logs:     journalctl -u booklore-api -f"
+fi
 echo "Apply changes: ${REPO_DIR}/deploy.sh"

@@ -153,3 +153,17 @@ bootRun {
 bootJar {
     mainClass = 'org.booklore.BookloreApplication'
 }
+
+// For native (non-Docker) production builds: embed the Angular production
+// build into the jar's static resources, same as the Dockerfile does for the
+// container image. No-op if booklore-ui/dist hasn't been built yet (e.g. dev
+// runs via bootRun, or CI test runs), since Copy silently skips a missing
+// source directory.
+tasks.register('copyFrontend', Copy) {
+    from "${projectDir}/../booklore-ui/dist/booklore/browser"
+    into "${layout.buildDirectory.get()}/resources/main/static"
+}
+
+tasks.named('processResources') {
+    dependsOn 'copyFrontend'
+}
