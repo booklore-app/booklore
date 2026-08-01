@@ -16,8 +16,8 @@ Organize, read, annotate, sync across devices, and share, all without relying on
 ---
 
 > [!NOTE]
-> **This is a fork.** The original [booklore-app/booklore](https://github.com/booklore-app/booklore) project was abandoned by its
-> maintainer. This fork keeps it running and moving forward — see [What's Changed](#whats-changed-in-this-fork) below.
+> **This is a fork.** The original [booklore-app/booklore](https://github.com/booklore-app/booklore) project appears to have been
+> abandoned by its maintainer. This fork keeps it running and moving forward — see [What's Changed](#whats-changed-in-this-fork) below.
 
 ---
 
