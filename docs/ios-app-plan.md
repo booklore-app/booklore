@@ -23,6 +23,30 @@ would be much faster than building from zero. Check:
 
 If nothing suitable turns up, proceed with the from-scratch plan below.
 
+### Candidate found: `advplyr/audiobookshelf-app` (evaluated 2026-08-02)
+
+- **Stack**: NuxtJS + Capacitor (web app in a native shell/WebView), not
+  native Swift. iOS + Android from one codebase.
+- **License**: GPL-3.0. No conflict with BookLore's AGPL-3.0 — AGPL's
+  network-copyleft clause applies to the *server*, not to client apps that
+  merely talk to it over the API (same pattern as GitLab/Mastodon mobile
+  clients). A fork would just need to stay GPL-3.0 itself.
+- **Maturity**: actively maintained, 2,596+ commits. Audiobookshelf serves
+  both audiobooks and ebooks, so the reader UI already covers this exact
+  use case (library browsing, EPUB/PDF/audio playback, progress sync,
+  auth, settings all already built).
+- **Their own iOS status**: still TestFlight-beta-only, capped at Apple's
+  10k tester limit — separate concern from whether a fork could go through
+  full App Store review under a new identity.
+- **Tradeoff vs. the native SwiftUI/Readium plan below**: much faster
+  start (mature app to adapt vs. building from zero) but WebView-based
+  rather than fully native feel/performance, and still requires ripping
+  out and rebuilding the entire API layer (auth, book/library models,
+  progress sync calls) to match BookLore's endpoints instead of
+  Audiobookshelf's — a real refactor, just smaller than from-scratch.
+
+**Decision not yet made** — pick this up when back from the trip.
+
 ## Decisions made
 
 - **Distribution**: full public App Store release (not TestFlight-only or
