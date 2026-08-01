@@ -31,10 +31,10 @@ public interface NotebookEntryRepository extends Repository<AnnotationEntity, Lo
             " WHERE t.user_id = :userId AND t.type IN (:types)" +
             " AND (:bookId IS NULL OR t.book_id = :bookId)" +
             " AND (:search IS NULL" +
-            " OR t.text LIKE :search ESCAPE '\\\\'" +
-            " OR t.note LIKE :search ESCAPE '\\\\'" +
-            " OR t.book_title LIKE :search ESCAPE '\\\\'" +
-            " OR t.chapter_title LIKE :search ESCAPE '\\\\')";
+            " OR t.text LIKE :search ESCAPE '\\'" +
+            " OR t.note LIKE :search ESCAPE '\\'" +
+            " OR t.book_title LIKE :search ESCAPE '\\'" +
+            " OR t.chapter_title LIKE :search ESCAPE '\\')";
 
     interface EntryProjection {
         Long getId();
@@ -85,7 +85,7 @@ public interface NotebookEntryRepository extends Repository<AnnotationEntity, Lo
                    "UNION " +
                    "SELECT b.book_id, bm.title AS book_title FROM book_marks b " +
                    "JOIN book_metadata bm ON bm.book_id = b.book_id WHERE b.user_id = :userId" +
-                   ") t WHERE (:search IS NULL OR t.book_title LIKE :search ESCAPE '\\\\') " +
+                   ") t WHERE (:search IS NULL OR t.book_title LIKE :search ESCAPE '\\') " +
                    "ORDER BY t.book_title",
            nativeQuery = true)
     List<BookProjection> findBooksWithAnnotations(@Param("userId") Long userId,
@@ -104,7 +104,7 @@ public interface NotebookEntryRepository extends Repository<AnnotationEntity, Lo
                    "SELECT b.book_id, b.user_id, bm.title AS book_title, bm.cover_updated_on " +
                    "FROM book_marks b JOIN book_metadata bm ON bm.book_id = b.book_id" +
                    ") t WHERE t.user_id = :userId" +
-                   " AND (:search IS NULL OR t.book_title LIKE :search ESCAPE '\\\\')" +
+                   " AND (:search IS NULL OR t.book_title LIKE :search ESCAPE '\\')" +
                    " GROUP BY t.book_id, t.book_title, t.cover_updated_on" +
                    " ORDER BY t.book_title",
            countQuery = "SELECT COUNT(*) FROM (" +
@@ -118,7 +118,7 @@ public interface NotebookEntryRepository extends Repository<AnnotationEntity, Lo
                         "SELECT b.book_id, b.user_id, bm.title AS book_title " +
                         "FROM book_marks b JOIN book_metadata bm ON bm.book_id = b.book_id" +
                         ") t WHERE t.user_id = :userId" +
-                        " AND (:search IS NULL OR t.book_title LIKE :search ESCAPE '\\\\')" +
+                        " AND (:search IS NULL OR t.book_title LIKE :search ESCAPE '\\')" +
                         ") cnt",
            nativeQuery = true)
     Page<BookWithCountProjection> findBooksWithAnnotationsPaginated(@Param("userId") Long userId,

@@ -11,7 +11,7 @@ Thanks for your interest in contributing to Booklore! Whether you're fixing bugs
 - **Frontend:** Angular 20, TypeScript, PrimeNG 19
 - **Backend:** Java 25, Spring Boot 3.5
 - **Authentication:** Local JWT + optional OIDC (e.g., Authentik)
-- **Database:** MariaDB
+- **Database:** PostgreSQL
 - **Deployment:** Docker-compatible, reverse proxy-ready
 
 ## Table of Contents
@@ -109,7 +109,7 @@ This starts:
 |------------|-----------------------|
 | Frontend   | http://localhost:4200 |
 | Backend    | http://localhost:8080 |
-| MariaDB    | localhost:3366        |
+| PostgreSQL | localhost:3366        |
 | Debug port | localhost:5005        |
 
 All ports are configurable via environment variables (`FRONTEND_PORT`, `BACKEND_PORT`, `DB_PORT`, `REMOTE_DEBUG_PORT`) in the compose file.
@@ -127,23 +127,22 @@ For full control over each component or IDE integration (debugging, hot-reload, 
 
 | Tool          | Version | Download                                     |
 |---------------|---------|----------------------------------------------|
-| Java          | 25+     | [Adoptium](https://adoptium.net/)            |
-| Node.js + npm | 20+     | [nodejs.org](https://nodejs.org/)            |
-| MariaDB       | 10.6+   | [mariadb.org](https://mariadb.org/download/) |
+| Java          | 25+     | [Adoptium](https://adoptium.net/)             |
+| Node.js + npm | 20+     | [nodejs.org](https://nodejs.org/)             |
+| PostgreSQL    | 16+     | [postgresql.org](https://www.postgresql.org/download/) |
 | Git           | latest  | [git-scm.com](https://git-scm.com/)         |
 
 #### 1. Database
 
-Start MariaDB and create the database:
+Start PostgreSQL and create the database:
 
 ```sql
-CREATE DATABASE IF NOT EXISTS booklore;
-CREATE USER 'booklore_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON booklore.* TO 'booklore_user'@'localhost';
-FLUSH PRIVILEGES;
+CREATE DATABASE booklore;
+CREATE USER booklore_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE booklore TO booklore_user;
 ```
 
-> **Tip:** You can also spin up MariaDB via Docker: `docker compose -f local/docker-compose-maria.yml up -d`
+> **Tip:** You can also spin up PostgreSQL via Docker: `docker compose -f local/docker-compose-postgres.yml up -d`
 
 #### 2. Backend
 
@@ -151,13 +150,13 @@ Create a dev config at `booklore-api/src/main/resources/application-dev.yml`:
 
 ```yaml
 app:
-  path-book: '/path/to/booklore-data/books'
   path-config: '/path/to/booklore-data/config'
+  bookdrop-folder: '/path/to/booklore-data/bookdrop'
 
 spring:
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/booklore?createDatabaseIfNotExist=true
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/booklore
     username: booklore_user
     password: your_password
 ```
@@ -307,7 +306,7 @@ We've seen a sharp increase in AI-generated PRs where the contributor clearly ne
 - Testing: JUnit 5 + Mockito + AssertJ. `@ExtendWith(MockitoExtension.class)` for unit tests, `@SpringBootTest` only for integration tests.
 - Use modern Java features (records, sealed classes, pattern matching, text blocks, etc.).
 - No fully qualified class names inline. Always use imports.
-- Flyway migrations go in `booklore-api/src/main/resources/db/migration/` with naming `V<number>__<Description>.sql`.
+- Flyway migrations go in `booklore-api/src/main/resources/db/migration/` with naming `V<number>__<Description>.sql`, and must target **PostgreSQL** syntax (the project migrated off MariaDB — see `db/migration-mariadb-archive/` for the pre-migration history).
 - Never modify a released migration. Always create a new migration file for changes.
 - Use idempotent guards in migrations (`CREATE TABLE IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`, `DROP ... IF EXISTS` before re-creating).
 

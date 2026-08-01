@@ -49,9 +49,9 @@ spring:
       pageable:
         max-page-size: 100
   datasource:
-    url: ${DATABASE_URL:jdbc:mariadb://${DATABASE_HOST:${DB_HOST:mariadb}}:${DATABASE_PORT:3306}/${DATABASE_NAME:booklore}?createDatabaseIfNotExist=true&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}
-    username: ${DATABASE_USERNAME:root}
-    password: ${DATABASE_PASSWORD:${MYSQL_ROOT_PASSWORD}}
+    url: ${DATABASE_URL:jdbc:postgresql://${DATABASE_HOST:${DB_HOST:postgres}}:${DATABASE_PORT:5432}/${DATABASE_NAME:booklore}}
+    username: ${DATABASE_USERNAME:booklore}
+    password: ${DATABASE_PASSWORD:${POSTGRES_PASSWORD}}
     hikari:
       pool-name: BookloreHikariPool
       max-lifetime: 580000         # 9.6 minutes (avoid DB-side connection cuts)

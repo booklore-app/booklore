@@ -18,7 +18,7 @@ Volume=booklore-data:/app/data
 
 Environment=TZ=Etc/UTC
 Secret=booklore_db_pass,type=env,target=DATABASE_PASSWORD
-Environment=DATABASE_URL=jdbc:mariadb://localhost:3306/booklore
+Environment=DATABASE_URL=jdbc:postgresql://localhost:5432/booklore
 Environment=DATABASE_USERNAME=booklore
 HealthCmd=wget -q -O - http://localhost:6060/api/v1/healthcheck
 HealthInterval=1m

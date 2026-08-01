@@ -2,10 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-mariadb:
+postgresql:
   enabled: true
   image:
-    tag: 11.8.3
+    tag: 16
   auth:
     database: booklore
     username: booklore-user
