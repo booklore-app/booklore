@@ -24,6 +24,35 @@ SKIP_PULL=false
 
 log() { echo ">> $*"; }
 
+# Resolve JAVA_HOME for the production build step below (gradlew bootJar).
+# The interactive shell running this script may not have SDKMAN's env
+# sourced (e.g. non-login shells, or it was only ever set up for the
+# systemd unit's own Environment= line during install.sh).
+resolve_java_home() {
+  if [ -n "${JAVA_HOME:-}" ] && [ -x "${JAVA_HOME}/bin/java" ]; then
+    return
+  fi
+  if command -v java >/dev/null 2>&1; then
+    JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")"
+    export JAVA_HOME
+    return
+  fi
+  if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
+    set +u
+    # shellcheck disable=SC1090,SC1091
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+    set -u
+  fi
+  if [ -d "$HOME/.sdkman/candidates/java/current" ]; then
+    JAVA_HOME="$HOME/.sdkman/candidates/java/current"
+    export JAVA_HOME
+  fi
+  if [ -n "${JAVA_HOME:-}" ]; then
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+  fi
+}
+resolve_java_home
+
 cd "$REPO_DIR"
 
 INSTALL_MODE="$(grep -oP '(?<=^INSTALL_MODE=).*' "$ENV_FILE" 2>/dev/null || true)"
