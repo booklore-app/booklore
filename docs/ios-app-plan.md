@@ -1,7 +1,15 @@
 # BookLore iOS App — Scope & Plan
 
-Status: **scoped, not started.** Picking this up when back from a trip
-(scoped 2026-08-02).
+Status: **superseded, not started.** See
+`bookshelf` repo's `docs/companion-reader-app-plan.md` (scoped
+2026-08-07) for the direction actually chosen: a fork of
+`advplyr/audiobookshelf-app`, generic OPDS (not BookLore's native API),
+cross-platform iOS+Android from one codebase (not iOS-only), and
+Bookshelf-branded rather than BookLore-branded. The `audiobookshelf-app`
+fork evaluation below carried forward into that plan; the native
+SwiftUI/Readium direction and the BookLore-native-API choice did not.
+
+Original scoping notes kept below for reference (scoped 2026-08-02).
 
 ## Why
 
