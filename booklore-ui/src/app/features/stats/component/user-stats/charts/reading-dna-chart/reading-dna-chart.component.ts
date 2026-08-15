@@ -9,6 +9,7 @@ import {BookService} from '../../../../../book/service/book.service';
 import {BookState} from '../../../../../book/model/state/book-state.model';
 import {Book, ReadStatus} from '../../../../../book/model/book.model';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {isHighPersonalRating} from './reading-dna-calculations';
 
 interface ReadingDNAProfile {
   adventurous: number;
@@ -282,7 +283,7 @@ export class ReadingDNAChartComponent implements OnInit, OnDestroy {
     const completionRate = completedBooks.length / books.length;
 
     const ratedBooks = books.filter(book => book.personalRating);
-    const highRatedBooks = ratedBooks.filter(book => book.personalRating! >= 4);
+    const highRatedBooks = ratedBooks.filter(book => isHighPersonalRating(book.personalRating!));
     const highRatingRate = ratedBooks.length > 0 ? highRatedBooks.length / ratedBooks.length : 0;
 
     return Math.min(100, Math.round(completionRate * 60 + highRatingRate * 40));
