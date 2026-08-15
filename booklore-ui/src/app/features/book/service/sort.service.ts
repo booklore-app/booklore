@@ -137,7 +137,12 @@ export class SortService {
     const aValue = extractor(a);
     const bValue = extractor(b);
 
-    let result = this.compareValues(aValue, bValue);
+    if (aValue == null || bValue == null) {
+      if (aValue == null && bValue == null) return 0;
+      return aValue == null ? 1 : -1;
+    }
+
+    const result = this.compareValues(aValue, bValue);
 
     return criterion.direction === SortDirection.ASCENDING ? result : -result;
   }
@@ -149,11 +154,8 @@ export class SortService {
       return this.naturalCompare(aValue, bValue);
     } else if (typeof aValue === 'number' && typeof bValue === 'number') {
       return aValue - bValue;
-    } else {
-      if (aValue == null && bValue != null) return 1;
-      if (aValue != null && bValue == null) return -1;
-      return 0;
     }
+    return 0;
   }
 
   private compareArrays(aValue: unknown[], bValue: unknown[]): number {
