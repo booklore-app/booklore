@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🔤 Custom Fonts for EPUB Reader | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🔤 Custom Fonts for EPUB Reader</h1></header>
+<p>Personalize your reading experience by uploading custom fonts to use in BookLore's EPUB reader. Choose fonts that match your style, improve readability, or support specific languages with an easy-to-use font management interface.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Pro Tip</div><div class="admonitionContent_BuS1"><p>Use fonts from <a href="https://web.archive.org/web/20260222092109/https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google Fonts</a>, <a href="https://web.archive.org/web/20260222092109/https://www.fontsquirrel.com/" target="_blank" rel="noopener noreferrer">Font Squirrel</a>, or <a href="https://web.archive.org/web/20260222092109/https://fonts.adobe.com/" target="_blank" rel="noopener noreferrer">Adobe Fonts</a> for high-quality, professionally designed typefaces. Make sure to download the font files in supported formats!</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-what-youll-achieve">🌟 What You'll Achieve<a href="#-what-youll-achieve" class="hash-link" aria-label="Direct link to 🌟 What You'll Achieve" title="Direct link to 🌟 What You'll Achieve">​</a></h2>
+<p>With Custom Fonts, you can:</p>
+<ul>
+<li><strong>Upload custom font files</strong> in TTF, OTF, WOFF, or WOFF2 format</li>
+<li><strong>Manage up to 10 fonts</strong> per user account</li>
+<li><strong>Apply fonts to EPUB books</strong> for a personalized reading experience</li>
+<li><strong>Switch between fonts</strong> easily in reader preferences</li>
+<li><strong>Delete fonts</strong> when no longer needed</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-how-custom-fonts-work">✨ How Custom Fonts Work<a href="#-how-custom-fonts-work" class="hash-link" aria-label="Direct link to ✨ How Custom Fonts Work" title="Direct link to ✨ How Custom Fonts Work">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-the-font-management-flow">🔄 The Font Management Flow<a href="#-the-font-management-flow" class="hash-link" aria-label="Direct link to 🔄 The Font Management Flow" title="Direct link to 🔄 The Font Management Flow">​</a></h3>
+<ol>
+<li>
+<p><strong>📥 Upload Font File</strong>
+Upload a font file from your computer (.ttf, .otf, .woff, .woff2).</p>
+</li>
+<li>
+<p><strong>✏️ Name Your Font</strong>
+Give your font a memorable display name (or use the original filename).</p>
+</li>
+<li>
+<p><strong>💾 Save to Library</strong>
+Font is saved securely to your BookLore data directory.</p>
+</li>
+<li>
+<p><strong>⚙️ Set as Default</strong>
+Select your custom font in EPUB Reader Preferences.</p>
+</li>
+<li>
+<p><strong>📖 Enjoy Reading</strong>
+Your chosen font is applied to all EPUB books you read.</p>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-getting-started">🚀 Getting Started<a href="#-getting-started" class="hash-link" aria-label="Direct link to 🚀 Getting Started" title="Direct link to 🚀 Getting Started">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="prerequisites">Prerequisites<a href="#prerequisites" class="hash-link" aria-label="Direct link to Prerequisites" title="Direct link to Prerequisites">​</a></h3>
+<ul>
+<li>A BookLore account with active session</li>
+<li>Font files in one of these formats:
+<ul>
+<li><strong>TTF</strong> (TrueType Font)</li>
+<li><strong>OTF</strong> (OpenType Font)</li>
+<li><strong>WOFF</strong> (Web Open Font Format)</li>
+<li><strong>WOFF2</strong> (Web Open Font Format 2)</li>
+</ul>
+</li>
+</ul>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Font File Requirements</div><div class="admonitionContent_BuS1"><ul>
+<li><strong>Maximum file size:</strong> 5MB per font</li>
+<li><strong>Maximum fonts per user:</strong> 10 fonts</li>
+<li><strong>Supported formats:</strong> .ttf, .otf, .woff, .woff2</li>
+</ul></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-accessing-custom-fonts">📖 Accessing Custom Fonts<a href="#-accessing-custom-fonts" class="hash-link" aria-label="Direct link to 📖 Accessing Custom Fonts" title="Direct link to 📖 Accessing Custom Fonts">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="opening-the-font-manager">Opening the Font Manager<a href="#opening-the-font-manager" class="hash-link" aria-label="Direct link to Opening the Font Manager" title="Direct link to Opening the Font Manager">​</a></h3>
+<ol>
+<li>
+<p><strong>Navigate to Settings</strong>
+Click your profile icon → <strong>Settings</strong></p>
+</li>
+<li>
+<p><strong>Find Custom Fonts Section</strong>
+Scroll down or navigate to the <strong>Custom Fonts</strong> section</p>
+</li>
+<li>
+<p><strong>View Your Font Collection</strong>
+See all uploaded fonts with details (name, format, size, upload date)</p>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-uploading-a-custom-font">📥 Uploading a Custom Font<a href="#-uploading-a-custom-font" class="hash-link" aria-label="Direct link to 📥 Uploading a Custom Font" title="Direct link to 📥 Uploading a Custom Font">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="step-by-step-upload-guide">Step-by-Step Upload Guide<a href="#step-by-step-upload-guide" class="hash-link" aria-label="Direct link to Step-by-Step Upload Guide" title="Direct link to Step-by-Step Upload Guide">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="1-click-add-new-font-button">1. Click "Add New Font" Button<a href="#1-click-add-new-font-button" class="hash-link" aria-label="Direct link to 1. Click &quot;Add New Font&quot; Button" title="Direct link to 1. Click &quot;Add New Font&quot; Button">​</a></h4>
+<p>In the Custom Fonts section, click the <strong>"Add New Font"</strong> button.
+<img decoding="async" loading="lazy" alt="Custom Fonts Tab" src="https://web.archive.org/web/20260222092109im_/https://booklore.org/assets/images/font-00-4d3fd772eb2614e805bf1f2fc7fe13d2.png" width="1165" height="440" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Quota Check</div><div class="admonitionContent_BuS1"><p>If you already have 10 fonts, you'll need to delete one before uploading a new font.</p></div></div>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="2-select-font-file">2. Select Font File<a href="#2-select-font-file" class="hash-link" aria-label="Direct link to 2. Select Font File" title="Direct link to 2. Select Font File">​</a></h4>
+<p>Font uploader dialog will open, click on upload area or drag and drop font file into it</p>
+<p><img decoding="async" loading="lazy" alt="Font Upload Dialog - Empty" src="https://web.archive.org/web/20260222092109im_/https://booklore.org/assets/images/font-01-df7ffcc6dd1d398a358d3dd1766761e5.png" width="700" height="523" class="img_ev3q"></p>
+<p>A file picker dialog will open. Choose your font file:</p>
+<p><strong>Supported formats:</strong></p>
+<ul>
+<li><code>font.ttf</code> - TrueType Font</li>
+<li><code>font.otf</code> - OpenType Font</li>
+<li><code>font.woff</code> - Web Font</li>
+<li><code>font.woff2</code> - Web Font (compressed)</li>
+</ul>
+<p>After select, font preview and font name input will show up</p>
+<p><img decoding="async" loading="lazy" alt="Font Upload Dialog - Font Selected" src="https://web.archive.org/web/20260222092109im_/https://booklore.org/assets/images/font-02-14114bebb61821bbb5ad5bdbecbef102.png" width="713" height="783" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="3-enter-font-name-optional">3. Enter Font Name (Optional)<a href="#3-enter-font-name-optional" class="hash-link" aria-label="Direct link to 3. Enter Font Name (Optional)" title="Direct link to 3. Enter Font Name (Optional)">​</a></h4>
+<p>You can provide a custom display name for your font:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Font Name: "My Beautiful Serif Font"</span><br></span></code></pre></div></div>
+<p><strong>Naming Guidelines:</strong></p>
+<ul>
+<li>Descriptive names help you identify fonts later</li>
+<li>If left blank, the original filename is used</li>
+<li>Examples: "Georgia Pro", "Reading Font", "OpenDyslexic"</li>
+</ul>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Meaningful Names</div><div class="admonitionContent_BuS1"><p>Use descriptive names like "Serif Reading" or "Code Display" instead of generic names like "Font1" or "MyFont".</p></div></div>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="4-upload-confirmation">4. Upload Confirmation<a href="#4-upload-confirmation" class="hash-link" aria-label="Direct link to 4. Upload Confirmation" title="Direct link to 4. Upload Confirmation">​</a></h4>
+<p>Click on <strong>"Upload Font"</strong> to confirm the upload. After successful upload, you'll see:</p>
+<ul>
+<li>✅ Success message</li>
+<li>Font appears in your collection</li>
+<li>Font details: name, format, file size, upload timestamp</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-managing-your-fonts">🎨 Managing Your Fonts<a href="#-managing-your-fonts" class="hash-link" aria-label="Direct link to 🎨 Managing Your Fonts" title="Direct link to 🎨 Managing Your Fonts">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="viewing-font-collection">Viewing Font Collection<a href="#viewing-font-collection" class="hash-link" aria-label="Direct link to Viewing Font Collection" title="Direct link to Viewing Font Collection">​</a></h3>
+<p>Your Custom Fonts section displays all uploaded fonts in a list or grid view.</p>
+<p><img decoding="async" loading="lazy" alt="Font Collection" src="https://web.archive.org/web/20260222092109im_/https://booklore.org/assets/images/font-03-fca4cb601c254f61f0f7f23471835f07.png" width="1188" height="716" class="img_ev3q"></p>
+<p><strong>Each font card shows:</strong></p>
+<ul>
+<li><strong>Font Name</strong> - Display name you provided</li>
+<li><strong>Original Filename</strong> - The file you uploaded</li>
+<li><strong>Format</strong> - Font file type (TTF, OTF, WOFF, WOFF2)</li>
+<li><strong>File Size</strong> - Size in KB or MB</li>
+<li><strong>Upload Date</strong> - When the font was added</li>
+<li><strong>CSS Identifier</strong> - Internal identifier for developers</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="font-information-display">Font Information Display<a href="#font-information-display" class="hash-link" aria-label="Direct link to Font Information Display" title="Direct link to Font Information Display">​</a></h3>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Font Name: Open Sans Regular</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Original File: OpenSans-Regular.ttf</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Format: TTF</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Size: 224 KB</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Uploaded: January 3, 2025, 10:30 AM</span><br></span></code></pre></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-deleting-a-font">🗑️ Deleting a Font<a href="#️-deleting-a-font" class="hash-link" aria-label="Direct link to 🗑️ Deleting a Font" title="Direct link to 🗑️ Deleting a Font">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="removal-process">Removal Process<a href="#removal-process" class="hash-link" aria-label="Direct link to Removal Process" title="Direct link to Removal Process">​</a></h3>
+<ol>
+<li>
+<p><strong>Locate the Font</strong>
+Find the font you want to delete in your collection</p>
+</li>
+<li>
+<p><strong>Click Delete Button</strong>
+Click the trash icon or "Delete" button on the font card</p>
+</li>
+<li>
+<p><strong>Confirm Deletion</strong>
+A confirmation dialog appears:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Are you sure you want to delete the font "Open Sans Regular"?</span><br></span></code></pre></div></div>
+</li>
+<li>
+<p><strong>Deletion Complete</strong></p>
+<ul>
+<li>Font file removed from server</li>
+<li>Database record deleted</li>
+<li>Font removed from your collection</li>
+</ul>
+</li>
+</ol>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Permanent Deletion</div><div class="admonitionContent_BuS1"><p>Deleted fonts cannot be recovered. If the font is currently selected in your EPUB preferences, it will revert to the default font.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-using-custom-fonts-in-epub-reader">⚙️ Using Custom Fonts in EPUB Reader<a href="#️-using-custom-fonts-in-epub-reader" class="hash-link" aria-label="Direct link to ⚙️ Using Custom Fonts in EPUB Reader" title="Direct link to ⚙️ Using Custom Fonts in EPUB Reader">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="setting-your-default-font-global-settings">Setting Your Default Font (Global Settings)<a href="#setting-your-default-font-global-settings" class="hash-link" aria-label="Direct link to Setting Your Default Font (Global Settings)" title="Direct link to Setting Your Default Font (Global Settings)">​</a></h3>
+<p>After uploading a font, apply it to your EPUB reader:</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="1-open-epub-global-settings">1. Open EPUB Global settings<a href="#1-open-epub-global-settings" class="hash-link" aria-label="Direct link to 1. Open EPUB Global settings" title="Direct link to 1. Open EPUB Global settings">​</a></h4>
+<p><strong>Navigate to:</strong> Settings → Reader Preferences → EPUB Preferences: Global</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="2-select-custom-font">2. Select Custom Font<a href="#2-select-custom-font" class="hash-link" aria-label="Direct link to 2. Select Custom Font" title="Direct link to 2. Select Custom Font">​</a></h4>
+<p><img decoding="async" loading="lazy" alt="Font Configuration - Global" src="https://web.archive.org/web/20260222092109im_/https://booklore.org/assets/images/font-04-0db4029186e9bc400aef86946693d396.png" width="888" height="518" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="setting-your-reader-font-per-book-settings">Setting Your Reader Font (Per book settings)<a href="#setting-your-reader-font-per-book-settings" class="hash-link" aria-label="Direct link to Setting Your Reader Font (Per book settings)" title="Direct link to Setting Your Reader Font (Per book settings)">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="1-open-epub-reader-preferences">1. Open EPUB Reader Preferences<a href="#1-open-epub-reader-preferences" class="hash-link" aria-label="Direct link to 1. Open EPUB Reader Preferences" title="Direct link to 1. Open EPUB Reader Preferences">​</a></h4>
+<p>**Navigate to:**Reader header -> Settings Button → Reader Settings</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="2-select-custom-font-1">2. Select Custom Font<a href="#2-select-custom-font-1" class="hash-link" aria-label="Direct link to 2. Select Custom Font" title="Direct link to 2. Select Custom Font">​</a></h4>
+<p>In the <strong>Typography</strong> section:</p>
+<ol>
+<li>Find the <strong>Font Family</strong> dropdown</li>
+<li>Your custom fonts appear at the bottom of the list</li>
+<li>Select your preferred custom font</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Font Configuration - Global" src="https://web.archive.org/web/20260222092109im_/https://booklore.org/assets/images/font-05-caee74ea7d4edf90960c0ebbc3e22bfd.png" width="1456" height="1268" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="3-font-applied-to-books">3. Font Applied to Books<a href="#3-font-applied-to-books" class="hash-link" aria-label="Direct link to 3. Font Applied to Books" title="Direct link to 3. Font Applied to Books">​</a></h4>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Font Loading</div><div class="admonitionContent_BuS1"><p>Custom fonts load from the BookLore server when you open an EPUB book. The first load may take a moment, but subsequent pages load instantly.</p></div></div>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="font-file-size-optimization">Font File Size Optimization<a href="#font-file-size-optimization" class="hash-link" aria-label="Direct link to Font File Size Optimization" title="Direct link to Font File Size Optimization">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="reducing-file-size">Reducing File Size<a href="#reducing-file-size" class="hash-link" aria-label="Direct link to Reducing File Size" title="Direct link to Reducing File Size">​</a></h4>
+<p>If your font exceeds the 5MB limit:</p>
+<ol>
+<li><strong>Use WOFF2 format</strong> - Most compressed format (typically 30% smaller than TTF)</li>
+<li><strong>Remove unused glyphs</strong> - Use tools like <a href="https://web.archive.org/web/20260222092109/https://fontforge.org/" target="_blank" rel="noopener noreferrer">FontForge</a> to subset fonts</li>
+<li><strong>Choose lighter weights</strong> - Regular weight instead of full font family</li>
+<li><strong>Online converters</strong> - Use <a href="https://web.archive.org/web/20260222092109/https://transfonter.org/" target="_blank" rel="noopener noreferrer">Transfonter</a> or <a href="https://web.archive.org/web/20260222092109/https://www.fontsquirrel.com/tools/webfont-generator" target="_blank" rel="noopener noreferrer">Font Squirrel Webfont Generator</a></li>
+</ol>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="font-conversion-tools">Font Conversion Tools<a href="#font-conversion-tools" class="hash-link" aria-label="Direct link to Font Conversion Tools" title="Direct link to Font Conversion Tools">​</a></h4>
+<p>Convert fonts to web-optimized formats:</p>
+<ul>
+<li><strong><a href="https://web.archive.org/web/20260222092109/https://transfonter.org/" target="_blank" rel="noopener noreferrer">Transfonter</a></strong> - TTF/OTF to WOFF/WOFF2</li>
+<li><strong><a href="https://web.archive.org/web/20260222092109/https://www.fontsquirrel.com/tools/webfont-generator" target="_blank" rel="noopener noreferrer">Font Squirrel</a></strong> - Comprehensive conversion</li>
+<li><strong><a href="https://web.archive.org/web/20260222092109/https://cloudconvert.com/font-converter" target="_blank" rel="noopener noreferrer">CloudConvert</a></strong> - Batch conversion</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="font-organization-strategy">Font Organization Strategy<a href="#font-organization-strategy" class="hash-link" aria-label="Direct link to Font Organization Strategy" title="Direct link to Font Organization Strategy">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="naming-strategy">Naming Strategy<a href="#naming-strategy" class="hash-link" aria-label="Direct link to Naming Strategy" title="Direct link to Naming Strategy">​</a></h4>
+<p>Use consistent naming conventions:</p>
+<p><strong>Good Names ✅</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Serif-Georgia-Regular</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Sans-OpenSans-Bold</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Mono-FiraCode-Regular</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Dyslexic-OpenDyslexic</span><br></span></code></pre></div></div>
+<p><strong>Bad Names ❌</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Font1</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">MyFont</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">NewFont2025</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">downloaded_font</span><br></span></code></pre></div></div>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="font-collection-management">Font Collection Management<a href="#font-collection-management" class="hash-link" aria-label="Direct link to Font Collection Management" title="Direct link to Font Collection Management">​</a></h4>
+<p><strong>Recommended approach:</strong></p>
+<ul>
+<li>Keep 3-5 fonts for different purposes</li>
+<li>1 serif for classic books</li>
+<li>1 sans-serif for modern content</li>
+<li>1 monospace for technical/code books</li>
+<li>1-2 specialty fonts (dyslexia, decorative)</li>
+</ul>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Stay Organized</div><div class="admonitionContent_BuS1"><p>Delete unused fonts to keep your collection manageable and leave room for experimentation.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-troubleshooting">🔧 Troubleshooting<a href="#-troubleshooting" class="hash-link" aria-label="Direct link to 🔧 Troubleshooting" title="Direct link to 🔧 Troubleshooting">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="common-issues-and-solutions">Common Issues and Solutions<a href="#common-issues-and-solutions" class="hash-link" aria-label="Direct link to Common Issues and Solutions" title="Direct link to Common Issues and Solutions">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="issue-file-size-exceeds-maximum-allowed-5mb">Issue: "File size exceeds maximum allowed (5MB)"<a href="#issue-file-size-exceeds-maximum-allowed-5mb" class="hash-link" aria-label="Direct link to Issue: &quot;File size exceeds maximum allowed (5MB)&quot;" title="Direct link to Issue: &quot;File size exceeds maximum allowed (5MB)&quot;">​</a></h4>
+<p><strong>Causes:</strong></p>
+<ul>
+<li>Font file is too large</li>
+<li>Font family includes multiple weights/styles</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ol>
+<li>Convert to WOFF2 format for better compression</li>
+<li>Use a font subsetting tool to remove unused characters</li>
+<li>Download only the specific weight you need (e.g., Regular instead of full family)</li>
+<li>Use online compression tools</li>
+</ol>
+<hr>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="issue-invalid-font-file-format">Issue: "Invalid font file format"<a href="#issue-invalid-font-file-format" class="hash-link" aria-label="Direct link to Issue: &quot;Invalid font file format&quot;" title="Direct link to Issue: &quot;Invalid font file format&quot;">​</a></h4>
+<p><strong>Causes:</strong></p>
+<ul>
+<li>Unsupported file format</li>
+<li>Corrupted font file</li>
+<li>File extension doesn't match actual format</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ol>
+<li>Verify file format is TTF, OTF, WOFF, or WOFF2</li>
+<li>Re-download font from the original source</li>
+<li>Convert font using a trusted converter</li>
+<li>Check file extension matches actual format</li>
+</ol>
+<hr>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="issue-maximum-fonts-quota-exceeded">Issue: "Maximum fonts quota exceeded"<a href="#issue-maximum-fonts-quota-exceeded" class="hash-link" aria-label="Direct link to Issue: &quot;Maximum fonts quota exceeded&quot;" title="Direct link to Issue: &quot;Maximum fonts quota exceeded&quot;">​</a></h4>
+<p><strong>Causes:</strong></p>
+<ul>
+<li>You already have 10 fonts uploaded</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ol>
+<li>Delete unused fonts to free up space</li>
+<li>Replace an existing font instead of adding new one</li>
+<li>Choose versatile fonts that work for multiple purposes</li>
+</ol>
+<hr>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="issue-font-doesnt-appear-in-epub-reader">Issue: Font doesn't appear in EPUB reader<a href="#issue-font-doesnt-appear-in-epub-reader" class="hash-link" aria-label="Direct link to Issue: Font doesn't appear in EPUB reader" title="Direct link to Issue: Font doesn't appear in EPUB reader">​</a></h4>
+<p><strong>Causes:</strong></p>
+<ul>
+<li>Browser cache not refreshed</li>
+<li>Font not properly uploaded</li>
+<li>Reader preferences not saved</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ol>
+<li>Hard refresh browser (Ctrl+F5 or Cmd+Shift+R)</li>
+<li>Check Custom Fonts section to verify upload</li>
+<li>Re-save EPUB Reader Preferences</li>
+<li>Try selecting a different font, then re-select your custom font</li>
+<li>Check browser console for errors (F12)</li>
+</ol>
+<hr>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="issue-font-renders-incorrectly-or-looks-broken">Issue: Font renders incorrectly or looks broken<a href="#issue-font-renders-incorrectly-or-looks-broken" class="hash-link" aria-label="Direct link to Issue: Font renders incorrectly or looks broken" title="Direct link to Issue: Font renders incorrectly or looks broken">​</a></h4>
+<p><strong>Causes:</strong></p>
+<ul>
+<li>Font file is corrupted</li>
+<li>Missing font glyphs for specific characters</li>
+<li>Font not designed for screen reading</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ol>
+<li>Re-upload the font file</li>
+<li>Try a different weight or version of the same font</li>
+<li>Test font in other applications to verify integrity</li>
+<li>Download font from official source</li>
+</ol>
+<hr>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="issue-upload-fails-with-no-error-message">Issue: Upload fails with no error message<a href="#issue-upload-fails-with-no-error-message" class="hash-link" aria-label="Direct link to Issue: Upload fails with no error message" title="Direct link to Issue: Upload fails with no error message">​</a></h4>
+<p><strong>Causes:</strong></p>
+<ul>
+<li>Network connectivity issues</li>
+<li>Server timeout</li>
+<li>File reading permissions</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ol>
+<li>Check your internet connection</li>
+<li>Try a smaller font file</li>
+<li>Refresh the page and try again</li>
+<li>Check browser console for errors</li>
+<li>Try a different browser</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-quick-reference">📋 Quick Reference<a href="#-quick-reference" class="hash-link" aria-label="Direct link to 📋 Quick Reference" title="Direct link to 📋 Quick Reference">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="supported-font-formats">Supported Font Formats<a href="#supported-font-formats" class="hash-link" aria-label="Direct link to Supported Font Formats" title="Direct link to Supported Font Formats">​</a></h3>
+<table><thead><tr><th>Format</th><th>Extension</th><th>Max Size</th><th>Compression</th><th>Browser Support</th></tr></thead><tbody><tr><td>TTF</td><td>.ttf</td><td>5MB</td><td>None</td><td>Excellent</td></tr><tr><td>OTF</td><td>.otf</td><td>5MB</td><td>None</td><td>Excellent</td></tr><tr><td>WOFF</td><td>.woff</td><td>5MB</td><td>Moderate</td><td>Excellent</td></tr><tr><td>WOFF2</td><td>.woff2</td><td>5MB</td><td>Best</td><td>Excellent</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="font-limits">Font Limits<a href="#font-limits" class="hash-link" aria-label="Direct link to Font Limits" title="Direct link to Font Limits">​</a></h3>
+<ul>
+<li><strong>Maximum fonts per user:</strong> 10</li>
+<li><strong>Maximum file size:</strong> 5MB per font</li>
+<li><strong>File storage:</strong> <code>~/booklore/data/custom-fonts/</code></li>
+<li><strong>Formats supported:</strong> TTF, OTF, WOFF, WOFF2</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="recommended-font-sources">Recommended Font Sources<a href="#recommended-font-sources" class="hash-link" aria-label="Direct link to Recommended Font Sources" title="Direct link to Recommended Font Sources">​</a></h3>
+<p><strong>Free & Open Source:</strong></p>
+<ul>
+<li><a href="https://web.archive.org/web/20260222092109/https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google Fonts</a></li>
+<li><a href="https://web.archive.org/web/20260222092109/https://www.fontsquirrel.com/" target="_blank" rel="noopener noreferrer">Font Squirrel</a></li>
+<li><a href="https://web.archive.org/web/20260222092109/https://fontlibrary.org/" target="_blank" rel="noopener noreferrer">Open Font Library</a></li>
+<li><a href="https://web.archive.org/web/20260222092109/https://www.theleagueofmoveabletype.com/" target="_blank" rel="noopener noreferrer">The League of Moveable Type</a></li>
+</ul>
+<p><strong>Specialized Fonts:</strong></p>
+<ul>
+<li><a href="https://web.archive.org/web/20260222092109/https://opendyslexic.org/" target="_blank" rel="noopener noreferrer">OpenDyslexic</a> - Dyslexia support</li>
+<li><a href="https://web.archive.org/web/20260222092109/https://brailleinstitute.org/freefont" target="_blank" rel="noopener noreferrer">Atkinson Hyperlegible</a> - Accessibility</li>
+<li><a href="https://web.archive.org/web/20260222092109/https://www.nerdfonts.com/" target="_blank" rel="noopener noreferrer">Nerd Fonts</a> - Programming</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-privacy--security">🔒 Privacy & Security<a href="#-privacy--security" class="hash-link" aria-label="Direct link to 🔒 Privacy & Security" title="Direct link to 🔒 Privacy & Security">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="font-storage">Font Storage<a href="#font-storage" class="hash-link" aria-label="Direct link to Font Storage" title="Direct link to Font Storage">​</a></h3>
+<ul>
+<li>Fonts are stored per-user in isolated directories</li>
+<li>Files are validated for security (magic byte validation)</li>
+<li>Path traversal protection prevents unauthorized access</li>
+<li>Fonts are only accessible to the uploading user</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="font-deletion">Font Deletion<a href="#font-deletion" class="hash-link" aria-label="Direct link to Font Deletion" title="Direct link to Font Deletion">​</a></h3>
+<ul>
+<li>Deleting a font removes:
+<ul>
+<li>The font file from disk</li>
+<li>The database record</li>
+<li>All references in preferences</li>
+</ul>
+</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="font-licensing">Font Licensing<a href="#font-licensing" class="hash-link" aria-label="Direct link to Font Licensing" title="Direct link to Font Licensing">​</a></h3>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>License Compliance</div><div class="admonitionContent_BuS1"><p><strong>Important:</strong> Ensure you have the right to use any font you upload to BookLore.</p><ul>
+<li>Only upload fonts with licenses allowing web/digital use</li>
+<li>Free fonts (Google Fonts, Font Squirrel) are typically safe</li>
+<li>Commercial fonts may have restrictions</li>
+<li>Respect font creators' licenses and terms</li>
+</ul><p>BookLore does not enforce font licensing - this is your responsibility.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-faq">🎓 FAQ<a href="#-faq" class="hash-link" aria-label="Direct link to 🎓 FAQ" title="Direct link to 🎓 FAQ">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="can-i-share-my-custom-fonts-with-other-users">Can I share my custom fonts with other users?<a href="#can-i-share-my-custom-fonts-with-other-users" class="hash-link" aria-label="Direct link to Can I share my custom fonts with other users?" title="Direct link to Can I share my custom fonts with other users?">​</a></h3>
+<p>No, custom fonts are private to each user account. Other users must upload their own fonts.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="what-happens-if-i-delete-a-font-thats-currently-in-use">What happens if I delete a font that's currently in use?<a href="#what-happens-if-i-delete-a-font-thats-currently-in-use" class="hash-link" aria-label="Direct link to What happens if I delete a font that's currently in use?" title="Direct link to What happens if I delete a font that's currently in use?">​</a></h3>
+<p>The EPUB reader will automatically fall back to the default font. You'll need to select a different font in your preferences.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="can-i-upload-multiple-variations-of-the-same-font-family">Can I upload multiple variations of the same font family?<a href="#can-i-upload-multiple-variations-of-the-same-font-family" class="hash-link" aria-label="Direct link to Can I upload multiple variations of the same font family?" title="Direct link to Can I upload multiple variations of the same font family?">​</a></h3>
+<p>Yes, but each variation counts as one font toward your 10-font limit. For example:</p>
+<ul>
+<li>Roboto Regular (1 font)</li>
+<li>Roboto Bold (1 font)</li>
+<li>Roboto Italic (1 font)</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="do-custom-fonts-work-with-pdf-or-comic-readers">Do custom fonts work with PDF or comic readers?<a href="#do-custom-fonts-work-with-pdf-or-comic-readers" class="hash-link" aria-label="Direct link to Do custom fonts work with PDF or comic readers?" title="Direct link to Do custom fonts work with PDF or comic readers?">​</a></h3>
+<p>No, custom fonts are only supported in the EPUB reader. PDFs and comics use embedded fonts from the original files.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="can-i-use-custom-fonts-on-my-kobo-or-koreader-device">Can I use custom fonts on my Kobo or KOReader device?<a href="#can-i-use-custom-fonts-on-my-kobo-or-koreader-device" class="hash-link" aria-label="Direct link to Can I use custom fonts on my Kobo or KOReader device?" title="Direct link to Can I use custom fonts on my Kobo or KOReader device?">​</a></h3>
+<p>No, custom fonts in BookLore only apply to the web-based EPUB reader. Device sync (Kobo/KOReader) uses device-native font settings.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="will-my-custom-fonts-affect-other-users-reading-the-same-book">Will my custom fonts affect other users reading the same book?<a href="#will-my-custom-fonts-affect-other-users-reading-the-same-book" class="hash-link" aria-label="Direct link to Will my custom fonts affect other users reading the same book?" title="Direct link to Will my custom fonts affect other users reading the same book?">​</a></h3>
+<p>No, font choices are personal preferences. Each user can have different font settings for the same book.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="how-do-i-reset-to-the-default-font">How do I reset to the default font?<a href="#how-do-i-reset-to-the-default-font" class="hash-link" aria-label="Direct link to How do I reset to the default font?" title="Direct link to How do I reset to the default font?">​</a></h3>
+<p>In EPUB Reader Preferences, select the default font from the Font Family dropdown and save.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-related-documentation">📚 Related Documentation<a href="#-related-documentation" class="hash-link" aria-label="Direct link to 📚 Related Documentation" title="Direct link to 📚 Related Documentation">​</a></h2>
+<ul>
+<li><strong><a href="../book-browser/grid.html">EPUB Reader Settings</a></strong> - Configure reading experience</li>
+<li><strong><a href="../tools/custom-icons.html">Custom Icons</a></strong> - Personalize your library icons</li>
+<li><strong><a href="../initial-setup.html">User Settings</a></strong> - Manage your BookLore account</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-need-help">🙋 Need Help?<a href="#-need-help" class="hash-link" aria-label="Direct link to 🙋 Need Help?" title="Direct link to 🙋 Need Help?">​</a></h2>
+<p><strong>Can't find what you're looking for?</strong></p>
+<ul>
+<li>💬 <strong>Discord</strong>: <a href="https://web.archive.org/web/20260222092109/https://discord.gg/Ee5hd458Uz" target="_blank" rel="noopener noreferrer">Join our community</a></li>
+<li>🐛 <strong>Issues</strong>: <a href="https://web.archive.org/web/20260222092109/https://github.com/booklore-app/booklore/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a></li>
+<li>📖 <strong>Docs</strong>: <a href="https://web.archive.org/web/20260222092109/https://booklore.org/docs" target="_blank" rel="noopener noreferrer">Full Documentation</a></li>
+</ul>
+<hr>
+<p><strong>Happy Reading with Your Custom Fonts! 🔤📚</strong></p>
+</body>
+</html>

@@ -107,6 +107,28 @@
 
             <div class="setting-item">
               <div class="setting-header">
+                <p-toggleswitch
+                  [(ngModel)]="bookshelfEnabled"
+                  [disabled]="!bookshelfToken">
+                </p-toggleswitch>
+                <label class="setting-label">Bookshelf</label>
+              </div>
+              <div class="setting-options">
+                <div class="config-field">
+                  <label class="config-label">{{ t('apiToken') }}</label>
+                  <input
+                    type="text"
+                    pInputText
+                    [placeholder]="t('bookshelfPlaceholder')"
+                    [(ngModel)]="bookshelfToken"
+                    (ngModelChange)="onBookshelfTokenChange($event)"
+                    class="config-input"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-header">
                 <p-toggleswitch [(ngModel)]="comicvineEnabled"></p-toggleswitch>
                 <label class="setting-label">Comic Vine</label>
               </div>
@@ -186,6 +208,7 @@
                 <label class="setting-label">Ranobedb</label>
               </div>
             </div>
+
           </div>
         </div>
 

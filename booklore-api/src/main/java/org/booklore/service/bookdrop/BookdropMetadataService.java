@@ -62,6 +62,29 @@ public class BookdropMetadataService {
     }
 
     @Transactional
+    public BookdropFileEntity fetchMetadataFromProvider(Long bookdropFileId, MetadataProvider provider) throws JacksonException {
+        BookdropFileEntity entity = getOrThrow(bookdropFileId);
+        BookMetadata initial = objectMapper.readValue(entity.getOriginalMetadata(), BookMetadata.class);
+
+        Book book = Book.builder()
+                .primaryFile(BookFile.builder().fileName(entity.getFileName()).build())
+                .metadata(initial)
+                .build();
+
+        BookMetadata fetched = metadataRefreshService.fetchTopMetadataFromAProvider(provider, book);
+        if (fetched == null) {
+            throw ApiError.NO_METADATA_FOUND_FROM_PROVIDER.createException(provider);
+        }
+
+        String fetchedJson = objectMapper.writeValueAsString(fetched);
+        entity.setFetchedMetadata(fetchedJson);
+        entity.setStatus(PENDING_REVIEW);
+        entity.setUpdatedAt(Instant.now());
+
+        return bookdropFileRepository.save(entity);
+    }
+
+    @Transactional
     public BookdropFileEntity attachFetchedMetadata(Long bookdropFileId) throws JacksonException {
         BookdropFileEntity entity = getOrThrow(bookdropFileId);
 

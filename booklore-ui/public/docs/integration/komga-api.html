@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📚 Komga API Integration Guide | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>📚 Komga API Integration Guide</h1></header>
+<p>The Komga API allows you to access your Booklore library using popular manga and comic reading applications that support the Komga server standard. This guide will walk you through setting up the Komga API and connecting your favorite reading apps to your Booklore collection.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-what-is-the-komga-api">🔧 What is the Komga API?<a href="#-what-is-the-komga-api" class="hash-link" aria-label="Direct link to 🔧 What is the Komga API?" title="Direct link to 🔧 What is the Komga API?">​</a></h2>
+<p><a href="https://web.archive.org/web/20260302013459/https://komga.org/" target="_blank" rel="noopener noreferrer">Komga</a> is a popular media server for comics and manga. Booklore provides a Komga-compatible API layer that enables Komga clients to access your Booklore library. With the Komga API enabled in Booklore, you can:</p>
+<ul>
+<li>Browse your library from any Komga-compatible reading app</li>
+<li>Read comics and manga directly on your mobile device</li>
+<li>Access your collection from multiple devices seamlessly</li>
+<li>Use apps like Mihon (formerly Tachiyomi), Komelia, Tachidesk, and many others</li>
+<li>Stream individual pages instead of downloading entire files</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-step-1-enable-the-komga-api">⚙️ Step 1: Enable the Komga API<a href="#️-step-1-enable-the-komga-api" class="hash-link" aria-label="Direct link to ⚙️ Step 1: Enable the Komga API" title="Direct link to ⚙️ Step 1: Enable the Komga API">​</a></h2>
+<p>First, let's enable the Komga API in your Booklore settings.</p>
+<ol>
+<li>Navigate to <strong>Settings</strong> > <strong>OPDS</strong> in Booklore</li>
+<li>Under <strong>Komga API</strong>, toggle <strong>Komga API Enabled</strong> to activate the service</li>
+</ol>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Note</div><div class="admonitionContent_BuS1"><p>The Komga API shares authentication with the OPDS server and uses OPDS user accounts. You'll need to enable OPDS users to authenticate with Komga clients.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-2-get-your-komga-api-base-url">🔗 Step 2: Get Your Komga API Base URL<a href="#-step-2-get-your-komga-api-base-url" class="hash-link" aria-label="Direct link to 🔗 Step 2: Get Your Komga API Base URL" title="Direct link to 🔗 Step 2: Get Your Komga API Base URL">​</a></h2>
+<p>Booklore provides the Komga API at a dedicated endpoint:</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="komga-base-url">Komga Base URL<a href="#komga-base-url" class="hash-link" aria-label="Direct link to Komga Base URL" title="Direct link to Komga Base URL">​</a></h3>
+<ul>
+<li><strong>URL:</strong> <code>http://localhost:8080/komga</code></li>
+<li><strong>API Endpoints:</strong> <code>/komga/api/v1/*</code></li>
+<li><strong>Compatibility:</strong> Works with Komga-compatible reading apps</li>
+<li><strong>Authentication:</strong> Requires OPDS user credentials (see Step 3)</li>
+</ul>
+<p>You can copy this URL directly from the <strong>Komga API Endpoint</strong> section in your settings.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Network Access</div><div class="admonitionContent_BuS1"><p>Replace <code>localhost:8080</code> with your actual Booklore server address when accessing from other devices on your network.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-3-create-opds-users-for-authentication">👤 Step 3: Create OPDS Users for Authentication<a href="#-step-3-create-opds-users-for-authentication" class="hash-link" aria-label="Direct link to 👤 Step 3: Create OPDS Users for Authentication" title="Direct link to 👤 Step 3: Create OPDS Users for Authentication">​</a></h2>
+<p>The Komga API uses OPDS user credentials for authentication. To access your Komga API, you'll need to create dedicated OPDS user credentials.</p>
+<ol>
+<li>In the <strong>OPDS Users</strong> section, click <strong>Add User</strong></li>
+<li>Fill in the user details:</li>
+</ol>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><strong>Username</strong></td><td>Choose a username for API access</td></tr><tr><td><strong>Password</strong></td><td>Create a strong password for this user</td></tr></tbody></table>
+<ol start="3">
+<li>Click <strong>Create</strong> to create the OPDS user</li>
+</ol>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Security Note</div><div class="admonitionContent_BuS1"><p>OPDS users are separate from your main Booklore account and are specifically for reading app access. Make sure OPDS is enabled to use these credentials with the Komga API.</p></div></div>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Important</div><div class="admonitionContent_BuS1"><p>Passwords are created once and cannot be retrieved later. Make sure to store your OPDS credentials securely before saving.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-step-4-configure-group-unknown-series-optional">⚙️ Step 4: Configure Group Unknown Series (Optional)<a href="#️-step-4-configure-group-unknown-series-optional" class="hash-link" aria-label="Direct link to ⚙️ Step 4: Configure Group Unknown Series (Optional)" title="Direct link to ⚙️ Step 4: Configure Group Unknown Series (Optional)">​</a></h2>
+<p>Booklore organizes books differently than Komga:</p>
+<ul>
+<li><strong>Komga</strong>: Libraries → Series → Books</li>
+<li><strong>Booklore</strong>: Libraries → Books (with optional series metadata)</li>
+</ul>
+<p>The Komga API automatically creates virtual "series" by grouping books with the same series name in their metadata.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="group-unknown-series-feature">Group Unknown Series Feature<a href="#group-unknown-series-feature" class="hash-link" aria-label="Direct link to Group Unknown Series Feature" title="Direct link to Group Unknown Series Feature">​</a></h3>
+<p>When enabled, books without series metadata are grouped together:</p>
+<ul>
+<li><strong>Enabled (Default)</strong>: Books without a series are grouped under a single "Unknown Series" entry</li>
+<li><strong>Disabled</strong>: Each book without a series appears as its own individual series</li>
+</ul>
+<p>To configure this setting:</p>
+<ol>
+<li>Navigate to <strong>Settings</strong> > <strong>OPDS</strong> in Booklore</li>
+<li>Under <strong>Komga API</strong>, toggle <strong>Group Unknown Series</strong> to your preference</li>
+</ol>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Recommendation</div><div class="admonitionContent_BuS1"><p>Keep this enabled if you have many standalone books to avoid cluttering your series list. Disable it if you want to see each standalone book separately.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-5-connect-reading-apps">📱 Step 5: Connect Reading Apps<a href="#-step-5-connect-reading-apps" class="hash-link" aria-label="Direct link to 📱 Step 5: Connect Reading Apps" title="Direct link to 📱 Step 5: Connect Reading Apps">​</a></h2>
+<p>Now that your Komga API is configured, you can connect various reading apps to access your Booklore library.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="popular-komga-compatible-apps">Popular Komga-Compatible Apps:<a href="#popular-komga-compatible-apps" class="hash-link" aria-label="Direct link to Popular Komga-Compatible Apps:" title="Direct link to Popular Komga-Compatible Apps:">​</a></h3>
+<ul>
+<li><strong>Koma</strong> (Android) - A fork of Mihon centered around comics</li>
+<li><strong>Mihon</strong> (Android) - Formerly known as Tachiyomi, a popular manga reader</li>
+<li><strong>Komelia</strong> (Multiple platforms) - Official Komga client</li>
+<li><strong>Tachidesk</strong> (Desktop) - Web-based manga reader with Komga support</li>
+<li><strong>TachiyomiSY</strong> (Android) - Tachiyomi fork with additional features</li>
+<li><strong>TachiyomiJ2K</strong> (Android) - Another Tachiyomi fork</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="general-connection-steps">General Connection Steps:<a href="#general-connection-steps" class="hash-link" aria-label="Direct link to General Connection Steps:" title="Direct link to General Connection Steps:">​</a></h3>
+<ol>
+<li>Open your reading app</li>
+<li>Look for <strong>Add Source</strong>, <strong>Add Server</strong>, or <strong>Browse Sources</strong> settings</li>
+<li>Find and select the <strong>Komga</strong> source/extension</li>
+<li>Configure the Komga source:
+<ul>
+<li><strong>Server URL:</strong> <code>http://your-booklore-domain/komga</code></li>
+<li><strong>Username:</strong> Your OPDS username</li>
+<li><strong>Password:</strong> Your OPDS password</li>
+</ul>
+</li>
+<li>Save and browse your library</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-example-connecting-koma">🔄 Example: Connecting Koma<a href="#-example-connecting-koma" class="hash-link" aria-label="Direct link to 🔄 Example: Connecting Koma" title="Direct link to 🔄 Example: Connecting Koma">​</a></h2>
+<p>Koma is a fork of Mihon. It is centered around comics and comes with a specialized Booklore extension</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="installing-the-booklore-extension">Installing the Booklore Extension<a href="#installing-the-booklore-extension" class="hash-link" aria-label="Direct link to Installing the Booklore Extension" title="Direct link to Installing the Booklore Extension">​</a></h3>
+<ol>
+<li>Open Koma</li>
+<li>Tap <strong>Browse</strong> at the bottom navigation</li>
+<li>Tap <strong>Extensions</strong> tab</li>
+<li>Use the top menu icon to select <strong>Extension repos</strong></li>
+<li>Add <code>https://github.com/farfromrefug/extensions-source/releases/latest/download/index.min.json</code>. Then go back.</li>
+<li>Find <strong>Booklore</strong> in the list</li>
+<li>Tap <strong>Install</strong> next to the Booklore extension</li>
+<li>Wait for the extension to install</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="configuring-the-booklore-source">Configuring the Booklore Source<a href="#configuring-the-booklore-source" class="hash-link" aria-label="Direct link to Configuring the Booklore Source" title="Direct link to Configuring the Booklore Source">​</a></h3>
+<ol>
+<li>After installation, go back to the <strong>Sources</strong> tab in Browse</li>
+<li>Tap the <strong>Booklore</strong> source</li>
+<li>Tap the settings icon (gear icon) in the top right</li>
+<li>Enter your connection details:
+<ul>
+<li><strong>Address:</strong> <code>http://your-booklore-domain/komga</code></li>
+<li><strong>Username:</strong> Your OPDS username</li>
+<li><strong>Password:</strong> Your OPDS password</li>
+</ul>
+</li>
+<li>Tap <strong>OK</strong> or <strong>Save</strong></li>
+<li>Go back and tap <strong>Booklore</strong> again to browse your libraries</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="using-koma-with-booklore">Using Koma with Booklore<a href="#using-koma-with-booklore" class="hash-link" aria-label="Direct link to Using Koma with Booklore" title="Direct link to Using Koma with Booklore">​</a></h3>
+<ul>
+<li><strong>Browse Libraries:</strong> See all your Booklore libraries</li>
+<li><strong>Browse Series:</strong> View books grouped by series</li>
+<li><strong>Read Online:</strong> Stream pages without downloading entire books</li>
+<li><strong>Download:</strong> Download books for offline reading</li>
+</ul>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Koma Tips</div><div class="admonitionContent_BuS1"><ul>
+<li>Use the search function to quickly find books</li>
+<li>Long-press on a series to add it to your library for quick access</li>
+<li>Enable auto-tracking in settings to remember your reading progress</li>
+</ul></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-example-connecting-mihon-formerly-tachiyomi">🔄 Example: Connecting Mihon (formerly Tachiyomi)<a href="#-example-connecting-mihon-formerly-tachiyomi" class="hash-link" aria-label="Direct link to 🔄 Example: Connecting Mihon (formerly Tachiyomi)" title="Direct link to 🔄 Example: Connecting Mihon (formerly Tachiyomi)">​</a></h2>
+<p>Mihon is one of the most popular manga reading apps for Android with excellent Komga support.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="installing-the-komga-extension">Installing the Komga Extension<a href="#installing-the-komga-extension" class="hash-link" aria-label="Direct link to Installing the Komga Extension" title="Direct link to Installing the Komga Extension">​</a></h3>
+<ol>
+<li>Open Mihon</li>
+<li>Tap <strong>Browse</strong> at the bottom navigation</li>
+<li>Tap <strong>Extensions</strong> tab</li>
+<li>Find <strong>Komga</strong> in the list (or search for it)</li>
+<li>Tap <strong>Install</strong> next to the Komga extension</li>
+<li>Wait for the extension to install</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="configuring-the-komga-source">Configuring the Komga Source<a href="#configuring-the-komga-source" class="hash-link" aria-label="Direct link to Configuring the Komga Source" title="Direct link to Configuring the Komga Source">​</a></h3>
+<ol>
+<li>After installation, go back to the <strong>Sources</strong> tab in Browse</li>
+<li>Tap the <strong>Komga</strong> source</li>
+<li>Tap the settings icon (gear icon) in the top right</li>
+<li>Enter your connection details:
+<ul>
+<li><strong>Address:</strong> <code>http://your-booklore-domain/komga</code></li>
+<li><strong>Username:</strong> Your OPDS username</li>
+<li><strong>Password:</strong> Your OPDS password</li>
+</ul>
+</li>
+<li>Tap <strong>OK</strong> or <strong>Save</strong></li>
+<li>Go back and tap <strong>Komga</strong> again to browse your libraries</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="using-mihon-with-booklore">Using Mihon with Booklore<a href="#using-mihon-with-booklore" class="hash-link" aria-label="Direct link to Using Mihon with Booklore" title="Direct link to Using Mihon with Booklore">​</a></h3>
+<ul>
+<li><strong>Browse Libraries:</strong> See all your Booklore libraries</li>
+<li><strong>Browse Series:</strong> View books grouped by series</li>
+<li><strong>Read Online:</strong> Stream pages without downloading entire books</li>
+<li><strong>Download:</strong> Download books for offline reading</li>
+</ul>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Mihon Tips</div><div class="admonitionContent_BuS1"><ul>
+<li>Use the search function to quickly find books</li>
+<li>Long-press on a series to add it to your library for quick access</li>
+<li>Enable auto-tracking in settings to remember your reading progress</li>
+</ul></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-example-connecting-komelia">🔄 Example: Connecting Komelia<a href="#-example-connecting-komelia" class="hash-link" aria-label="Direct link to 🔄 Example: Connecting Komelia" title="Direct link to 🔄 Example: Connecting Komelia">​</a></h2>
+<p>Komelia is the official Komga client with cross-platform support.</p>
+<ol>
+<li>Open Komelia</li>
+<li>Click <strong>Add Server</strong> or the <strong>+</strong> button</li>
+<li>Enter your server details:
+<ul>
+<li><strong>Server URL:</strong> <code>http://your-booklore-domain/komga</code></li>
+<li><strong>Username:</strong> Your OPDS username</li>
+<li><strong>Password:</strong> Your OPDS password</li>
+</ul>
+</li>
+<li>Click <strong>Connect</strong> or <strong>Add</strong></li>
+<li>Browse your Booklore libraries and series</li>
+</ol>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Komelia Features</div><div class="admonitionContent_BuS1"><p>Komelia provides a desktop and mobile experience optimized for the Komga API with features like collection management, advanced filtering, and read progress sync.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-komga-api-features">📖 Komga API Features<a href="#-komga-api-features" class="hash-link" aria-label="Direct link to 📖 Komga API Features" title="Direct link to 📖 Komga API Features">​</a></h2>
+<p>The Booklore Komga API implementation provides comprehensive endpoints for accessing your library:</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="available-endpoints">Available Endpoints<a href="#available-endpoints" class="hash-link" aria-label="Direct link to Available Endpoints" title="Direct link to Available Endpoints">​</a></h3>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="libraries">Libraries<a href="#libraries" class="hash-link" aria-label="Direct link to Libraries" title="Direct link to Libraries">​</a></h4>
+<ul>
+<li><strong>List all libraries</strong> - <code>GET /komga/api/v1/libraries</code></li>
+<li><strong>Get library details</strong> - <code>GET /komga/api/v1/libraries/{libraryId}</code></li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="series">Series<a href="#series" class="hash-link" aria-label="Direct link to Series" title="Direct link to Series">​</a></h4>
+<ul>
+<li><strong>List series</strong> - <code>GET /komga/api/v1/series</code>
+<ul>
+<li>Supports pagination (<code>page</code>, <code>size</code>)</li>
+<li>Library filtering (<code>library_id</code>)</li>
+<li>Unpaged mode (<code>unpaged=true</code>)</li>
+</ul>
+</li>
+<li><strong>Get series details</strong> - <code>GET /komga/api/v1/series/{seriesId}</code></li>
+<li><strong>List books in series</strong> - <code>GET /komga/api/v1/series/{seriesId}/books</code></li>
+<li><strong>Get series thumbnail</strong> - <code>GET /komga/api/v1/series/{seriesId}/thumbnail</code></li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="books">Books<a href="#books" class="hash-link" aria-label="Direct link to Books" title="Direct link to Books">​</a></h4>
+<ul>
+<li><strong>List all books</strong> - <code>GET /komga/api/v1/books</code>
+<ul>
+<li>Supports pagination (<code>page</code>, <code>size</code>)</li>
+<li>Library filtering (<code>library_id</code>)</li>
+</ul>
+</li>
+<li><strong>Get book details</strong> - <code>GET /komga/api/v1/books/{bookId}</code></li>
+<li><strong>Get book pages metadata</strong> - <code>GET /komga/api/v1/books/{bookId}/pages</code></li>
+<li><strong>Get book page image</strong> - <code>GET /komga/api/v1/books/{bookId}/pages/{pageNumber}</code>
+<ul>
+<li>Supports format conversion (<code>convert=png</code>)</li>
+</ul>
+</li>
+<li><strong>Download book file</strong> - <code>GET /komga/api/v1/books/{bookId}/file</code></li>
+<li><strong>Get book thumbnail</strong> - <code>GET /komga/api/v1/books/{bookId}/thumbnail</code></li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="collections">Collections<a href="#collections" class="hash-link" aria-label="Direct link to Collections" title="Direct link to Collections">​</a></h4>
+<ul>
+<li><strong>List collections</strong> - <code>GET /komga/api/v1/collections</code>
+<ul>
+<li>Maps to Booklore Magic Shelves</li>
+<li>Supports pagination</li>
+</ul>
+</li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="users">Users<a href="#users" class="hash-link" aria-label="Direct link to Users" title="Direct link to Users">​</a></h4>
+<ul>
+<li><strong>Get current user</strong> - <code>GET /komga/api/v2/users/me</code></li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="clean-mode">Clean Mode<a href="#clean-mode" class="hash-link" aria-label="Direct link to Clean Mode" title="Direct link to Clean Mode">​</a></h3>
+<p>All Komga API endpoints support a <code>clean</code> query parameter for smaller responses:</p>
+<ul>
+<li><strong>Usage:</strong> Add <code>?clean</code> or <code>?clean=true</code> to any endpoint</li>
+<li><strong>Effect:</strong> Removes null values, empty arrays, and lock fields</li>
+<li><strong>Benefit:</strong> Significantly smaller JSON payloads, ideal for mobile devices</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">GET /komga/api/v1/series?clean</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">GET /komga/api/v1/books/123?clean=true</span><br></span></code></pre></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-troubleshooting">🔍 Troubleshooting<a href="#-troubleshooting" class="hash-link" aria-label="Direct link to 🔍 Troubleshooting" title="Direct link to 🔍 Troubleshooting">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="common-issues-and-solutions">Common Issues and Solutions<a href="#common-issues-and-solutions" class="hash-link" aria-label="Direct link to Common Issues and Solutions" title="Direct link to Common Issues and Solutions">​</a></h3>
+<p><strong>❌ Reading App Can't Connect</strong></p>
+<ul>
+<li>Verify the Komga API is enabled in Booklore settings</li>
+<li>Check that you're using the correct base URL: <code>http://your-server/komga</code></li>
+<li>Ensure your OPDS username and password are correct</li>
+<li>Verify network connectivity to your Booklore server</li>
+<li>Make sure OPDS is enabled (required for authentication)</li>
+</ul>
+<p><strong>❌ Books Not Appearing</strong></p>
+<ul>
+<li>Confirm you have access to the libraries containing the books</li>
+<li>Check that books have metadata populated, especially series information</li>
+<li>Books without series metadata will appear under "Unknown Series" (if grouping is enabled)</li>
+<li>Refresh or restart your reading app</li>
+<li>Try re-syncing the source in your app</li>
+</ul>
+<p><strong>❌ Authentication Errors</strong></p>
+<ul>
+<li>The Komga API uses OPDS user accounts, not your main Booklore account</li>
+<li>Create an OPDS user in the Settings → OPDS section</li>
+<li>Verify the OPDS user exists in Booklore settings</li>
+<li>Try creating a new OPDS user if issues persist</li>
+<li>Ensure OPDS server is enabled</li>
+</ul>
+<p><strong>❌ Series Show as "Unknown Series"</strong></p>
+<ul>
+<li>This means the books don't have series metadata populated</li>
+<li>Edit book metadata in Booklore to add series information</li>
+<li>Alternatively, disable "Group Unknown Series" to show each book separately</li>
+</ul>
+<p><strong>❌ Pages Not Loading</strong></p>
+<ul>
+<li>Verify the book file is accessible</li>
+<li>Check that the book is a supported format (CBZ, CBR, CB7, PDF, EPUB)</li>
+<li>Ensure your reading app supports streaming pages</li>
+<li>Try downloading the entire book instead of streaming</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-network-considerations">🌐 Network Considerations<a href="#-network-considerations" class="hash-link" aria-label="Direct link to 🌐 Network Considerations" title="Direct link to 🌐 Network Considerations">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="local-network-access">Local Network Access<a href="#local-network-access" class="hash-link" aria-label="Direct link to Local Network Access" title="Direct link to Local Network Access">​</a></h3>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Local Network Access</div><div class="admonitionContent_BuS1"><p>Replace <code>localhost:8080</code> with your actual Booklore server IP address when connecting from other devices on your local network.</p><p>Example: <code>http://192.168.1.100:8080/komga</code></p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="remote-access">Remote Access<a href="#remote-access" class="hash-link" aria-label="Direct link to Remote Access" title="Direct link to Remote Access">​</a></h3>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Remote Access</div><div class="admonitionContent_BuS1"><p>Ensure your Booklore server is accessible from the internet. Use HTTPS for secure connections when accessing remotely.</p><p>Example: <code>https://booklore.yourdomain.com/komga</code></p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="firewall-settings">Firewall Settings<a href="#firewall-settings" class="hash-link" aria-label="Direct link to Firewall Settings" title="Direct link to Firewall Settings">​</a></h3>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Firewall Settings</div><div class="admonitionContent_BuS1"><p>Ensure your Booklore server port is accessible and your firewall allows Komga API connections on the appropriate port.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-komga-api-vs-opds">🆚 Komga API vs OPDS<a href="#-komga-api-vs-opds" class="hash-link" aria-label="Direct link to 🆚 Komga API vs OPDS" title="Direct link to 🆚 Komga API vs OPDS">​</a></h2>
+<p>Both APIs allow external access to your Booklore library, but they serve different purposes:</p>
+<table><thead><tr><th>Feature</th><th>Komga API</th><th>OPDS</th></tr></thead><tbody><tr><td><strong>Primary Use</strong></td><td>Manga/comic readers</td><td>E-book readers</td></tr><tr><td><strong>Page Streaming</strong></td><td>✅ Yes</td><td>❌ No</td></tr><tr><td><strong>Series Organization</strong></td><td>✅ Native support</td><td>⚠️ Limited</td></tr><tr><td><strong>File Download</strong></td><td>✅ Yes</td><td>✅ Yes</td></tr><tr><td><strong>Popular Apps</strong></td><td>Mihon, Komelia</td><td>KOReader, FBReader</td></tr><tr><td><strong>Best For</strong></td><td>Comics, manga, visual novels</td><td>Books, novels, text content</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>When to Use Which</div><div class="admonitionContent_BuS1"><ul>
+<li>Use <strong>Komga API</strong> for comics, manga, and graphic novels where you want to stream pages</li>
+<li>Use <strong>OPDS</strong> for traditional e-books (EPUB, MOBI, PDF) where you download entire files</li>
+<li>Both use the same OPDS user credentials for authentication</li>
+</ul></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-api-compatibility">📋 API Compatibility<a href="#-api-compatibility" class="hash-link" aria-label="Direct link to 📋 API Compatibility" title="Direct link to 📋 API Compatibility">​</a></h2>
+<p>The Booklore Komga API aims to be compatible with Komga v1.x API. While not all endpoints are implemented, the core functionality needed for reading and browsing is fully supported.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="supported-features">Supported Features:<a href="#supported-features" class="hash-link" aria-label="Direct link to Supported Features:" title="Direct link to Supported Features:">​</a></h3>
+<ul>
+<li>✅ Library browsing</li>
+<li>✅ Series browsing and filtering</li>
+<li>✅ Book metadata retrieval</li>
+<li>✅ Page streaming</li>
+<li>✅ Thumbnail retrieval</li>
+<li>✅ Book file downloads</li>
+<li>✅ Basic authentication</li>
+<li>✅ Pagination</li>
+<li>✅ Clean mode responses</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="known-limitations">Known Limitations:<a href="#known-limitations" class="hash-link" aria-label="Direct link to Known Limitations:" title="Direct link to Known Limitations:">​</a></h3>
+<ul>
+<li>⚠️ Read progress tracking from Komga clients is not synchronized with Booklore</li>
+<li>⚠️ Some advanced Komga features may not be implemented</li>
+<li>⚠️ Collection support is mapped to Magic Shelves (limited functionality)</li>
+</ul>
+<p>For the complete Komga API specification, see: <a href="https://web.archive.org/web/20260302013459/https://komga.org/" target="_blank" rel="noopener noreferrer">Komga Documentation</a></p>
+</body>
+</html>

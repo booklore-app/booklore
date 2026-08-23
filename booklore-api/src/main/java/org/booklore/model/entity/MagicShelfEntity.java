@@ -3,6 +3,8 @@ package org.booklore.model.entity;
 import org.booklore.model.enums.IconType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +35,7 @@ public class MagicShelfEntity {
     @Column(name = "icon_type")
     private IconType iconType;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "filter_json", columnDefinition = "json", nullable = false)
     private String filterJson;
 

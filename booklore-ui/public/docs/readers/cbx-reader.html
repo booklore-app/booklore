@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🦸 Comic Reader | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🦸 Comic Reader</h1></header>
+<p>BookLore's comic reader handles CBZ, CBR, and CB7 files with page-by-page navigation, two-page spreads, slideshow mode, bookmarks, notes, and customizable display settings.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-reading-interface">📚 Reading Interface<a href="#-reading-interface" class="hash-link" aria-label="Direct link to 📚 Reading Interface" title="Direct link to 📚 Reading Interface">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Comic Reader Overview" src="https://web.archive.org/web/20260228160451im_/https://booklore.org/assets/images/cbx-reader-overview-0a4ec3e59deae1a666d05c35304dda81.jpg" width="1200" height="696" class="img_ev3q"></p>
+<p>The reader displays comic pages with a header toolbar at the top and a progress bar at the bottom. Both auto-hide and reappear when you hover near the edges or tap the image.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-toolbar-actions">🔧 Toolbar Actions<a href="#-toolbar-actions" class="hash-link" aria-label="Direct link to 🔧 Toolbar Actions" title="Direct link to 🔧 Toolbar Actions">​</a></h3>
+<table><thead><tr><th>Button</th><th>Action</th></tr></thead><tbody><tr><td><strong>Menu</strong></td><td>Opens the sidebar with pages, bookmarks, and notes</td></tr><tr><td><strong>Bookmark</strong></td><td>Toggles a bookmark on the current page</td></tr><tr><td><strong>Notes</strong></td><td>Opens the note dialog for the current page (indicator dot when a note exists)</td></tr><tr><td><strong>Play/Pause</strong></td><td>Starts or stops the slideshow</td></tr><tr><td><strong>Fullscreen</strong></td><td>Enters fullscreen mode</td></tr><tr><td><strong>?</strong></td><td>Shows keyboard shortcuts</td></tr><tr><td><strong>Settings</strong></td><td>Opens the settings panel</td></tr><tr><td><strong>X</strong></td><td>Closes the reader</td></tr></tbody></table>
+<p>On mobile, Play/Pause, Fullscreen, and Help are moved into an overflow menu.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-sidebar">📑 Sidebar<a href="#-sidebar" class="hash-link" aria-label="Direct link to 📑 Sidebar" title="Direct link to 📑 Sidebar">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Sidebar with Pages" src="https://web.archive.org/web/20260228160451im_/https://booklore.org/assets/images/cbx-reader-pages-df5341ad46965076d126f18654f47b99.jpg" width="1200" height="696" class="img_ev3q"></p>
+<p>The sidebar has three tabs:</p>
+<ul>
+<li><strong>Contents</strong> lists all pages by filename. Click a page to jump to it. The current page is highlighted.</li>
+<li><strong>Bookmarks</strong> shows all bookmarked pages with their title and creation date.</li>
+<li><strong>Notes</strong> lists all notes with a search box to filter by content.</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-settings">⚙️ Settings<a href="#️-settings" class="hash-link" aria-label="Direct link to ⚙️ Settings" title="Direct link to ⚙️ Settings">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Comic Reader Settings" src="https://web.archive.org/web/20260228160451im_/https://booklore.org/assets/images/cbx-reader-settings-921f06b576dafba47fd9e941093dd6b3.jpg" width="500" height="525" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-fit-mode">🔳 Fit Mode<a href="#-fit-mode" class="hash-link" aria-label="Direct link to 🔳 Fit Mode" title="Direct link to 🔳 Fit Mode">​</a></h3>
+<table><thead><tr><th>Mode</th><th>Description</th></tr></thead><tbody><tr><td><strong>Fit Page</strong></td><td>Fits the entire page in the viewport</td></tr><tr><td><strong>Fit Width</strong></td><td>Scales to match the container width</td></tr><tr><td><strong>Fit Height</strong></td><td>Scales to match the container height</td></tr><tr><td><strong>Actual Size</strong></td><td>Displays at the original image resolution</td></tr><tr><td><strong>Auto</strong></td><td>Automatically selects the best fit</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-scroll-mode">📜 Scroll Mode<a href="#-scroll-mode" class="hash-link" aria-label="Direct link to 📜 Scroll Mode" title="Direct link to 📜 Scroll Mode">​</a></h3>
+<table><thead><tr><th>Mode</th><th>Description</th></tr></thead><tbody><tr><td><strong>Paginated</strong></td><td>Flip through one page (or spread) at a time (default)</td></tr><tr><td><strong>Infinite</strong></td><td>Continuous vertical scrolling through all pages</td></tr><tr><td><strong>Long Strip</strong></td><td>Long strip continuous scrolling (for webtoons)</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-page-view">📖 Page View<a href="#-page-view" class="hash-link" aria-label="Direct link to 📖 Page View" title="Direct link to 📖 Page View">​</a></h3>
+<p>Toggle between <strong>Single</strong> page and <strong>Two-page</strong> spread. In two-page mode, wide pages (landscape images) are automatically displayed as a single page.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Two-page mode is hidden on phones in portrait orientation.</p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-reading-direction">🔄 Reading Direction<a href="#-reading-direction" class="hash-link" aria-label="Direct link to 🔄 Reading Direction" title="Direct link to 🔄 Reading Direction">​</a></h3>
+<p>Toggle between <strong>Left to Right</strong> and <strong>Right to Left</strong>. RTL mode reverses the page order in two-page spreads and flips the direction of swipe gestures and arrow keys.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-slideshow-interval">🎬 Slideshow Interval<a href="#-slideshow-interval" class="hash-link" aria-label="Direct link to 🎬 Slideshow Interval" title="Direct link to 🎬 Slideshow Interval">​</a></h3>
+<p>Auto-advance pages at a set interval: <strong>3s</strong>, <strong>5s</strong> (default), <strong>10s</strong>, <strong>15s</strong>, or <strong>30s</strong>. The slideshow stops automatically at the last page and pauses on any user interaction.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-background">🎨 Background<a href="#-background" class="hash-link" aria-label="Direct link to 🎨 Background" title="Direct link to 🎨 Background">​</a></h3>
+<p>Three background colors: <strong>Black</strong>, <strong>Gray</strong> (default), or <strong>White</strong>.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📝 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📝 Notes" title="Direct link to 📝 Notes">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Note Dialog" src="https://web.archive.org/web/20260228160451im_/https://booklore.org/assets/images/cbx-reader-notes-79c24f64635e169ebdb9c42329b33c5c.jpg" width="500" height="532" class="img_ev3q"></p>
+<p>Click the notes button in the toolbar to add a note to the current page. Each note includes:</p>
+<ul>
+<li>The page number (auto-filled)</li>
+<li>Your note text</li>
+<li>A color label (Amber, Green, Blue, Pink, Purple, or Deep Orange)</li>
+</ul>
+<p>Notes are listed in the sidebar under the Notes tab where you can search, edit, or delete them. Click a note to jump to that page.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-bookmarks">🔖 Bookmarks<a href="#-bookmarks" class="hash-link" aria-label="Direct link to 🔖 Bookmarks" title="Direct link to 🔖 Bookmarks">​</a></h2>
+<p>Click the bookmark button to bookmark the current page. A red bookmark overlay appears in the top-right corner of bookmarked pages. Manage bookmarks from the sidebar Bookmarks tab.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-keyboard-shortcuts">⌨️ Keyboard Shortcuts<a href="#️-keyboard-shortcuts" class="hash-link" aria-label="Direct link to ⌨️ Keyboard Shortcuts" title="Direct link to ⌨️ Keyboard Shortcuts">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Keyboard Shortcuts" src="https://web.archive.org/web/20260228160451im_/https://booklore.org/assets/images/cbx-reader-shortcuts-9ce590746235bfb256afa0d09169059a.jpg" width="500" height="882" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="navigation">Navigation<a href="#navigation" class="hash-link" aria-label="Direct link to Navigation" title="Direct link to Navigation">​</a></h3>
+<table><thead><tr><th>Keys</th><th>Action</th></tr></thead><tbody><tr><td><code>←</code> <code>→</code></td><td>Previous / Next page (reversed in RTL)</td></tr><tr><td><code>Space</code></td><td>Next page</td></tr><tr><td><code>Shift+Space</code></td><td>Previous page</td></tr><tr><td><code>Home</code></td><td>First page</td></tr><tr><td><code>End</code></td><td>Last page</td></tr><tr><td><code>Page Up</code> <code>Page Down</code></td><td>Previous / Next page</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="display">Display<a href="#display" class="hash-link" aria-label="Direct link to Display" title="Direct link to Display">​</a></h3>
+<table><thead><tr><th>Keys</th><th>Action</th></tr></thead><tbody><tr><td><code>F</code></td><td>Toggle fullscreen</td></tr><tr><td><code>D</code></td><td>Toggle reading direction (LTR/RTL)</td></tr><tr><td><code>Escape</code></td><td>Exit fullscreen or close dialogs</td></tr><tr><td><code>Double-click</code></td><td>Toggle zoom (fit page vs actual size)</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="playback">Playback<a href="#playback" class="hash-link" aria-label="Direct link to Playback" title="Direct link to Playback">​</a></h3>
+<table><thead><tr><th>Keys</th><th>Action</th></tr></thead><tbody><tr><td><code>P</code></td><td>Toggle slideshow</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="touch">Touch<a href="#touch" class="hash-link" aria-label="Direct link to Touch" title="Direct link to Touch">​</a></h3>
+<ul>
+<li><strong>Swipe left/right</strong> to navigate pages (direction respects RTL setting)</li>
+<li><strong>Double-tap</strong> to toggle zoom</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-reading-progress">📊 Reading Progress<a href="#-reading-progress" class="hash-link" aria-label="Direct link to 📊 Reading Progress" title="Direct link to 📊 Reading Progress">​</a></h2>
+<p>Progress is saved automatically as you navigate. The reader tracks your current page and calculates a reading percentage. When you reopen a comic, it picks up where you left off.</p>
+<p>Reading sessions are recorded with timing and page data.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-series-navigation">📚 Series Navigation<a href="#-series-navigation" class="hash-link" aria-label="Direct link to 📚 Series Navigation" title="Direct link to 📚 Series Navigation">​</a></h2>
+<p>If the comic is part of a series, navigation buttons appear in the footer to jump to the previous or next book in the series.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-settings-persistence">💾 Settings Persistence<a href="#-settings-persistence" class="hash-link" aria-label="Direct link to 💾 Settings Persistence" title="Direct link to 💾 Settings Persistence">​</a></h2>
+<p>Display settings can be saved globally (for all comics) or per book. The scope is controlled in <a href="../reader-preferences.html">Reader Preferences</a>.</p>
+</body>
+</html>

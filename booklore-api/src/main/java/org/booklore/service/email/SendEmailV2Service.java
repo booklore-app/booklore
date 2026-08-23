@@ -16,6 +16,7 @@ import org.booklore.repository.EmailProviderV2Repository;
 import org.booklore.repository.EmailRecipientV2Repository;
 import org.booklore.repository.UserEmailProviderPreferenceRepository;
 import org.booklore.service.NotificationService;
+import org.booklore.service.restriction.BookAccessService;
 import org.booklore.util.FileUtils;
 import org.booklore.util.SecurityContextVirtualThread;
 import jakarta.mail.MessagingException;
@@ -45,8 +46,10 @@ public class SendEmailV2Service {
     private final NotificationService notificationService;
     private final AuthenticationService authenticationService;
     private final AuditService auditService;
+    private final BookAccessService bookAccessService;
 
     public void emailBookQuick(Long bookId) {
+        bookAccessService.assertAccess(bookId);
         BookLoreUser user = authenticationService.getAuthenticatedUser();
         BookEntity book = bookRepository.findByIdWithBookFiles(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         EmailProviderV2Entity defaultEmailProvider = getDefaultEmailProvider();
@@ -56,6 +59,7 @@ public class SendEmailV2Service {
     }
 
     public void emailBook(SendBookByEmailRequest request) {
+        bookAccessService.assertAccess(request.getBookId());
         BookLoreUser user = authenticationService.getAuthenticatedUser();
         EmailProviderV2Entity emailProvider = emailProviderRepository.findByIdAndUserId(request.getProviderId(), user.getId())
                 .orElseGet(() ->

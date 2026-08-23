@@ -17,12 +17,12 @@ import java.util.List;
 public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEntity, Long> {
 
     @Query(value = """
-            SELECT DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as date,
+            SELECT ((start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::date as date,
                    COUNT(*) as count
             FROM reading_sessions
             WHERE user_id = :userId
-            AND YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :year
-            GROUP BY DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset))
+            AND EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year
+            GROUP BY date
             ORDER BY date
             """, nativeQuery = true)
     List<ReadingSessionCountDto> findSessionCountsByUserAndYear(
@@ -31,13 +31,13 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
             @Param("tzOffset") String tzOffset);
 
     @Query(value = """
-            SELECT DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as date,
+            SELECT ((start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::date as date,
                    COUNT(*) as count
             FROM reading_sessions
             WHERE user_id = :userId
-            AND YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :year
-            AND MONTH(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :month
-            GROUP BY DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset))
+            AND EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year
+            AND EXTRACT(MONTH FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :month
+            GROUP BY date
             ORDER BY date
             """, nativeQuery = true)
     List<ReadingSessionCountDto> findSessionCountsByUserAndYearAndMonth(
@@ -85,14 +85,14 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
 
     @Query(value = """
             SELECT
-                HOUR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as hourOfDay,
+                EXTRACT(HOUR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int as hourOfDay,
                 COUNT(*) as sessionCount,
                 SUM(duration_seconds) as totalDurationSeconds
             FROM reading_sessions
             WHERE user_id = :userId
-            AND (:year IS NULL OR YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :year)
-            AND (:month IS NULL OR MONTH(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :month)
-            GROUP BY HOUR(CONVERT_TZ(start_time, '+00:00', :tzOffset))
+            AND (:year IS NULL OR EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year)
+            AND (:month IS NULL OR EXTRACT(MONTH FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :month)
+            GROUP BY hourOfDay
             ORDER BY hourOfDay
             """, nativeQuery = true)
     List<PeakReadingHourDto> findPeakReadingHoursByUser(
@@ -103,14 +103,14 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
 
     @Query(value = """
             SELECT
-                DAYOFWEEK(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as dayOfWeek,
+                (EXTRACT(DOW FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int + 1) as dayOfWeek,
                 COUNT(*) as sessionCount,
                 COALESCE(SUM(duration_seconds), 0) as totalDurationSeconds
             FROM reading_sessions
             WHERE user_id = :userId
-            AND (:year IS NULL OR YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :year)
-            AND (:month IS NULL OR MONTH(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :month)
-            GROUP BY DAYOFWEEK(CONVERT_TZ(start_time, '+00:00', :tzOffset))
+            AND (:year IS NULL OR EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year)
+            AND (:month IS NULL OR EXTRACT(MONTH FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :month)
+            GROUP BY dayOfWeek
             ORDER BY dayOfWeek
             """, nativeQuery = true)
     List<FavoriteReadingDayDto> findFavoriteReadingDaysByUser(
@@ -186,11 +186,11 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
             @Param("year") int year);
 
     @Query(value = """
-            SELECT DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as date,
+            SELECT ((start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::date as date,
                    COUNT(*) as count
             FROM reading_sessions
             WHERE user_id = :userId
-            GROUP BY DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset))
+            GROUP BY date
             ORDER BY date
             """, nativeQuery = true)
     List<ReadingSessionCountDto> findAllSessionCountsByUser(
@@ -199,13 +199,13 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
 
     @Query(value = """
             SELECT
-                HOUR(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset))
-                    + MINUTE(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset)) / 60.0 as hourOfDay,
+                EXTRACT(HOUR FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)
+                    + EXTRACT(MINUTE FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset) / 60.0 as hourOfDay,
                 rs.duration_seconds / 60.0 as durationMinutes,
-                DAYOFWEEK(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset)) as dayOfWeek
+                (EXTRACT(DOW FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int + 1) as dayOfWeek
             FROM reading_sessions rs
             WHERE rs.user_id = :userId
-            AND YEAR(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset)) = :year
+            AND EXTRACT(YEAR FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year
             ORDER BY rs.start_time DESC
             LIMIT 500
             """, nativeQuery = true)
@@ -219,15 +219,15 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
     // ========================================================================
 
     @Query(value = """
-            SELECT DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as date,
+            SELECT ((start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::date as date,
                    COUNT(*) as sessions,
-                   COALESCE(ROUND(SUM(duration_seconds) / 60.0), 0) as durationMinutes
+                   COALESCE(ROUND((SUM(duration_seconds) / 60.0)::numeric), 0) as durationMinutes
             FROM reading_sessions
             WHERE user_id = :userId
             AND book_type = 'AUDIOBOOK'
-            AND YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :year
-            AND MONTH(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :month
-            GROUP BY DATE(CONVERT_TZ(start_time, '+00:00', :tzOffset))
+            AND EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year
+            AND EXTRACT(MONTH FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :month
+            GROUP BY date
             ORDER BY date
             """, nativeQuery = true)
     List<ListeningHeatmapDto> findListeningSessionsByUserAndMonth(
@@ -237,14 +237,14 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
             @Param("tzOffset") String tzOffset);
 
     @Query(value = """
-            SELECT YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as year,
-                   WEEK(CONVERT_TZ(start_time, '+00:00', :tzOffset), 3) as week,
+            SELECT EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int as year,
+                   EXTRACT(WEEK FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int as week,
                    COALESCE(SUM(duration_seconds), 0) as totalDurationSeconds,
                    COUNT(*) as sessions
             FROM reading_sessions
             WHERE user_id = :userId
             AND book_type = 'AUDIOBOOK'
-            AND CONVERT_TZ(start_time, '+00:00', :tzOffset) >= DATE_SUB(NOW(), INTERVAL :weeks WEEK)
+            AND ((start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset) >= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC') - make_interval(weeks => :weeks)
             GROUP BY year, week
             ORDER BY year, week
             """, nativeQuery = true)
@@ -270,8 +270,8 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
     List<AudiobookProgressDto> findAudiobookProgressByUser(@Param("userId") Long userId);
 
     @Query(value = """
-            SELECT YEAR(COALESCE(ubp.date_finished, ubp.read_status_modified_time)) as year,
-                   MONTH(COALESCE(ubp.date_finished, ubp.read_status_modified_time)) as month,
+            SELECT EXTRACT(YEAR FROM COALESCE(ubp.date_finished, ubp.read_status_modified_time))::int as year,
+                   EXTRACT(MONTH FROM COALESCE(ubp.date_finished, ubp.read_status_modified_time))::int as month,
                    COUNT(*) as booksCompleted
             FROM user_book_progress ubp
             WHERE ubp.user_id = :userId
@@ -289,8 +289,8 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
     List<MonthlyCompletedAudiobookDto> findMonthlyCompletedAudiobooks(@Param("userId") Long userId);
 
     @Query(value = """
-            SELECT YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as year,
-                   MONTH(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as month,
+            SELECT EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int as year,
+                   EXTRACT(MONTH FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int as month,
                    COALESCE(SUM(duration_seconds), 0) as totalDurationSeconds
             FROM reading_sessions
             WHERE user_id = :userId
@@ -304,15 +304,15 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
 
     @Query(value = """
             SELECT
-                HOUR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) as hourOfDay,
+                EXTRACT(HOUR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int as hourOfDay,
                 COUNT(*) as sessionCount,
                 SUM(duration_seconds) as totalDurationSeconds
             FROM reading_sessions
             WHERE user_id = :userId
             AND book_type = 'AUDIOBOOK'
-            AND (:year IS NULL OR YEAR(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :year)
-            AND (:month IS NULL OR MONTH(CONVERT_TZ(start_time, '+00:00', :tzOffset)) = :month)
-            GROUP BY HOUR(CONVERT_TZ(start_time, '+00:00', :tzOffset))
+            AND (:year IS NULL OR EXTRACT(YEAR FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year)
+            AND (:month IS NULL OR EXTRACT(MONTH FROM (start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :month)
+            GROUP BY hourOfDay
             ORDER BY hourOfDay
             """, nativeQuery = true)
     List<PeakReadingHourDto> findListeningPeakHoursByUser(
@@ -354,10 +354,10 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
 
     @Query(value = """
             SELECT
-                HOUR(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset))
-                    + MINUTE(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset)) / 60.0 as hourOfDay,
+                EXTRACT(HOUR FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)
+                    + EXTRACT(MINUTE FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset) / 60.0 as hourOfDay,
                 rs.duration_seconds / 60.0 as durationMinutes,
-                DAYOFWEEK(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset)) as dayOfWeek
+                (EXTRACT(DOW FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int + 1) as dayOfWeek
             FROM reading_sessions rs
             WHERE rs.user_id = :userId
             AND rs.book_type = 'AUDIOBOOK'
@@ -372,8 +372,8 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
             SELECT rs.book_id as bookId,
                    COALESCE(bm.title, 'Unknown') as title,
                    bm.page_count as pageCount,
-                   MIN(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset)) as firstSessionDate,
-                   MAX(CONVERT_TZ(rs.end_time, '+00:00', :tzOffset)) as lastSessionDate,
+                   MIN((rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset) as firstSessionDate,
+                   MAX((rs.end_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset) as lastSessionDate,
                    COUNT(*) as totalSessions,
                    COALESCE(SUM(rs.duration_seconds), 0) as totalDurationSeconds,
                    COALESCE(MAX(rs.end_progress), 0) / 100.0 as maxProgress,
@@ -383,7 +383,7 @@ public interface ReadingSessionRepository extends JpaRepository<ReadingSessionEn
             LEFT JOIN book_metadata bm ON bm.book_id = b.id
             LEFT JOIN user_book_progress ubp ON ubp.book_id = rs.book_id AND ubp.user_id = rs.user_id
             WHERE rs.user_id = :userId
-            AND YEAR(CONVERT_TZ(rs.start_time, '+00:00', :tzOffset)) = :year
+            AND EXTRACT(YEAR FROM (rs.start_time AT TIME ZONE 'UTC') AT TIME ZONE :tzOffset)::int = :year
             GROUP BY rs.book_id, bm.title, bm.page_count, ubp.read_status
             ORDER BY firstSessionDate
             """, nativeQuery = true)

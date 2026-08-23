@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📱 Devices | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>📱 Devices</h1></header>
+<p>The Devices page lets you configure integrations with external reading devices and services. It contains three sections: <strong>KOReader Sync</strong>, <strong>Hardcover Integration</strong>, and <strong>Kobo Integration</strong>.</p>
+<p>Navigate to <strong>Settings > Devices</strong> to access this page.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-koreader-sync">📖 KOReader Sync<a href="#-koreader-sync" class="hash-link" aria-label="Direct link to 📖 KOReader Sync" title="Direct link to 📖 KOReader Sync">​</a></h2>
+<p>Sync your reading progress between your KOReader device and Booklore. When enabled, reading progress updates on your KOReader device are automatically reflected in Booklore.</p>
+<p>Requires the <strong>KOReader Sync</strong> permission.</p>
+<p><img decoding="async" loading="lazy" alt="KOReader Sync Configuration" src="https://web.archive.org/web/20260309185346im_/https://booklore.org/assets/images/koreader-sync-131d3bf5cf017a92641969121e50f82e.jpg" width="500" height="269" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="sync-configuration">Sync Configuration<a href="#sync-configuration" class="hash-link" aria-label="Direct link to Sync Configuration" title="Direct link to Sync Configuration">​</a></h3>
+<table><thead><tr><th>Setting</th><th>Description</th></tr></thead><tbody><tr><td><strong>Enable KOReader Sync</strong></td><td>Turns on synchronization. Only available after credentials are saved.</td></tr><tr><td><strong>Sync reading progress with Booklore eBook Reader</strong></td><td>Enables bidirectional sync between KOReader and Booklore's built-in web reader. Progress is approximate and may update by chapter rather than exact page.</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="credentials">Credentials<a href="#credentials" class="hash-link" aria-label="Direct link to Credentials" title="Direct link to Credentials">​</a></h3>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><strong>KOReader API Path</strong></td><td>The API endpoint to configure on your KOReader device. Auto-generated from your Booklore URL (e.g., <code>https://demo.booklore.org/api/koreader</code>). Read-only with a copy button.</td></tr><tr><td><strong>KOReader Username</strong></td><td>Your username for authenticating with the sync service.</td></tr><tr><td><strong>KOReader Password</strong></td><td>Your password (minimum 6 characters).</td></tr></tbody></table>
+<p>Click <strong>Edit</strong> to modify your credentials, then <strong>Save</strong> to persist them. The sync toggles are disabled until credentials are saved.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Setting Up Your KOReader Device</div><div class="admonitionContent_BuS1"><p>On your KOReader device, go to <strong>Tools > Progress sync > Custom sync server</strong> and enter the API Path, Username, and Password shown on this page.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-hardcover-integration">📚 Hardcover Integration<a href="#-hardcover-integration" class="hash-link" aria-label="Direct link to 📚 Hardcover Integration" title="Direct link to 📚 Hardcover Integration">​</a></h2>
+<p>Sync your KOReader reading progress from Booklore to your <a href="https://web.archive.org/web/20260309185346/https://hardcover.app/" target="_blank" rel="noopener noreferrer">Hardcover</a> account. When enabled, progress updates from KOReader are automatically pushed to Hardcover.</p>
+<p>Requires the <strong>KOReader Sync</strong> or <strong>Kobo Sync</strong> permission.</p>
+<p><img decoding="async" loading="lazy" alt="Hardcover Integration" src="https://web.archive.org/web/20260309185346im_/https://booklore.org/assets/images/hardcover-integration-46cf0ff5d03c51852139acfba76ca848.jpg" width="500" height="169" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="configuration">Configuration<a href="#configuration" class="hash-link" aria-label="Direct link to Configuration" title="Direct link to Configuration">​</a></h3>
+<table><thead><tr><th>Setting</th><th>Description</th></tr></thead><tbody><tr><td><strong>Sync KOReader Reading Progress to Hardcover</strong></td><td>Enable or disable the sync. When enabled, the API Key field appears.</td></tr><tr><td><strong>Hardcover API Key</strong></td><td>Your personal API key from Hardcover. Get it from <a href="https://web.archive.org/web/20260309185346/https://hardcover.app/account/api" target="_blank" rel="noopener noreferrer">hardcover.app/account/api</a>. This key is private to your account.</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>How It Works</div><div class="admonitionContent_BuS1"><p>When KOReader progress is synced to Booklore, Booklore automatically forwards the update to Hardcover. Books are marked as "Currently Reading" when progress begins and "Read" when progress reaches 99%+. Booklore matches books to Hardcover using the Hardcover book ID stored in metadata.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-kobo-integration">📲 Kobo Integration<a href="#-kobo-integration" class="hash-link" aria-label="Direct link to 📲 Kobo Integration" title="Direct link to 📲 Kobo Integration">​</a></h2>
+<p>Sync your Booklore library and reading progress with your Kobo e-reader. Books on your Kobo shelf are delivered to the device, and reading progress can be synced bidirectionally.</p>
+<p>Requires the <strong>Kobo Sync</strong> permission.</p>
+<p><img decoding="async" loading="lazy" alt="Kobo Integration Configuration" src="https://web.archive.org/web/20260309185346im_/https://booklore.org/assets/images/kobo-integration-8291a70f4919a6bd388647c5a6143527.jpg" width="500" height="263" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="sync-configuration-1">Sync Configuration<a href="#sync-configuration-1" class="hash-link" aria-label="Direct link to Sync Configuration" title="Direct link to Sync Configuration">​</a></h3>
+<table><thead><tr><th>Setting</th><th>Description</th></tr></thead><tbody><tr><td><strong>Enable Kobo Sync</strong></td><td>Turns on Kobo synchronization. Automatically creates a "Kobo" shelf in your library. Disabling deletes the Kobo shelf.</td></tr><tr><td><strong>Two-Way Reading Progress Sync</strong></td><td>Enables bidirectional sync between Booklore's web reader and your Kobo device. Due to different position formats, accuracy is best-effort and typically accurate to the chapter level.</td></tr><tr><td><strong>Kobo Sync Token</strong></td><td>Your unique authentication token for the Kobo device. Keep this secure. Use the regenerate button if you need a new token (invalidates the previous one).</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="reading-thresholds">Reading Thresholds<a href="#reading-thresholds" class="hash-link" aria-label="Direct link to Reading Thresholds" title="Direct link to Reading Thresholds">​</a></h3>
+<table><thead><tr><th>Setting</th><th>Range</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><strong>Mark as Reading at</strong></td><td>1-10%</td><td>1%</td><td>Books are marked as "Reading" when progress exceeds this percentage.</td></tr><tr><td><strong>Mark as Finished at</strong></td><td>90-100%</td><td>99%</td><td>Books are marked as "Finished" when progress reaches this percentage. Accounts for books where the last few pages are acknowledgments or an index.</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="auto-add-new-books">Auto-Add New Books<a href="#auto-add-new-books" class="hash-link" aria-label="Direct link to Auto-Add New Books" title="Direct link to Auto-Add New Books">​</a></h3>
+<table><thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><strong>Auto-Add New Books to Kobo Shelf</strong></td><td>Off</td><td>When enabled, newly added books are automatically added to your Kobo shelf for syncing, so you don't have to add each book manually.</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-kobo-administrator-settings">⚙️ Kobo Administrator Settings<a href="#️-kobo-administrator-settings" class="hash-link" aria-label="Direct link to ⚙️ Kobo Administrator Settings" title="Direct link to ⚙️ Kobo Administrator Settings">​</a></h2>
+<p>These settings are only visible to admin users and affect all Kobo sync users on the server.</p>
+<p><img decoding="async" loading="lazy" alt="Kobo Administrator Settings" src="https://web.archive.org/web/20260309185346im_/https://booklore.org/assets/images/kobo-admin-settings-1e8372a800b6a1474fd3eef29f764f16.jpg" width="500" height="205" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="epub-to-kepub-conversion">EPUB to KEPUB Conversion<a href="#epub-to-kepub-conversion" class="hash-link" aria-label="Direct link to EPUB to KEPUB Conversion" title="Direct link to EPUB to KEPUB Conversion">​</a></h3>
+<table><thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><strong>Convert to KEPUB</strong></td><td>On</td><td>Converts EPUB files to KEPUB format during sync. KEPUB enables enhanced Kobo features like better typography, reading statistics, and faster page turns. Conversion may fail for complex layouts.</td></tr><tr><td><strong>Conversion Size Limit</strong></td><td>100 MB</td><td>Maximum file size for KEPUB conversion (1-250 MB). Books exceeding this limit sync as regular EPUB. Recommended: 50-100 MB for most libraries.</td></tr><tr><td><strong>Force Enable Hyphenation</strong></td><td>Off</td><td>Forces hyphenation in converted books. Without this, hyphenation is only enabled when text alignment on the Kobo device is set to justified.</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="cbx-to-epub-conversion">CBX to EPUB Conversion<a href="#cbx-to-epub-conversion" class="hash-link" aria-label="Direct link to CBX to EPUB Conversion" title="Direct link to CBX to EPUB Conversion">​</a></h3>
+<table><thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><strong>Convert CBX to EPUB</strong></td><td>Off</td><td>Converts comic book archives (CBZ/CBR/CB7) to EPUB during sync so they can be read on Kobo devices.</td></tr><tr><td><strong>Conversion image compression</strong></td><td>85%</td><td>Compresses images during CBX conversion to keep file sizes manageable (1-100%).</td></tr><tr><td><strong>CBX Conversion Size Limit</strong></td><td>100 MB</td><td>Maximum CBX file size for conversion (1-500 MB). Files exceeding this limit are not converted or synced. Recommended: 100-200 MB for most comic libraries.</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Conversion Performance</div><div class="admonitionContent_BuS1"><p>KEPUB and CBX conversions take extra processing time. Large files or libraries with many books may put strain on the server. Adjust size limits to balance quality and performance.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📋 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📋 Notes" title="Direct link to 📋 Notes">​</a></h2>
+<ul>
+<li>The Devices page shows all three sections on a single scrollable page. Each section operates independently.</li>
+<li>KOReader credentials are stored per user. Each user manages their own sync settings.</li>
+<li>Kobo sync creates a dedicated "Kobo" shelf automatically. Add books to this shelf (or enable auto-add) to sync them to your device.</li>
+<li>Hardcover sync is triggered automatically whenever KOReader progress is updated. There is no manual sync button.</li>
+<li>Reading progress from KOReader and Kobo is stored separately, so both devices can be used independently.</li>
+<li>KEPUB conversion uses the <a href="https://web.archive.org/web/20260309185346/https://github.com/pgaskin/kepubify" target="_blank" rel="noopener noreferrer">kepubify</a> tool and is handled server-side.</li>
+<li>All device settings changes are reflected immediately without needing to restart the server.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📥 Bookdrop | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="./index.html">Back to docs index</a>
+</div>
+<header><h1>📥 Bookdrop</h1></header>
+<p>Add books to your library by dropping files into a folder. Bookdrop watches for new files, extracts metadata, optionally enriches it from online sources, and queues everything for review before importing.</p>
+<p><img decoding="async" loading="lazy" alt="Bookdrop Processing" src="https://web.archive.org/web/20260309184052im_/https://booklore.org/assets/images/processing-status-99c1eecdae7a489b7f88b352ebd42eb2.jpg" width="1200" height="692" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Network Storage Limitation</div><div class="admonitionContent_BuS1"><p>Bookdrop may not reliably detect new files on network-mounted storage (e.g., NFS or SMB). Many network filesystems do not propagate real-time filesystem events to the host process, so Bookdrop may not notice newly added files.</p><p><strong>If Bookdrop doesn't react when you add files:</strong></p><ul>
+<li>Use a local folder instead</li>
+<li>Adjust mount options to enable notification support</li>
+<li>Restart Booklore to trigger a manual rescan</li>
+<li>Open the Bookdrop UI and click the manual "Refresh" button to force a reload</li>
+<li>You can also enable periodic scanning for the Bookdrop folder in <strong>Settings → Tasks</strong>.</li>
+</ul></div></div>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Pro Tip</div><div class="admonitionContent_BuS1"><p>Drop entire folders of books at once. Bookdrop processes them sequentially and queues everything for easy review.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-getting-started">🚀 Getting Started<a href="#-getting-started" class="hash-link" aria-label="Direct link to 🚀 Getting Started" title="Direct link to 🚀 Getting Started">​</a></h2>
+<p>Mount a local directory as your Bookdrop path in <code>docker-compose.yml</code>:</p>
+<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token key atrule">volumes</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> /path/to/bookdrop</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain">/bookdrop</span><br></span></code></pre></div></div>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Permissions</div><div class="admonitionContent_BuS1"><p>Ensure the Bookdrop folder has proper read/write permissions for the BookLore container.</p></div></div>
+<p>Drop supported files (PDF, EPUB, CBZ, CBR, CB7) into this folder. You can drop entire folders of books at once.</p>
+<p><img decoding="async" loading="lazy" alt="Bookdrop Folder" src="https://web.archive.org/web/20260309184052im_/https://booklore.org/assets/images/bookdrop-folder-a202a82b20c31eb9b4e21541b60c3111.jpg" width="1200" height="715" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="monitoring-progress">Monitoring Progress<a href="#monitoring-progress" class="hash-link" aria-label="Direct link to Monitoring Progress" title="Direct link to Monitoring Progress">​</a></h3>
+<p>Click the bell icon in the top bar to see processing status. When processing completes, click <strong>Review</strong> to open the Bookdrop UI.</p>
+<p><img decoding="async" loading="lazy" alt="Bookdrop Progress" src="https://web.archive.org/web/20260309184052im_/https://booklore.org/assets/images/bookdrop-progress-3f6c9e2d9f36d15eb3b1c7b03ac1c4b7.jpg" width="1200" height="715" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-the-bookdrop-ui">📖 The Bookdrop UI<a href="#-the-bookdrop-ui" class="hash-link" aria-label="Direct link to 📖 The Bookdrop UI" title="Direct link to 📖 The Bookdrop UI">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Bookdrop UI Overview" src="https://web.archive.org/web/20260309184052im_/https://booklore.org/assets/images/bookdrop-pre-478e92c10320f9749b371eb6054257b6.jpg" width="1200" height="715" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-global-settings-top">🎯 Global Settings (Top)<a href="#-global-settings-top" class="hash-link" aria-label="Direct link to 🎯 Global Settings (Top)" title="Direct link to 🎯 Global Settings (Top)">​</a></h3>
+<ol>
+<li><strong>Filename Pattern Preview</strong> showing how books will be renamed based on your <a href="./metadata/file-naming-patterns.html">configured pattern</a></li>
+<li><strong>Default Library</strong> for all books (can be overridden per book)</li>
+<li><strong>Default Subfolder</strong> within the library (e.g., "Sci-Fi", "Non-Fiction")</li>
+<li><strong>Apply Defaults to All</strong> to set the library and subfolder for every book in the list</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-per-book-controls-middle">📚 Per-Book Controls (Middle)<a href="#-per-book-controls-middle" class="hash-link" aria-label="Direct link to 📚 Per-Book Controls (Middle)" title="Direct link to 📚 Per-Book Controls (Middle)">​</a></h3>
+<ol start="5">
+<li><strong>Metadata Status</strong> (green = fetched from online, yellow = internal only)</li>
+<li><strong>Fetched Cover</strong> from online sources</li>
+<li><strong>Internal Cover</strong> embedded in the book file</li>
+<li><strong>Per-Book Library Override</strong></li>
+<li><strong>Per-Book Subfolder Override</strong></li>
+<li><strong>Metadata Comparison Panel</strong> for side-by-side fetched vs. internal metadata</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-bulk-actions-bottom">🛠️ Bulk Actions (Bottom)<a href="#️-bulk-actions-bottom" class="hash-link" aria-label="Direct link to 🛠️ Bulk Actions (Bottom)" title="Direct link to 🛠️ Bulk Actions (Bottom)">​</a></h3>
+<table><thead><tr><th>Button</th><th>Description</th></tr></thead><tbody><tr><td><strong>Apply All Metadata (with Cover)</strong></td><td>Copies all fetched metadata including covers to all books</td></tr><tr><td><strong>Apply All Metadata (without Cover)</strong></td><td>Applies fetched metadata but keeps original embedded covers</td></tr><tr><td><strong>Reset All Metadata</strong></td><td>Reverts all changes, restoring original file-based values</td></tr><tr><td><strong>Delete All</strong></td><td>Clears the Bookdrop queue (files remain on disk)</td></tr><tr><td><strong>Finalize Import</strong></td><td>Moves files to libraries, applies metadata, renames files</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-per-book-metadata-comparison">🎨 Per-Book Metadata Comparison<a href="#-per-book-metadata-comparison" class="hash-link" aria-label="Direct link to 🎨 Per-Book Metadata Comparison" title="Direct link to 🎨 Per-Book Metadata Comparison">​</a></h2>
+<p>Click the dropdown icon next to any book to open the comparison panel:</p>
+<p><img decoding="async" loading="lazy" alt="Metadata Picker" src="https://web.archive.org/web/20260309184052im_/https://booklore.org/assets/images/bookdrop-dropdown-764b29c995e45d129ad0153655062cd7.jpg" width="1200" height="715" class="img_ev3q"></p>
+<p><strong>Single Arrow</strong> copies only missing fields from fetched metadata. Existing values are left untouched:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Current:  Title = "Book",     Author = ""</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Fetched:  Title = "The Book", Author = "John Doe"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Result:   Title = "Book",     Author = "John Doe"  ← only author was empty, so only author copied</span><br></span></code></pre></div></div>
+<p><strong>Double Arrow</strong> overwrites all fields with fetched metadata:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Current:  Title = "Book",     Author = "Unknown"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Fetched:  Title = "The Book", Author = "John Doe"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">Result:   Title = "The Book", Author = "John Doe"  ← everything replaced</span><br></span></code></pre></div></div>
+<p>You can also use the <strong>copy button</strong> next to individual fields for selective updates. Updated fields are highlighted in green.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-finalizing-the-import">✅ Finalizing the Import<a href="#-finalizing-the-import" class="hash-link" aria-label="Direct link to ✅ Finalizing the Import" title="Direct link to ✅ Finalizing the Import">​</a></h2>
+<p>After clicking <strong>Finalize Import</strong>, a summary shows successfully imported books, their library placement, any skipped files, and processing statistics.</p>
+<p><img decoding="async" loading="lazy" alt="Import Summary" src="https://web.archive.org/web/20260309184052im_/https://booklore.org/assets/images/bookdrop-summary-15312a0e451d7aad8d317e1eba8e482e.jpg" width="1200" height="715" class="img_ev3q"></p>
+<p>After import, original files are automatically removed from the Bookdrop folder.</p>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📧 Email Setup Guide | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="./index.html">Back to docs index</a>
+</div>
+<header><h1>📧 Email Setup Guide</h1></header>
+<p>Booklore allows you to send books directly via email using various email providers. This guide will walk you through setting up Gmail as your email provider, enabling you to use the "Quick Book Send" feature from any book card.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>What's New in v2</div><div class="admonitionContent_BuS1"><p>Users with email permission can now set up their own personal email providers and recipients without interfering with other users' configurations. Each user manages their own email settings independently. Additionally, administrators can optionally share email providers with all users, making it
+easy to provide centralized email configurations while still allowing users to create their own private providers.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-prerequisites">🔧 Prerequisites<a href="#-prerequisites" class="hash-link" aria-label="Direct link to 🔧 Prerequisites" title="Direct link to 🔧 Prerequisites">​</a></h2>
+<p>Before setting up Gmail as your email provider, ensure you have:</p>
+<ol>
+<li><strong>A Gmail account</strong> with email sending privileges</li>
+<li><strong>2-Factor Authentication enabled</strong> on your Google account (required for app passwords)</li>
+<li><strong>App Password generated</strong> for Booklore (we'll guide you through this process)</li>
+<li><strong>Email permission</strong> in your Booklore account (contact your administrator if needed)</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-1-generate-gmail-app-password">🔐 Step 1: Generate Gmail App Password<a href="#-step-1-generate-gmail-app-password" class="hash-link" aria-label="Direct link to 🔐 Step 1: Generate Gmail App Password" title="Direct link to 🔐 Step 1: Generate Gmail App Password">​</a></h2>
+<p>Since Gmail requires secure authentication, you'll need to create an app-specific password for Booklore.</p>
+<ol>
+<li>Go to your <a href="https://web.archive.org/web/20260103092012/https://myaccount.google.com/security" target="_blank" rel="noopener noreferrer">Google Account Security Settings</a></li>
+<li>Ensure <strong>2-Step Verification</strong> is enabled (required for app passwords)</li>
+<li>Click on <strong>App passwords</strong> under "Signing in to Google"</li>
+</ol>
+<hr>
+<ol>
+<li>Select <strong>Mail</strong> as the app type</li>
+<li>Choose <strong>Other (Custom name)</strong> for the device</li>
+<li>Enter "Booklore" as the custom name</li>
+<li>Click <strong>Generate</strong></li>
+<li><strong>Copy the 16-character password</strong> - you'll need this for the Booklore setup</li>
+</ol>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Important</div><div class="admonitionContent_BuS1"><p>Save this app password securely. Google will only display it once!</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-step-2-configure-email-provider-in-booklore">⚙️ Step 2: Configure Email Provider in Booklore<a href="#️-step-2-configure-email-provider-in-booklore" class="hash-link" aria-label="Direct link to ⚙️ Step 2: Configure Email Provider in Booklore" title="Direct link to ⚙️ Step 2: Configure Email Provider in Booklore">​</a></h2>
+<p>Now let's add Gmail as an email provider in your Booklore settings.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Personal and Shared Providers</div><div class="admonitionContent_BuS1"><p>Your email provider configuration is personal to your account by default. Other users won't see or be able to use your email providers unless you're an admin and choose to share them. Admins can optionally share providers with all users, while non-admin users' providers remain private.</p></div></div>
+<p><img decoding="async" loading="lazy" alt="Email Providers Page" src="https://web.archive.org/web/20260103092012im_/https://booklore.org/assets/images/email-1-ee0a0054d23c50c3087883a4689ce0f4.jpg" width="1500" height="865" class="img_ev3q"></p>
+<ol>
+<li>Navigate to <strong>Settings</strong> > <strong>Email</strong> in Booklore</li>
+<li>Click <strong>Create Provider</strong></li>
+</ol>
+<hr>
+<p><img decoding="async" loading="lazy" alt="Gmail Configuration" src="https://web.archive.org/web/20260103092012im_/https://booklore.org/assets/images/email-2-d1e7b69c5a13bb44c22a65b1f082d81e.jpg" width="1500" height="865" class="img_ev3q"></p>
+<p>Fill in the Gmail configuration details:</p>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td><strong>Name</strong></td><td>Gmail (or any descriptive name)</td></tr><tr><td><strong>Host</strong></td><td><code>smtp.gmail.com</code></td></tr><tr><td><strong>Port</strong></td><td><code>587</code></td></tr><tr><td><strong>Username</strong></td><td>Your full Gmail address (e.g., <code><a href="https://web.archive.org/web/20260103092012/https://booklore.org/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f0899f8582dd959d91999cb0979d91999cde939f9d">[email protected]</a></code>)</td></tr><tr><td><strong>Password</strong></td><td>The 16-character app password you generated</td></tr><tr><td><strong>From Address</strong></td><td>Your Gmail address (same as username)</td></tr><tr><td><strong>Auth</strong></td><td>✅ Enabled</td></tr><tr><td><strong>StartTLS</strong></td><td>✅ Enabled</td></tr><tr><td><strong>Shared</strong></td><td>⬜ (Admin only - check to share with all users)</td></tr></tbody></table>
+<ol>
+<li>Click <strong>Create Email Provider</strong> to save the configuration</li>
+</ol>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Admin Sharing</div><div class="admonitionContent_BuS1"><p>If you are an administrator, you'll see a <strong>Shared</strong> checkbox. Enabling this option will make the email provider available to all users in your Booklore instance. Shared providers appear with an "S" badge and can only be modified or deleted by the admin who created them.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-3-set-up-recipient-emails">📮 Step 3: Set Up Recipient Emails<a href="#-step-3-set-up-recipient-emails" class="hash-link" aria-label="Direct link to 📮 Step 3: Set Up Recipient Emails" title="Direct link to 📮 Step 3: Set Up Recipient Emails">​</a></h2>
+<p>After configuring your email provider, you'll need to add recipients who will receive your books via email.</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Personal Recipients</div><div class="admonitionContent_BuS1"><p>Your recipient list is private to your account. Each user maintains their own list of recipients independently.</p></div></div>
+<ol>
+<li>Navigate to <strong>Email</strong> > <strong>Recipients</strong> in Booklore</li>
+<li>Click <strong>Create Recipient</strong></li>
+</ol>
+<hr>
+<p><img decoding="async" loading="lazy" alt="Add Recipient" src="https://web.archive.org/web/20260103092012im_/https://booklore.org/assets/images/email-3-3c739ca97dec98331a238cb4e0769bfa.jpg" width="1500" height="865" class="img_ev3q"></p>
+<p>Fill in the recipient details:</p>
+<table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td><strong>Email Address</strong></td><td>The recipient's email address (e.g., <code><a href="https://web.archive.org/web/20260103092012/https://booklore.org/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="01677368646f65416479606c716d642f626e6c">[email protected]</a></code>)</td></tr><tr><td><strong>Name</strong></td><td>A friendly name for the recipient (e.g., <code>John's Kindle</code>)</td></tr><tr><td><strong>Default Recipient</strong></td><td>Check this box to set as your default recipient</td></tr></tbody></table>
+<ol>
+<li>Click <strong>Save</strong> to add the recipient</li>
+</ol>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>You can add multiple recipients such as family members, friends, or different devices (Kindle, tablet, etc.)</p></div></div>
+<div class="theme-admonition theme-admonition-success admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Quick Send Ready</div><div class="admonitionContent_BuS1"><p>Once you have configured a default email provider and default recipient, you can send books with one click using "Quick Book Send" from any book card. Your default settings are personal to your account.</p></div></div>
+<hr>
+<p>This is how the interface should look after setting up both the email provider and recipient:</p>
+<p><img decoding="async" loading="lazy" alt="Recipients List" src="https://web.archive.org/web/20260103092012im_/https://booklore.org/assets/images/email-4-6eb62a936c1d91be16a70c4e217fd296.jpg" width="1500" height="865" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-step-4-sending-books-via-email">📚 Step 4: Sending Books via Email<a href="#-step-4-sending-books-via-email" class="hash-link" aria-label="Direct link to 📚 Step 4: Sending Books via Email" title="Direct link to 📚 Step 4: Sending Books via Email">​</a></h2>
+<p>Booklore offers two convenient methods to send books via email:</p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>When sending books, you'll use your own configured email providers and recipients. Other users sending books will use their own configurations.</p></div></div>
+<p><img decoding="async" loading="lazy" alt="Advanced Send" src="https://web.archive.org/web/20260103092012im_/https://booklore.org/assets/images/email-5-199eca3e0d046d58e4d4c940c6383736.jpg" width="1500" height="865" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-quick-book-send-one-click">🚀 Quick Book Send (One-Click)<a href="#-quick-book-send-one-click" class="hash-link" aria-label="Direct link to 🚀 Quick Book Send (One-Click)" title="Direct link to 🚀 Quick Book Send (One-Click)">​</a></h3>
+<p>For fast, streamlined sending using your default settings:</p>
+<ol>
+<li>Navigate to any book in your library</li>
+<li>Click the <strong>three-dot menu</strong> on the book card</li>
+<li>Select <strong>Book Send</strong> > <strong>Quick Send</strong></li>
+<li>The book is instantly sent using your <strong>default email provider</strong> to your <strong>default recipient</strong></li>
+</ol>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>Perfect for regular sending to the same recipient (such as your Kindle).</p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-customadvanced-send">⚙️ Custom/Advanced Send<a href="#️-customadvanced-send" class="hash-link" aria-label="Direct link to ⚙️ Custom/Advanced Send" title="Direct link to ⚙️ Custom/Advanced Send">​</a></h3>
+<p>For flexible sending with specific provider and recipient selection:</p>
+<ol>
+<li>Navigate to any book in your library</li>
+<li>Click the <strong>three-dot menu</strong> on the book card</li>
+<li>Select <strong>Book Send</strong> > <strong>Custom Send</strong></li>
+<li>Choose your desired <strong>email provider</strong> from the dropdown</li>
+<li>Select the <strong>recipient</strong> from the dropdown</li>
+<li>Click <strong>Send</strong></li>
+</ol>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>Perfect for sending to different recipients or using specific email providers for certain books.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-multi-user-email-configuration">👥 Multi-User Email Configuration<a href="#-multi-user-email-configuration" class="hash-link" aria-label="Direct link to 👥 Multi-User Email Configuration" title="Direct link to 👥 Multi-User Email Configuration">​</a></h2>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Multi-User Email Configuration</div><div class="admonitionContent_BuS1"><p>In the new email configuration system, each user can configure their own email providers and recipients. Administrators can optionally share email providers with all users for centralized management.</p></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="how-email-v2-works">How Email v2 Works<a href="#how-email-v2-works" class="hash-link" aria-label="Direct link to How Email v2 Works" title="Direct link to How Email v2 Works">​</a></h3>
+<p>In the new email configuration system:</p>
+<ul>
+<li><strong>Personal Email Providers</strong>: Each user can configure their own private email providers (Gmail, Outlook, custom SMTP, etc.)</li>
+<li><strong>Shared Email Providers (Admin Only)</strong>: Administrators can create shared providers that are available to all users</li>
+<li><strong>Personal Recipients</strong>: Each user maintains their own list of email recipients</li>
+<li><strong>Independent Defaults</strong>: Each user sets their own default email provider and default recipient</li>
+<li><strong>Provider Protection</strong>: Users cannot modify or delete shared providers created by other admins</li>
+<li><strong>No Interference</strong>: Users cannot see or modify other users' private email configurations</li>
+<li><strong>Shared Library</strong>: All users can send any book from the shared library using their own email settings</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="shared-providers">Shared Providers<a href="#shared-providers" class="hash-link" aria-label="Direct link to Shared Providers" title="Direct link to Shared Providers">​</a></h3>
+<p><strong>What are Shared Providers?</strong></p>
+<ul>
+<li>Administrators can mark email providers as "shared" to make them available to all users</li>
+<li>Shared providers appear with an "S" badge in the provider list</li>
+<li>All users can use shared providers to send books</li>
+<li>Only the admin who created a shared provider can modify or delete it</li>
+</ul>
+<p><strong>Benefits of Shared Providers:</strong></p>
+<ul>
+<li><strong>Centralized Management</strong>: Admins can set up instance-wide email providers</li>
+<li><strong>Simplified Setup</strong>: Users don't need to configure their own SMTP settings</li>
+<li><strong>Cost Efficiency</strong>: Share paid email services across your instance</li>
+<li><strong>Consistency</strong>: Ensure all users have access to reliable email providers</li>
+</ul>
+<p><strong>Use Cases for Shared Providers:</strong></p>
+<ul>
+<li>Shared email service account for the entire instance</li>
+<li>Educational institutions providing centralized email access</li>
+<li>Families sharing a single email account for sending books</li>
+<li>Small teams wanting simplified configuration</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="use-cases">Use Cases<a href="#use-cases" class="hash-link" aria-label="Direct link to Use Cases" title="Direct link to Use Cases">​</a></h3>
+<p><strong>Scenario 1: Instance with Shared Provider</strong></p>
+<ul>
+<li>Admin sets up a shared Gmail account for all users</li>
+<li>Users can use the shared provider to send books</li>
+<li>Users can also add their own personal providers if desired</li>
+<li>Each user maintains their own recipient list</li>
+</ul>
+<p><strong>Scenario 2: Family Library with Mixed Setup</strong></p>
+<ul>
+<li>Parent (admin) shares their Gmail provider with the family</li>
+<li>Children use the shared provider to send to their devices</li>
+<li>Other parent adds their own Outlook provider for personal use</li>
+<li>Each person has their own recipient lists</li>
+</ul>
+<p><strong>Scenario 3: Friend Group Library</strong></p>
+<ul>
+<li>Admin creates shared email provider for the group</li>
+<li>Friends can use the shared provider immediately</li>
+<li>Friends can add personal providers if they prefer</li>
+<li>Everyone manages their own recipient lists privately</li>
+</ul>
+<p><strong>Scenario 4: Privacy-Focused Users</strong></p>
+<ul>
+<li>Users create only private email providers</li>
+<li>No sharing enabled - full privacy</li>
+<li>Each person's email configuration is completely isolated</li>
+<li>Suitable for privacy-conscious individuals sharing a library</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-troubleshooting">🔍 Troubleshooting<a href="#-troubleshooting" class="hash-link" aria-label="Direct link to 🔍 Troubleshooting" title="Direct link to 🔍 Troubleshooting">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="common-issues-and-solutions">Common Issues and Solutions<a href="#common-issues-and-solutions" class="hash-link" aria-label="Direct link to Common Issues and Solutions" title="Direct link to Common Issues and Solutions">​</a></h3>
+<p><strong>❌ Authentication Failed</strong></p>
+<ul>
+<li>Double-check your Gmail address and app password</li>
+<li>Ensure 2-Factor Authentication is enabled on your Google account</li>
+<li>Verify you're using the app password, not your regular Gmail password</li>
+</ul>
+<p><strong>❌ Connection Timeout</strong></p>
+<ul>
+<li>Confirm the host is <code>smtp.gmail.com</code> and port is <code>587</code></li>
+<li>Check that StartTLS is enabled</li>
+<li>Verify your network allows SMTP connections</li>
+</ul>
+<p><strong>❌ "Less Secure App" Error</strong></p>
+<ul>
+<li>This usually indicates you're using your regular password instead of an app password</li>
+<li>Generate a new app password and use that instead</li>
+</ul>
+<p><strong>❌ Books Not Arriving</strong></p>
+<ul>
+<li>Check the recipient's spam/junk folder</li>
+<li>Verify the recipient email address is correct</li>
+<li>Ensure your Gmail account has sufficient sending limits</li>
+</ul>
+<p><strong>❌ Recipient Not Receiving Books</strong></p>
+<ul>
+<li>Verify the recipient's email address is correct</li>
+<li>Check if the recipient needs to whitelist your Gmail address</li>
+<li>For Kindle users, ensure your Gmail address is added to their approved email list in their Amazon account settings</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="permission-and-visibility-issues">Permission and Visibility Issues<a href="#permission-and-visibility-issues" class="hash-link" aria-label="Direct link to Permission and Visibility Issues" title="Direct link to Permission and Visibility Issues">​</a></h3>
+<p><strong>❌ Cannot See Email Settings</strong></p>
+<ul>
+<li>Verify you have email permission in your Booklore account</li>
+<li>Contact your administrator to request email access</li>
+<li>Check that you're logged into the correct account</li>
+</ul>
+<p><strong>❌ Cannot See Other Users' Providers</strong></p>
+<ul>
+<li>This is expected behavior - private email configurations are personal to each user</li>
+<li>Only shared providers (marked with "S" badge) are visible to all users</li>
+<li>Each user must set up their own private email providers and recipients</li>
+<li>If you need to send using different credentials, create a new provider in your account</li>
+</ul>
+<p><strong>❌ Cannot Edit or Delete a Shared Provider</strong></p>
+<ul>
+<li>Shared providers can only be modified by the admin who created them</li>
+<li>If you need changes to a shared provider, contact your administrator</li>
+<li>You can always create your own private provider as an alternative</li>
+</ul>
+<p><strong>❌ Cannot Share Providers (No Checkbox)</strong></p>
+<ul>
+<li>Only administrators can share email providers</li>
+<li>Contact your administrator if you need a provider shared with all users</li>
+<li>Regular users can only create private providers</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-security-best-practices">🔒 Security Best Practices<a href="#-security-best-practices" class="hash-link" aria-label="Direct link to 🔒 Security Best Practices" title="Direct link to 🔒 Security Best Practices">​</a></h2>
+<ol>
+<li><strong>Use App Passwords Only</strong>: Never use your main Gmail password for third-party applications</li>
+<li><strong>Limit Access</strong>: Only enable the minimum permissions required</li>
+<li><strong>Monitor Usage</strong>: Regularly check your Gmail sent folder for unexpected activity</li>
+<li><strong>Revoke When Needed</strong>: If you stop using Booklore, revoke the app password from your Google Account</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-alternative-email-providers">📋 Alternative Email Providers<a href="#-alternative-email-providers" class="hash-link" aria-label="Direct link to 📋 Alternative Email Providers" title="Direct link to 📋 Alternative Email Providers">​</a></h2>
+<p>While this guide focuses on Gmail, Booklore supports other email providers:</p>
+<ul>
+<li><strong>Outlook/Hotmail</strong>: Use <code>smtp-mail.outlook.com</code> on port <code>587</code></li>
+<li><strong>Yahoo</strong>: Use <code>smtp.mail.yahoo.com</code> on port <code>587</code></li>
+<li><strong>Custom SMTP</strong>: Any SMTP server with the appropriate settings</li>
+</ul>
+<p>The configuration process is similar - simply adjust the host, port, and authentication settings according to your provider's documentation.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>You can configure multiple email providers and switch between them as needed. The default provider will be used for Quick Book Send, but you can select different providers when manually sending books. All your private email configurations are personal to your account and won't be visible to other
+users. Administrators can optionally share providers to make them available to everyone.</p></div></div>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>Privacy Note</div><div class="admonitionContent_BuS1"><p>In email configuration v2, your private email provider credentials, recipient lists, and sending history are private to your account. Administrators can create shared providers that are available to all users, but they can only be modified by the admin who created them. Other users with email
+permission will have their own separate private configurations.</p></div></div>
+</body>
+</html>

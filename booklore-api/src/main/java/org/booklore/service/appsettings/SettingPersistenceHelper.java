@@ -112,6 +112,10 @@ public class SettingPersistenceHelper {
         MetadataProviderSettings.Ranobedb defaultRanobedb = new MetadataProviderSettings.Ranobedb();
         defaultRanobedb.setEnabled(false);
 
+        MetadataProviderSettings.Bookshelf defaultBookshelf = new MetadataProviderSettings.Bookshelf();
+        defaultBookshelf.setEnabled(false);
+        defaultBookshelf.setApiKey(null);
+
         defaultMetadataProviderSettings.setAmazon(defaultAmazon);
         defaultMetadataProviderSettings.setGoogle(defaultGoogle);
         defaultMetadataProviderSettings.setGoodReads(defaultGoodreads);
@@ -120,6 +124,7 @@ public class SettingPersistenceHelper {
         defaultMetadataProviderSettings.setComicvine(defaultComicvine);
         defaultMetadataProviderSettings.setRanobedb(defaultRanobedb);
         defaultMetadataProviderSettings.setDouban(defaultDouban);
+        defaultMetadataProviderSettings.setBookshelf(defaultBookshelf);
 
         return defaultMetadataProviderSettings;
     }

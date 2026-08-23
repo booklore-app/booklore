@@ -1,12 +1,8 @@
 package org.booklore.config.security.aspect;
 
-import org.booklore.config.security.service.AuthenticationService;
 import org.booklore.config.security.annotation.CheckBookAccess;
 import org.booklore.exception.ApiError;
-import org.booklore.model.dto.BookLoreUser;
-import org.booklore.model.entity.BookEntity;
-import org.booklore.repository.BookRepository;
-import org.booklore.service.restriction.ContentRestrictionService;
+import org.booklore.service.restriction.BookAccessService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,7 +11,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -25,9 +20,7 @@ import java.util.regex.Pattern;
 public class BookAccessAspect {
 
     private static final Pattern NUMERIC_PATTERN = Pattern.compile("\\d+");
-    private final AuthenticationService authenticationService;
-    private final BookRepository bookRepository;
-    private final ContentRestrictionService contentRestrictionService;
+    private final BookAccessService bookAccessService;
 
     @Before("@annotation(org.booklore.config.security.annotation.CheckBookAccess)")
     public void checkBookAccess(JoinPoint joinPoint) {
@@ -44,24 +37,7 @@ public class BookAccessAspect {
             throw ApiError.GENERIC_BAD_REQUEST.createException("Missing or invalid book ID in method parameters.");
         }
 
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
-
-        if (user.getPermissions().isAdmin()) {
-            return;
-        }
-
-        boolean hasLibraryAccess = user.getAssignedLibraries().stream().anyMatch(library -> library.getId().equals(bookEntity.getLibrary().getId()));
-
-        if (!hasLibraryAccess) {
-            throw ApiError.FORBIDDEN.createException("You are not authorized to access this book.");
-        }
-
-        List<BookEntity> filteredBooks = contentRestrictionService.applyRestrictions(List.of(bookEntity), user.getId());
-        if (filteredBooks.isEmpty()) {
-            throw ApiError.FORBIDDEN.createException("You are not authorized to access this book.");
-        }
+        bookAccessService.assertAccess(bookId);
     }
 
     private Long extractBookId(Object[] args, String[] paramNames, String targetParamName) {

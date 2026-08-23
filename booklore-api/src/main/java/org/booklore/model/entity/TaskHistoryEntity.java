@@ -48,7 +48,7 @@ public class TaskHistoryEntity {
     @Column(length = 512)
     private String message;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String errorDetails;
 
     @Convert(converter = JpaJsonConverter.class)

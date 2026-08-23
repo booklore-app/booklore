@@ -42,6 +42,9 @@ out/
 local/
 local-scripts/
 
+### Claude Code ###
+.claude/
+
 ### Dev config, books, and data ###
 booklore-ui/test-results/
 booklore-api/src/main/resources/application-local.yaml

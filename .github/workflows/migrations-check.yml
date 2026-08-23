@@ -46,15 +46,16 @@ jobs:
     if: needs.check-for-migrations.outputs.has_migrations == 'true'
     runs-on: ubuntu-latest
     services:
-      mariadb:
-        image: mariadb:10.6
+      postgres:
+        image: postgres:16-alpine
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: booklore_test
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: booklore_test
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping --silent"
+          --health-cmd="pg_isready -U root -d booklore_test"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=10
@@ -72,7 +73,7 @@ jobs:
           docker run --network host \
             -v ${{ github.workspace }}:/flyway/sql \
             flyway/flyway:11.19.0-alpine \
-            -url=jdbc:mariadb://127.0.0.1:3306/booklore_test \
+            -url=jdbc:postgresql://127.0.0.1:5432/booklore_test \
             -user=root -password=root \
             -locations=filesystem:/flyway/sql/booklore-api/src/main/resources/db/migration \
             migrate
@@ -89,7 +90,7 @@ jobs:
           docker run --network host \
             -v ${{ github.workspace }}:/flyway/sql \
             flyway/flyway:11.19.0-alpine \
-            -url=jdbc:mariadb://127.0.0.1:3306/booklore_test \
+            -url=jdbc:postgresql://127.0.0.1:5432/booklore_test \
             -user=root -password=root \
             -locations=filesystem:/flyway/sql/booklore-api/src/main/resources/db/migration \
             migrate

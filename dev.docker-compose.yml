@@ -6,7 +6,7 @@ services:
       - "${BACKEND_PORT:-6060}:6060"
       - "127.0.0.1:${REMOTE_DEBUG_PORT:-5005}:5005"
     environment:
-      - DATABASE_URL=jdbc:mariadb://backend_db:3306/booklore
+      - DATABASE_URL=jdbc:postgresql://backend_db:5432/booklore
       - DATABASE_USERNAME=booklore
       - DATABASE_PASSWORD=booklore
       - REMOTE_DEBUG_ENABLED=true
@@ -25,20 +25,19 @@ services:
       - ./shared/bookdrop:/bookdrop
 
   backend_db:
-    image: mariadb:11.4
+    image: postgres:16-alpine
     container_name: backend_db
     volumes:
-      - backend_db:/var/lib/mysql
+      - backend_db:/var/lib/postgresql/data
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=booklore
-      - MYSQL_DATABASE=booklore
-      - MYSQL_USER=booklore
-      - MYSQL_PASSWORD=booklore
+      - POSTGRES_DB=booklore
+      - POSTGRES_USER=booklore
+      - POSTGRES_PASSWORD=booklore
     ports:
-      - "${DB_PORT:-3366}:3306"
+      - "${DB_PORT:-3366}:5432"
     healthcheck:
-      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost", "-uroot", "-pbooklore" ]
+      test: [ "CMD", "pg_isready", "-U", "booklore", "-d", "booklore" ]
       interval: 10s
       timeout: 5s
       retries: 5

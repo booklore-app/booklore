@@ -98,6 +98,8 @@ export class MetadataProviderSettingsComponent implements OnInit {
   doubanEnabled: boolean = false;
   lubimyCzytacEnabled: boolean = false;
   ranobedbEnabled: boolean = false;
+  bookshelfEnabled: boolean = false;
+  bookshelfToken: string = '';
   googleApiKey: string = '';
 
   private appSettingsService = inject(AppSettingsService);
@@ -132,6 +134,8 @@ export class MetadataProviderSettingsComponent implements OnInit {
         this.ranobedbEnabled = metadataProviderSettings?.ranobedb?.enabled ?? false;
         this.audibleEnabled = metadataProviderSettings?.audible?.enabled ?? false;
         this.selectedAudibleDomain = metadataProviderSettings?.audible?.domain ?? 'com';
+        this.bookshelfEnabled = metadataProviderSettings?.bookshelf?.enabled ?? false;
+        this.bookshelfToken = metadataProviderSettings?.bookshelf?.apiKey ?? '';
       });
   }
 
@@ -144,6 +148,13 @@ export class MetadataProviderSettingsComponent implements OnInit {
 
   onComicTokenChange(newToken: string): void {
     this.comicvineToken = newToken;
+  }
+
+  onBookshelfTokenChange(newToken: string): void {
+    this.bookshelfToken = newToken;
+    if (!newToken.trim()) {
+      this.bookshelfEnabled = false;
+    }
   }
 
   saveSettings(): void {
@@ -177,6 +188,10 @@ export class MetadataProviderSettingsComponent implements OnInit {
           audible: {
             enabled: this.audibleEnabled,
             domain: this.selectedAudibleDomain
+          },
+          bookshelf: {
+            enabled: this.bookshelfEnabled,
+            apiKey: this.bookshelfToken.trim()
           }
         }
       }

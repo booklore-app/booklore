@@ -15,6 +15,24 @@ Organize, read, annotate, sync across devices, and share, all without relying on
 
 ---
 
+> [!NOTE]
+> **This is a fork.** The original [booklore-app/booklore](https://github.com/booklore-app/booklore) project appears to have been
+> abandoned by its maintainer. This fork keeps it running and moving forward — see [What's Changed](#whats-changed-in-this-fork) below.
+
+---
+
+## 🔀 What's Changed in This Fork
+
+- **PostgreSQL instead of MariaDB.** The database layer, all schema migrations, and every Docker/Podman/Helm example have been
+  ported from MariaDB to PostgreSQL.
+- **Native (non-Docker) install & deploy tooling.** `install.sh` sets up a full native install (Java, Node, PostgreSQL,
+  systemd services, reverse proxy + TLS via Caddy or nginx/certbot) without requiring Docker. `deploy.sh` pulls and applies
+  code changes to an existing install.
+- **Local documentation archive.** The original docs site (`booklore.org/docs`) went offline along with the abandoned project;
+  a full local copy now lives at `/docs` in the app itself so in-app help links keep working.
+
+---
+
 ## ✨ Features
 
 | | Feature | Description |
@@ -53,18 +71,15 @@ APP_GROUP_ID=1000
 TZ=Etc/UTC
 
 # Database
-DATABASE_URL=jdbc:mariadb://mariadb:3306/booklore
+DATABASE_URL=jdbc:postgresql://postgres:5432/booklore
 DB_USER=booklore
 DB_PASSWORD=ChangeMe_BookLoreApp_2025!
 
 # Storage: LOCAL (default) or NETWORK (disables file operations, see Network Storage section below)
 DISK_TYPE=LOCAL
 
-# MariaDB
-DB_USER_ID=1000
-DB_GROUP_ID=1000
-MYSQL_ROOT_PASSWORD=ChangeMe_MariaDBRoot_2025!
-MYSQL_DATABASE=booklore
+# PostgreSQL
+POSTGRES_DB=booklore
 ```
 
 ### Step 2: Docker Compose
@@ -85,7 +100,7 @@ services:
       - DATABASE_PASSWORD=${DB_PASSWORD}
       - DISK_TYPE=${DISK_TYPE}
     depends_on:
-      mariadb:
+      postgres:
         condition: service_healthy
     ports:
       - "6060:6060"
@@ -101,22 +116,19 @@ services:
       timeout: 10s
     restart: unless-stopped
 
-  mariadb:
-    image: lscr.io/linuxserver/mariadb:11.4.5
-    container_name: mariadb
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
     environment:
-      - PUID=${DB_USER_ID}
-      - PGID=${DB_GROUP_ID}
       - TZ=${TZ}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
-      - ./mariadb/config:/config
+      - ./postgres/data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost" ]
+      test: [ "CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -168,14 +180,14 @@ volumes:
 
 ---
 
-## 💜 Support BookLore
+## 💜 Support This Fork
 
 BookLore is free, open source, and built with care. Here's how you can give back:
 
 | Action | How |
 |:---|:---|
-| ⭐ **Star this repo** | It's the simplest way to help others find BookLore |
-| 💰 **Sponsor development** | [Open Collective](https://opencollective.com/booklore) funds hosting, testing, and new features |
+| ⭐ **Star this repo** | It's the simplest way to help others find this fork |
+| ☕ **Buy me a coffee** | [Ko-fi](https://ko-fi.com/xspader) — a one-time tip to fuel continued development |
 | 📢 **Tell someone** | Share BookLore with a friend, a subreddit, or your local book club |
 
 ---

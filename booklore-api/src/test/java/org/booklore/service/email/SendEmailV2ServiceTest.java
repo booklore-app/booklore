@@ -1,6 +1,7 @@
 package org.booklore.service.email;
 
 import org.booklore.config.security.service.AuthenticationService;
+import org.booklore.exception.ApiError;
 import org.booklore.exception.APIException;
 import org.booklore.model.dto.BookLoreUser;
 import org.booklore.model.dto.request.SendBookByEmailRequest;
@@ -10,6 +11,7 @@ import org.booklore.repository.EmailProviderV2Repository;
 import org.booklore.repository.EmailRecipientV2Repository;
 import org.booklore.repository.UserEmailProviderPreferenceRepository;
 import org.booklore.service.NotificationService;
+import org.booklore.service.restriction.BookAccessService;
 import org.booklore.util.FileUtils;
 import org.booklore.util.SecurityContextVirtualThread;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +48,9 @@ class SendEmailV2ServiceTest {
 
     @Mock
     private AuthenticationService authenticationService;
+
+    @Mock
+    private BookAccessService bookAccessService;
 
     @InjectMocks
     private SendEmailV2Service sendEmailV2Service;
@@ -307,6 +312,34 @@ class SendEmailV2ServiceTest {
                 verify(notificationService, atLeastOnce()).sendMessage(any(), any());
             }
         }
+    }
+
+    @Test
+    void emailBookQuick_accessDenied_bookNotSent() {
+        doThrow(ApiError.FORBIDDEN.createException("You are not authorized to access this book."))
+                .when(bookAccessService).assertAccess(10L);
+
+        assertThrows(APIException.class, () -> sendEmailV2Service.emailBookQuick(10L));
+
+        verifyNoInteractions(notificationService);
+        verify(bookRepository, never()).findByIdWithBookFiles(anyLong());
+    }
+
+    @Test
+    void emailBook_accessDenied_bookNotSent() {
+        SendBookByEmailRequest request = SendBookByEmailRequest.builder()
+                .bookId(10L)
+                .providerId(100L)
+                .recipientId(200L)
+                .build();
+
+        doThrow(ApiError.FORBIDDEN.createException("You are not authorized to access this book."))
+                .when(bookAccessService).assertAccess(10L);
+
+        assertThrows(APIException.class, () -> sendEmailV2Service.emailBook(request));
+
+        verifyNoInteractions(notificationService);
+        verify(bookRepository, never()).findByIdWithBookFiles(anyLong());
     }
 
     @Test

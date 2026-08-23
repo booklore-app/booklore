@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OPDS | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>OPDS</h1></header>
+<p>OPDS (Open Publication Distribution System) lets you browse and download books from your Booklore library using any OPDS-compatible reading app. Point your app at Booklore's catalog URL, authenticate, and your full library is available on any device: e-readers, tablets, phones.</p>
+<p>Booklore also provides a <strong>Komga-compatible API</strong> for apps that speak the Komga protocol (Tachiyomi, Komelia, etc.), which is especially useful for comic/manga readers that support per-page streaming of CBX files. Both APIs share the same user accounts and respect library access permissions.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="server-control">Server Control<a href="#server-control" class="hash-link" aria-label="Direct link to Server Control" title="Direct link to Server Control">​</a></h2>
+<p>Go to <strong>Settings > OPDS</strong> in Booklore. The top section has two toggles:</p>
+<p><img decoding="async" loading="lazy" alt="Booklore OPDS Configuration page showing server toggles, endpoint URLs, and OPDS user management" src="https://web.archive.org/web/20260305164129im_/https://booklore.org/assets/images/opds-08ecee47ec279c59032faa8770d4223b.jpg" width="1200" height="696" class="img_ev3q"></p>
+<p><strong>OPDS Server Enabled</strong> activates the standard OPDS catalog at <code>/api/v1/opds</code>. This is what most reading apps connect to.</p>
+<p><strong>Komga API</strong> activates the Komga-compatible API at <code>/komga/api/</code>. Enable this if you use Tachiyomi, Komelia, or other Komga clients. It uses the same OPDS user accounts for authentication.</p>
+<p>When the Komga API is enabled, an additional toggle appears:</p>
+<ul>
+<li><strong>Group Unknown Series</strong>: When on, books without a series are grouped under "Unknown Series." When off, each standalone book appears as its own individual series entry. This controls how Komga clients display books that aren't part of a series.</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="endpoints">Endpoints<a href="#endpoints" class="hash-link" aria-label="Direct link to Endpoints" title="Direct link to Endpoints">​</a></h2>
+<p>Once enabled, the endpoint URLs appear in the <strong>Endpoints</strong> section with copy buttons. The URLs are auto-generated based on your Booklore instance.</p>
+<table><thead><tr><th>Endpoint</th><th>URL Pattern</th><th>Used by</th></tr></thead><tbody><tr><td>OPDS Catalog</td><td><code>http://your-server:6060/api/v1/opds</code></td><td>KOReader, Moon+ Reader, Panels, and other OPDS apps</td></tr><tr><td>Komga API</td><td><code>http://your-server:6060/komga/api</code></td><td>Tachiyomi, Komelia, and other Komga clients</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Network Access</div><div class="admonitionContent_BuS1"><p>Replace <code>localhost</code> with your server's IP address or domain name when connecting from other devices. If you're behind a reverse proxy, use your external URL.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="opds-users">OPDS Users<a href="#opds-users" class="hash-link" aria-label="Direct link to OPDS Users" title="Direct link to OPDS Users">​</a></h2>
+<p>OPDS uses its own user accounts, separate from your Booklore login. Both the OPDS catalog and Komga API authenticate with these same credentials using HTTP Basic Auth.</p>
+<p>To create a user:</p>
+<ol>
+<li>In the <strong>OPDS Users</strong> section, click <strong>Add User</strong></li>
+<li>Enter a username, password, and default sort order</li>
+<li>Click <strong>Create</strong></li>
+</ol>
+<p>Each OPDS user is linked to the Booklore user who created it, which determines library access: the OPDS user can only see libraries that the parent Booklore user has access to. Admins can see everything.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="sort-order">Sort Order<a href="#sort-order" class="hash-link" aria-label="Direct link to Sort Order" title="Direct link to Sort Order">​</a></h3>
+<p>Each OPDS user has a configurable sort order that controls how books appear in feeds. You can set it when creating the user or edit it later with the pencil icon. The options are:</p>
+<table><thead><tr><th>Sort Order</th><th>Description</th></tr></thead><tbody><tr><td>Recently Added</td><td>Newest books first (default)</td></tr><tr><td>Title (A-Z / Z-A)</td><td>Alphabetical by title</td></tr><tr><td>Author (A-Z / Z-A)</td><td>Alphabetical by author</td></tr><tr><td>Series (A-Z / Z-A)</td><td>Alphabetical by series name</td></tr><tr><td>Rating (Low-High / High-Low)</td><td>By average rating</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Passwords</div><div class="admonitionContent_BuS1"><p>Passwords cannot be retrieved after creation. Store your OPDS credentials securely.</p></div></div>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Permissions</div><div class="admonitionContent_BuS1"><p>Only users with the <strong>Access OPDS</strong> permission can access the OPDS settings page and create OPDS users. Admins have this by default. Grant it to other users in <strong>Settings > Users</strong>.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="connecting-a-reading-app">Connecting a Reading App<a href="#connecting-a-reading-app" class="hash-link" aria-label="Direct link to Connecting a Reading App" title="Direct link to Connecting a Reading App">​</a></h2>
+<p>In your reading app, add a new OPDS catalog with:</p>
+<ul>
+<li><strong>URL:</strong> Your OPDS Catalog URL</li>
+<li><strong>Username:</strong> Your OPDS username</li>
+<li><strong>Password:</strong> Your OPDS password</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="compatible-apps">Compatible Apps<a href="#compatible-apps" class="hash-link" aria-label="Direct link to Compatible Apps" title="Direct link to Compatible Apps">​</a></h3>
+<table><thead><tr><th>App</th><th>Platform</th><th>Notes</th></tr></thead><tbody><tr><td>KOReader</td><td>Android, iOS, Linux, Windows</td><td>Also supports <a href="../integration/koreader.html">progress sync</a> for books downloaded via OPDS</td></tr><tr><td>Moon+ Reader</td><td>Android</td><td></td></tr><tr><td>FBReader</td><td>Multi-platform</td><td></td></tr><tr><td>Panels</td><td>iOS, macOS</td><td></td></tr><tr><td>Yomu</td><td>iOS</td><td></td></tr><tr><td>KyBook 3</td><td>iOS, macOS</td><td></td></tr><tr><td>Boox</td><td>Android (e-ink devices)</td><td></td></tr><tr><td>Tachiyomi</td><td>Android</td><td>Use the Komga API endpoint</td></tr><tr><td>Komelia</td><td>Multi-platform</td><td>Use the Komga API endpoint</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="koreader-example">KOReader Example<a href="#koreader-example" class="hash-link" aria-label="Direct link to KOReader Example" title="Direct link to KOReader Example">​</a></h3>
+<ol>
+<li>Open KOReader (with no book open)</li>
+<li>Tap the magnifying glass icon in the top menu</li>
+<li>Select <strong>OPDS catalog</strong></li>
+<li>Tap the hamburger menu (top left) and select <strong>Add catalog</strong></li>
+<li>Enter a name, your OPDS URL, username, and password</li>
+<li>Save and browse your library</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="available-feeds">Available Feeds<a href="#available-feeds" class="hash-link" aria-label="Direct link to Available Feeds" title="Direct link to Available Feeds">​</a></h2>
+<p>Most reading apps automatically discover these feeds from the root catalog URL. You don't need to enter them manually.</p>
+<table><thead><tr><th>Feed</th><th>Path</th><th>Description</th></tr></thead><tbody><tr><td>Root Catalog</td><td><code>/api/v1/opds</code></td><td>Main entry point with navigation links to all feeds below</td></tr><tr><td>All Books</td><td><code>/api/v1/opds/catalog</code></td><td>Full catalog with pagination and search</td></tr><tr><td>Recently Added</td><td><code>/api/v1/opds/recent</code></td><td>Books sorted by date added</td></tr><tr><td>Libraries</td><td><code>/api/v1/opds/libraries</code></td><td>Browse by library</td></tr><tr><td>Shelves</td><td><code>/api/v1/opds/shelves</code></td><td>Browse by shelf</td></tr><tr><td>Magic Shelves</td><td><code>/api/v1/opds/magic-shelves</code></td><td>Browse dynamic magic shelves</td></tr><tr><td>Authors</td><td><code>/api/v1/opds/authors</code></td><td>Browse by author</td></tr><tr><td>Series</td><td><code>/api/v1/opds/series</code></td><td>Browse by series</td></tr><tr><td>Surprise Me</td><td><code>/api/v1/opds/surprise</code></td><td>25 random books</td></tr><tr><td>Search</td><td><code>/api/v1/opds/catalog?q={terms}</code></td><td>Search across titles, authors, descriptions, publishers, ISBNs, series, languages, and categories</td></tr></tbody></table>
+<p>All acquisition feeds support pagination with <code>page</code> (default 1) and <code>size</code> (default 50, max 100) query parameters.</p>
+<p>Books include series metadata (<code>belongs-to-collection</code>) when available, so apps that support EPUB 3 collection grouping can display series information.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="komga-compatible-api">Komga-Compatible API<a href="#komga-compatible-api" class="hash-link" aria-label="Direct link to Komga-Compatible API" title="Direct link to Komga-Compatible API">​</a></h2>
+<p>The Komga API exposes your library in the format that Komga clients expect. This is particularly useful for <strong>CBX files</strong> (CBZ, CBR, CB7) because Komga clients can stream individual pages without downloading the full archive.</p>
+<p>Key endpoints:</p>
+<table><thead><tr><th>Endpoint</th><th>What it does</th></tr></thead><tbody><tr><td><code>GET /komga/api/v1/libraries</code></td><td>List libraries the user has access to</td></tr><tr><td><code>GET /komga/api/v1/series</code></td><td>List series (with optional <code>library_id</code> filter)</td></tr><tr><td><code>GET /komga/api/v1/books</code></td><td>List books</td></tr><tr><td><code>GET /komga/api/v1/books/{id}/file</code></td><td>Download the full book file</td></tr><tr><td><code>GET /komga/api/v1/books/{id}/thumbnail</code></td><td>Get the book cover</td></tr><tr><td><code>GET /komga/api/v1/books/{id}/pages</code></td><td>Get page metadata (page count, filenames, media types)</td></tr><tr><td><code>GET /komga/api/v1/books/{id}/pages/{num}</code></td><td>Get a single page image (supports <code>?convert=png</code>)</td></tr><tr><td><code>GET /komga/api/v1/collections</code></td><td>List collections</td></tr></tbody></table>
+<p>Authentication is the same: HTTP Basic Auth with your OPDS user credentials.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting">​</a></h2>
+<table><thead><tr><th>Problem</th><th>What to check</th></tr></thead><tbody><tr><td>App can't connect</td><td>Verify the OPDS server is enabled, the URL is correct, and the OPDS credentials are right. If connecting from another device, make sure <code>localhost</code> is replaced with the server's IP or hostname.</td></tr><tr><td>Books not appearing</td><td>The OPDS user inherits library access from the parent Booklore user. If the Booklore user doesn't have access to a library, books from that library won't appear in OPDS.</td></tr><tr><td>Authentication errors</td><td>OPDS users are separate from Booklore accounts. Double-check the OPDS username and password. Passwords can't be retrieved after creation.</td></tr><tr><td>Komga client shows no series</td><td>Make sure the Komga API toggle is enabled in OPDS settings. Try toggling <strong>Group Unknown Series</strong> if standalone books aren't showing up.</td></tr><tr><td>CBX pages not loading</td><td>Per-page streaming only works through the Komga API (<code>/komga/api/</code>), not the standard OPDS endpoint. Make sure your client is pointed at the Komga URL.</td></tr><tr><td>Search returns nothing</td><td>OPDS search queries against title, author, description, publisher, ISBN, series, language, and categories. Make sure the search terms match content in those fields.</td></tr></tbody></table>
+</body>
+</html>

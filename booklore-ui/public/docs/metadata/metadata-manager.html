@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🏷️ Metadata Manager | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🏷️ Metadata Manager</h1></header>
+<p>The Metadata Manager lets you clean up and standardize metadata across your entire library. Merge duplicates, rename entries, split combined values, and delete unwanted metadata in bulk.</p>
+<p><img decoding="async" loading="lazy" alt="Metadata Manager Overview" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/overview-be18963a62c323e34e7825c339703d4e.jpg" width="1200" height="716" class="img_ev3q"></p>
+<p>Access it from <strong>Settings > Metadata Manager</strong>.</p>
+<p><img decoding="async" loading="lazy" alt="Access Settings" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/access-settings-dfe3fe5ca3cad751b1ffb1f93ed5dda2.jpg" width="1200" height="716" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>File Management</div><div class="admonitionContent_BuS1"><p>If "Auto-Move Files on Metadata Update" and/or "Write to File" are enabled, those settings are honored when metadata changes are applied through the manager.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="metadata-categories">Metadata Categories<a href="#metadata-categories" class="hash-link" aria-label="Direct link to Metadata Categories" title="Direct link to Metadata Categories">​</a></h2>
+<p>The manager has seven tabs, each showing all unique values and a count of how many books use each one:</p>
+<table><thead><tr><th>Tab</th><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Authors</strong></td><td>Multi-value</td><td>Books can have multiple authors</td></tr><tr><td><strong>Genres</strong></td><td>Multi-value</td><td>Books can belong to multiple genres</td></tr><tr><td><strong>Moods</strong></td><td>Multi-value</td><td>Books can have multiple mood tags</td></tr><tr><td><strong>Tags</strong></td><td>Multi-value</td><td>Unlimited custom tags per book</td></tr><tr><td><strong>Series</strong></td><td>Single-value</td><td>Each book belongs to one series</td></tr><tr><td><strong>Publishers</strong></td><td>Single-value</td><td>One publisher per book</td></tr><tr><td><strong>Languages</strong></td><td>Single-value</td><td>One language per book</td></tr></tbody></table>
+<p>The distinction between multi-value and single-value fields matters for merge and rename operations (see below).</p>
+<p>Each tab has a search bar, sortable columns (by name or book count), and pagination. Click any metadata value to navigate to the filtered book view showing all books with that value.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="merging-metadata">Merging Metadata<a href="#merging-metadata" class="hash-link" aria-label="Direct link to Merging Metadata" title="Direct link to Merging Metadata">​</a></h2>
+<p>Combine duplicate or similar entries into a standardized value. Useful for cleaning up variations like "Sci-Fi", "Science Fiction", and "SciFi" into a single entry.</p>
+<ol>
+<li>Select at least two items using the checkboxes</li>
+<li>Click <strong>Merge Selected</strong></li>
+<li>Enter the target value</li>
+</ol>
+<p><img decoding="async" loading="lazy" alt="Select Items" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/select-items-d76b12cd3f53849b6e51984bb531bbac.jpg" width="1200" height="716" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" alt="Merge Target" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/merge-target-2dc621b3643467a7d33e30185103b517.jpg" width="1200" height="716" class="img_ev3q"></p>
+<p><strong>For multi-value fields</strong> (Authors, Genres, Moods, Tags), you can enter comma-separated values to give all affected books multiple tags. For example, merging "Mystery & Detective" into <code>Mystery, Detective</code> gives every affected book both tags.</p>
+<p><strong>For single-value fields</strong> (Series, Publisher, Language), only a single target value is allowed. All selected entries are standardized to that one value.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="examples">Examples<a href="#examples" class="hash-link" aria-label="Direct link to Examples" title="Direct link to Examples">​</a></h3>
+<table><thead><tr><th>Selected</th><th>Target</th><th>Result</th></tr></thead><tbody><tr><td>"Sci-Fi", "Science Fiction", "SciFi"</td><td><code>Science Fiction</code></td><td>All books get "Science Fiction"</td></tr><tr><td>"En", "English", "en-US"</td><td><code>English</code></td><td>All books have language set to "English"</td></tr><tr><td>"Mystery & Detective"</td><td><code>Mystery, Detective</code></td><td>Books get both "Mystery" and "Detective"</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="renaming-metadata">Renaming Metadata<a href="#renaming-metadata" class="hash-link" aria-label="Direct link to Renaming Metadata" title="Direct link to Renaming Metadata">​</a></h2>
+<p>Rename individual entries or split them into multiple values. Click the <strong>pencil icon</strong> next to any entry.</p>
+<p><img decoding="async" loading="lazy" alt="Rename Button" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/rename-button-d24b5e411fbcc87b27913ae40bda7807.jpg" width="1200" height="716" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" alt="Rename Input" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/rename-input-2422ae40cc424c51fb096b0115410d85.jpg" width="1200" height="716" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" alt="Rename Confirm" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/rename-confirm-3d4bb1f6c55588941e7986fabe9e7ac2.jpg" width="1200" height="716" class="img_ev3q"></p>
+<p>For multi-value fields, entering comma-separated values splits the entry. For example, renaming "Mystery & Detective" to <code>Mystery, Detective</code> gives affected books both tags.</p>
+<p>For single-value fields, only a single new name is allowed.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="deleting-metadata">Deleting Metadata<a href="#deleting-metadata" class="hash-link" aria-label="Direct link to Deleting Metadata" title="Direct link to Deleting Metadata">​</a></h2>
+<p>Remove metadata values from all books that have them. Click the <strong>trash icon</strong> on a single entry, or select multiple items and click <strong>Delete Selected</strong>.</p>
+<p><img decoding="async" loading="lazy" alt="Delete Option" src="https://web.archive.org/web/20260308082420im_/https://booklore.org/assets/images/delete-option-63f660eb30421393671ecd6c31fff3fe.jpg" width="1200" height="716" class="img_ev3q"></p>
+<p>Deletion removes the metadata from affected books. The books themselves remain in your library with all other metadata intact.</p>
+<div class="theme-admonition theme-admonition-danger admonition_xJq3 alert alert--danger"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path></svg></span>Cannot Be Undone</div><div class="admonitionContent_BuS1"><p>Merge, rename, and delete operations cannot be undone. Review the affected book count in the confirmation dialog before proceeding. Consider backing up your database before major bulk changes.</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="select-similar">Select Similar<a href="#select-similar" class="hash-link" aria-label="Direct link to Select Similar" title="Direct link to Select Similar">​</a></h2>
+<p>Click the <strong>Select Similar</strong> button (filter icon) on any entry to automatically select other entries with similar names. This uses substring matching in both directions, making it easy to find variations and duplicates quickly.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tips">Tips<a href="#tips" class="hash-link" aria-label="Direct link to Tips" title="Direct link to Tips">​</a></h2>
+<ul>
+<li><strong>Sort by book count</strong> to focus on high-impact entries first</li>
+<li><strong>Use Select Similar</strong> to quickly find duplicate variations before merging</li>
+<li>Metadata is <strong>case-sensitive</strong>: "fiction" and "Fiction" are treated as separate entries</li>
+<li>Leading and trailing spaces matter: "Author " and "Author" are different</li>
+<li>Click any metadata value to see which books it applies to before making changes</li>
+</ul>
+</body>
+</html>

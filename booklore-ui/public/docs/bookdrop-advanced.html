@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🎯 Bookdrop Advanced Features | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="./index.html">Back to docs index</a>
+</div>
+<header><h1>🎯 Bookdrop Advanced Features</h1></header>
+<p>Bookdrop has 2 more advanced tools to assist with importing large collections into Booklore</p>
+<ul>
+<li>Bulk Edit</li>
+<li>Pattern Extraction</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-bulk-edit-metadata">✏️ Bulk Edit Metadata<a href="#️-bulk-edit-metadata" class="hash-link" aria-label="Direct link to ✏️ Bulk Edit Metadata" title="Direct link to ✏️ Bulk Edit Metadata">​</a></h2>
+<p>Apply the same metadata changes to multiple books at once.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-use">How to Use<a href="#how-to-use" class="hash-link" aria-label="Direct link to How to Use" title="Direct link to How to Use">​</a></h3>
+<ol>
+<li><strong>Select files</strong> using checkboxes, or the <strong>"Select All"</strong> button</li>
+<li>Click <strong>"Bulk Edit"</strong> button in toolbar</li>
+<li><strong>Edit fields</strong> you want to change:
+<ul>
+<li>Text: Series Name, Publisher, Language</li>
+<li>Number: Series Total</li>
+<li>Arrays: Authors, Genres, Moods, Tags</li>
+</ul>
+</li>
+<li>Choose <strong>Merge</strong> (add new data to existing metadata) or <strong>Replace</strong> (overwrite) for array fields</li>
+<li>Click <strong>"Apply to Selected"</strong></li>
+</ol>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>Only checked fields will be updated. Fields are auto-checked when you enter values, but make sure any fields you want to set a ticked.</p></div></div>
+<p><strong>Example:</strong> Update 150 comic issues with the same series name and publisher in seconds.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-pattern-extraction">🔍 Pattern Extraction<a href="#-pattern-extraction" class="hash-link" aria-label="Direct link to 🔍 Pattern Extraction" title="Direct link to 🔍 Pattern Extraction">​</a></h2>
+<p>Automatically extract metadata from filenames using patterns.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-use-1">How to Use<a href="#how-to-use-1" class="hash-link" aria-label="Direct link to How to Use" title="Direct link to How to Use">​</a></h3>
+<ol>
+<li><strong>Select files</strong> to process, or the use <strong>"Select All"</strong> button</li>
+<li>Click <strong>"Extract Pattern"</strong> button</li>
+<li><strong>Enter a pattern</strong> or choose one of the existing ones (You can modify these after selection)</li>
+<li><strong>Preview</strong> results on sample files</li>
+<li>Click <strong>"Extract and Apply"</strong></li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="pattern-syntax">Pattern Syntax<a href="#pattern-syntax" class="hash-link" aria-label="Direct link to Pattern Syntax" title="Direct link to Pattern Syntax">​</a></h3>
+<p><strong>Placeholders</strong> (capture metadata):</p>
+<ul>
+<li>Text: <code>{Title}</code>, <code>{SeriesName}</code>, <code>{Authors}</code>, <code>{Publisher}</code>, <code>{Language}</code>, <code>{Subtitle}</code></li>
+<li>Numbers: <code>{SeriesNumber}</code>, <code>{SeriesTotal}</code></li>
+<li>Identifiers: <code>{ISBN10}</code>, <code>{ISBN13}</code>, <code>{ASIN}</code></li>
+<li>Dates: <code>{Published}</code>, <code>{Published:yyyy-MM-dd}</code>, <code>{Published:yyyy}</code></li>
+</ul>
+<p><strong>Wildcard</strong> (skip text without extraction): <code>*</code></p>
+<p><strong>Literal text:</strong> Everything else matches exactly as shown, dashes, spaces etc. So adding in <code>-</code> between 2 placeholders would require that <code>-</code> is present between those placeholders in the filename for a successful match.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="example-patterns">Example Patterns<a href="#example-patterns" class="hash-link" aria-label="Direct link to Example Patterns" title="Direct link to Example Patterns">​</a></h3>
+<p><strong>Books:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">{Authors} - {Title}</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">{Title} ({Published:yyyy})</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">{Authors} - {Title} ({Published:yyyy})</span><br></span></code></pre></div></div>
+<p><strong>Series/Comics:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">{SeriesName} #{SeriesNumber}</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">{SeriesName} - Chapter {SeriesNumber}</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">{SeriesName} v{SeriesNumber} (of {SeriesTotal})</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">[*] {SeriesName} - Chapter {SeriesNumber}</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="pattern-examples">Pattern Examples<a href="#pattern-examples" class="hash-link" aria-label="Direct link to Pattern Examples" title="Direct link to Pattern Examples">​</a></h3>
+<table><thead><tr><th>Filename</th><th>Pattern</th><th>Result</th></tr></thead><tbody><tr><td><code>John Smith - The Lost City.epub</code></td><td><code>{Authors} - {Title}</code></td><td>Authors="John Smith"<br>Title="The Lost City"</td></tr><tr><td><code>Chronicles #025.cbz</code></td><td><code>{SeriesName} #{SeriesNumber}</code></td><td>Series="Chronicles"<br>Number=25</td></tr><tr><td><code>The Book (2023).epub</code></td><td><code>{Title} ({Published})</code></td><td>Title="The Book"<br>Year=2023</td></tr><tr><td><code>[Tag] Series - Ch 5.cbz</code></td><td><code>[*] {SeriesName} - Ch {SeriesNumber}</code></td><td>Series="Series"<br>Number=5</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="date-formats">Date Formats<a href="#date-formats" class="hash-link" aria-label="Direct link to Date Formats" title="Direct link to Date Formats">​</a></h3>
+<p>While Booklore will attempt to automatically detect the right date format to match what is given, you can explicitly tell it the format to override any auto-detection. This is useful when a date is ambigious.</p>
+<p>The below are some example formats that can be given to a date placeholder:</p>
+<table><thead><tr><th>Format</th><th>Example</th><th>Use</th></tr></thead><tbody><tr><td><code>yyyy-MM-dd</code></td><td>2023-05-15</td><td>ISO standard</td></tr><tr><td><code>MM-dd-yyyy</code></td><td>05-15-2023</td><td>US format</td></tr><tr><td><code>dd.MM.yyyy</code></td><td>15.05.2023</td><td>European</td></tr><tr><td><code>yyyyMMdd</code></td><td>20230515</td><td>Compact</td></tr><tr><td><code>yyyy</code></td><td>2023</td><td>Year only</td></tr></tbody></table>
+<p>Tokens: <code>yyyy</code>=year, <code>MM</code>=month, <code>dd</code>=day, <code>M</code>=1-2 digit month, <code>d</code>=1-2 digit day</p>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>note</div><div class="admonitionContent_BuS1"><p>When using <code>yyyy</code> it'll default the day/month to the first of January when adding to the book metadata, as Booklore requires a full date value</p></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-quick-tips">💡 Quick Tips<a href="#-quick-tips" class="hash-link" aria-label="Direct link to 💡 Quick Tips" title="Direct link to 💡 Quick Tips">​</a></h2>
+<p><strong>Pattern Extraction:</strong></p>
+<ul>
+<li>Always preview before extracting to see the data that will be pulled from the files</li>
+<li>For files with extremely different patterns, I would suggest editing them in "groups" rather than trying to make 1 perfect pattern to fit wildly different filename styles</li>
+<li>Use wildcards <code>*</code> for any parts that vary between files</li>
+</ul>
+<p><strong>Bulk Edit:</strong></p>
+<ul>
+<li>Only enable fields you want to change, enabling a blank field will replace it with a blank value</li>
+<li>For array fields, merge will attempt to merge the data already there with what you set, while replace will override it</li>
+<li>Press Enter after each value in array fields to add multiple values to those fields</li>
+</ul>
+<p><strong>Combining Features:</strong></p>
+<ol>
+<li>Use Pattern Extraction to get metadata from filenames, useful for getting details like a books position in its series from the filename</li>
+<li>Use Bulk Edit to add consistent series info, publishers, or tags across multiple files</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-troubleshooting">🚨 Troubleshooting<a href="#-troubleshooting" class="hash-link" aria-label="Direct link to 🚨 Troubleshooting" title="Direct link to 🚨 Troubleshooting">​</a></h2>
+<p><strong>Pattern doesn't match:</strong></p>
+<ul>
+<li>Check literal text matches exactly (spaces, dashes, etc) and use a wildcard if in doubt</li>
+<li>Compare pattern to actual filenames character-by-character</li>
+<li>Start from a simple pattern, and add to it while checking the preview to see what's failing</li>
+</ul>
+<p><strong>Dates wrong:</strong></p>
+<ul>
+<li>Specify explicit format: <code>{Published:MM-dd-yyyy}</code> for a date formated like <code>02-20-2025</code> in the filename</li>
+</ul>
+<p><strong>Bulk edit not applying:</strong></p>
+<ul>
+<li>Verify fields are checked</li>
+<li>Ensure values are entered</li>
+<li>Check selection count</li>
+</ul>
+<hr>
+<p>You can always review the extracted or bulk metadata prior to finalizing the import by clicking on each book.</p>
+</body>
+</html>

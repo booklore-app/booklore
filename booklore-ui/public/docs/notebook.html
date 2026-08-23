@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>📓 Notebook | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="./index.html">Back to docs index</a>
+</div>
+<header><h1>📓 Notebook</h1></header>
+<p>The Notebook is a centralized view of all your highlights, notes, and bookmarks across every book in your library. Access it from the sidebar navigation.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-overview">📖 Overview<a href="#-overview" class="hash-link" aria-label="Direct link to 📖 Overview" title="Direct link to 📖 Overview">​</a></h2>
+<p><img decoding="async" loading="lazy" alt="Notebook" src="https://web.archive.org/web/20260310031309im_/https://booklore.org/assets/images/notebook-overview-963186efcdfb492dceb4d27167a4aa31.jpg" width="1200" height="762" class="img_ev3q"></p>
+<p>Annotations are grouped by book. Each book section shows a thumbnail, title, and annotation count, and can be collapsed or expanded. Individual entries display the annotation type (colored badge), chapter name, content, and creation date.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="️-annotation-types">🏷️ Annotation Types<a href="#️-annotation-types" class="hash-link" aria-label="Direct link to 🏷️ Annotation Types" title="Direct link to 🏷️ Annotation Types">​</a></h3>
+<table><thead><tr><th>Type</th><th>Badge</th><th>Description</th></tr></thead><tbody><tr><td><strong>Highlight</strong></td><td>Yellow</td><td>Text passages you highlighted in the EPUB reader</td></tr><tr><td><strong>Note</strong></td><td>Blue</td><td>Notes you attached to text in EPUB or comic readers</td></tr><tr><td><strong>Bookmark</strong></td><td>Green</td><td>Positions you bookmarked in any reader</td></tr></tbody></table>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-filtering--search">🔍 Filtering & Search<a href="#-filtering--search" class="hash-link" aria-label="Direct link to 🔍 Filtering & Search" title="Direct link to 🔍 Filtering & Search">​</a></h2>
+<p>The toolbar at the top offers several ways to narrow down your annotations:</p>
+<ul>
+<li><strong>Search</strong> text input filters annotations by content (with a short debounce)</li>
+<li><strong>Filter by book</strong> dropdown lets you scope to a single book</li>
+<li><strong>Type toggles</strong> (Highlights, Notes, Bookmarks) can be toggled independently to show or hide each type</li>
+</ul>
+<p>All filters can be combined. For example, show only highlights from a specific book that match a search term.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-sorting">🔃 Sorting<a href="#-sorting" class="hash-link" aria-label="Direct link to 🔃 Sorting" title="Direct link to 🔃 Sorting">​</a></h2>
+<p>A sort toggle switches between:</p>
+<ul>
+<li><strong>Newest first</strong> (default) sorted by creation date descending</li>
+<li><strong>Oldest first</strong> sorted by creation date ascending</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-export">📤 Export<a href="#-export" class="hash-link" aria-label="Direct link to 📤 Export" title="Direct link to 📤 Export">​</a></h2>
+<p>Click the <strong>Export</strong> button to download all matching annotations as a Markdown file (<code>notebook-export.md</code>). The export respects your active filters, so you can export just the highlights from one book, or everything at once.</p>
+<p>The exported file includes:</p>
+<ul>
+<li>Entries grouped by book title</li>
+<li>Chapter headings where available</li>
+<li>Highlighted text in blockquote format</li>
+<li>Associated notes with a "Note:" prefix</li>
+</ul>
+<p>The export button is disabled when there are no entries to export.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-pagination">📄 Pagination<a href="#-pagination" class="hash-link" aria-label="Direct link to 📄 Pagination" title="Direct link to 📄 Pagination">​</a></h2>
+<p>Results are paginated with a default page size of 50. You can switch to 25 or 100 entries per page. The paginator only appears when total results exceed the page size.</p>
+</body>
+</html>

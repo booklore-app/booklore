@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🖥️ System Task Manager | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="../index.html">Back to docs index</a>
+</div>
+<header><h1>🖥️ System Task Manager</h1></header>
+<p>Manage automated system tasks for library maintenance, metadata refreshing, and cleanup. Execute tasks manually, monitor progress in real-time, and configure scheduled automation using cron expressions.</p>
+<p>Navigate to <strong>Settings > Tasks</strong> to access this page. Requires the <strong>Access Task Manager</strong> permission.</p>
+<p><img decoding="async" loading="lazy" alt="System Task Manager" src="https://web.archive.org/web/20260224011320im_/https://booklore.org/assets/images/system-task-manager-4c79c063cc459d7e349a6379c51015fb.jpg" width="1200" height="871" class="img_ev3q"></p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-system-tasks">📋 System Tasks<a href="#-system-tasks" class="hash-link" aria-label="Direct link to 📋 System Tasks" title="Direct link to 📋 System Tasks">​</a></h2>
+<p>Booklore provides six system tasks. Each can be run manually or on a schedule.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="1--refresh-metadata">1. 🔄 Refresh Metadata<a href="#1--refresh-metadata" class="hash-link" aria-label="Direct link to 1. 🔄 Refresh Metadata" title="Direct link to 1. 🔄 Refresh Metadata">​</a></h3>
+<p>Re-reads book information (title, author, cover, etc.) from your files and updates the Booklore database.</p>
+<p>This task has a <strong>Metadata Replace Mode</strong> option:</p>
+<table><thead><tr><th>Mode</th><th>Description</th></tr></thead><tbody><tr><td><strong>Update Missing Metadata Only</strong> (Recommended)</td><td>Only fills in missing metadata fields. Existing metadata is preserved. Safe for routine use.</td></tr><tr><td><strong>Replace All Metadata</strong></td><td>Overwrites all metadata for every book with data from the files, even if metadata already exists. Use with caution.</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>Replace All</div><div class="admonitionContent_BuS1"><p>"Replace All Metadata" will overwrite your manually edited metadata, cover changes, and fetched data. Back up your database before using this mode.</p></div></div>
+<p><strong>When to use:</strong></p>
+<ul>
+<li>After editing book files outside Booklore</li>
+<li>After bulk imports where embedded metadata needs to be read</li>
+<li>To recover metadata from book files after a database issue</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="2--sync-library-files">2. 🔃 Sync Library Files<a href="#2--sync-library-files" class="hash-link" aria-label="Direct link to 2. 🔃 Sync Library Files" title="Direct link to 2. 🔃 Sync Library Files">​</a></h3>
+<p>Scans your library folders to detect new books and removes entries for files that no longer exist.</p>
+<p><strong>When to use:</strong></p>
+<ul>
+<li>After adding or removing files manually on disk</li>
+<li>When library monitoring (watch folders) is disabled</li>
+<li>To reconcile the database with the actual files on the filesystem</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="3--bookdrop-periodic-scanning">3. 📥 Bookdrop Periodic Scanning<a href="#3--bookdrop-periodic-scanning" class="hash-link" aria-label="Direct link to 3. 📥 Bookdrop Periodic Scanning" title="Direct link to 3. 📥 Bookdrop Periodic Scanning">​</a></h3>
+<p>Scans the Bookdrop ingest folder for newly added files and queues them for Bookdrop processing.</p>
+<p><strong>When to use:</strong></p>
+<ul>
+<li>When Bookdrop file monitoring isn't detecting new uploads</li>
+<li>To process files dropped into the ingest folder while Booklore was offline</li>
+<li>As a scheduled fallback alongside real-time Bookdrop monitoring</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="4--update-book-recommendations">4. ✨ Update Book Recommendations<a href="#4--update-book-recommendations" class="hash-link" aria-label="Direct link to 4. ✨ Update Book Recommendations" title="Direct link to 4. ✨ Update Book Recommendations">​</a></h3>
+<p>Analyzes your library to generate personalized book recommendations based on the books you own. Computes similarity scores between all books using text embeddings and stores the top recommendations for each book.</p>
+<p><strong>When to use:</strong></p>
+<ul>
+<li>After adding a significant number of new books</li>
+<li>Periodically (e.g., weekly) to keep recommendations fresh</li>
+<li>After major metadata updates that change titles, descriptions, or categories</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="5-️-cleanup-deleted-books">5. 🗑️ Cleanup Deleted Books<a href="#5-️-cleanup-deleted-books" class="hash-link" aria-label="Direct link to 5. 🗑️ Cleanup Deleted Books" title="Direct link to 5. 🗑️ Cleanup Deleted Books">​</a></h3>
+<p>Permanently removes database entries for books you previously deleted from your libraries. Deleted books are soft-deleted first and this task handles the final cleanup.</p>
+<p>A badge shows how many books are pending cleanup (e.g., "Books pending cleanup: 5").</p>
+<table><thead><tr><th>Trigger</th><th>Behavior</th></tr></thead><tbody><tr><td><strong>Manual run</strong></td><td>Deletes all soft-deleted books immediately</td></tr><tr><td><strong>Scheduled run</strong></td><td>Deletes only soft-deleted books older than 7 days</td></tr></tbody></table>
+<p><strong>When to use:</strong> Run periodically to keep the database clean, or manually after a large batch deletion.</p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="6--cleanup-temporary-metadata">6. 🧹 Cleanup Temporary Metadata<a href="#6--cleanup-temporary-metadata" class="hash-link" aria-label="Direct link to 6. 🧹 Cleanup Temporary Metadata" title="Direct link to 6. 🧹 Cleanup Temporary Metadata">​</a></h3>
+<p>Removes temporary metadata records created during the Bookdrop and manual metadata review processes. These are intermediate records that are no longer needed after processing completes.</p>
+<p>A badge shows how many records are pending cleanup (e.g., "Metadata rows pending cleanup: 12").</p>
+<table><thead><tr><th>Trigger</th><th>Behavior</th></tr></thead><tbody><tr><td><strong>Manual run</strong></td><td>Deletes all temporary metadata records immediately</td></tr><tr><td><strong>Scheduled run</strong></td><td>Deletes only records older than 3 days</td></tr></tbody></table>
+<p><strong>When to use:</strong> Run periodically to prevent temporary data from accumulating, or manually after heavy Bookdrop or metadata editing sessions.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-running-tasks">▶️ Running Tasks<a href="#️-running-tasks" class="hash-link" aria-label="Direct link to ▶️ Running Tasks" title="Direct link to ▶️ Running Tasks">​</a></h2>
+<p>Click the <strong>Run</strong> button on any task to execute it immediately. While a task is running:</p>
+<ul>
+<li>A <strong>progress bar</strong> shows completion percentage</li>
+<li>A <strong>status message</strong> shows what's currently being processed (e.g., "Processing: filename.epub (Library: My Books)")</li>
+<li>A <strong>started timestamp</strong> shows when the task began</li>
+<li>A <strong>Cancel</strong> button appears to stop the task</li>
+</ul>
+<p>Some tasks (Refresh Metadata and Update Book Recommendations) run asynchronously in the background. Others run synchronously but still show progress. Only one instance of each task can run at a time.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-scheduling-tasks">⏰ Scheduling Tasks<a href="#-scheduling-tasks" class="hash-link" aria-label="Direct link to ⏰ Scheduling Tasks" title="Direct link to ⏰ Scheduling Tasks">​</a></h2>
+<p>Every task supports cron-based scheduling. Each task card shows its schedule on the right side:</p>
+<ul>
+<li><strong>Cron expression</strong> displayed as a badge (e.g., <code>0 45 0 * * 1</code>)</li>
+<li><strong>Enable/disable toggle</strong> to activate or deactivate the schedule</li>
+<li><strong>Edit button</strong> (pencil icon) to modify the expression</li>
+</ul>
+<p>Click the edit button to enter a new cron expression. Booklore uses <strong>Spring cron format</strong> with 6 fields:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">┌───────────── second (0-59)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">│ ┌───────────── minute (0-59)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">│ │ ┌───────────── hour (0-23)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">│ │ │ ┌───────────── day of month (1-31)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">│ │ │ │ ┌───────────── month (1-12)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">│ │ │ │ │ ┌───────────── day of week (0-7, 0 and 7 = Sunday)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">│ │ │ │ │ │</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">* * * * * *</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="common-schedule-examples">Common Schedule Examples<a href="#common-schedule-examples" class="hash-link" aria-label="Direct link to Common Schedule Examples" title="Direct link to Common Schedule Examples">​</a></h3>
+<table><thead><tr><th>Expression</th><th>Runs</th></tr></thead><tbody><tr><td><code>0 0 2 * * *</code></td><td>Every day at 2:00 AM</td></tr><tr><td><code>0 0 */6 * * *</code></td><td>Every 6 hours</td></tr><tr><td><code>0 30 1 * * 1</code></td><td>Every Monday at 1:30 AM</td></tr><tr><td><code>0 0 3 1 * *</code></td><td>First day of each month at 3:00 AM</td></tr><tr><td><code>0 0 0 * * 6,0</code></td><td>Every Saturday and Sunday at midnight</td></tr></tbody></table>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>Recommended Schedules</div><div class="admonitionContent_BuS1"><ul>
+<li><strong>Sync Library Files:</strong> Daily or every few hours if you add files frequently</li>
+<li><strong>Bookdrop Periodic Scanning:</strong> Every 10-30 minutes as a fallback for real-time monitoring</li>
+<li><strong>Cleanup Deleted Books:</strong> Weekly</li>
+<li><strong>Cleanup Temporary Metadata:</strong> Weekly</li>
+<li><strong>Update Book Recommendations:</strong> Weekly</li>
+<li><strong>Refresh Metadata:</strong> As needed (not typically scheduled)</li>
+</ul></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-task-status">📊 Task Status<a href="#-task-status" class="hash-link" aria-label="Direct link to 📊 Task Status" title="Direct link to 📊 Task Status">​</a></h2>
+<p>Each task shows its current state with a colored indicator:</p>
+<table><thead><tr><th>Status</th><th>Indicator</th><th>Description</th></tr></thead><tbody><tr><td><strong>Running</strong></td><td>Blue spinner</td><td>Task is currently executing with live progress updates</td></tr><tr><td><strong>Completed</strong></td><td>Green dot</td><td>Task finished successfully. Shows relative time (e.g., "23h ago")</td></tr><tr><td><strong>Failed</strong></td><td>Red dot</td><td>Task encountered an error</td></tr><tr><td><strong>Cancelled</strong></td><td>Orange dot</td><td>Task was manually stopped</td></tr><tr><td><strong>Stale</strong></td><td>Orange warning</td><td>No status updates received for 5+ minutes. Task may be stuck.</td></tr><tr><td><strong>Never run</strong></td><td>Gray text</td><td>Task has never been executed</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="handling-stale-tasks">Handling Stale Tasks<a href="#handling-stale-tasks" class="hash-link" aria-label="Direct link to Handling Stale Tasks" title="Direct link to Handling Stale Tasks">​</a></h3>
+<p>A task becomes <strong>stale</strong> when no progress updates have been received for over 5 minutes. This usually means the task is stuck. When a task is stale:</p>
+<ol>
+<li>A warning box appears: "This task appears stuck. No updates received for over 5 minutes."</li>
+<li>The Run button changes to <strong>Re-run</strong>, allowing you to restart the task</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-notes">📋 Notes<a href="#-notes" class="hash-link" aria-label="Direct link to 📋 Notes" title="Direct link to 📋 Notes">​</a></h2>
+<ul>
+<li>All task executions are recorded in the <a href="../tools/audit-logs.html">Audit Log</a> with the action <strong>Task Executed</strong>.</li>
+<li>Tasks run one at a time per type. You cannot start a second instance of a task that's already running.</li>
+<li>Scheduled tasks run as the system user. Manual tasks run as the currently logged-in user.</li>
+<li>Progress updates are delivered in real-time via WebSocket, so you don't need to refresh the page.</li>
+<li>The Refresh Metadata task also requires the <strong>Bulk Auto Fetch Metadata</strong> permission.</li>
+</ul>
+</body>
+</html>

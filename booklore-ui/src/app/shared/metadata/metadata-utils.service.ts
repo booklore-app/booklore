@@ -125,6 +125,61 @@ export class MetadataUtilsService {
     }
   }
 
+  /**
+   * Rough confidence (0-100) that fetched metadata actually matches the book,
+   * based on title/author string similarity against the original (embedded
+   * or filename-derived) metadata. Used to auto-apply obviously-correct
+   * fetches in bulk without requiring a manual look at every file.
+   */
+  calculateMatchConfidence(original: BookMetadata | undefined, fetched: BookMetadata | undefined, fallbackTitle: string): number | null {
+    if (!fetched || !fetched.title) return null;
+
+    const originalTitle = original?.title || fallbackTitle;
+    const titleScore = this.stringSimilarity(originalTitle, fetched.title);
+
+    const originalAuthors = (original?.authors ?? []).join(', ');
+    const fetchedAuthors = (fetched.authors ?? []).join(', ');
+    if (originalAuthors && fetchedAuthors) {
+      const authorScore = this.stringSimilarity(originalAuthors, fetchedAuthors);
+      return Math.round((titleScore * 0.7 + authorScore * 0.3) * 100);
+    }
+    return Math.round(titleScore * 100);
+  }
+
+  private stringSimilarity(a: string, b: string): number {
+    const normA = this.normalizeForSimilarity(a);
+    const normB = this.normalizeForSimilarity(b);
+    if (!normA && !normB) return 1;
+    if (!normA || !normB) return 0;
+    const distance = this.levenshtein(normA, normB);
+    return 1 - distance / Math.max(normA.length, normB.length);
+  }
+
+  private normalizeForSimilarity(value: string | null | undefined): string {
+    return (value ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+  }
+
+  private levenshtein(a: string, b: string): number {
+    const m = a.length;
+    const n = b.length;
+    if (m === 0) return n;
+    if (n === 0) return m;
+
+    const dp = new Array(n + 1);
+    for (let j = 0; j <= n; j++) dp[j] = j;
+
+    for (let i = 1; i <= m; i++) {
+      let prev = dp[0];
+      dp[0] = i;
+      for (let j = 1; j <= n; j++) {
+        const temp = dp[j];
+        dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
+        prev = temp;
+      }
+    }
+    return dp[n];
+  }
+
   patchMetadataToForm(
     metadata: BookMetadata,
     metadataForm: FormGroup,

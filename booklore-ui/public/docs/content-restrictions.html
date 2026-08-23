@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🛡️ Content Restrictions | BookLore Docs (archived)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; line-height: 1.65; }
+  .archive-notice { background: #fef3c7; color: #78350f; border: 1px solid #f59e0b; border-radius: 6px;
+                      padding: 0.75rem 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a1a; color: #e5e5e5; }
+    a { color: #7dd3fc; }
+    .archive-notice { background: #422006; color: #fde68a; border-color: #92400e; }
+  }
+  pre { overflow-x: auto; padding: 1rem; border-radius: 6px; background: #f3f4f6; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; }
+  pre code { padding: 0; background: none; }
+  @media (prefers-color-scheme: dark) { pre, code { background: #262626; } }
+  img { max-width: 100%; height: auto; border-radius: 6px; }
+  h1, h2, h3 { line-height: 1.3; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: left; }
+  .hash-link { margin-left: 0.4rem; opacity: 0.4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="archive-notice">
+  📦 This is a local archived copy of the BookLore documentation (booklore.org/docs), captured
+  20260305164130 via the Wayback Machine after the original site went offline.
+  <a href="./index.html">Back to docs index</a>
+</div>
+<header><h1>🛡️ Content Restrictions</h1></header>
+<p>Content Restrictions let admins control what books are visible to specific users based on metadata like categories, tags, moods, age ratings, and content ratings.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-configuration">🔧 Configuration<a href="#-configuration" class="hash-link" aria-label="Direct link to 🔧 Configuration" title="Direct link to 🔧 Configuration">​</a></h2>
+<p>Content restrictions are configured per user in <strong>Settings > User Management</strong>. Expand a user's card to find the Content Restrictions section.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-restriction-types">📋 Restriction Types<a href="#-restriction-types" class="hash-link" aria-label="Direct link to 📋 Restriction Types" title="Direct link to 📋 Restriction Types">​</a></h2>
+<table><thead><tr><th>Type</th><th>Description</th><th>Example values</th></tr></thead><tbody><tr><td><strong>Category</strong></td><td>Filter by book genre/category</td><td>Horror, Romance, True Crime</td></tr><tr><td><strong>Tag</strong></td><td>Filter by book tags</td><td>violence, explicit-language</td></tr><tr><td><strong>Mood</strong></td><td>Filter by book moods</td><td>dark, disturbing</td></tr><tr><td><strong>Age Rating</strong></td><td>Filter by numeric age rating</td><td>0, 6, 10, 13, 16, 18, 21</td></tr><tr><td><strong>Content Rating</strong></td><td>Filter by content rating label</td><td>Everyone, Teen, Mature, Adult, Explicit</td></tr></tbody></table>
+<p>The value dropdowns are populated dynamically from your actual library metadata, so only categories, tags, and moods that exist in your collection are available to select.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-restriction-modes">🔀 Restriction Modes<a href="#-restriction-modes" class="hash-link" aria-label="Direct link to 🔀 Restriction Modes" title="Direct link to 🔀 Restriction Modes">​</a></h2>
+<p>Each restriction operates in one of two modes:</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-exclude">🚫 Exclude<a href="#-exclude" class="hash-link" aria-label="Direct link to 🚫 Exclude" title="Direct link to 🚫 Exclude">​</a></h3>
+<p>Hides any book that matches the restricted value. For example, excluding the category "Horror" removes all horror books from the user's view.</p>
+<p>For age ratings in exclude mode, the system uses the minimum excluded age as a ceiling. Excluding age 13 and above means the user only sees books rated below 13.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="-allow-only">✅ Allow Only<a href="#-allow-only" class="hash-link" aria-label="Direct link to ✅ Allow Only" title="Direct link to ✅ Allow Only">​</a></h3>
+<p>Shows only books that match the allowed values. For example, allowing only the category "Children" means the user sees nothing else.</p>
+<p>Both modes can be combined across different restriction types. A user can have exclude restrictions on categories and allow-only restrictions on content ratings at the same time.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-how-restrictions-are-enforced">🔒 How Restrictions Are Enforced<a href="#-how-restrictions-are-enforced" class="hash-link" aria-label="Direct link to 🔒 How Restrictions Are Enforced" title="Direct link to 🔒 How Restrictions Are Enforced">​</a></h2>
+<p>Restrictions apply in two places:</p>
+<ul>
+<li><strong>Book listings</strong> are filtered before results are returned, so restricted books never appear in the book browser, shelves, magic shelves, or search results</li>
+<li><strong>Direct book access</strong> is checked when opening a specific book. If a restricted book is accessed directly (e.g., via URL), the server returns a 403 Forbidden response</li>
+</ul>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewbox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Only admins can configure content restrictions. Users cannot see or modify their own restrictions.</p></div></div>
+</body>
+</html>

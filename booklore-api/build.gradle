@@ -45,9 +45,9 @@ dependencies {
     implementation 'io.projectreactor:reactor-core'
 
     // --- Database & Migration ---
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.9'
+    implementation 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-flyway'
-    implementation 'org.flywaydb:flyway-mysql:12.9.0'
+    implementation 'org.flywaydb:flyway-database-postgresql:12.9.0'
 
     // --- Security & Authentication ---
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
@@ -152,4 +152,18 @@ bootRun {
 
 bootJar {
     mainClass = 'org.booklore.BookloreApplication'
+}
+
+// For native (non-Docker) production builds: embed the Angular production
+// build into the jar's static resources, same as the Dockerfile does for the
+// container image. No-op if booklore-ui/dist hasn't been built yet (e.g. dev
+// runs via bootRun, or CI test runs), since Copy silently skips a missing
+// source directory.
+tasks.register('copyFrontend', Copy) {
+    from "${projectDir}/../booklore-ui/dist/booklore/browser"
+    into "${layout.buildDirectory.get()}/resources/main/static"
+}
+
+tasks.named('processResources') {
+    dependsOn 'copyFrontend'
 }

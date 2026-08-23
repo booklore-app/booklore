@@ -34,8 +34,7 @@ public class PdfAnnotationEntity {
     @Column(name = "book_id", insertable = false, updatable = false)
     private Long bookId;
 
-    @Lob
-    @Column(name = "data", nullable = false, columnDefinition = "LONGTEXT")
+    @Column(name = "data", nullable = false, columnDefinition = "TEXT")
     private String data;
 
     @jakarta.persistence.Version
