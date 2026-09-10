@@ -159,8 +159,13 @@ export class ReadingSurvivalChartComponent implements OnInit, OnDestroy {
         dangerIdx = i;
       }
     }
-    this.dangerZoneRange = `${THRESHOLDS[dangerIdx - 1]}-${THRESHOLDS[dangerIdx]}%`;
-    this.dangerZoneDrop = `-${maxDrop.toFixed(0)}%`;
+    if (maxDrop === 0) {
+      this.dangerZoneRange = '—';
+      this.dangerZoneDrop = '0%';
+    } else {
+      this.dangerZoneRange = `${THRESHOLDS[dangerIdx - 1]}-${THRESHOLDS[dangerIdx]}%`;
+      this.dangerZoneDrop = `-${maxDrop.toFixed(0)}%`;
+    }
 
     const labels = THRESHOLDS.map(t => `${t}%`);
     this.chartDataSubject.next({
