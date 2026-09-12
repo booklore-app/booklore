@@ -34,4 +34,12 @@ describe('ReadingSurvivalChartComponent', () => {
     expect(component.dangerZoneRange).toBe('—');
     expect(component.dangerZoneDrop).toBe('0%');
   });
+
+  it('includes an audiobook-only book among started books', () => {
+    const audiobook = {audiobookProgress: {positionMs: 1000, percentage: 62.5}} as Book;
+    const component = createComponent([audiobook]);
+    calculate(component);
+
+    expect(component.totalStarted).toBe(1);
+  });
 });

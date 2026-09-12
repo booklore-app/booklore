@@ -39,4 +39,19 @@ describe('ReadingProgressChartComponent', () => {
     expect(counts['76-99%']).toBe(2);
     expect(counts['100%']).toBe(0);
   });
+
+  it('includes audiobook-only progress', () => {
+    const component = createComponent();
+    const calculate = component as unknown as {
+      processReadingProgressStats(books: Book[]): {progressRange: string; count: number}[];
+    };
+    const books = [{audiobookProgress: {positionMs: 1000, percentage: 62.5}}] as Book[];
+
+    const counts = Object.fromEntries(
+      calculate.processReadingProgressStats(books).map(item => [item.progressRange, item.count])
+    );
+
+    expect(counts['51-75%']).toBe(1);
+    expect(counts['0%']).toBe(0);
+  });
 });
