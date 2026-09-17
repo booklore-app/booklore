@@ -50,7 +50,7 @@ dependencies {
     // --- Database & Migration ---
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.10'
     implementation 'org.springframework.boot:spring-boot-starter-flyway'
-    implementation 'org.flywaydb:flyway-mysql:12.11.0'
+    implementation 'org.flywaydb:flyway-mysql:13.6.0'
 
     // --- Security & Authentication ---
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
@@ -82,7 +82,7 @@ dependencies {
     implementation 'com.github.RouHim:jaudiotagger:2.0.36'
 
     // --- UNRAR Support ---
-    implementation 'com.github.junrar:junrar:7.6.1'
+    implementation 'com.github.junrar:junrar:8.1.1'
 
     // --- JSON & Web Scraping ---
     implementation 'org.jsoup:jsoup:1.23.2'
