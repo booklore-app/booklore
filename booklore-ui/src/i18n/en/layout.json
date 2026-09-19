@@ -11,6 +11,7 @@
     "logout": "Logout",
     "language": "Language",
     "supportBookLore": "Support BookLore",
+    "migrateToBookOrbit": "Migrate to BookOrbit",
     "notificationAriaLabel": "Unified Notification Icon",
     "createLibrary": "Create Library",
     "stats": "Stats",
@@ -39,6 +40,16 @@
   "theme": {
     "primary": "Primary",
     "surface": "Surface"
+  },
+  "bookorbitAnnouncement": {
+    "title": "BookOrbit is the official successor to BookLore",
+    "description": "BookOrbit takes BookLore far beyond library management: one home for ebooks, PDFs, comics, and audiobooks, with polished readers, cross-device progress and annotation sync, discovery and request automation, and deep reading insights. A native, offline-capable iOS app with Apple Watch audiobook playback is in active development.",
+    "migration": "BookLore will remain available in maintenance mode for occasional maintenance, bug fixes, and security updates, with a guided migration path when you are ready.",
+    "explore": "Visit BookOrbit",
+    "github": "BookOrbit on GitHub",
+    "migrationGuide": "Migration guide",
+    "dismiss": "Dismiss BookOrbit announcement",
+    "closeDialog": "Close BookOrbit transition dialog"
   },
   "uploadDialog": {
     "chooseFile": "Choose File:",
