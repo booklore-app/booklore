@@ -86,7 +86,10 @@ export class SeriesDataService {
 
   private computeSeriesStatus(books: Book[]): ReadStatus {
     if (!books || books.length === 0) return ReadStatus.UNREAD;
-    const statuses = books.map(b => (b.readStatus as ReadStatus) ?? ReadStatus.UNREAD);
+    const statuses = books.map(b => {
+      const status = (b.readStatus as ReadStatus) ?? ReadStatus.UNREAD;
+      return status === ReadStatus.UNSET ? ReadStatus.UNREAD : status;
+    });
 
     if (statuses.includes(ReadStatus.WONT_READ)) return ReadStatus.WONT_READ;
     if (statuses.includes(ReadStatus.ABANDONED)) return ReadStatus.ABANDONED;

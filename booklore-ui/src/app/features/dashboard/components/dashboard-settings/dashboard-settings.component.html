@@ -18,11 +18,16 @@
       />
     </div>
 
-    <div class="scrollers-container">
+    <div
+      class="scrollers-container"
+      cdkDropList
+      [cdkDropListData]="config.scrollers"
+      (cdkDropListDropped)="onScrollerDrop($event)">
       @for (scroller of config.scrollers; track scroller.id; let i = $index) {
-        <div class="scroller-item">
+        <div class="scroller-item" cdkDrag>
           <div class="scroller-content">
             <div class="scroller-controls-left">
+              <i class="pi pi-bars scroller-drag-handle" cdkDragHandle aria-hidden="true"></i>
               <p-checkbox [(ngModel)]="scroller.enabled" [binary]="true"></p-checkbox>
             </div>
 

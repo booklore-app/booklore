@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: BookOrbit Feature Requests
+    url: https://github.com/bookorbit/bookorbit/issues/new/choose
+    about: Request new features in BookOrbit, the official successor to BookLore.
+  - name: BookOrbit Questions and Discussions
+    url: https://github.com/bookorbit/bookorbit/discussions
+    about: Ask about BookOrbit or moving from BookLore.
   - name: Questions & Support
     url: https://discord.gg/Ee5hd458Uz
     about: Join our Discord community to chat with other users and maintainers.

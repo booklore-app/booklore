@@ -1,0 +1,46 @@
+<ng-container *transloco="let t; prefix: 'layout.bookorbitAnnouncement'">
+  @if (!dismissed && (userService.userState$ | async)?.user?.permissions?.admin) {
+    <aside class="bookorbit-announcement" role="region" aria-labelledby="bookorbit-announcement-title">
+      <div class="announcement-mark" aria-hidden="true">
+        <i class="pi pi-compass"></i>
+      </div>
+
+      <div class="announcement-content">
+        <h2 id="bookorbit-announcement-title">{{ t('title') }}</h2>
+        <p>{{ t('description') }}</p>
+        <p class="migration-note">{{ t('migration') }}</p>
+
+        <div class="announcement-actions">
+          <a
+            class="announcement-link announcement-link-primary"
+            href="https://bookorbit.app"
+            target="_blank"
+            rel="noopener noreferrer">
+            {{ t('explore') }}
+            <i class="pi pi-external-link" aria-hidden="true"></i>
+          </a>
+          <a
+            class="announcement-link announcement-link-secondary"
+            href="https://github.com/bookorbit/bookorbit"
+            target="_blank"
+            rel="noopener noreferrer">
+            {{ t('github') }}
+            <i class="pi pi-github" aria-hidden="true"></i>
+          </a>
+          <a
+            class="announcement-link announcement-link-secondary"
+            href="https://bookorbit.app/migration/"
+            target="_blank"
+            rel="noopener noreferrer">
+            {{ t('migrationGuide') }}
+            <i class="pi pi-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <button type="button" class="dismiss-button" (click)="dismiss()" [attr.aria-label]="t('dismiss')">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </aside>
+  }
+</ng-container>

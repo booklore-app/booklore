@@ -9,6 +9,7 @@ import {BookService} from '../../../../../book/service/book.service';
 import {BookState} from '../../../../../book/model/state/book-state.model';
 import {Book} from '../../../../../book/model/book.model';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {getReadingProgress} from '../reading-dna-chart/reading-dna-calculations';
 
 type SurvivalChartData = ChartData<'line', number[], string>;
 
@@ -159,8 +160,13 @@ export class ReadingSurvivalChartComponent implements OnInit, OnDestroy {
         dangerIdx = i;
       }
     }
-    this.dangerZoneRange = `${THRESHOLDS[dangerIdx - 1]}-${THRESHOLDS[dangerIdx]}%`;
-    this.dangerZoneDrop = `-${maxDrop.toFixed(0)}%`;
+    if (maxDrop === 0) {
+      this.dangerZoneRange = '—';
+      this.dangerZoneDrop = '0%';
+    } else {
+      this.dangerZoneRange = `${THRESHOLDS[dangerIdx - 1]}-${THRESHOLDS[dangerIdx]}%`;
+      this.dangerZoneDrop = `-${maxDrop.toFixed(0)}%`;
+    }
 
     const labels = THRESHOLDS.map(t => `${t}%`);
     this.chartDataSubject.next({
@@ -195,11 +201,6 @@ export class ReadingSurvivalChartComponent implements OnInit, OnDestroy {
   }
 
   private getBookProgress(book: Book): number {
-    if (book.pdfProgress?.percentage) return book.pdfProgress.percentage;
-    if (book.epubProgress?.percentage) return book.epubProgress.percentage;
-    if (book.cbxProgress?.percentage) return book.cbxProgress.percentage;
-    if (book.koreaderProgress?.percentage) return book.koreaderProgress.percentage;
-    if (book.koboProgress?.percentage) return book.koboProgress.percentage;
-    return 0;
+    return getReadingProgress(book);
   }
 }

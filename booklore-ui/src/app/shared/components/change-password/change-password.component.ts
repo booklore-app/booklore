@@ -24,6 +24,7 @@ import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
   styleUrl: './change-password.component.scss'
 })
 export class ChangePasswordComponent {
+  readonly minimumPasswordLength = 8;
   currentPassword: string = '';
   newPassword: string = '';
   confirmNewPassword: string = '';
@@ -39,12 +40,25 @@ export class ChangePasswordComponent {
     return this.newPassword === this.confirmNewPassword;
   }
 
+  get newPasswordMeetsMinimumLength(): boolean {
+    return this.newPassword.length >= this.minimumPasswordLength;
+  }
+
+  get passwordMinLengthMessage(): string {
+    return this.t.translate('shared.setup.validation.passwordMinLength');
+  }
+
   changePassword() {
     this.errorMessage = null;
     this.successMessage = null;
 
     if (!this.currentPassword || !this.newPassword || !this.confirmNewPassword) {
       this.errorMessage = this.t.translate('shared.changePassword.validation.allFieldsRequired');
+      return;
+    }
+
+    if (!this.newPasswordMeetsMinimumLength) {
+      this.errorMessage = this.passwordMinLengthMessage;
       return;
     }
 

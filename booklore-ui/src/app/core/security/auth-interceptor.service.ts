@@ -1,24 +1,23 @@
 import {HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest} from '@angular/common/http';
 import {inject} from '@angular/core';
-import {Router} from '@angular/router';
-import {catchError, filter, switchMap, take} from 'rxjs/operators';
-import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {catchError, switchMap, take} from 'rxjs/operators';
+import {Observable, ReplaySubject, throwError} from 'rxjs';
 import {AuthService} from '../../shared/service/auth.service';
 import {API_CONFIG} from '../config/api-config';
 
 export const AuthInterceptorService: HttpInterceptorFn = (req, next: HttpHandlerFn) => {
   const authService = inject(AuthService);
-  const router = inject(Router);
 
   const token = authService.getInternalAccessToken();
   const isApiRequest = req.url.startsWith(`${API_CONFIG.BASE_URL}/api/`);
+  const isRefreshRequest = req.url === `${API_CONFIG.BASE_URL}/api/v1/auth/refresh`;
 
   const authReq = (token && isApiRequest) ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        return handle401Error(authService, authReq, next, router);
+      if (error.status === 401 && !isRefreshRequest) {
+        return handle401Error(authService, authReq, next);
       }
       return throwError(() => error);
     })
@@ -26,12 +25,12 @@ export const AuthInterceptorService: HttpInterceptorFn = (req, next: HttpHandler
 };
 
 let isRefreshing = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+let refreshTokenSubject = new ReplaySubject<string>(1);
 
-function handle401Error(authService: AuthService, request: HttpRequest<unknown>, next: HttpHandlerFn, router: Router): Observable<HttpEvent<unknown>> {
+function handle401Error(authService: AuthService, request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
   if (!isRefreshing) {
     isRefreshing = true;
-    refreshTokenSubject.next(null);
+    refreshTokenSubject = new ReplaySubject<string>(1);
 
     return authService.internalRefreshToken().pipe(
       switchMap(response => {
@@ -47,14 +46,14 @@ function handle401Error(authService: AuthService, request: HttpRequest<unknown>,
       }),
       catchError(err => {
         isRefreshing = false;
-        forceLogout(authService, router);
+        refreshTokenSubject.error(err);
+        authService.forceLogout('session_expired');
         return throwError(() => err);
       })
     );
   }
 
   return refreshTokenSubject.pipe(
-    filter(token => token !== null),
     take(1),
     switchMap(token =>
       next(request.clone({
@@ -62,8 +61,4 @@ function handle401Error(authService: AuthService, request: HttpRequest<unknown>,
       }))
     )
   );
-}
-
-function forceLogout(authService: AuthService, router: Router): void {
-  authService.logout();
 }

@@ -31,15 +31,22 @@ export class ReaderBookMetadataDialogComponent {
 
   formatDate(date: string | undefined): string {
     if (!date) return this.t.translate('readerEbook.metadataDialog.na');
-    try {
-      return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch {
-      return date;
-    }
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+    const parsedDate = dateOnlyMatch
+      ? new Date(
+        Number(dateOnlyMatch[1]),
+        Number(dateOnlyMatch[2]) - 1,
+        Number(dateOnlyMatch[3])
+      )
+      : new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) return date;
+
+    return parsedDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   }
 
   formatAuthors(authors: string[] | undefined): string {

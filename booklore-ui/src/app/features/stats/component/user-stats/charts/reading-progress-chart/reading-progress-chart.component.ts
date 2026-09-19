@@ -9,6 +9,7 @@ import {BookService} from '../../../../../book/service/book.service';
 import {BookState} from '../../../../../book/model/state/book-state.model';
 import {Book} from '../../../../../book/model/book.model';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {getReadingProgress} from '../reading-dna-chart/reading-dna-calculations';
 
 interface ReadingProgressStats {
   progressRange: string;
@@ -33,12 +34,12 @@ const CHART_DEFAULTS = {
 } as const;
 
 const PROGRESS_RANGES = [
-  {range: '0%', min: 0, max: 0, desc: 'Not Started'},
-  {range: '1-25%', min: 0.1, max: 25, desc: 'Just Started'},
-  {range: '26-50%', min: 26, max: 50, desc: 'Getting Into It'},
-  {range: '51-75%', min: 51, max: 75, desc: 'Halfway Through'},
-  {range: '76-99%', min: 76, max: 99, desc: 'Almost Finished'},
-  {range: '100%', min: 100, max: 100, desc: 'Completed'}
+  {range: '0%', desc: 'Not Started'},
+  {range: '1-25%', desc: 'Just Started'},
+  {range: '26-50%', desc: 'Getting Into It'},
+  {range: '51-75%', desc: 'Halfway Through'},
+  {range: '76-99%', desc: 'Almost Finished'},
+  {range: '100%', desc: 'Completed'}
 ] as const;
 
 type ProgressChartData = ChartData<'doughnut', number[], string>;
@@ -223,13 +224,8 @@ export class ReadingProgressChartComponent implements OnInit, OnDestroy {
 
     for (const book of books) {
       const progress = this.getBookProgress(book);
-
-      for (const range of PROGRESS_RANGES) {
-        if (progress >= range.min && progress <= range.max) {
-          rangeCounts.set(range.range, (rangeCounts.get(range.range) || 0) + 1);
-          break;
-        }
-      }
+      const range = this.getProgressRange(progress);
+      rangeCounts.set(range.range, (rangeCounts.get(range.range) || 0) + 1);
     }
 
     return PROGRESS_RANGES.map(range => ({
@@ -239,12 +235,16 @@ export class ReadingProgressChartComponent implements OnInit, OnDestroy {
     }));
   }
 
+  private getProgressRange(progress: number): typeof PROGRESS_RANGES[number] {
+    if (progress <= 0) return PROGRESS_RANGES[0];
+    if (progress <= 25) return PROGRESS_RANGES[1];
+    if (progress <= 50) return PROGRESS_RANGES[2];
+    if (progress <= 75) return PROGRESS_RANGES[3];
+    if (progress < 100) return PROGRESS_RANGES[4];
+    return PROGRESS_RANGES[5];
+  }
+
   private getBookProgress(book: Book): number {
-    if (book.pdfProgress?.percentage) return book.pdfProgress.percentage;
-    if (book.epubProgress?.percentage) return book.epubProgress.percentage;
-    if (book.cbxProgress?.percentage) return book.cbxProgress.percentage;
-    if (book.koreaderProgress?.percentage) return book.koreaderProgress.percentage;
-    if (book.koboProgress?.percentage) return book.koboProgress.percentage;
-    return 0;
+    return getReadingProgress(book);
   }
 }
