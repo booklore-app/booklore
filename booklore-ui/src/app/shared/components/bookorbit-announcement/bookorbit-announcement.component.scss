@@ -1,0 +1,205 @@
+:host {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.bookorbit-announcement {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 1rem;
+  padding: 1rem 3.25rem 1rem 1rem;
+  overflow: hidden;
+  color: var(--text-color);
+  background:
+    radial-gradient(circle at 0 0, color-mix(in srgb, var(--primary-color) 20%, transparent), transparent 45%),
+    var(--card-background);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 45%, var(--p-content-border-color));
+  border-radius: 0.75rem;
+  box-shadow: 0 0.35rem 1.25rem color-mix(in srgb, black 16%, transparent);
+  animation: announcement-enter 0.22s ease-out;
+}
+
+.bookorbit-announcement::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.25rem;
+  content: '';
+  background: linear-gradient(180deg, var(--primary-color), #8b5cf6);
+}
+
+.announcement-mark {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 28%, transparent);
+  border-radius: 50%;
+  place-items: center;
+
+  i {
+    font-size: 1.15rem;
+  }
+}
+
+.announcement-content {
+  min-width: 0;
+
+  h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  p {
+    max-width: 82rem;
+    margin: 0;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .migration-note {
+    margin-top: 0.2rem;
+    color: var(--text-color);
+    font-weight: 500;
+  }
+}
+
+.announcement-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.announcement-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.15rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  i {
+    font-size: 0.72rem;
+  }
+}
+
+.announcement-link-primary {
+  color: var(--primary-contrast-color);
+  background: var(--primary-color);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary-color) 88%, black);
+  }
+}
+
+.announcement-link-secondary {
+  color: var(--text-color);
+  background: color-mix(in srgb, var(--card-background) 80%, transparent);
+  border-color: var(--p-content-border-color);
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+}
+
+.dismiss-button {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  place-items: center;
+
+  &:hover {
+    color: var(--text-color);
+    background: color-mix(in srgb, var(--text-color) 8%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+  }
+}
+
+@media (max-width: 768px) {
+  .bookorbit-announcement {
+    gap: 0.75rem;
+    width: calc(100% - 1.5rem);
+    margin: 0 0.75rem 0.75rem;
+    padding: 0.85rem 2.75rem 0.85rem 0.85rem;
+    border-radius: 0.65rem;
+  }
+
+  .announcement-mark {
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+
+  .announcement-content {
+    h2 {
+      font-size: 0.9rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
+
+  .announcement-link {
+    min-height: 2rem;
+    padding: 0.4rem 0.65rem;
+  }
+}
+
+@keyframes announcement-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bookorbit-announcement {
+    animation: none;
+  }
+
+  .announcement-link {
+    transition: none;
+  }
+}

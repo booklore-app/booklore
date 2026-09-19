@@ -1,0 +1,210 @@
+.bookorbit-dialog {
+  overflow: hidden;
+  color: var(--text-color);
+  background: var(--card-background);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 38%, var(--border-color));
+  border-radius: 0.75rem;
+}
+
+.dialog-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 3.5rem 1.25rem 1.5rem;
+  background:
+    radial-gradient(circle at 0 0, color-mix(in srgb, var(--primary-color) 28%, transparent), transparent 55%),
+    linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 9%, transparent), transparent 70%);
+  border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+}
+
+.orbit-mark {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  width: 3.5rem;
+  height: 3.5rem;
+  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 14%, var(--card-background));
+  border: 1px solid color-mix(in srgb, var(--primary-color) 42%, transparent);
+  border-radius: 50%;
+  place-items: center;
+
+  i {
+    font-size: 1.35rem;
+  }
+}
+
+.orbit-ring {
+  position: absolute;
+  inset: -0.3rem;
+  border: 1px dashed color-mix(in srgb, var(--primary-color) 55%, transparent);
+  border-radius: 50%;
+  animation: orbit-spin 12s linear infinite;
+}
+
+.header-copy {
+  min-width: 0;
+
+  h2 {
+    margin: 0.15rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+}
+
+.eyebrow {
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.close-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  place-items: center;
+
+  &:hover {
+    color: var(--text-color);
+    background: color-mix(in srgb, var(--text-color) 8%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+  }
+}
+
+.dialog-content {
+  padding: 1.5rem;
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-color-secondary);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.maintenance-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding: 0.9rem 1rem;
+  color: var(--text-color);
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 24%, var(--border-color));
+  border-radius: 0.65rem;
+
+  i {
+    margin-top: 0.15rem;
+    color: var(--primary-color);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+}
+
+.dialog-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.6rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+}
+
+.dialog-link-primary {
+  color: var(--primary-contrast-color);
+  background: var(--primary-color);
+}
+
+.dialog-link-secondary {
+  color: var(--text-color);
+  background: transparent;
+  border-color: var(--border-color);
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-header,
+  .dialog-content {
+    padding: 1rem;
+  }
+
+  .dialog-header {
+    padding-right: 3rem;
+  }
+
+  .orbit-mark {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .header-copy h2 {
+    font-size: 1.05rem;
+  }
+
+  .dialog-actions,
+  .dialog-link {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-ring {
+    animation: none;
+  }
+
+  .dialog-link {
+    transition: none;
+  }
+}
