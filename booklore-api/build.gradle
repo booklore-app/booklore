@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.hibernate.orm' version '7.4.8.Final'
+    id 'org.hibernate.orm' version '7.4.10.Final'
     id 'io.github.ben-manes.versions' version '0.64.0'
     id 'jacoco'
 }
@@ -50,7 +50,7 @@ dependencies {
     // --- Database & Migration ---
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.10'
     implementation 'org.springframework.boot:spring-boot-starter-flyway'
-    implementation 'org.flywaydb:flyway-mysql:12.11.0'
+    implementation 'org.flywaydb:flyway-mysql:13.7.0'
 
     // --- Security & Authentication ---
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
@@ -71,10 +71,10 @@ dependencies {
     implementation 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'
     
     // --- TwelveMonkeys ImageIO ---
-    implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.15.1'
-    implementation 'com.twelvemonkeys.imageio:imageio-tiff:3.15.1'
-    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.15.1'
-    implementation 'com.twelvemonkeys.imageio:imageio-bmp:3.15.1'
+    implementation 'com.twelvemonkeys.imageio:imageio-jpeg:3.15.2'
+    implementation 'com.twelvemonkeys.imageio:imageio-tiff:3.15.2'
+    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.15.2'
+    implementation 'com.twelvemonkeys.imageio:imageio-bmp:3.15.2'
     
     implementation 'io.documentnode:epub4j-core:4.2.3'
 
@@ -82,7 +82,7 @@ dependencies {
     implementation 'com.github.RouHim:jaudiotagger:2.0.36'
 
     // --- UNRAR Support ---
-    implementation 'com.github.junrar:junrar:7.6.1'
+    implementation 'com.github.junrar:junrar:8.1.1'
 
     // --- JSON & Web Scraping ---
     implementation 'org.jsoup:jsoup:1.23.2'
@@ -116,7 +116,7 @@ dependencies {
 
     // --- Caching ---
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.4'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.3.0'
 
     // --- Test Dependencies ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
