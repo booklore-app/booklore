@@ -203,8 +203,8 @@ export class BookNotesComponent implements OnInit, OnChanges {
     });
   }
 
-  private performDelete(noteId: number): void {
-    this.bookNoteService.deleteNote(noteId).subscribe({
+  private performDelete(noteId: string): void {
+    this.bookNoteService.deleteNote(this.bookId, noteId).subscribe({
       next: () => {
         this.notes = this.notes.filter(n => n.id !== noteId);
         this.messageService.add({

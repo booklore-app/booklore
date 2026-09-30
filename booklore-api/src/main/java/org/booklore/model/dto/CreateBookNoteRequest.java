@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateBookNoteRequest {
-    private Long id;
+    private String id;
 
     @NotNull(message = "Book ID is required")
     private Long bookId;

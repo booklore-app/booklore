@@ -1,0 +1,2 @@
+ALTER TABLE book_notes
+    ADD COLUMN migrated_to_file BOOLEAN NOT NULL DEFAULT FALSE;

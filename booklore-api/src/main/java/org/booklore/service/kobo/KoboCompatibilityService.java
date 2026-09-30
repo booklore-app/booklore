@@ -3,6 +3,7 @@ package org.booklore.service.kobo;
 import org.booklore.model.dto.settings.KoboSettings;
 import org.booklore.model.entity.BookEntity;
 import org.booklore.model.enums.BookFileType;
+import org.booklore.service.book.PhysicalBookFileService;
 import org.booklore.service.appsettings.AppSettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class KoboCompatibilityService {
         }
 
         var primaryFile = book.getPrimaryBookFile();
-        if (primaryFile == null) {
+        if (primaryFile == null || PhysicalBookFileService.isHiddenPlaceholder(primaryFile)) {
             return false;
         }
         BookFileType bookType = primaryFile.getBookType();

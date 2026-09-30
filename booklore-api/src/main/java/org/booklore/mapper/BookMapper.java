@@ -3,6 +3,7 @@ package org.booklore.mapper;
 import org.booklore.model.dto.*;
 import org.booklore.model.entity.*;
 import org.booklore.model.enums.BookFileType;
+import org.booklore.service.book.PhysicalBookFileService;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -76,19 +77,25 @@ public interface BookMapper {
 
     @Named("mapPrimaryFile")
     default BookFile mapPrimaryFile(List<BookFileEntity> bookFiles) {
-        if (bookFiles == null || bookFiles.isEmpty()) {
+        // A physical book's placeholder file is not exposed, so it shows as a physical book and not as an EPUB
+        List<BookFileEntity> files = bookFiles == null ? null
+                : bookFiles.stream().filter(bf -> !PhysicalBookFileService.isHiddenPlaceholder(bf)).toList();
+        if (files == null || files.isEmpty()) {
             return null;
         }
-        BookFileEntity primary = getPrimaryBookFile(bookFiles);
+        BookFileEntity primary = getPrimaryBookFile(files);
         return toBookFile(primary);
     }
 
     @Named("mapAlternativeFormats")
     default List<BookFile> mapAlternativeFormats(List<BookFileEntity> bookFiles) {
         if (bookFiles == null) return null;
-        return bookFiles.stream()
+        List<BookFileEntity> files = bookFiles.stream()
+                .filter(bf -> !PhysicalBookFileService.isHiddenPlaceholder(bf))
+                .toList();
+        return files.stream()
                 .filter(bf -> bf.isBook())
-                .filter(bf -> !bf.equals(getPrimaryBookFile(bookFiles)))
+                .filter(bf -> !bf.equals(getPrimaryBookFile(files)))
                 .map(this::toBookFile)
                 .toList();
     }
@@ -98,6 +105,7 @@ public interface BookMapper {
         if (bookFiles == null)
             return null;
         return bookFiles.stream()
+                .filter(bf -> !PhysicalBookFileService.isHiddenPlaceholder(bf))
                 .filter(bf -> !bf.isBook())
                 .map(this::toBookFile)
                 .toList();

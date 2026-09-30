@@ -18,6 +18,10 @@ import java.util.Set;
 
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpecificationExecutor<BookEntity> {
+
+    @Query("SELECT b.id FROM BookEntity b WHERE b.isPhysical = true AND (b.deleted IS NULL OR b.deleted = false) " +
+            "AND NOT EXISTS (SELECT 1 FROM BookFileEntity f WHERE f.book.id = b.id)")
+    List<Long> findPhysicalBookIdsWithoutFiles();
     Optional<BookEntity> findBookByIdAndLibraryId(long id, long libraryId);
 
     @EntityGraph(attributePaths = { "metadata", "metadata.comicMetadata", "shelves", "libraryPath", "library", "bookFiles" })

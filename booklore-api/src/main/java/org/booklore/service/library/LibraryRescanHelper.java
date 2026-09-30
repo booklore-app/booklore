@@ -1,5 +1,6 @@
 package org.booklore.service.library;
 
+import org.booklore.service.book.PhysicalBookFileService;
 import org.booklore.exception.ApiError;
 import org.booklore.model.MetadataUpdateContext;
 import org.booklore.model.MetadataUpdateWrapper;
@@ -68,7 +69,8 @@ public class LibraryRescanHelper {
             }
 
             // Skip fileless books (e.g., physical books) - they have no file to extract metadata from
-            if (!bookEntity.hasFiles()) {
+            // A physical book's placeholder file holds no real content either
+            if (!bookEntity.hasFiles() || PhysicalBookFileService.isHiddenPlaceholder(bookEntity.getPrimaryBookFile())) {
                 processedBooks++;
                 continue;
             }
