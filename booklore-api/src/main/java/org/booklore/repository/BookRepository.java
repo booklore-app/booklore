@@ -53,6 +53,42 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
     @Query("SELECT b FROM BookEntity b WHERE (b.deleted IS NULL OR b.deleted = false)")
     List<BookEntity> findAllWithMetadata();
 
+    // --- Projection-based list loading (avoids full entity hydration) ---
+    // Only the fields the list view actually emits (see BookQueryService.stripFieldsForListView).
+    @Query("SELECT b.id, b.metadataMatchScore, b.isPhysical, b.addedOn, b.library.id, b.library.name, " +
+           "m.title, m.publisher, m.publishedDate, m.seriesName, m.seriesNumber, " +
+           "m.isbn13, m.isbn10, m.pageCount, m.language, m.narrator, m.rating, " +
+           "m.amazonRating, m.amazonReviewCount, m.goodreadsRating, m.goodreadsReviewCount, " +
+           "m.hardcoverRating, m.hardcoverReviewCount, m.ranobedbRating, " +
+           "m.ageRating, m.contentRating, m.coverUpdatedOn, m.audiobookCoverUpdatedOn " +
+           "FROM BookEntity b LEFT JOIN b.metadata m WHERE (b.deleted IS NULL OR b.deleted = false)")
+    List<Object[]> findAllBookListRows();
+
+    @Query("SELECT m.bookId, a.name FROM BookMetadataEntity m JOIN m.authors a")
+    List<Object[]> findAllAuthorRows();
+
+    @Query("SELECT m.bookId, c.name FROM BookMetadataEntity m JOIN m.categories c")
+    List<Object[]> findAllCategoryRows();
+
+    @Query("SELECT m.bookId, x.name FROM BookMetadataEntity m JOIN m.moods x")
+    List<Object[]> findAllMoodRows();
+
+    @Query("SELECT m.bookId, x.name FROM BookMetadataEntity m JOIN m.tags x")
+    List<Object[]> findAllTagRows();
+
+    @Query("SELECT b.id, s.id, s.name, s.icon, s.iconType, s.user.id, s.isPublic FROM BookEntity b JOIN b.shelves s " +
+           "WHERE (b.deleted IS NULL OR b.deleted = false)")
+    List<Object[]> findAllShelfRows();
+
+    @Query("SELECT s.id, COUNT(b) FROM BookEntity b JOIN b.shelves s WHERE (b.deleted IS NULL OR b.deleted = false) GROUP BY s.id")
+    List<Object[]> findShelfBookCounts();
+
+    @Query("SELECT bf.book.id, bf.id, bf.fileName, bf.fileSubPath, bf.bookType, bf.fileSizeKb, bf.addedOn, " +
+           "bf.book.libraryPath.path, bf.folderBased, bf.isBookFormat " +
+           "FROM BookFileEntity bf WHERE (bf.book.deleted IS NULL OR bf.book.deleted = false)")
+    List<Object[]> findAllBookFileRows();
+
+
     @EntityGraph(attributePaths = {"metadata", "metadata.comicMetadata", "shelves", "libraryPath", "bookFiles"})
     @Query("SELECT b FROM BookEntity b WHERE b.id IN :bookIds AND (b.deleted IS NULL OR b.deleted = false)")
     List<BookEntity> findAllWithMetadataByIds(@Param("bookIds") Set<Long> bookIds);
