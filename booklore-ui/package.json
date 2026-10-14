@@ -52,7 +52,7 @@
     "@analogjs/vite-plugin-angular": "^2.7.2",
     "@analogjs/vitest-angular": "^2.7.2",
     "@angular/build": "^21.2.24",
-    "@angular/cli": "^21.2.24",
+    "@angular/cli": "^21.2.26",
     "@angular/compiler-cli": "^21.2.23",
     "@eslint/js": "^10.0.1",
     "@types/dompurify": "^3.2.0",
