@@ -4,6 +4,7 @@ import org.booklore.model.dto.BookMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.time.LocalDate;
@@ -51,16 +52,23 @@ class BookMetadataPublishedDateDeserializationTest {
     }
 
     @Test
-    void null_value_returns_null() throws Exception {
-        String json = "{\"publishedDate\":null}";
+    void empty_string_returns_null() throws Exception {
+        String json = "{\"publishedDate\":\"\"}";
         BookMetadata meta = mapper.readValue(json, BookMetadata.class);
         assertThat(meta.getPublishedDate()).isNull();
     }
 
     @Test
-    void empty_string_returns_null() throws Exception {
-        String json = "{\"publishedDate\":\"\"}";
-        BookMetadata meta = mapper.readValue(json, BookMetadata.class);
-        assertThat(meta.getPublishedDate()).isNull();
+    void two_digit_year_throws_invalid_format() {
+        String json = "{\"publishedDate\":\"20\"}";
+        assertThatThrownBy(() -> mapper.readValue(json, BookMetadata.class))
+                .isInstanceOf(InvalidFormatException.class);
+    }
+
+    @Test
+    void non_numeric_string_throws_invalid_format() {
+        String json = "{\"publishedDate\":\"abcd\"}";
+        assertThatThrownBy(() -> mapper.readValue(json, BookMetadata.class))
+                .isInstanceOf(InvalidFormatException.class);
     }
 }

@@ -17,7 +17,7 @@ public class FlexibleLocalDateDeserializer extends StdDeserializer<LocalDate> {
     @Override
     public LocalDate deserialize(JsonParser p, DeserializationContext ctx) throws JacksonException {
         String value = p.getText();
-        if (value == null || value.isBlank()) {
+        if (value.isBlank()) {
             return null;
         }
         String trimmed = value.trim();
@@ -33,9 +33,7 @@ public class FlexibleLocalDateDeserializer extends StdDeserializer<LocalDate> {
         }
         // Year-only: "2020" → January 1
         if (trimmed.matches("\\d{4}")) {
-            try {
-                return LocalDate.of(Integer.parseInt(trimmed), 1, 1);
-            } catch (NumberFormatException ignored) {}
+            return LocalDate.of(Integer.parseInt(trimmed), 1, 1);
         }
         return (LocalDate) ctx.handleWeirdStringValue(LocalDate.class, value,
                 "Cannot parse LocalDate from '%s': expected yyyy-MM-dd, yyyy-MM, or yyyy", value);
