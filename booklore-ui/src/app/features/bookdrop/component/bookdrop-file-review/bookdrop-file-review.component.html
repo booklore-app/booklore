@@ -241,6 +241,7 @@
 
             @if (file.showDetails) {
               <app-bookdrop-file-metadata-picker-component
+                #metadataPicker
                 class="details-section"
                 [originalMetadata]="file.file.originalMetadata"
                 [fetchedMetadata]="file.file.fetchedMetadata!"

@@ -119,6 +119,15 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
             """)
     List<BookEntity> findBooksWithMetadataAndAuthors(@Param("bookIds") List<Long> bookIds);
 
+    @Query("""
+                SELECT b FROM BookEntity b
+                LEFT JOIN FETCH b.metadata m
+                LEFT JOIN FETCH m.authors
+                WHERE b.id = :id
+                AND (b.deleted IS NULL OR b.deleted = false)
+            """)
+    Optional<BookEntity> findByIdWithAuthors(@Param("id") Long id);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM BookEntity b WHERE b.deleted IS TRUE")
