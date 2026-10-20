@@ -117,17 +117,20 @@
           </p-popover>
         </li>
 
-        <li class="topbar-item-relative heart-button topbar-item"
-            [class.heart-button-static]="!supportAnimationEnabled"
-            (click)="openGithubSupportDialog()">
-          @if (supportAnimationEnabled) {
-            <span class="heart-ripple"></span>
-            <span class="heart-ripple heart-ripple-delayed"></span>
-            <span class="heart-orbit heart-orbit-1"></span>
-            <span class="heart-orbit heart-orbit-2"></span>
-            <span class="heart-orbit heart-orbit-3"></span>
-          }
-          <i class="pi pi-heart-fill heart-icon"></i>
+        <li class="topbar-item-relative">
+          <button
+            type="button"
+            class="topbar-item migration-button"
+            (click)="openBookOrbitTransitionDialog()"
+            [pTooltip]="t('migrateToBookOrbit')"
+            tooltipPosition="bottom"
+            [attr.aria-label]="t('migrateToBookOrbit')">
+            <svg class="migration-glyph" viewBox="0 0 24 24" aria-hidden="true">
+              <circle class="migration-orbit" cx="12" cy="12" r="8.25"/>
+              <path class="migration-arrow" d="M7.5 12h8.25m-2.9-3.1 3.1 3.1-3.1 3.1"/>
+              <circle class="migration-origin" cx="6.25" cy="12" r="1.35"/>
+            </svg>
+          </button>
         </li>
         <li class="topbar-item-relative">
           <button
@@ -296,11 +299,11 @@
           </li>
           <li>
             <button
+              type="button"
               class="mobile-menu-item"
-              (click)="openGithubSupportDialog(); mobileMenu.hide()"
-            >
-              <i class="pi pi-thumbs-up topbar-icon"></i>
-              {{ t('supportBookLore') }}
+              (click)="openBookOrbitTransitionDialog(); mobileMenu.hide()">
+              <i class="pi pi-directions-alt topbar-icon"></i>
+              {{ t('migrateToBookOrbit') }}
             </button>
           </li>
 

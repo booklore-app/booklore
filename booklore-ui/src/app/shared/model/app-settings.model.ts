@@ -57,6 +57,7 @@ export interface MetadataProviderSettings {
   goodReads: Goodreads;
   ranobedb: Ranobedb;
   hardcover: Hardcover;
+  openLibrary: OpenLibrary;
   comicvine: Comicvine;
   douban: Douban;
   lubimyczytac: Lubimyczytac;
@@ -86,6 +87,10 @@ export interface Ranobedb {
 export interface Hardcover {
   enabled: boolean;
   apiKey: string;
+}
+
+export interface OpenLibrary {
+  enabled: boolean;
 }
 
 export interface Comicvine {

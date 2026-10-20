@@ -1,5 +1,5 @@
-import {inject, Injectable} from '@angular/core';
-import {DynamicDialogRef} from 'primeng/dynamicdialog';
+import {inject, Injectable, Type} from '@angular/core';
+import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DialogLauncherService, DialogSize, DialogStyle} from '../../../../shared/services/dialog-launcher.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {LockUnlockMetadataDialogComponent} from './lock-unlock-metadata-dialog/lock-unlock-metadata-dialog.component';
@@ -10,7 +10,6 @@ import {MultiBookMetadataFetchComponent} from '../../../metadata/component/multi
 import {FileMoverComponent} from '../../../../shared/components/file-mover/file-mover-component';
 import {ShelfCreatorComponent} from '../shelf-creator/shelf-creator.component';
 import {BookSenderComponent} from '../book-sender/book-sender.component';
-import {MetadataFetchOptionsComponent} from '../../../metadata/component/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {BookMetadataCenterComponent} from '../../../metadata/component/book-metadata-center/book-metadata-center.component';
 import {CoverSearchComponent} from '../../../metadata/component/cover-search/cover-search.component';
 import {Book} from '../../model/book.model';
@@ -25,7 +24,7 @@ export class BookDialogHelperService {
 
   private dialogLauncherService = inject(DialogLauncherService);
 
-  private openDialog(component: unknown, options: {}): DynamicDialogRef | null {
+  private openDialog<T>(component: Type<T>, options: DynamicDialogConfig): DynamicDialogRef<T> | null {
     return this.dialogLauncherService.openDialog(component, options);
   }
 
@@ -40,13 +39,11 @@ export class BookDialogHelperService {
   }
 
   openShelfAssignerDialog(book: Book | null, bookIds: Set<number> | null): DynamicDialogRef | null {
-    const data: any = {};
+    let data: {isMultiBooks: false; book: Book} | {isMultiBooks: true; bookIds: Set<number>};
     if (book !== null) {
-      data.isMultiBooks = false;
-      data.book = book;
+      data = {isMultiBooks: false, book};
     } else if (bookIds !== null) {
-      data.isMultiBooks = true;
-      data.bookIds = bookIds;
+      data = {isMultiBooks: true, bookIds};
     } else {
       return null;
     }

@@ -9,6 +9,7 @@ import {BookService} from '../../../../../book/service/book.service';
 import {BookState} from '../../../../../book/model/state/book-state.model';
 import {Book, ReadStatus} from '../../../../../book/model/book.model';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {getBookRatingOnFivePointScale} from './author-universe-rating';
 
 interface AuthorStats {
   name: string;
@@ -236,10 +237,7 @@ export class AuthorUniverseChartComponent implements OnInit, OnDestroy {
       if (!authors || authors.length === 0) continue;
 
       // Get book's rating once
-      const bookRating = book.personalRating ||
-        book.metadata?.goodreadsRating ||
-        book.metadata?.amazonRating ||
-        book.metadata?.hardcoverRating || 0;
+      const bookRating = getBookRatingOnFivePointScale(book);
 
       const isRead = book.readStatus === ReadStatus.READ;
       const pageCount = book.metadata?.pageCount || 0;

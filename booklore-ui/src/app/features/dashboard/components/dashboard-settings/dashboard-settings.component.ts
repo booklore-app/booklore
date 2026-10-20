@@ -1,4 +1,5 @@
 import {Component, DestroyRef, inject, OnInit} from '@angular/core';
+import {CdkDragDrop, DragDropModule, moveItemInArray} from '@angular/cdk/drag-drop';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -30,6 +31,7 @@ export const MAX_ITEMS = 20;
     InputTextModule,
     SelectModule,
     InputNumberModule,
+    DragDropModule,
     TranslocoDirective,
     TranslocoPipe
   ],
@@ -181,6 +183,13 @@ export class DashboardSettingsComponent implements OnInit {
         [this.config.scrollers[index + 1], this.config.scrollers[index]];
       this.updateOrder();
     }
+  }
+
+  onScrollerDrop(event: CdkDragDrop<ScrollerConfig[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+
+    moveItemInArray(this.config.scrollers, event.previousIndex, event.currentIndex);
+    this.updateOrder();
   }
 
   private updateOrder(): void {

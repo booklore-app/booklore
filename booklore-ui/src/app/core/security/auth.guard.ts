@@ -2,7 +2,7 @@ import {inject} from '@angular/core';
 import {CanActivateFn, Router} from '@angular/router';
 import {AuthService} from '../../shared/service/auth.service';
 
-export const AuthGuard: CanActivateFn = (route, state) => {
+export const AuthGuard: CanActivateFn = (_route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
@@ -15,7 +15,7 @@ export const AuthGuard: CanActivateFn = (route, state) => {
         localStorage.removeItem('accessToken_Internal');
         return router.createUrlTree(['/login']);
       }
-      if (payload.isDefaultPassword) {
+      if (payload.isDefaultPassword && state.url !== '/change-password') {
         router.navigate(['/change-password']);
         return false;
       }

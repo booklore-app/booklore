@@ -1,28 +1,32 @@
-name: Feature Request
-description: Suggest a new feature or enhancement for Booklore
-title: "[Feature] "
+name: BookLore Maintenance Request
+description: Suggest a focused maintenance improvement for BookLore
+title: "[Maintenance] "
 labels: ["feature"]
 body:
   - type: markdown
     attributes:
       value: |
-        Please share as much detail as you can to help us understand your suggestion.
+        ## BookLore is in maintenance mode
+
+        Active feature development has moved to [BookOrbit](https://bookorbit.app), the official successor to BookLore. Please submit new feature ideas to the [BookOrbit issue tracker](https://github.com/bookorbit/bookorbit/issues/new/choose).
+
+        Use this form only for a small, focused BookLore maintenance improvement. Bug reports should use the bug report form.
 
   - type: textarea
     id: description
     attributes:
-      label: What's Your Idea?
-      description: Tell us about the feature you'd like to see
-      placeholder: "Example: Add a 'Currently Reading' shelf where I can track books I'm reading and see my progress"
+      label: What maintenance improvement are you proposing?
+      description: Describe the focused improvement and why it belongs in maintenance-mode BookLore rather than BookOrbit.
+      placeholder: "Describe the existing BookLore behavior and the limited improvement you are proposing."
     validations:
       required: true
 
   - type: textarea
     id: problem
     attributes:
-      label: Why Would This Be Helpful?
-      description: Help us understand the problem this solves or the value it brings
-      placeholder: "Example: Right now, it's hard to keep track of multiple books I'm reading at once. Having a dedicated shelf with progress tracking would help me stay organized"
+      label: What existing problem would this address?
+      description: Explain the impact on current BookLore installations.
+      placeholder: "Explain the current limitation and who it affects."
     validations:
       required: true
 
@@ -41,10 +45,10 @@ body:
   - type: dropdown
     id: willing-to-contribute
     attributes:
-      label: Want to Help Out?
-      description: Let us know if you'd like to be involved in making this happen
+      label: Want to help?
+      description: Let us know if you can help implement or verify this maintenance improvement.
       options:
-        - "Yes! I'd love to help implement this"
+        - "Yes! I'd love to help implement this improvement"
         - "I'm happy to help test and give feedback"
         - "Just sharing the idea for now"
     validations:
@@ -59,8 +63,10 @@ body:
   - type: checkboxes
     id: prerequisites
     attributes:
-      label: Before Submitting
-      description: Please confirm you've completed this step
+      label: Before submitting
+      description: Please confirm both items.
       options:
-        - label: I've searched existing issues and confirmed this feature hasn't been requested yet
+        - label: I've searched existing issues and confirmed this maintenance improvement has not already been requested.
+          required: true
+        - label: I understand that new feature development has moved to BookOrbit.
           required: true

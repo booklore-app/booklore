@@ -1,6 +1,5 @@
 import {inject, Injectable, Type} from '@angular/core';
-import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {GithubSupportDialog} from '../components/github-support-dialog/github-support-dialog';
+import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryCreatorComponent} from '../../features/library-creator/library-creator.component';
 import {BookUploaderComponent} from '../components/book-uploader/book-uploader.component';
 import {UserProfileDialogComponent} from '../../features/settings/user-profile-dialog/user-profile-dialog.component';
@@ -18,6 +17,7 @@ import {MetadataRefreshType} from '../../features/metadata/model/request/metadat
 import {MetadataFetchOptionsComponent} from '../../features/metadata/component/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {ShelfEditDialogComponent} from '../../features/book/components/shelf-edit-dialog/shelf-edit-dialog.component';
 import {IconPickerComponent} from '../components/icon-picker/icon-picker-component';
+import {BookOrbitTransitionDialogComponent} from '../components/bookorbit-transition-dialog/bookorbit-transition-dialog.component';
 
 /**
  * Dialog size classes - use these to control dialog dimensions
@@ -56,8 +56,8 @@ export class DialogLauncherService {
     maximizable: false,
   }
 
-  openDialog(component: unknown, options: {}): DynamicDialogRef | null {
-    return this.dialogService.open(component as Type<any>, {
+  openDialog<T>(component: Type<T>, options: DynamicDialogConfig): DynamicDialogRef<T> | null {
+    return this.dialogService.open(component, {
       ...this.defaultDialogOptions,
       ...options,
     });
@@ -70,8 +70,8 @@ export class DialogLauncherService {
     });
   }
 
-  openGithubSupportDialog(): DynamicDialogRef | null {
-    return this.openDialog(GithubSupportDialog, {
+  openBookOrbitTransitionDialog(): DynamicDialogRef | null {
+    return this.openDialog(BookOrbitTransitionDialogComponent, {
       showHeader: false,
       styleClass: `${DialogSize.MD} ${DialogStyle.MINIMAL}`,
     });

@@ -7,6 +7,7 @@ import {AppTopBarComponent} from '../layout-topbar/app.topbar.component';
 import {NgClass} from '@angular/common';
 import {ToastModule} from 'primeng/toast';
 import {LocalStorageService} from '../../../service/local-storage.service';
+import {BookOrbitAnnouncementComponent} from '../../../components/bookorbit-announcement/bookorbit-announcement.component';
 
 @Component({
   selector: 'app-layout',
@@ -14,6 +15,7 @@ import {LocalStorageService} from '../../../service/local-storage.service';
     RouterOutlet,
     AppSidebarComponent,
     AppTopBarComponent,
+    BookOrbitAnnouncementComponent,
     NgClass,
     ToastModule
   ],

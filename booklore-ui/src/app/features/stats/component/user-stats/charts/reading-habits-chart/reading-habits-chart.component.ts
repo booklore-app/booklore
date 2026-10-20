@@ -9,6 +9,7 @@ import {BookService} from '../../../../../book/service/book.service';
 import {BookState} from '../../../../../book/model/state/book-state.model';
 import {Book, ReadStatus} from '../../../../../book/model/book.model';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {getReadingProgress} from '../reading-dna-chart/reading-dna-calculations';
 
 interface ReadingHabitsProfile {
   consistency: number;
@@ -493,13 +494,7 @@ export class ReadingHabitsChartComponent implements OnInit, OnDestroy {
   }
 
   private getBookProgress(book: Book): number {
-    return Math.max(
-      book.epubProgress?.percentage || 0,
-      book.pdfProgress?.percentage || 0,
-      book.cbxProgress?.percentage || 0,
-      book.koreaderProgress?.percentage || 0,
-      book.koboProgress?.percentage || 0
-    );
+    return getReadingProgress(book);
   }
 
   private getHabitDescription(habitKey: string, score: number): string {

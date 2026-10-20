@@ -1,0 +1,55 @@
+<ng-container *transloco="let t; prefix: 'layout.bookorbitAnnouncement'">
+  <section class="bookorbit-dialog" aria-labelledby="bookorbit-dialog-title">
+    <header class="dialog-header">
+      <div class="orbit-mark" aria-hidden="true">
+        <span class="orbit-ring"></span>
+        <i class="pi pi-compass"></i>
+      </div>
+
+      <div class="header-copy">
+        <span class="eyebrow">BookOrbit</span>
+        <h2 id="bookorbit-dialog-title">{{ t('title') }}</h2>
+      </div>
+
+      <button type="button" class="close-button" (click)="close()" [attr.aria-label]="t('closeDialog')">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="dialog-content">
+      <p class="lead">{{ t('description') }}</p>
+
+      <div class="maintenance-note">
+        <i class="pi pi-shield" aria-hidden="true"></i>
+        <p>{{ t('migration') }}</p>
+      </div>
+
+      <div class="dialog-actions">
+        <a
+          class="dialog-link dialog-link-primary"
+          href="https://bookorbit.app"
+          target="_blank"
+          rel="noopener noreferrer">
+          {{ t('explore') }}
+          <i class="pi pi-external-link" aria-hidden="true"></i>
+        </a>
+        <a
+          class="dialog-link dialog-link-secondary"
+          href="https://github.com/bookorbit/bookorbit"
+          target="_blank"
+          rel="noopener noreferrer">
+          {{ t('github') }}
+          <i class="pi pi-github" aria-hidden="true"></i>
+        </a>
+        <a
+          class="dialog-link dialog-link-secondary"
+          href="https://bookorbit.app/migration/"
+          target="_blank"
+          rel="noopener noreferrer">
+          {{ t('migrationGuide') }}
+          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+</ng-container>
