@@ -1,8 +1,10 @@
 package org.booklore.model.dto;
 
+import org.booklore.config.FlexibleLocalDateDeserializer;
 import org.booklore.model.enums.MetadataProvider;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,6 +22,7 @@ public class BookMetadata {
     private String title;
     private String subtitle;
     private String publisher;
+    @JsonDeserialize(using = FlexibleLocalDateDeserializer.class)
     private LocalDate publishedDate;
     private String description;
     private String seriesName;
