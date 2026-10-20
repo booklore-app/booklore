@@ -128,16 +128,6 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
             """)
     Optional<BookEntity> findByIdWithAuthors(@Param("id") Long id);
 
-    @Query("""
-                SELECT DISTINCT b FROM BookEntity b
-                LEFT JOIN FETCH b.metadata m
-                LEFT JOIN FETCH m.authors
-                LEFT JOIN FETCH b.bookFiles
-                WHERE b.id = :id
-                AND (b.deleted IS NULL OR b.deleted = false)
-            """)
-    Optional<BookEntity> findByIdWithBookFilesAndAuthors(@Param("id") Long id);
-
     @Modifying
     @Transactional
     @Query("DELETE FROM BookEntity b WHERE b.deleted IS TRUE")

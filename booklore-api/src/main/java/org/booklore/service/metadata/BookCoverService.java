@@ -191,7 +191,7 @@ public class BookCoverService {
      * Uses square cover format appropriate for audiobooks.
      */
     public void generateCustomAudiobookCover(long bookId) {
-        BookEntity bookEntity = bookRepository.findByIdWithBookFilesAndAuthors(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findByIdWithBookFiles(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
 
         if (isAudiobookCoverLocked(bookEntity)) {
             throw ApiError.METADATA_LOCKED.createException();
