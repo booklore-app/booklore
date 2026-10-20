@@ -14,6 +14,7 @@ import java.nio.file.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -28,7 +29,7 @@ public class BookdropMonitoringService {
     private WatchService watchService;
     private Thread watchThread;
     private volatile boolean running;
-    private WatchKey watchKey;
+    private final ConcurrentHashMap<Path, WatchKey> registeredKeys = new ConcurrentHashMap<>();
     private volatile boolean paused;
     private volatile boolean disabled;
 
@@ -60,9 +61,7 @@ public class BookdropMonitoringService {
         try {
             log.info("Starting bookdrop folder monitor: {}", bookdrop);
             this.watchService = FileSystems.getDefault().newWatchService();
-            this.watchKey = bookdrop.register(watchService,
-                    StandardWatchEventKinds.ENTRY_CREATE,
-                    StandardWatchEventKinds.ENTRY_DELETE);
+            registerDirectoryRecursive(bookdrop);
             this.running = true;
             this.paused = false;
             this.watchThread = new Thread(this::processEvents, "BookdropFolderWatcher");
@@ -94,10 +93,8 @@ public class BookdropMonitoringService {
     public synchronized void pauseMonitoring() {
         if (disabled) return;
         if (!paused) {
-            if (watchKey != null) {
-                watchKey.cancel();
-                watchKey = null;
-            }
+            registeredKeys.values().forEach(WatchKey::cancel);
+            registeredKeys.clear();
             paused = true;
             log.info("Bookdrop monitoring paused.");
         } else {
@@ -108,15 +105,9 @@ public class BookdropMonitoringService {
     public synchronized void resumeMonitoring() {
         if (disabled) return;
         if (paused) {
-            try {
-                watchKey = bookdrop.register(watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE);
-                paused = false;
-                log.info("Bookdrop monitoring resumed.");
-            } catch (IOException e) {
-                log.error("Error reregistering bookdrop folder during resume", e);
-            }
+            registerDirectoryRecursive(bookdrop);
+            paused = false;
+            log.info("Bookdrop monitoring resumed.");
         } else {
             log.info("Bookdrop monitoring is not paused, cannot resume.");
         }
@@ -147,6 +138,8 @@ public class BookdropMonitoringService {
                 return;
             }
 
+            Path watchedDir = (Path) key.watchable();
+
             for (WatchEvent<?> event : key.pollEvents()) {
                 WatchEvent.Kind<?> kind = event.kind();
 
@@ -156,13 +149,14 @@ public class BookdropMonitoringService {
                 }
 
                 Path context = (Path) event.context();
-                Path fullPath = bookdrop.resolve(context);
+                Path fullPath = watchedDir.resolve(context);
 
                 log.info("Detected {} event on: {}", kind.name(), fullPath);
 
                 if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
                     if (Files.isDirectory(fullPath)) {
-                        log.info("New directory detected, scanning recursively: {}", fullPath);
+                        log.info("New directory detected, registering and scanning recursively: {}", fullPath);
+                        registerDirectoryRecursive(fullPath);
                         try (Stream<Path> pathStream = Files.walk(fullPath)) {
                             pathStream
                                     .filter(Files::isRegularFile)
@@ -184,6 +178,10 @@ public class BookdropMonitoringService {
                 } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
                     if (Files.isDirectory(fullPath)) {
                         log.info("Directory deleted: {}, performing bulk DB cleanup", fullPath);
+                        WatchKey deletedKey = registeredKeys.remove(fullPath);
+                        if (deletedKey != null) {
+                            deletedKey.cancel();
+                        }
                     } else {
                         log.info("File deleted: {}", fullPath);
                     }
@@ -193,9 +191,29 @@ public class BookdropMonitoringService {
 
             boolean valid = key.reset();
             if (!valid) {
-                log.warn("WatchKey is no longer valid");
-                break;
+                log.warn("WatchKey no longer valid for: {}", watchedDir);
+                registeredKeys.remove(watchedDir);
             }
+        }
+    }
+
+    private void registerDirectoryRecursive(Path root) {
+        try (Stream<Path> stream = Files.walk(root)) {
+            stream.filter(Files::isDirectory).forEach(dir -> {
+                if (!registeredKeys.containsKey(dir)) {
+                    try {
+                        WatchKey key = dir.register(watchService,
+                                StandardWatchEventKinds.ENTRY_CREATE,
+                                StandardWatchEventKinds.ENTRY_DELETE);
+                        registeredKeys.put(dir, key);
+                        log.debug("Registered bookdrop directory: {}", dir);
+                    } catch (IOException e) {
+                        log.warn("Failed to register bookdrop directory {}: {}", dir, e.getMessage());
+                    }
+                }
+            });
+        } catch (IOException e) {
+            log.warn("Failed to walk bookdrop directory tree {}: {}", root, e.getMessage());
         }
     }
 
