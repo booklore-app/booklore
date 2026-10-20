@@ -179,6 +179,18 @@ export class BookdropFileMetadataPickerComponent implements OnInit {
     setTimeout(() => this.authorInputValue = '');
   }
 
+  commitPendingAuthor(): void {
+    const value = this.authorInputValue?.trim();
+    if (value) {
+      const authors = this.metadataForm.get('authors')?.value || [];
+      if (!authors.includes(value)) {
+        this.metadataForm.get('authors')?.setValue([...authors, value]);
+        this.metadataForm.get('authors')?.markAsDirty();
+      }
+      this.authorInputValue = '';
+    }
+  }
+
   onAutoCompleteBlur(fieldName: string, event: Event): void {
     const target = event.target as HTMLInputElement;
     const inputValue = target?.value?.trim();

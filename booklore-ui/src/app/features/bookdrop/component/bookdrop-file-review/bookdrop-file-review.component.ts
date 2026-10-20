@@ -521,6 +521,8 @@ export class BookdropFileReviewComponent implements OnInit {
   private finalizeImport(): void {
     this.saving = true;
 
+    this.metadataPickers.forEach(p => p.commitPendingAuthor());
+
     const selectedFiles = this.getSelectedFiles();
 
     const files = selectedFiles.map(fileUi => {
