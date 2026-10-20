@@ -304,16 +304,25 @@ export class MetadataPickerComponent implements OnInit {
 
   onAuthorInputKeyUp(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      const value = this.authorInputValue?.trim();
-      if (value) {
-        const authors = this.metadataForm.get('authors')?.value || [];
-        if (!authors.includes(value)) {
-          this.metadataForm.get('authors')?.setValue([...authors, value]);
-          this.metadataForm.get('authors')?.markAsDirty();
-        }
-        this.authorInputValue = '';
-      }
+      this.commitPendingAuthor();
     }
+  }
+
+  /**
+   * The author input is a standalone ngModel, so text only reaches the
+   * `authors` control on Enter or on picking a suggestion. Anything else
+   * typed is still visible in the input but would be dropped on save, which
+   * the user only notices after a reload. Flush it before building a payload.
+   */
+  private commitPendingAuthor() {
+    const value = this.authorInputValue?.trim();
+    if (!value) return;
+    const authors = this.metadataForm.get('authors')?.value || [];
+    if (!authors.includes(value)) {
+      this.metadataForm.get('authors')?.setValue([...authors, value]);
+      this.metadataForm.get('authors')?.markAsDirty();
+    }
+    this.authorInputValue = '';
   }
 
   onAuthorInputSelect(event: AutoCompleteSelectEvent) {
@@ -360,6 +369,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   private buildMetadataWrapper(shouldLockAllFields: boolean | undefined): MetadataUpdateWrapper {
+    this.commitPendingAuthor();
     const metadata = this.buildMetadataFromForm();
 
     if (shouldLockAllFields !== undefined) {
