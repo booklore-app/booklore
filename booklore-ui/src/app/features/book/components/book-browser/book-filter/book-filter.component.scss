@@ -7,8 +7,10 @@
 }
 
 :host ::ng-deep .cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper {
-  width: calc(var(--sidebar-width, 225px) - 35px) !important;
-  min-width: unset;
+  // Fill the list's own viewport. A fixed width ignored the scrollbars and panel padding,
+  // which made every filter list scroll sideways.
+  width: 100% !important;
+  min-width: 0;
 }
 
 .book-filter-container {
@@ -110,23 +112,7 @@
   flex-shrink: 0;
 }
 
-.truncation-notice {
-  font-size: 0.75rem;
-  color: #6b7280;
-  text-align: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e5e7eb;
-}
 
-.footer-notice {
-  font-size: 0.75rem;
-  color: #6b7280;
-  text-align: center;
-  padding-top: 1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-top: 0.5rem;
-}
 
 .year-range {
   display: flex;

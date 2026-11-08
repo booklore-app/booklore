@@ -89,11 +89,6 @@
                       <p-badge class="filter-value-badge" [value]="filter.bookCount"></p-badge>
                     </div>
                   </cdk-virtual-scroll-viewport>
-                  @if (truncatedFilters[filterType]) {
-                    <div class="truncation-notice">
-                      {{ t('showingFirst100') }}
-                    </div>
-                  }
                 }
               </p-accordion-content>
             </p-accordion-panel>
@@ -101,10 +96,6 @@
         }
       }
     </p-accordion>
-
-    <div class="footer-notice">
-      {{ t('footerNote') }}
-    </div>
   </div>
 </div>
 </ng-container>

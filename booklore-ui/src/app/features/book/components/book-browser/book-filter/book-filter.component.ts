@@ -56,7 +56,6 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   filterTypes: FilterType[] = [];
   visibleFilterTypes: FilterType[] = [];
   expandedPanels: number[] = [0];
-  truncatedFilters: Record<string, boolean> = {};
 
   // What is typed in the Published Year boxes
   yearFromInput = '';

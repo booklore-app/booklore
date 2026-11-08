@@ -13,7 +13,6 @@ import {Filter, FILTER_CONFIGS, FILTER_EXTRACTORS, FilterType, FilterValue, NUME
 import {filterBooksByFilters} from '../filters/sidebar-filter';
 import {BookFilterMode} from '../../../../settings/user-management/user.service';
 
-const MAX_FILTER_ITEMS = 100;
 
 @Injectable({providedIn: 'root'})
 export class BookFilterService {
@@ -175,7 +174,7 @@ export class BookFilterService {
       ? this.sortFiltersBySortIndex(filters)
       : this.sortFiltersByCount(filters);
 
-    return sorted.slice(0, MAX_FILTER_ITEMS);
+    return sorted;
   }
 
   private sortFiltersByCount(filters: Filter[]): Filter[] {
