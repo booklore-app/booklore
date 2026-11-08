@@ -18,6 +18,7 @@ import org.booklore.repository.BookRepository;
 import org.booklore.repository.LibraryRepository;
 import org.booklore.service.file.FileFingerprint;
 import org.booklore.service.appsettings.AppSettingService;
+import org.booklore.service.book.PhysicalBookFileService;
 import org.booklore.service.file.FileMovingHelper;
 import org.booklore.service.monitoring.MonitoringRegistrationService;
 import org.booklore.service.metadata.extractor.MetadataExtractorFactory;
@@ -34,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.booklore.model.enums.AuditAction;
 import org.booklore.service.audit.AuditService;
@@ -149,6 +151,9 @@ public class FileUploadService {
                 finalPath = buildAdditionalFilePath(book, sanitizedFileName);
                 effectiveBookType = bookType;
             }
+            if (wasPhysicalBook && isBook) {
+                removePhysicalPlaceholders(book);
+            }
             validateFinalPath(finalPath);
 
             if (libraryId != null) {
@@ -183,6 +188,27 @@ public class FileUploadService {
                 }
             }
             cleanupTempFile(tempPath);
+        }
+    }
+
+    /**
+     * A physical book carries a small placeholder file. When a real digital book file is attached, the placeholder
+     * is removed so the real file becomes the book's file (and can use the same file name).
+     */
+    private void removePhysicalPlaceholders(BookEntity book) {
+        if (book.getBookFiles() == null) {
+            return;
+        }
+        final List<BookFileEntity> placeholders = book.getBookFiles().stream()
+                .filter(PhysicalBookFileService::isPlaceholder)
+                .toList();
+        for (BookFileEntity placeholder : placeholders) {
+            try {
+                Files.deleteIfExists(placeholder.getFullFilePath());
+            } catch (IOException | RuntimeException e) {
+                log.warn("Could not delete physical book placeholder for book {}: {}", book.getId(), e.getMessage());
+            }
+            book.getBookFiles().remove(placeholder);
         }
     }
 

@@ -511,6 +511,12 @@
     "title": "Filters",
     "showingFirst100": "Showing first 100 items",
     "footerNote": "Note: Top 100 items are displayed per filter category",
+    "yearFrom": "From",
+    "yearTo": "To",
+    "yearApply": "Apply",
+    "yearClear": "Clear",
+    "yearInvalid": "Enter a year with up to 4 digits",
+    "yearHint": "Use the same year in both boxes for a single year. Leave a box empty for no limit.",
     "labels": {
       "author": "Author",
       "category": "Genre",

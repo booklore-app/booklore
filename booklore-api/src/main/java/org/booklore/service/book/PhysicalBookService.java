@@ -42,6 +42,7 @@ public class PhysicalBookService {
     private final CategoryRepository categoryRepository;
     private final BookMapper bookMapper;
     private final FileService fileService;
+    private final PhysicalBookFileService physicalBookFileService;
 
     @Transactional
     public Book createPhysicalBook(CreatePhysicalBookRequest request) {
@@ -92,6 +93,10 @@ public class PhysicalBookService {
                 log.warn("Failed to download cover for physical book {}: {}", savedBook.getId(), ex.getMessage());
             }
         }
+
+        // Give the physical book a real file in its library folder (after the cover exists, so it can be embedded)
+        physicalBookFileService.attachPlaceholderFile(savedBook);
+        savedBook = bookRepository.save(savedBook);
 
         return bookMapper.toBook(savedBook);
     }

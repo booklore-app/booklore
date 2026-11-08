@@ -38,12 +38,13 @@ public class BookNoteController {
         return bookNoteService.createOrUpdateNote(request);
     }
 
-    @Operation(summary = "Delete a note", description = "Delete a specific note by its ID.")
+    @Operation(summary = "Delete a note", description = "Delete a specific note of a book by its ID.")
     @ApiResponse(responseCode = "204", description = "Note deleted successfully")
-    @DeleteMapping("/{noteId}")
+    @DeleteMapping("/book/{bookId}/{noteId}")
     public ResponseEntity<Void> deleteNote(
-            @Parameter(description = "ID of the note to delete") @PathVariable Long noteId) {
-        bookNoteService.deleteNote(noteId);
+            @Parameter(description = "ID of the book") @PathVariable Long bookId,
+            @Parameter(description = "ID of the note to delete") @PathVariable String noteId) {
+        bookNoteService.deleteNote(bookId, noteId);
         return ResponseEntity.noContent().build();
     }
 }

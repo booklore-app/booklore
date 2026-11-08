@@ -40,6 +40,13 @@ public class BookNoteEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    /**
+     * Notes now live in a file next to the book. This table is only kept as a source for the one-time
+     * import; rows are flagged once they have been written to their file.
+     */
+    @Column(name = "migrated_to_file", nullable = false)
+    private boolean migratedToFile;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

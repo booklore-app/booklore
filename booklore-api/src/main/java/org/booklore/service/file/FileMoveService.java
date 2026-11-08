@@ -17,6 +17,7 @@ import org.booklore.repository.BookAdditionalFileRepository;
 import org.booklore.repository.BookRepository;
 import org.booklore.repository.LibraryRepository;
 import org.booklore.service.NotificationService;
+import org.booklore.service.book.BookNoteFileStore;
 import org.booklore.service.metadata.sidecar.SidecarMetadataWriter;
 import org.booklore.service.monitoring.MonitoringRegistrationService;
 import org.springframework.stereotype.Service;
@@ -228,6 +229,8 @@ public class FileMoveService {
                 log.warn("Failed to move sidecar files for book ID {}: {}", bookId, e.getMessage());
             }
 
+            BookNoteFileStore.moveNotesFile(currentPrimaryFilePath, newFilePath);
+
             entityManager.clear();
 
             BookEntity fresh = bookRepository.findById(bookId).orElseThrow();
@@ -386,6 +389,8 @@ public class FileMoveService {
             } catch (Exception e) {
                 log.warn("Failed to move sidecar files for book ID {}: {}", bookEntity.getId(), e.getMessage());
             }
+
+            BookNoteFileStore.moveNotesFile(currentPrimaryFilePath, expectedPrimaryFilePath);
 
             if (isLibraryMonitoredWhenCalled) {
                 // Ensure any file system events from the move and cleanup are drained/ignored while we are still unregistered

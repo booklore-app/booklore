@@ -184,7 +184,6 @@ BookLore is free, open source, and built with care. Here's how you can give back
 | Action | How |
 |:---|:---|
 | ⭐ **Star this repo** | It's the simplest way to help others find BookLore |
-| 💰 **Sponsor development** | [Open Collective](https://opencollective.com/booklore) funds hosting, testing, and new features |
 | 📢 **Tell someone** | Share BookLore with a friend, a subreddit, or your local book club |
 
 ---

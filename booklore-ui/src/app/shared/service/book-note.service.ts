@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {API_CONFIG} from '../../core/config/api-config';
 
 export interface BookNote {
-  id: number;
+  id: string;
   userId: number;
   bookId: number;
   title: string;
@@ -14,7 +14,7 @@ export interface BookNote {
 }
 
 export interface CreateBookNoteRequest {
-  id?: number;
+  id?: string;
   bookId: number;
   title: string;
   content: string;
@@ -36,7 +36,7 @@ export class BookNoteService {
     return this.http.post<BookNote>(this.url, request);
   }
 
-  deleteNote(noteId: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${noteId}`);
+  deleteNote(bookId: number, noteId: string): Observable<void> {
+    return this.http.delete<void>(`${this.url}/book/${bookId}/${noteId}`);
   }
 }
