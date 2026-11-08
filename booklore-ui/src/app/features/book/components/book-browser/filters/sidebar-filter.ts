@@ -5,6 +5,7 @@ import {BookState} from '../../../model/state/book-state.model';
 import {fileSizeRanges, matchScoreRanges, pageCountRanges, ratingRanges} from '../book-filter/book-filter.config';
 import {Book, ReadStatus} from '../../../model/book.model';
 import {BookFilterMode} from '../../../../settings/user-management/user.service';
+import {doesYearMatchFilterValue, getBookPublishedYear} from '../book-filter/year-range';
 
 export function isRatingInRange(rating: number | undefined | null, rangeId: string | number): boolean {
   if (rating == null) return false;
@@ -102,11 +103,10 @@ export function doesBookMatchFilter(
       return effectiveMode === 'or'
         ? filterValues.some(val => book.metadata?.tags?.includes(val as string))
         : filterValues.every(val => book.metadata?.tags?.includes(val as string));
-    case 'publishedDate':
-      const bookYear = book.metadata?.publishedDate
-        ? new Date(book.metadata.publishedDate).getFullYear()
-        : null;
-      return bookYear ? filterValues.some(val => val == bookYear || val == bookYear.toString()) : false;
+    case 'publishedDate': {
+      const bookYear = getBookPublishedYear(book.metadata?.publishedDate);
+      return filterValues.some(val => doesYearMatchFilterValue(bookYear, val));
+    }
     case 'fileSize':
       return filterValues.some(range => isFileSizeInRange(book.fileSizeKb, range as string | number));
     case 'amazonRating':

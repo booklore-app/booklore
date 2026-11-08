@@ -5,6 +5,7 @@ import org.booklore.mapper.ShelfMapper;
 import org.booklore.model.dto.*;
 import org.booklore.model.entity.*;
 import org.booklore.model.enums.BookFileType;
+import org.booklore.service.book.PhysicalBookFileService;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -112,15 +113,21 @@ public interface BookMapperV2 {
 
     @Named("mapPrimaryFile")
     default BookFile mapPrimaryFile(List<BookFileEntity> bookFiles) {
-        BookFileEntity primary = getPrimaryBookFile(bookFiles);
+        // A physical book's placeholder file is not exposed, so it shows as a physical book and not as an EPUB
+        List<BookFileEntity> files = bookFiles == null ? null
+                : bookFiles.stream().filter(bf -> !PhysicalBookFileService.isHiddenPlaceholder(bf)).toList();
+        BookFileEntity primary = getPrimaryBookFile(files);
         return toBookFile(primary);
     }
 
     @Named("mapAlternativeFormats")
     default List<BookFile> mapAlternativeFormats(List<BookFileEntity> bookFiles) {
         if (bookFiles == null) return null;
-        BookFileEntity primary = getPrimaryBookFile(bookFiles);
-        return bookFiles.stream()
+        List<BookFileEntity> files = bookFiles.stream()
+                .filter(bf -> !PhysicalBookFileService.isHiddenPlaceholder(bf))
+                .toList();
+        BookFileEntity primary = getPrimaryBookFile(files);
+        return files.stream()
                 .filter(BookFileEntity::isBook)
                 .filter(bf -> !bf.equals(primary))
                 .map(this::toBookFile)
@@ -131,6 +138,7 @@ public interface BookMapperV2 {
     default List<BookFile> mapSupplementaryFiles(List<BookFileEntity> bookFiles) {
         if (bookFiles == null) return null;
         return bookFiles.stream()
+                .filter(bf -> !PhysicalBookFileService.isHiddenPlaceholder(bf))
                 .filter(bf -> !bf.isBook())
                 .map(this::toBookFile)
                 .toList();

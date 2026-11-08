@@ -1,4 +1,5 @@
 import {Book, ReadStatus} from '../../../model/book.model';
+import {getBookPublishedYear} from './year-range';
 
 // ============================================================================
 // TYPES
@@ -221,10 +222,10 @@ export const FILTER_EXTRACTORS: Readonly<Record<Exclude<FilterType, 'library'>, 
   },
   tag: (book) => extractStringsAsFilters(book.metadata?.tags),
   publishedDate: (book) => {
-    const date = book.metadata?.publishedDate;
-    if (!date) return [];
-    const year = new Date(date).getFullYear().toString();
-    return [{id: year, name: year}];
+    const year = getBookPublishedYear(book.metadata?.publishedDate);
+    if (year == null) return [];
+    // Negative sortIndex lists the newest year first
+    return [{id: year.toString(), name: year.toString(), sortIndex: -year}];
   },
   fileSize: (book) => findInRange(book.fileSizeKb, FILE_SIZE_RANGES),
   amazonRating: (book) => findInRange(book.metadata?.amazonRating, RATING_RANGES_5),
@@ -349,7 +350,7 @@ export const FILTER_CONFIGS: Readonly<Record<Exclude<FilterType, 'library'>, Omi
   shelf: {label: 'Shelf', sortMode: 'count', isNumericId: true},
   shelfStatus: {label: 'Shelf Status', sortMode: 'count'},
   tag: {label: 'Tag', sortMode: 'count'},
-  publishedDate: {label: 'Published Year', sortMode: 'count'},
+  publishedDate: {label: 'Published Year', sortMode: 'sortIndex'},
   fileSize: {label: 'File Size', sortMode: 'sortIndex', isNumericId: true},
   amazonRating: {label: 'Amazon Rating', sortMode: 'sortIndex', isNumericId: true},
   goodreadsRating: {label: 'Goodreads Rating', sortMode: 'sortIndex', isNumericId: true},

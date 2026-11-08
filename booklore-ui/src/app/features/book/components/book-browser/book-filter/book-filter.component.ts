@@ -7,12 +7,15 @@ import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'prim
 import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {Badge} from 'primeng/badge';
+import {Button} from 'primeng/button';
+import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
 import {SelectButton} from 'primeng/selectbutton';
 import {BookFilterMode, DEFAULT_VISIBLE_FILTERS, UserService, VisibleFilterType} from '../../../../settings/user-management/user.service';
 import {MagicShelf} from '../../../../magic-shelf/service/magic-shelf.service';
 import {Filter, FILTER_LABEL_KEYS, FilterType} from './book-filter.config';
 import {BookFilterService} from './book-filter.service';
+import {buildYearFilterValue, parseYearFilterValue, parseYearInput} from './year-range';
 import {filter} from 'rxjs/operators';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 
@@ -27,7 +30,7 @@ type FilterModeOption = { label: string; value: BookFilterMode };
   imports: [
     Accordion, AccordionPanel, AccordionHeader, AccordionContent,
     CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf,
-    NgClass, Badge, AsyncPipe, FormsModule, SelectButton,
+    NgClass, Badge, AsyncPipe, FormsModule, SelectButton, Button, InputText,
     TranslocoDirective
   ]
 })
@@ -54,6 +57,11 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   visibleFilterTypes: FilterType[] = [];
   expandedPanels: number[] = [0];
   truncatedFilters: Record<string, boolean> = {};
+
+  // What is typed in the Published Year boxes
+  yearFromInput = '';
+  yearToInput = '';
+  yearInputInvalid = false;
 
   private _selectedFilterMode: BookFilterMode = 'and';
   private _visibleFilters: VisibleFilterType[] = [...DEFAULT_VISIBLE_FILTERS];
@@ -113,8 +121,42 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   clearActiveFilter(): void {
     this.activeFilters = {};
     this.expandedPanels = [0];
+    this.syncYearInputs();
     this.activeFilters$.next(null);
     this.filterSelected.emit(null);
+  }
+
+  /** Applies the From / To years as one filter value, replacing any earlier Published Year selection. */
+  applyYearRange(): void {
+    const from = parseYearInput(this.yearFromInput);
+    const to = parseYearInput(this.yearToInput);
+    if (from === undefined || to === undefined) {
+      this.yearInputInvalid = true;
+      return;
+    }
+    this.yearInputInvalid = false;
+
+    const token = buildYearFilterValue(from, to);
+    if (token === null) {
+      this.clearYearRange();
+      return;
+    }
+
+    this.activeFilters = this._selectedFilterMode === 'single'
+      ? {publishedDate: [token]}
+      : {...this.activeFilters, publishedDate: [token]};
+    this.emitFilters();
+  }
+
+  /** Removes every Published Year selection and empties the boxes. */
+  clearYearRange(): void {
+    this.yearInputInvalid = false;
+    delete this.activeFilters['publishedDate'];
+    this.emitFilters();
+  }
+
+  hasYearSelection(): boolean {
+    return !!this.activeFilters['publishedDate']?.length || !!this.yearFromInput || !!this.yearToInput;
   }
 
   onExpandedPanelsChange(value: string | number | string[] | number[] | null | undefined): void {
@@ -223,8 +265,19 @@ export class BookFilterComponent implements OnInit, OnDestroy {
   private emitFilters(): void {
     const hasFilters = Object.keys(this.activeFilters).length > 0;
     const filtersToEmit = hasFilters ? {...this.activeFilters} : null;
+    this.syncYearInputs();
     this.activeFilters$.next(filtersToEmit);
     this.filterSelected.emit(filtersToEmit);
+  }
+
+  /** Keeps the From / To boxes in line with the active Published Year selection (URL, reset, list clicks). */
+  private syncYearInputs(): void {
+    const tokens = this.activeFilters['publishedDate'] ?? [];
+    const rangeToken = tokens.find(v => String(v).includes('-')) ?? (tokens.length === 1 ? tokens[0] : undefined);
+    const range = rangeToken === undefined ? null : parseYearFilterValue(rangeToken);
+    this.yearFromInput = range?.from != null ? String(range.from) : '';
+    this.yearToInput = range?.to != null ? String(range.to) : '';
+    this.yearInputInvalid = false;
   }
 
   private updateExpandedPanels(): void {

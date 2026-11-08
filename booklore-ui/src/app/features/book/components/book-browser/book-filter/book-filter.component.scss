@@ -127,3 +127,39 @@
   padding-right: 1rem;
   margin-top: 0.5rem;
 }
+
+.year-range {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+
+.year-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.year-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.year-range-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.year-range-error {
+  font-size: 0.75rem;
+  color: var(--p-red-400);
+}
+
+.year-range-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
