@@ -9,20 +9,13 @@
 <p align="center"><strong>Your books deserve a home. This is it.</strong></p>
 
 <p align="center">
+| | This is a fork, to continue the improvements, forked on 30, sep 2026 | |
+</p>
+
+<p align="center">
 BookLore is a self-hosted app that brings your entire book collection under one roof.<br/>
 Organize, read, annotate, sync across devices, and share, all without relying on third-party services.
 </p>
-
-> [!IMPORTANT]
-> ## BookOrbit is the next chapter of BookLore
->
-> **[BookOrbit](https://bookorbit.app)** is BookLore's official successor and the home of active development. It expands BookLore into a complete self-hosted reading platform for ebooks, PDFs, comics, and audiobooks, with richer readers and sync, automation, reading insights, integrations, and a native offline-capable iOS app with Apple Watch audiobook playback in development.
->
-> BookLore is entering maintenance mode and will continue to receive occasional maintenance, bug fixes, and security updates. Moving is optional, with a guided migration available whenever you are ready.
->
-> **[Visit BookOrbit](https://bookorbit.app)** · **[View on GitHub](https://github.com/bookorbit/bookorbit)** · **[Read the migration guide](https://bookorbit.app/migration/)**
-
----
 
 ## ✨ Features
 
@@ -179,39 +172,12 @@ volumes:
 
 ## 💜 Support BookLore
 
-BookLore is free, open source, and built with care. Here's how you can give back:
+BookLore is free, open source, and built with care. Here's how you can give back to the actual booklore team:
 
 | Action | How |
 |:---|:---|
 | ⭐ **Star this repo** | It's the simplest way to help others find BookLore |
 | 📢 **Tell someone** | Share BookLore with a friend, a subreddit, or your local book club |
-
----
-
-## 🌍 Translations
-
-BookLore is used by readers around the world. Help make it accessible in your language on [Weblate](https://hosted.weblate.org/engage/booklore/).
-
-<a href="https://hosted.weblate.org/engage/booklore/">
-  <img src="https://hosted.weblate.org/widget/booklore/multi-auto.svg?v=1" alt="Translation status" />
-</a>
-
----
-
-## 🌟 Sponsors & Partners
-
-<table>
-<tr>
-
-<a href="https://jb.gg/OpenSource">
-  <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg" alt="JetBrains" height="40" />
-</a>
-
-
-</td>
-</tr>
-</table>
-</div>
 
 ---
 
