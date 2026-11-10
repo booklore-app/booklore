@@ -2,7 +2,7 @@ import {combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BookFilter} from './BookFilter';
 import {BookState} from '../../../model/state/book-state.model';
-import {fileSizeRanges, matchScoreRanges, pageCountRanges, ratingRanges} from '../book-filter/book-filter.config';
+import {fileSizeRanges, isValueMissing, matchScoreRanges, NO_VALUE_ID, pageCountRanges, ratingRanges} from '../book-filter/book-filter.config';
 import {Book, ReadStatus} from '../../../model/book.model';
 import {BookFilterMode} from '../../../../settings/user-management/user.service';
 import {doesYearMatchFilterValue, getBookPublishedYear} from '../book-filter/year-range';
@@ -51,6 +51,12 @@ export function doesBookMatchReadStatus(book: Book, selected: unknown[]): boolea
   return selected.includes(status);
 }
 
+// Filters where selecting several values in AND mode means the book must have all of them
+const MATCH_ALL_FILTERS = new Set<string>([
+  'author', 'category', 'series', 'publisher', 'tag', 'mood',
+  'comicCharacter', 'comicTeam', 'comicLocation', 'comicCreator'
+]);
+
 export function doesBookMatchFilter(
   book: Book,
   filterType: string,
@@ -62,6 +68,16 @@ export function doesBookMatchFilter(
   }
 
   const effectiveMode = mode === 'not' ? 'or' : mode;
+
+  // "No ..." entry: matches books that have no value for this filter, alone or together with other values
+  if (filterValues.includes(NO_VALUE_ID)) {
+    const otherValues = filterValues.filter(v => v !== NO_VALUE_ID);
+    // A book cannot both have no value and have all of several values
+    if (effectiveMode !== 'or' && MATCH_ALL_FILTERS.has(filterType) && otherValues.length > 0) return false;
+    if (isValueMissing(book, filterType)) return true;
+    if (otherValues.length === 0) return false;
+    filterValues = otherValues;
+  }
 
   switch (filterType) {
     case 'author':

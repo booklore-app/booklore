@@ -13,7 +13,7 @@ import {FormsModule} from '@angular/forms';
 import {SelectButton} from 'primeng/selectbutton';
 import {BookFilterMode, DEFAULT_VISIBLE_FILTERS, UserService, VisibleFilterType} from '../../../../settings/user-management/user.service';
 import {MagicShelf} from '../../../../magic-shelf/service/magic-shelf.service';
-import {Filter, FILTER_LABEL_KEYS, FilterType} from './book-filter.config';
+import {Filter, FILTER_LABEL_KEYS, FilterType, NO_VALUE_ID} from './book-filter.config';
 import {BookFilterService} from './book-filter.service';
 import {buildYearFilterValue, parseYearFilterValue, parseYearInput} from './year-range';
 import {filter} from 'rxjs/operators';
@@ -179,6 +179,10 @@ export class BookFilterComponent implements OnInit, OnDestroy {
     return typeof value === 'object' && value !== null && 'id' in value
       ? value.id
       : f.value;
+  }
+
+  isNoValueEntry(f: Filter): boolean {
+    return this.getFilterValueId(f) === NO_VALUE_ID;
   }
 
   getFilterValueDisplay(f: Filter): string {

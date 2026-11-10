@@ -149,3 +149,8 @@
   font-size: 0.75rem;
   color: #6b7280;
 }
+
+// The "No ..." entry for books without a value
+.filter-value-text.no-value {
+  font-style: italic;
+}

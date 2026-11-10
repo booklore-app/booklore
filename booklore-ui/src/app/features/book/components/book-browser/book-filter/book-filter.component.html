@@ -85,7 +85,7 @@
                     'active-not': activeFilters[filterType]?.includes(getFilterValueId(filter)) && selectedFilterMode === 'not'
                   }"
                       (click)="handleFilterClick(filterType, getFilterValueId(filter))">
-                      <span class="filter-value-text">{{ getFilterValueDisplay(filter) }}</span>
+                      <span class="filter-value-text" [class.no-value]="isNoValueEntry(filter)">{{ getFilterValueDisplay(filter) }}</span>
                       <p-badge class="filter-value-badge" [value]="filter.bookCount"></p-badge>
                     </div>
                   </cdk-virtual-scroll-viewport>
