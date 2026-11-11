@@ -1,4 +1,5 @@
 import {Book, ReadStatus} from '../../../model/book.model';
+import {getBookPublishedYear} from './year-range';
 
 // ============================================================================
 // TYPES
@@ -221,10 +222,10 @@ export const FILTER_EXTRACTORS: Readonly<Record<Exclude<FilterType, 'library'>, 
   },
   tag: (book) => extractStringsAsFilters(book.metadata?.tags),
   publishedDate: (book) => {
-    const date = book.metadata?.publishedDate;
-    if (!date) return [];
-    const year = new Date(date).getFullYear().toString();
-    return [{id: year, name: year}];
+    const year = getBookPublishedYear(book.metadata?.publishedDate);
+    if (year == null) return [];
+    // Negative sortIndex lists the newest year first
+    return [{id: year.toString(), name: year.toString(), sortIndex: -year}];
   },
   fileSize: (book) => findInRange(book.fileSizeKb, FILE_SIZE_RANGES),
   amazonRating: (book) => findInRange(book.metadata?.amazonRating, RATING_RANGES_5),
@@ -270,6 +271,66 @@ export const FILTER_EXTRACTORS: Readonly<Record<Exclude<FilterType, 'library'>, 
     return creators;
   }
 };
+
+// ============================================================================
+// BOOKS WITHOUT A VALUE
+// ============================================================================
+
+/** Id of the list entry that stands for "this book has no value for this filter". */
+export const NO_VALUE_ID = '__none__';
+
+export interface MissingValueConfig {
+  /** Name of the list entry, e.g. "No Series" */
+  label: string;
+  /** Limits which books count as "missing", for filters that only make sense for some kinds of book */
+  appliesTo?: (book: Book) => boolean;
+}
+
+const isAudiobook = (book: Book): boolean => book.primaryFile?.bookType === 'AUDIOBOOK';
+const isComic = (book: Book): boolean => book.primaryFile?.bookType === 'CBX';
+
+/**
+ * Filters that leave a book out of their list when it has no value, and so get a "No ..." entry.
+ * Read Status, Shelf Status, File Format and Library are left out because every book already has a value there.
+ */
+export const MISSING_VALUE_FILTERS: Readonly<Partial<Record<FilterType, MissingValueConfig>>> = {
+  author: {label: 'No Author'},
+  category: {label: 'No Genre'},
+  series: {label: 'No Series'},
+  publisher: {label: 'No Publisher'},
+  tag: {label: 'No Tag'},
+  mood: {label: 'No Mood'},
+  language: {label: 'No Language'},
+  publishedDate: {label: 'No Year'},
+  personalRating: {label: 'No Personal Rating'},
+  matchScore: {label: 'No Match Score'},
+  amazonRating: {label: 'No Amazon Rating'},
+  goodreadsRating: {label: 'No Goodreads Rating'},
+  hardcoverRating: {label: 'No Hardcover Rating'},
+  pageCount: {label: 'No Page Count'},
+  fileSize: {label: 'No File Size'},
+  ageRating: {label: 'No Age Rating'},
+  contentRating: {label: 'No Content Rating'},
+  narrator: {label: 'No Narrator', appliesTo: isAudiobook},
+  comicCharacter: {label: 'No Character', appliesTo: isComic},
+  comicTeam: {label: 'No Team', appliesTo: isComic},
+  comicLocation: {label: 'No Location', appliesTo: isComic},
+  comicCreator: {label: 'No Creator', appliesTo: isComic}
+};
+
+/** The list entry for books that have no value, or null when this filter has no such entry for the book. */
+export function getNoValueEntry(book: Book, filterType: string): FilterValue | null {
+  const config = MISSING_VALUE_FILTERS[filterType as FilterType];
+  if (!config || (config.appliesTo && !config.appliesTo(book))) return null;
+  return {id: NO_VALUE_ID, name: config.label, sortIndex: Number.MIN_SAFE_INTEGER};
+}
+
+/** True when the filter would otherwise have nothing to show for this book. */
+export function isValueMissing(book: Book, filterType: string): boolean {
+  if (!getNoValueEntry(book, filterType)) return false;
+  const extractor = FILTER_EXTRACTORS[filterType as Exclude<FilterType, 'library'>];
+  return !!extractor && extractor(book).length === 0;
+}
 
 // Translation key for each FilterType — used by UI components to translate filter labels
 export const FILTER_LABEL_KEYS: Readonly<Record<FilterType, string>> = {
@@ -349,7 +410,7 @@ export const FILTER_CONFIGS: Readonly<Record<Exclude<FilterType, 'library'>, Omi
   shelf: {label: 'Shelf', sortMode: 'count', isNumericId: true},
   shelfStatus: {label: 'Shelf Status', sortMode: 'count'},
   tag: {label: 'Tag', sortMode: 'count'},
-  publishedDate: {label: 'Published Year', sortMode: 'count'},
+  publishedDate: {label: 'Published Year', sortMode: 'sortIndex'},
   fileSize: {label: 'File Size', sortMode: 'sortIndex', isNumericId: true},
   amazonRating: {label: 'Amazon Rating', sortMode: 'sortIndex', isNumericId: true},
   goodreadsRating: {label: 'Goodreads Rating', sortMode: 'sortIndex', isNumericId: true},

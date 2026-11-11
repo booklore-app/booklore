@@ -9,11 +9,10 @@ import {LibraryService} from '../../../service/library.service';
 import {BookRuleEvaluatorService} from '../../../../magic-shelf/service/book-rule-evaluator.service';
 import {GroupRule} from '../../../../magic-shelf/component/magic-shelf-component';
 import {EntityType} from '../book-browser.component';
-import {Filter, FILTER_CONFIGS, FILTER_EXTRACTORS, FilterType, FilterValue, NUMERIC_ID_FILTER_TYPES, SortMode} from './book-filter.config';
+import {Filter, FILTER_CONFIGS, FILTER_EXTRACTORS, FilterType, FilterValue, getNoValueEntry, NO_VALUE_ID, NUMERIC_ID_FILTER_TYPES, SortMode} from './book-filter.config';
 import {filterBooksByFilters} from '../filters/sidebar-filter';
 import {BookFilterMode} from '../../../../settings/user-management/user.service';
 
-const MAX_FILTER_ITEMS = 100;
 
 @Injectable({providedIn: 'root'})
 export class BookFilterService {
@@ -72,6 +71,7 @@ export class BookFilterService {
   }
 
   processFilterValue(key: string, value: unknown): unknown {
+    if (value === NO_VALUE_ID) return value;
     if (NUMERIC_ID_FILTER_TYPES.has(key as FilterType) && typeof value === 'string') {
       return Number(value);
     }
@@ -109,7 +109,7 @@ export class BookFilterService {
     return combineLatest([books$, activeFilters$, filterMode$]).pipe(
       map(([books, activeFilters, mode]) => {
         const filteredBooks = filterBooksByFilters(books, activeFilters, mode, filterType);
-        return this.buildAndSortFilters(filteredBooks, extractor, sortMode);
+        return this.buildAndSortFilters(filteredBooks, extractor, sortMode, filterType);
       }),
       shareReplay({bufferSize: 1, refCount: true})
     );
@@ -156,12 +156,19 @@ export class BookFilterService {
   private buildAndSortFilters(
     books: Book[],
     extractor: (book: Book) => FilterValue[],
-    sortMode: SortMode
+    sortMode: SortMode,
+    filterType: FilterType
   ): Filter[] {
     const filterMap = new Map<unknown, Filter>();
 
     for (const book of books) {
-      for (const item of extractor(book)) {
+      let items = extractor(book);
+      if (items.length === 0) {
+        // Books with no value still get an entry, so they can be found
+        const noValue = getNoValueEntry(book, filterType);
+        if (noValue) items = [noValue];
+      }
+      for (const item of items) {
         const id = item.id;
         if (!filterMap.has(id)) {
           filterMap.set(id, {value: item, bookCount: 0});
@@ -175,7 +182,16 @@ export class BookFilterService {
       ? this.sortFiltersBySortIndex(filters)
       : this.sortFiltersByCount(filters);
 
-    return sorted.slice(0, MAX_FILTER_ITEMS);
+    return this.pinNoValueFirst(sorted);
+  }
+
+  /** Keeps the "No ..." entry at the top, where it cannot get lost at the end of a long list. */
+  private pinNoValueFirst(filters: Filter[]): Filter[] {
+    const index = filters.findIndex(f => (f.value as FilterValue).id === NO_VALUE_ID);
+    if (index > 0) {
+      filters.unshift(...filters.splice(index, 1));
+    }
+    return filters;
   }
 
   private sortFiltersByCount(filters: Filter[]): Filter[] {

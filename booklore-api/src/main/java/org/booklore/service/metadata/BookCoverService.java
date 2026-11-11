@@ -1,5 +1,6 @@
 package org.booklore.service.metadata;
 
+import org.booklore.service.book.PhysicalBookFileService;
 import org.booklore.config.AppProperties;
 import org.booklore.exception.ApiError;
 import org.booklore.model.dto.settings.MetadataPersistenceSettings;
@@ -321,7 +322,7 @@ public class BookCoverService {
                         transactionTemplate.execute(status -> {
                             bookRepository.findById(bookInfo.id()).ifPresent(book -> {
                                 var primaryFile = book.getPrimaryBookFile();
-                                if (primaryFile == null) {
+                                if (primaryFile == null || PhysicalBookFileService.isHiddenPlaceholder(primaryFile)) {
                                     log.warn("{}Skipping physical book ID {} ({}) - no file to regenerate cover from", progress, book.getId(), bookInfo.title());
                                     return;
                                 }

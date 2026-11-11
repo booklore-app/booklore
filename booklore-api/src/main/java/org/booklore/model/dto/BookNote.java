@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookNote {
-    private Long id;
+    private String id;
     private Long userId;
     private Long bookId;
     private String title;

@@ -34,6 +34,45 @@
 
               <p-accordion-content>
                 @if (expandedPanels.includes(i)) {
+                  @if (filterType === 'publishedDate') {
+                    <div class="year-range">
+                      <div class="year-range-inputs">
+                        <input
+                          pInputText
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="4"
+                          class="year-input"
+                          [class.p-invalid]="yearInputInvalid"
+                          [placeholder]="t('yearFrom')"
+                          [attr.aria-label]="t('yearFrom')"
+                          [(ngModel)]="yearFromInput"
+                          (keydown.enter)="applyYearRange()"/>
+                        <span class="year-range-dash">&ndash;</span>
+                        <input
+                          pInputText
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="4"
+                          class="year-input"
+                          [class.p-invalid]="yearInputInvalid"
+                          [placeholder]="t('yearTo')"
+                          [attr.aria-label]="t('yearTo')"
+                          [(ngModel)]="yearToInput"
+                          (keydown.enter)="applyYearRange()"/>
+                      </div>
+                      <div class="year-range-actions">
+                        <p-button [label]="t('yearApply')" size="small" (click)="applyYearRange()"></p-button>
+                        @if (hasYearSelection()) {
+                          <p-button [label]="t('yearClear')" size="small" severity="secondary" [text]="true" (click)="clearYearRange()"></p-button>
+                        }
+                      </div>
+                      @if (yearInputInvalid) {
+                        <div class="year-range-error">{{ t('yearInvalid') }}</div>
+                      }
+                      <div class="year-range-hint">{{ t('yearHint') }}</div>
+                    </div>
+                  }
                   <cdk-virtual-scroll-viewport
                     [itemSize]="28"
                     [style.height.px]="getVirtualScrollHeight(filters.length)"
@@ -46,15 +85,10 @@
                     'active-not': activeFilters[filterType]?.includes(getFilterValueId(filter)) && selectedFilterMode === 'not'
                   }"
                       (click)="handleFilterClick(filterType, getFilterValueId(filter))">
-                      <span class="filter-value-text">{{ getFilterValueDisplay(filter) }}</span>
+                      <span class="filter-value-text" [class.no-value]="isNoValueEntry(filter)">{{ getFilterValueDisplay(filter) }}</span>
                       <p-badge class="filter-value-badge" [value]="filter.bookCount"></p-badge>
                     </div>
                   </cdk-virtual-scroll-viewport>
-                  @if (truncatedFilters[filterType]) {
-                    <div class="truncation-notice">
-                      {{ t('showingFirst100') }}
-                    </div>
-                  }
                 }
               </p-accordion-content>
             </p-accordion-panel>
@@ -62,10 +96,6 @@
         }
       }
     </p-accordion>
-
-    <div class="footer-notice">
-      {{ t('footerNote') }}
-    </div>
   </div>
 </div>
 </ng-container>
