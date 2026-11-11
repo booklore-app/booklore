@@ -168,19 +168,6 @@ volumes:
   - ./bookdrop:/bookdrop
 ```
 
----
-
-## 💜 Support BookLore
-
-BookLore is free, open source, and built with care. Here's how you can give back to the actual booklore team:
-
-| Action | How |
-|:---|:---|
-| ⭐ **Star this repo** | It's the simplest way to help others find BookLore |
-| 📢 **Tell someone** | Share BookLore with a friend, a subreddit, or your local book club |
-
----
-
 <div align="center">
 
 ## ⚖️ License
